@@ -1,0 +1,39 @@
+{
+ "type": "object",
+ "properties": {
+  "headline": {
+   "type": "string"
+  },
+  "leaning": {
+   "type": "string",
+   "enum": [
+    "pattern_consistent_with_upcoding",
+    "pattern_consistent_with_high_acuity_panel",
+    "inconclusive"
+   ]
+  },
+  "rationale": {
+   "type": "string"
+  },
+  "cited_claim_ids": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "next_steps": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  }
+ },
+ "required": [
+  "headline",
+  "leaning",
+  "rationale",
+  "cited_claim_ids",
+  "next_steps"
+ ],
+ "additionalProperties": false
+}
