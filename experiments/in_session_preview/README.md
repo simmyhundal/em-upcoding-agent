@@ -22,3 +22,9 @@ All three leanings matched. P0014 is the useful one: it had the highest plain z-
 - Not the Opus 5.5 API call: no schema-constrained output, no fixed effort setting, and the writer knew the project context.
 - The packet gives the writer the complexity-by-complexity numbers, so the leaning is largely readable off the packet; a weaker or cold model may do worse.
 - Do not treat this as ground truth or as the eval. The eval metrics are in `reports/eval_report.md`.
+
+## Correction (added later)
+The P0215 summary says the high-complexity examples "all three ... come from one patient". That was wrong: I had only
+looked at the first three claims printed from the packet. The packet's high-complexity sample has 10 claims across
+7 different patients. The leaning and the other numbers are unaffected, but that sentence overstated a concern.
+Lesson: a summary is only as good as the part of the packet its writer actually read.
