@@ -38,3 +38,8 @@ A plain z-score on 99215 share puts 7 of 8 upcoders, 3 of 8 hard negatives and 1
 
 ## Tests
 `python tests/test_generate_synthetic.py` checks determinism, role counts, that the agent-visible files do not leak ground truth, and that only upcoders bill above the justified level.
+
+## Baseline 2 result (risk-adjusted, seed 42)
+Top 25 flagged: 8 of 8 upcoders, 3 of 8 hard negatives, 14 of 200 normal providers. Upcoder ranks 1-10 (plain z-score: 2-35). Hard negatives still rank 5, 12 and 22.
+
+Why risk adjustment does not clear the hard negatives: it only uses the chronic-condition count. In the generator, providers also differ in a legitimate way that complexity does not explain (a coding-style effect and a separate provider-level propensity for 99215). Those providers look like outliers even after adjusting for patient complexity. That is a property of how the data was built, not a bug in the baseline.

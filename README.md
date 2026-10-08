@@ -56,4 +56,11 @@ reports/          results and failure-mode write-ups
 - **Milestone 2 - Path A (parked):** the LLM judges from synthetic clinical notes. Not being worked on.
 
 ## Status
-Synthetic data generator and Baseline 1 (plain z-score) done. Next: risk-adjusted baseline, flagging, case summaries, eval. First scorecard line, plain z-score top 25: 7/8 upcoders found, 3/8 hard negatives and 15/200 normal providers falsely flagged. Details in `docs/synthetic_data.md`.
+Done: synthetic data generator, Baseline 1 (plain z-score), Baseline 2 (risk-adjusted). Next: flagging, case summaries, eval. Scorecard so far (top 25 flagged, seed 42):
+
+| Method | Upcoders found | Hard negatives falsely flagged | Normal providers falsely flagged |
+|---|---|---|---|
+| Plain z-score | 7 / 8 | 3 / 8 | 15 / 200 |
+| Risk-adjusted | 8 / 8 | 3 / 8 | 14 / 200 |
+
+Risk adjustment ranks upcoders higher (ranks 1-10 vs 2-35) but flags the same number of hard negatives. Details in `docs/synthetic_data.md`.
