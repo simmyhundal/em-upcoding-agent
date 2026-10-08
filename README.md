@@ -33,6 +33,14 @@ eval/             eval harness and rubric
 reports/          results and failure-mode write-ups
 ```
 
+## Baseline data caveats
+`data/baselines/em_specialty_baselines.json` is built by `src/build_baselines.py` from the CMS file above. Read these before relying on it:
+- **Small-cell suppression biases shares upward.** CMS hides provider-code rows with 10 or fewer beneficiaries, so low-volume codes (mostly 99211/99212) drop out. Each provider's 99214+99215 share is therefore inflated, and some providers show 100% only because one code is visible. Treat the shares as biased, not as true billing mix.
+- **Not a national sample.** It covers all individual providers in five states (OH, NC, WA, GA, MI), not a random national draw.
+- **Data year is unverified.** The JSON records `UNVERIFIED` until the release year is confirmed on data.cms.gov.
+- **Office-visit codes only.** Established-patient 99211-99215; new-patient codes (99202-99205) are excluded.
+- **Privacy.** NPIs are used only to group rows, then replaced by a discarded salted hash. Only specialty-level distributions are saved; no provider-level rows.
+
 ## Ground rules
 - Synthetic data only. No real claims, no PHI.
 - Never flag real, named providers, even from public data.
