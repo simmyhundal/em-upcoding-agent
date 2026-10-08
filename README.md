@@ -56,7 +56,7 @@ reports/          results and failure-mode write-ups
 - **Milestone 2 - Path A (parked):** the LLM judges from synthetic clinical notes. Not being worked on.
 
 ## Status
-Done: synthetic data generator, both baselines, flagging step. Case-summary step is written and tested with a fake LLM, but not yet run against the real API (needs an API key in `.env`). Citation guardrail done (tested with fake summaries). Next: eval harness; live run of the summary step. Scorecard so far (top 25 flagged, seed 42):
+Done: synthetic data generator, both baselines, flagging step. Case-summary step is written and tested with a fake LLM, but not yet run against the real API (needs an API key in `.env`). Citation guardrail done (tested with fake summaries). Eval harness written (`eval/run_eval.py`, report in `reports/eval_report.md`); its two LLM metrics are pending the live run of the summary step. Scorecard so far (top 25 flagged, seed 42):
 
 | Method | Upcoders found | Hard negatives falsely flagged | Normal providers falsely flagged |
 |---|---|---|---|
