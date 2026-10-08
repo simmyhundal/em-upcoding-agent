@@ -42,6 +42,41 @@ def test_fake_llm_roundtrip_records_citations_unchecked():
     assert set(out[0]["summary"]) == set(cs.SCHEMA["properties"])
 
 
+def _packets():
+    return [r["packet"] for r in cs.run(D, FLAGGED, os.path.join(D, "p2.jsonl"), dry_run=True)]
+
+
+def test_sampler_is_deterministic():
+    a = json.dumps(_packets(), sort_keys=True)
+    b = json.dumps(_packets(), sort_keys=True)
+    assert a == b
+
+
+def test_sampler_sizes_and_distinct_patients_when_possible():
+    LOW = "99215_claims_on_low_complexity_patients_0_or_1_conditions"
+    HIGH = "99215_claims_on_high_complexity_patients_4_plus_conditions"
+    for p in _packets():
+        for key, cap in ((LOW, cs.LOW_COMPLEXITY_SAMPLE), (HIGH, cs.HIGH_COMPLEXITY_SAMPLE)):
+            lst = p[key]
+            assert len(lst) <= cap
+            assert len({c["patient_id"] for c in lst}) >= min(len(lst), 3) or len(lst) <= 3
+        cmp_ = p["comparison_claims_other_than_99215_random_sample"]
+        assert len(cmp_) <= cs.COMPARISON_SAMPLE and all(c["cpt"] != "99215" for c in cmp_)
+
+
+def test_sample_claims_stratifies_and_prefers_distinct_patients():
+    import random
+    rows = [{"claim_id": f"C{i:03d}", "patient_id": f"A{i % 2}", "g": "x"} for i in range(20)]       # 2 patients
+    rows += [{"claim_id": f"D{i:03d}", "patient_id": f"B{i}", "g": "y"} for i in range(20)]           # 20 patients
+    out = cs.sample_claims(random.Random(1), rows, 6, lambda r: r["g"])
+    assert len(out) == 6 and {r["g"] for r in out} == {"x", "y"}
+    ys = [r for r in out if r["g"] == "y"]
+    assert len({r["patient_id"] for r in ys}) == len(ys)           # distinct where possible
+    # falls back to repeats only when patients run out
+    only_two = cs.sample_claims(random.Random(1), rows[:20], 5, lambda r: r["g"])
+    assert len(only_two) == 5 and len({r["patient_id"] for r in only_two}) == 2
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

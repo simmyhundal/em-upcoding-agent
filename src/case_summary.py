@@ -15,12 +15,15 @@ import argparse
 import csv
 import json
 import os
+import random
 from collections import Counter, defaultdict
 
 MODEL = os.environ.get("CASE_SUMMARY_MODEL", "claude-opus-5-5")
 FALLBACK_BETA = "server-side-fallback-2026-07-01"
 LOW_COMPLEXITY_SAMPLE = 25    # 99215 claims on the least complex patients
 HIGH_COMPLEXITY_SAMPLE = 10   # 99215 claims on the most complex patients
+COMPARISON_SAMPLE = 10        # non-99215 claims, stratified by complexity, for comparison
+SAMPLER_SEED = "case-summary-v1"
 
 SCHEMA = {
     "type": "object",
@@ -44,6 +47,7 @@ Your job is to explain, for an investigator, whether the billing pattern looks l
 legitimately sicker patient panel, using only the evidence packet you are given.
 
 Rules:
+- The claim lists in the packet are random samples, not every claim. Do not generalize from them beyond what the tables show.
 - Ground every factual statement in the packet. Cite claim IDs only from the packet's claim lists, and never invent one.
 - Compare billed level to patient complexity: a high 99215 share on complex patients is expected; the same share
   on low-complexity patients is the concern.
@@ -70,6 +74,40 @@ def bucket(c):
     return "5+" if c >= 5 else str(c)
 
 
+def sample_claims(rng, rows, k, stratum):
+    """Random, stratified sample of up to k claims, at most one per patient where possible.
+
+    Strata are filled round-robin so each level present is represented. A second claim from the same
+    patient is used only when there are not enough distinct patients to reach k.
+    """
+    groups = defaultdict(list)
+    for r in rows:
+        groups[stratum(r)].append(r)
+    firsts, seconds = {}, {}
+    for key, items in groups.items():
+        by_patient = defaultdict(list)
+        for r in items:
+            by_patient[r["patient_id"]].append(r)
+        pats = sorted(by_patient)
+        rng.shuffle(pats)
+        first, rest = [], []
+        for p in pats:
+            claims = by_patient[p][:]
+            rng.shuffle(claims)
+            first.append(claims[0])
+            rest.extend(claims[1:])
+        rng.shuffle(rest)
+        firsts[key], seconds[key] = first, rest
+    picked = []
+    for pool in (firsts, seconds):
+        keys = sorted(pool)
+        while len(picked) < k and any(pool[x] for x in keys):
+            for x in keys:
+                if pool[x] and len(picked) < k:
+                    picked.append(pool[x].pop())
+    return sorted(picked, key=lambda r: r["claim_id"])
+
+
 def build_packet(pid, flag_row, chronic, age, conditions, claims, peer_rate):
     rows = claims[pid]
     mix = Counter(r["cpt"] for r in rows)
@@ -88,14 +126,18 @@ def build_packet(pid, flag_row, chronic, age, conditions, claims, peer_rate):
 
     def card(r):
         p = r["patient_id"]
-        return {"claim_id": r["claim_id"], "date": r["service_date"], "patient_id": p, "age": age[p],
-                "chronic_conditions": chronic[p], "conditions": conditions[p],
+        return {"claim_id": r["claim_id"], "cpt": r["cpt"], "date": r["service_date"], "patient_id": p,
+                "age": age[p], "chronic_conditions": chronic[p], "conditions": conditions[p],
                 "diagnosis_codes": r["diagnosis_codes"]}
 
-    top = sorted((r for r in rows if r["cpt"] == "99215"),
-                 key=lambda r: (chronic[r["patient_id"]], r["claim_id"]))
-    low = [card(r) for r in top if chronic[r["patient_id"]] <= 1][:LOW_COMPLEXITY_SAMPLE]
-    high = [card(r) for r in reversed(top) if chronic[r["patient_id"]] >= 4][:HIGH_COMPLEXITY_SAMPLE]
+    rng = random.Random(f"{SAMPLER_SEED}:{pid}")
+    n215 = [r for r in rows if r["cpt"] == "99215"]
+    low = [card(r) for r in sample_claims(rng, [r for r in n215 if chronic[r["patient_id"]] <= 1],
+                                          LOW_COMPLEXITY_SAMPLE, lambda r: chronic[r["patient_id"]])]
+    high = [card(r) for r in sample_claims(rng, [r for r in n215 if chronic[r["patient_id"]] >= 4],
+                                           HIGH_COMPLEXITY_SAMPLE, lambda r: min(chronic[r["patient_id"]], 5))]
+    comparison = [card(r) for r in sample_claims(rng, [r for r in rows if r["cpt"] != "99215"],
+                                                 COMPARISON_SAMPLE, lambda r: bucket(chronic[r["patient_id"]]))]
     return {
         "provider_id": pid, "specialty": "Family Practice", "state": "GA",
         "n_claims": len(rows), "n_patients": len({r["patient_id"] for r in rows}),
@@ -107,6 +149,7 @@ def build_packet(pid, flag_row, chronic, age, conditions, claims, peer_rate):
         "99215_share_by_patient_complexity": table,
         "99215_claims_on_low_complexity_patients_0_or_1_conditions": low,
         "99215_claims_on_high_complexity_patients_4_plus_conditions": high,
+        "comparison_claims_other_than_99215_random_sample": comparison,
     }
 
 
