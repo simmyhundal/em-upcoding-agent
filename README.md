@@ -56,4 +56,4 @@ reports/          results and failure-mode write-ups
 - **Milestone 2 - Path A (parked):** the LLM judges from synthetic clinical notes. Not being worked on.
 
 ## Status
-Scoped. Baselines built; synthetic data generator in progress.
+Synthetic data generator and Baseline 1 (plain z-score) done. Next: risk-adjusted baseline, flagging, case summaries, eval. First scorecard line, plain z-score top 25: 7/8 upcoders found, 3/8 hard negatives and 15/200 normal providers falsely flagged. Details in `docs/synthetic_data.md`.
