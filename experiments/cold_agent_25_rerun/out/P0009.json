@@ -1,0 +1,23 @@
+{
+  "headline": "P0009 (Family Practice, GA): 99215 share is elevated across every complexity stratum, including patients with 0-1 chronic conditions; pattern consistent with upcoding, pending documentation review",
+  "leaning": "pattern_consistent_with_upcoding",
+  "rationale": "P0009 billed 99215 on 13.8% of 145 claims against an expected 2.5% given patient complexity (risk-adjusted score 3.19; peer z-score a more modest 1.27), and 99214 makes up 92 of 145 claims. A sicker panel does not explain the excess. Most visits (96 of 145) are with patients who have 0-1 chronic conditions, and in those strata the provider's 99215 share is 7.1% vs 2.1% for all providers (0 conditions) and 13.0% vs 3.4% (1 condition). Several low-complexity 99215 claims carry only symptom or single-condition codes: patient P0009-N0049, with no chronic conditions, was billed 99215 twice for rash (C0003267, C0003327) and 99214 for a follow-up code (C0003239). Other examples are C0003259 (abdominal pain, 0 conditions), C0003217 (hyperlipidemia only) and C0003216 (hypertension, age 18). Some cases may be legitimate, such as heart failure at age 96 (C0003235). The 4+ condition stratum (3 of 4 visits billed 99215, e.g. C0003210, C0003330) is plausible but too small to offset the low-complexity excess. The claim lists are samples, and no clinical notes, time records or MDM documentation are in the packet, so this is a pattern for review, not a finding of improper billing.",
+  "cited_claim_ids": [
+    "C0003267",
+    "C0003327",
+    "C0003239",
+    "C0003259",
+    "C0003217",
+    "C0003216",
+    "C0003235",
+    "C0003210",
+    "C0003330"
+  ],
+  "next_steps": [
+    "Request medical records for the low-complexity 99215 claims (e.g. C0003267, C0003327, C0003259, C0003217, C0003216, C0003213, C0003234) and check whether MDM or total time supports level 5 under 2021+ E/M guidelines.",
+    "Review the repeat 99215 billing for patient P0009-N0049 (rash, no chronic conditions) on 2024-10-08 and 2024-12-24.",
+    "Pull a larger or complete claim set to confirm the stratum-level 99215 shares and assess the heavy 99214 use (92 of 145 claims), which is not benchmarked in this packet.",
+    "Check whether the chronic-condition counts may be understated (e.g. missing diagnosis codes) before attributing the excess to billing behavior.",
+    "Compare against same-specialty GA peers and check for patterns in billing staff, EHR templates or time-based coding."
+  ]
+}

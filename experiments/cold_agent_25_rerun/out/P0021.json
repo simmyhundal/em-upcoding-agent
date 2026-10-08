@@ -1,0 +1,27 @@
+{
+  "headline": "P0021 (Family Practice, GA): 99215 share of 21.5% vs 2.8% expected for its patient mix, with the excess concentrated on low-complexity patients",
+  "leaning": "pattern_consistent_with_upcoding",
+  "rationale": "P0021 billed 28 of 130 claims (21.5%) as 99215, against an expected 2.8% given patient complexity (z = 2.46 vs peers; risk-adjusted score 4.78). The provider bills 99215 above the all-provider rate in every complexity stratum. The gap matters most at the low end: 12.2% vs 2.1% for patients with 0 chronic conditions, and 18.9% vs 3.4% for patients with 1. Those two strata account for 13 of the 28 99215s. The sampled low-complexity 99215s carry single, routine diagnoses: hypothyroidism alone, billed three times for patient N0013 (C0010993, C0011060, C0011088); low back pain (C0011002); abdominal pain (C0011031, C0011046); rash (C0011036); follow-up exam Z09 (C0011077); and UTI (C0011096). Patient N0026 has a 99215 (C0011032) and a 99213 (C0011081) with the same codes, M19.90;J06.9. In contrast, the 99215s on patients with 4+ conditions (for example C0011064, C0011047) look consistent with high acuity, but there are only 5 such visits, too few to explain the overall rate. Overall, the pattern is consistent with upcoding rather than a sicker panel. This packet has no clinical documentation (notes, MDM, time), so it cannot confirm that any individual level is unsupported.",
+  "cited_claim_ids": [
+    "C0010993",
+    "C0011060",
+    "C0011088",
+    "C0011002",
+    "C0011031",
+    "C0011046",
+    "C0011036",
+    "C0011077",
+    "C0011096",
+    "C0011032",
+    "C0011081",
+    "C0011064",
+    "C0011047"
+  ],
+  "next_steps": [
+    "Request medical records for the 13 99215 claims on 0-1 condition patients and audit MDM complexity and/or total time against 2021+ E/M guidelines.",
+    "Check whether the visits for patient N0013 (C0010993, C0011060, C0011088) and patient N0026 (C0011032 vs C0011081) document anything beyond routine management of a single stable condition.",
+    "Pull the full 99215 claim list (not just samples) to look for templated or cloned notes, time-based billing claims, and whether 99215s cluster by date or patient.",
+    "Review 99214 use on low-complexity patients (e.g., C0011014, C0011015) to see whether level inflation extends past 99215.",
+    "Confirm whether the low-complexity diagnoses are under-coded (missing comorbidities) before drawing conclusions."
+  ]
+}

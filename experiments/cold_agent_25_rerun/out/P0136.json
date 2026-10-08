@@ -1,0 +1,25 @@
+{
+  "headline": "P0136 (Family Practice, GA): 99215 share of 14.9% versus about 2.0% expected for this panel's complexity, with most 99215s on patients with 0-1 chronic conditions",
+  "leaning": "pattern_consistent_with_upcoding",
+  "rationale": "This provider billed 33 of 222 claims (14.9%) as 99215. The expected share given patient complexity is 1.96%, and the risk-adjusted score is 5.02. The panel is mostly low-complexity: 194 of 222 visits are for patients with 0 or 1 chronic conditions. Those patients account for 26 of the 33 99215s. The 99215 share is 12.4% at 0 conditions versus 2.1% for all providers, and 14.4% at 1 condition versus 3.4%. In the sampled low-complexity 99215 claims, the diagnoses are often simple acute problems. Examples are URI (J06.9) in C0064025 and C0064176, UTI (N39.0) in C0064003, C0064028 and C0064037, rash (R21) in C0064031, unspecified abdominal pain (R10.9) in C0064064 and C0064177, and a follow-up visit (Z09) in C0064186. The few high-complexity 99215s look plausible, such as C0064181 and C0064188 for a patient with 4 conditions. However, 4+ condition patients account for only 3 visits. The z-score against peers is moderate (1.44), but the gap after risk adjustment is large. Overall, the pattern is consistent with upcoding rather than a sicker panel. Clinical documentation such as notes, MDM complexity and time was not available, so this cannot be confirmed from claims alone.",
+  "cited_claim_ids": [
+    "C0064025",
+    "C0064176",
+    "C0064003",
+    "C0064028",
+    "C0064037",
+    "C0064031",
+    "C0064064",
+    "C0064177",
+    "C0064186",
+    "C0064181",
+    "C0064188"
+  ],
+  "next_steps": [
+    "Request medical records for the sampled low-complexity 99215 claims, such as C0064025, C0064003, C0064031 and C0064186. Check whether the documented MDM or total time supports level 5.",
+    "Look for repeat 99215 billing on the same low-complexity patients, such as P0136-N0005, P0136-N0061 and P0136-N0011. Check whether the documentation is cloned or templated.",
+    "Check whether 99215 visits involved prolonged time, same-day procedures, or acute escalation (such as an ED referral or admission) that could justify high complexity.",
+    "Compare the provider's 99214 use (128 of 222 claims) with peers, since level inflation may extend beyond 99215.",
+    "Review the full claim population, not just the random samples, before drawing conclusions about specific patients or dates."
+  ]
+}

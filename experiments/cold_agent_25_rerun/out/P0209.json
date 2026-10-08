@@ -1,0 +1,34 @@
+{
+  "headline": "P0209 (Family Practice, GA): 99215 share of 11.2% against 1.7% expected for a low-complexity panel; pattern consistent with upcoding",
+  "leaning": "pattern_consistent_with_upcoding",
+  "rationale": "This provider billed 23 of 205 claims (11.2%) as 99215. Given the panel's complexity, the expected share is about 1.7% (risk-adjusted score 3.77). The raw z-score against peers is modest (0.87), so the flag comes from the complexity adjustment rather than from the raw volume. The panel does not look high-acuity. Every visit falls in the 0, 1 or 2 chronic-condition bands, and there are no 99215 claims on patients with 4 or more conditions. In each band the 99215 share runs about 3.1 to 4.6 times the all-provider share: 9.6% vs 2.1% at 0 conditions, 10.4% vs 3.4% at 1, and 21.7% vs 5.6% at 2. Eighteen of the 23 claims at the highest level are on patients with 0 or 1 conditions. Many of the sampled ones carry single, typically self-limited diagnoses, such as URI J06.9 (C0093991, C0094085), UTI N39.0 (C0094003, C0094009, C0094010), rash R21 (C0094074, C0094133), abdominal pain R10.9 (C0093999, C0094095, C0094122) and low back pain M54.50 (C0094103). Some patients were billed 99215 more than once for the same single chronic condition: N0088 for depression (C0093994, C0094094) and N0079 for hyperlipidemia (C0094082, C0094096). The random sample of other claims also shows 99214 billed for 0-condition patients with minor diagnoses (C0093983, C0094001, C0094025, C0094109). The claim lists are samples, and clinical notes, time records and MDM documentation are not in the packet. A legitimate reason for the high-level billing therefore cannot be ruled out, such as acute severity, extended time or a mental health crisis.",
+  "cited_claim_ids": [
+    "C0093991",
+    "C0094085",
+    "C0094003",
+    "C0094009",
+    "C0094010",
+    "C0094074",
+    "C0094133",
+    "C0093999",
+    "C0094095",
+    "C0094122",
+    "C0094103",
+    "C0093994",
+    "C0094094",
+    "C0094082",
+    "C0094096",
+    "C0093983",
+    "C0094001",
+    "C0094025",
+    "C0094109"
+  ],
+  "next_steps": [
+    "Request the full medical records for the sampled 99215 claims on 0-1 condition patients. Check whether the documented MDM level or total time supports 99215 under the 2021+ E/M guidelines.",
+    "Prioritize the claims for self-limited problems (J06.9, N39.0, R21, R10.9, M54.50), since these rarely meet high-complexity MDM.",
+    "Review the repeat 99215 visits for the same patient and condition (P0209-N0088, P0209-N0079) for templated or cloned documentation.",
+    "Check whether time-based billing is being used, and verify the documented time against the day's schedule and visit volume.",
+    "Extend the review to the 99214 claims on 0-condition patients, which may show a broader shift toward higher levels.",
+    "Pull the full claim population, not just the samples, to confirm the band-level rates and check for trends over time or by place of service."
+  ]
+}

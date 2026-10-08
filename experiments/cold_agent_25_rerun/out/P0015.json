@@ -1,0 +1,27 @@
+{
+  "headline": "P0015 (Family Practice, GA): 99215 share of 14.2% vs 2.6% expected for its panel, elevated across every complexity stratum, including patients with 0-1 chronic conditions",
+  "leaning": "pattern_consistent_with_upcoding",
+  "rationale": "P0015 billed 88 of 621 claims (14.2%) as 99215, against an expected 2.6% given its patients' complexity (risk-adjusted score 6.52). The panel does not look unusually sick: 389 of 621 visits (63%) were for patients with 0-1 chronic conditions, and only 18 visits were for patients with 4 or more. The excess is not limited to complex patients. The provider's 99215 share runs about 2-4x the all-provider share in every stratum: 4.0% vs 2.1% at 0 conditions, 10.2% vs 3.4% at 1, 18.4% vs 5.6% at 2 and 37.3% vs 8.7% at 3. Of the 88 99215 claims, 29 (33%) were for 0-1 condition patients. In the sample these include visits whose only listed codes are simple acute problems or follow-ups, such as an upper respiratory infection (C0007796, C0007868, C0008074), a urinary tract infection (C0007635), a rash (C0008068), abdominal pain (C0007893) and a Z09 follow-up (C0007512). Visits for single stable chronic conditions were also billed at 99215 (C0007675, C0007771). Coding is also heavy at 99214, which is 438 of 621 claims (71%). Some 99215 claims look plausible, for example repeat visits by a patient with 5 conditions (C0007514, C0007555, C0007872) and a 30-year-old with heart failure (C0007652). Taken together, the pattern is consistent with upcoding rather than a high-acuity panel. However, the claim lists are samples, the 4 and 5+ condition strata are small, and no clinical documentation, time records or medical decision-making details are available, so this cannot be confirmed.",
+  "cited_claim_ids": [
+    "C0007796",
+    "C0007868",
+    "C0008074",
+    "C0007635",
+    "C0008068",
+    "C0007893",
+    "C0007512",
+    "C0007675",
+    "C0007771",
+    "C0007514",
+    "C0007555",
+    "C0007872",
+    "C0007652"
+  ],
+  "next_steps": [
+    "Request progress notes for the 99215 claims on 0-1 condition patients, prioritizing the acute or follow-up visits (C0007796, C0007868, C0008074, C0007635, C0008068, C0007893, C0007512), and check whether the documentation supports high-complexity medical decision making or the time thresholds for 99215.",
+    "Review a sample of the 438 99214 claims, since the 71% 99214 share suggests level inflation may extend beyond 99215.",
+    "Check whether the 99215 rate in the 1-3 condition strata is driven by a few patients or spread across the panel, and whether the diagnosis codes billed on each claim reflect the patient's recorded comorbidities.",
+    "Check whether the provider documents E/M levels by time, and whether there is any template-driven or EHR default coding.",
+    "Use the plausible high-complexity claims (C0007514, C0007555, C0007872) as a documentation baseline to compare against the low-complexity 99215s."
+  ]
+}
