@@ -56,12 +56,14 @@ reports/          results and failure-mode write-ups
 - **Milestone 2 - Path A (parked):** the LLM judges from synthetic clinical notes. Not being worked on.
 
 ## Status
-Done: synthetic data generator, both baselines, flagging step. Case-summary step is written and tested with a fake LLM, but not yet run against the real API (needs an API key in `.env`). Citation guardrail done (tested with fake summaries). Eval harness written (`eval/run_eval.py`, report in `reports/eval_report.md`); its two LLM metrics are pending the live run of the summary step. Scorecard so far (top 25 flagged, seed 42):
+Done: synthetic data generator (with a records-review documentation sample), both baselines, flagging, case-summary step, citation guardrail, eval harness (scores detectors and the LLM's leanings against the answer key).
 
-| Method | Upcoders found | Hard negatives falsely flagged | Normal providers falsely flagged |
-|---|---|---|---|
-| Plain z-score | 7 / 8 | 3 / 8 | 15 / 200 |
-| Risk-adjusted | 8 / 8 | 3 / 8 | 14 / 200 |
-| Combined review list (average of both ranks) | 8 / 8 | 3 / 8 | 14 / 200 |
+The live API run of the summary step is still pending (needs an API key in `.env`). In its place, three in-session experiments (`experiments/`) exercised the step with fresh agents; they are not API runs. Headline from `reports/eval_report.md` (seed 42, top 25 flagged):
 
-Risk adjustment ranks upcoders higher (ranks 1-10 vs 2-35) but flags the same number of hard negatives. Details in `docs/synthetic_data.md`.
+| Run | Upcoders called upcoding | Honest providers called upcoding |
+|---|---|---|
+| Plain z-score flags only | 7 / 8 flagged | 18 / 217 flagged (3 hard negatives + 15 normal) |
+| Experiment 2: summaries without documentation | 8 / 8 | 14 / 17 flagged honest |
+| Experiment 3: summaries with documentation evidence | 8 / 8 | 0 / 17 flagged honest |
+
+Experiment 3 is easier by construction (documentation is generated from the same hidden level that defines an upcoded visit); read it as a ceiling on what records-review evidence can do, not a real-world estimate.
