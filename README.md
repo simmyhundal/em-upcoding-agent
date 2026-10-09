@@ -121,14 +121,48 @@ In the live runs most of the separation came from the records-review evidence, n
 6. **Guardrail** - rejects any summary citing claim IDs that don't exist for that provider.
 
 ### Eval
-| Metric | Target |
-|---|---|
-| Recall on planted upcoders | >= 7 of 8 |
-| False-flag rate on hard negatives | Lower than the plain z-score; compared with the risk-adjusted baseline too |
-| Citation accuracy | 100% |
-| Case summary usefulness (1-5 rubric) | >= 4 average |
+Every run is graded against the same thresholds. How each is computed is in `eval/`; per-run detail tables are in `reports/eval_report.md`.
 
-Results go in `reports/`, always detectors side by side. Note that in the synthetic data, billed level depends on patient complexity by construction, so the risk-adjusted baseline is helped by how the data was built. Report that plainly.
+| Eval | Threshold |
+|---|---|
+| Upcoders caught | at least 7 of 8 |
+| Hard negatives wrongly accused (honest doctors with sicker patients) | lower than the plain z-score's count on the same data |
+| Precision of "upcoding" calls | at least 80% are real upcoders (*proposed*; added because the original targets ignored the ordinary honest doctors who also get flagged) |
+| Citations valid | 100% |
+| Case Summary Usefulness (1-5) | average of at least 4 (scored by an LLM judge) |
+| No templating | the templating check finds none |
+
+Note that in the synthetic data, billed level depends on patient complexity by construction, so the risk-adjusted baseline is helped by how the data was built. Report that plainly.
+
+### Status
+Done: synthetic data generator (with a records-review documentation sample), both baselines, flagging, case-summary step (run live on the API), citation guardrail, evidence charts and case pages, Payment Integrity packet, eval harness (detectors, LLM leanings, templating check, LLM-judge usefulness), a held-out run.
+
+Each run scored against the thresholds above. Screen rows show the statistical screen alone (its flagged doctors count as accused); the other rows show what the AI called upcoding. A dash means not scored or not applicable and is left out of the total.
+
+<!-- scoreboard:start -->
+| Run | Upcoders caught | Hard negatives wrongly accused | Precision of upcoding calls | Citations valid | Case Summary Usefulness (1-5) | No templating | Evals passed |
+|---|---|---|---|---|---|---|---|
+| **Threshold** | at least 7 of 8 | lower than the plain z-score's count (seed 42: 3, seed 101: 2) | at least 80% (proposed) | 100% | at least 4 | none | every eval that applies |
+| Screen alone, seed 42 (no AI) | 8 / 8 ✓ | 3 / 8 ✗ | 32% ✗ | – | – | – | **1 / 3** |
+| 261008_2_cc: one agent for all 25 (templated) | 7 / 8 ✓ | 1 / 8 ✓ | 41% ✗ | 100% ✓ | – | templated ✗ | **3 / 5** |
+| 261008_3_cc: chat agents, no records evidence | 8 / 8 ✓ | 1 / 8 ✓ | 36% ✗ | 100% ✓ | – | none ✓ | **4 / 5** |
+| 261008_4_cc: chat agents, with records evidence | 8 / 8 ✓ | 0 / 8 ✓ | 100% ✓ | 100% ✓ | – | none ✓ | **5 / 5** |
+| **261009_1_api: live API run, seed 42** | 8 / 8 ✓ | 0 / 8 ✓ | 100% ✓ | 100% ✓ | 3.44 ✗ | none ✓ | **5 / 6** |
+| Screen alone, seed 101 (no AI) | 8 / 8 ✓ | 1 / 8 ✓ | 32% ✗ | – | – | – | **2 / 3** |
+| **261009_2_api: held-out API run, seed 101** | 8 / 8 ✓ | 0 / 8 ✓ | 100% ✓ | 100% ✓ | 3.24 ✗ | none ✓ | **5 / 6** |
+<!-- scoreboard:end -->
+
+This table is generated from the saved outputs (`python docs/update_readme.py`). Usefulness is scored by an LLM judge (`eval/judge_usefulness.py`, a different model from the writer), so it is a rough rubric check. Run outputs are in `experiments/`; the naming is explained in `experiments/README.md`.
+
+### Roadmap
+<!-- roadmap:start -->
+Live from this repository's [milestones](https://github.com/simmyhundal/em-upcoding-agent/milestones); each badge shows the milestone's current title and closed/total issues.
+
+- ![PoC (Path B): statistics select, AI explains and advises](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/1) Statistics choose who gets a close look; an AI reads each flagged provider's evidence, writes a cited summary and gives an advisory leaning (upcoding, high-acuity panel, inconclusive); code checks the citations; people decide.
+- ![Path A (parked): LLM judges from clinical notes](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/2) An LLM judges from synthetic free-text clinical notes instead of structured evidence.
+- ![M3: Enhancements to Path B](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/3) Follow-on features once the Path B PoC (Milestone 1) is evaluated: evidence visuals for reviewers and a downstream artifact for the Payment Integrity team.
+- ![M4: Reduce API cost](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/4) Cut the cost per run (about $2.14 for the first full run: $1.49 Claude Opus 5.5 writer, $0.65 Claude Sonnet 5.5 judge) without losing quality.
+<!-- roadmap:end -->
 
 ### Repo layout
 ```
@@ -171,26 +205,3 @@ has not been built.
 - Synthetic data only. No real claims, no PHI.
 - Never flag real, named providers, even from public data.
 - Synthetic claims are cleaner than real ones, and patient complexity is a simplified proxy for documentation. Results don't transfer directly to production.
-
-### Roadmap
-- **Milestone 1 - PoC (Path B):** statistics select, the AI explains and advises. Done.
-- **Milestone 2 - Path A (parked):** the LLM judges from synthetic free-text clinical notes. Not being worked on.
-- **Milestone 3 - Enhancements to Path B:** evidence charts, the Payment Integrity packet, README, and eval additions. Done.
-- **Milestone 4 - Reduce API cost:** measure and cut the cost per run behind the eval quality gate. In progress.
-
-### Status
-Done: synthetic data generator (with a records-review documentation sample), both baselines, flagging, case-summary step (run live on the API), citation guardrail, evidence charts and case pages, Payment Integrity packet, eval harness (detectors, LLM leanings, templating check, LLM-judge usefulness).
-
-Headline from `reports/eval_report.md` (seed 42, top 25 flagged):
-
-| Run | Upcoders called upcoding | Honest providers called upcoding | Citations valid | Case Summary Usefulness (1-5) |
-|---|---|---|---|---|
-| Screen flags only (no summaries) | 8 / 8 flagged | 17 flagged | n/a | n/a |
-| Experiment 2: chat agents, no documentation | 8 / 8 | 14 / 17 | 287 / 287 | not scored |
-| Experiment 3: chat agents, with documentation | 8 / 8 | 0 / 17 | 230 / 230 | not scored |
-| **Live API run (Claude Opus 5.5), with documentation** | **8 / 8** | **0 / 17** | **261 / 261** | **3.44** |
-| Held-out run, fresh data (seed 101), pipeline frozen | 8 / 8 | 0 / 17 | 278 / 278 | 3.24 |
-
-Usefulness is scored by an LLM judge (`eval/judge_usefulness.py`, a different model from the writer), so it is a rough rubric check.
-
-The live run's outputs are in `experiments/261009_1_api/` (summaries, guardrail-checked summaries, judge scores, case pages).
