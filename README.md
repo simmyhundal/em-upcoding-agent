@@ -46,6 +46,12 @@ reports/          results and failure-mode write-ups
 - **Office-visit codes only.** Established-patient 99211-99215; new-patient codes (99202-99205) are excluded.
 - **Privacy.** NPIs are used only to group rows, then replaced by a discarded salted hash. Only aggregate distributions are saved; no provider-level rows.
 
+## Evidence charts and case pages
+`python src/evidence_chart.py data/synthetic reports/flagged.csv reports/charts` draws one SVG per flagged provider: boxes show how
+the other providers' 99215 share varies at each patient-complexity level, and the provider is a point with a 95% Wilson interval
+(thin levels are hollow and dashed). `python src/case_report.py CHECKED_SUMMARIES CHARTS_DIR OUT_DIR` builds a markdown page per
+provider that combines the summary, its cited claims and the chart; see `experiments/cold_agent_25_docs/cases/` for an example.
+
 ## Guardrail scope
 `src/guardrail.py` checks that every cited claim ID exists and belongs to the provider being summarized, and rejects summaries
 with no citations. It does **not** check that a cited claim supports the sentence that cites it. For example, a summary could
