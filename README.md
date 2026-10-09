@@ -54,7 +54,7 @@ Results on the synthetic data (one random seed, small counts, so read them as di
 - Adding a sample of **records-review evidence** (what the medical record says the visit supported) brings that to **0 of 17**, with the AI saying "inconclusive" when too few records exist. **This last result is a ceiling, not a forecast:** the records evidence is generated from the same hidden truth that defines an upcoded visit, so it makes the problem easier by construction.
 - In the latest run every cited visit was real: **230 of 230** citations passed the check. The check confirms the visits exist and belong to the doctor, not that each one supports the sentence citing it.
 - **The real pipeline run:** the project's own API step (Claude Opus 5.5) wrote the 25 summaries with the records evidence and got the same result: all 8 real upcoders called upcoding, 0 of 17 honest doctors, 3 of 3 sicker-panel doctors read as a heavy panel, and **261 of 261** citations real. The first two AI bars above came from agents in a chat session.
-- **No held-out test yet.** I refined the evidence page and the AI's instructions while looking at these same 25 doctors, and I built the synthetic data myself. So these numbers show the pipeline works where a signal exists, not that it generalizes. A fresh, untouched dataset is the next check.
+- **A held-out check:** I froze the code, generated a brand-new dataset and ran the whole pipeline once, with no tuning. The headline held: all 8 real upcoders called upcoding, 0 of 17 honest doctors accused, 278 of 278 citations real. It is still the same data generator and the same kind of records evidence, so it is a check on tuning, not on real-world difficulty (details in `experiments/261009_2_api/`).
 - **Quality is not yet at the bar I set.** An independent AI grader (a different model, using a written 1-to-5 rubric) averaged **3.4 out of 5** on how useful the summaries are, against a target of 4. The usual complaints were small numeric slips, a cited visit that does not quite fit the sentence citing it, and headlines that lean a little too hard. The grader is itself an AI and makes mistakes, so this is a rough check, not a verdict.
 
 ## Built responsibly
@@ -185,6 +185,7 @@ Headline from `reports/eval_report.md` (seed 42, top 25 flagged):
 | Experiment 2: chat agents, no documentation | 8 / 8 | 14 / 17 | 287 / 287 | not scored |
 | Experiment 3: chat agents, with documentation | 8 / 8 | 0 / 17 | 230 / 230 | not scored |
 | **Live API run (Claude Opus 5.5), with documentation** | **8 / 8** | **0 / 17** | **261 / 261** | **3.44 (target 4: not met)** |
+| Held-out run, fresh data (seed 101), pipeline frozen | 8 / 8 | 0 / 17 | 278 / 278 | 3.24 (not met) |
 
 Documentation-based rows are easier by construction (documentation is generated from the same hidden level that defines an upcoded visit); read them as a ceiling on what records-review evidence can do, not a real-world estimate. Usefulness is scored by an LLM judge (`eval/judge_usefulness.py`, a different model from the writer), so it is a rough rubric check.
 
