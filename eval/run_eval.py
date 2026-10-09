@@ -76,7 +76,16 @@ def leaning_stats(records, truth):
             "honest_called_upcoding": honest_up, "honest_total": honest_n}
 
 
-def render(res, top_n, runs=None, truth=None):
+def usefulness_line(rows):
+    scores = [r["score"] for r in rows]
+    mean = sum(scores) / len(scores)
+    dist = ", ".join(f"{k}: {scores.count(k)}" for k in (1, 2, 3, 4, 5))
+    verdict = "met" if mean >= 4 else "NOT met"
+    return (f"- Summary usefulness (LLM judge, 1-5, eval/rubric.md): mean {mean:.2f} over {len(scores)} summaries "
+            f"(scores {dist}); target >= 4: {verdict}. The judge is itself an LLM, so treat this as a rough rubric check.")
+
+
+def render(res, top_n, runs=None, truth=None, usefulness=None):
     z, ra, comb = (res[n] for n, _ in DETECTORS)
     lines = [f"# Eval report (top {top_n} flagged)", "",
              "| Metric | Plain z-score | Risk-adjusted | Combined list | Target |", "|---|---|---|---|---|"]
@@ -97,6 +106,7 @@ def render(res, top_n, runs=None, truth=None):
     for label, records in (runs or []):
         c = citation_stats(records)
         acc = "n/a" if c["accuracy"] is None else f"{c['accuracy']:.1%}"
+        useful = (usefulness or {}).get(label)
         tc = template_check.describe(template_check.check([r["summary"]["rationale"] for r in records if r["summary"].get("rationale")]))
         lines += ["", f"### {label}",
                   f"- Templating check: {tc}",
@@ -115,12 +125,23 @@ def render(res, top_n, runs=None, truth=None):
                           f"({L['true_upcoders_called']} of {L['n_role']['upcoder']} upcoders).",
                       f"- Honest providers labeled upcoding: {L['honest_called_upcoding']} of {L['honest_total']}.",
                       f"- Summaries rejected by the guardrail and not scored: {L['rejected']}."]
-    lines += ["- Summary usefulness (1-5, see eval/rubric.md): pending. Target: average >= 4.", "",
-              "## Target check"]
+        if useful:
+            lines += [usefulness_line(useful)]
+    if not any((usefulness or {}).get(label) for label, _ in (runs or [])):
+        lines += ["- Summary usefulness (1-5, see eval/rubric.md): pending. Target: average >= 4."]
+    lines += ["", "## Target check"]
     lines += [f"- Recall >= 7/8: {'met' if comb['upcoders_found'] >= 7 else 'NOT met'} (combined list)"]
     better = comb["hard_neg_flagged"] < z["hard_neg_flagged"]
     lines += [f"- Hard-negative false flags lower than plain z-score: {'met' if better else 'NOT met'} "
-              f"({comb['hard_neg_flagged']} vs {z['hard_neg_flagged']})", "",
+              f"({comb['hard_neg_flagged']} vs {z['hard_neg_flagged']})"]
+    for label, records in (runs or []):
+        if (usefulness or {}).get(label):
+            c = citation_stats(records)
+            scores = [r["score"] for r in usefulness[label]]
+            lines += [f"- {label}: citation accuracy 100%: {'met' if c['accuracy'] == 1.0 else 'NOT met'} "
+                      f"({c['valid']}/{c['cited']}); summary usefulness >= 4: "
+                      f"{'met' if sum(scores) / len(scores) >= 4 else 'NOT met'} (mean {sum(scores) / len(scores):.2f})"]
+    lines += ["",
               "## Caveats",
               "- Synthetic data. Billed level depends on patient complexity by construction, so the risk-adjusted "
               "detector is helped by how the data was built; results do not transfer directly to real claims.",
@@ -149,11 +170,16 @@ if __name__ == "__main__":
     ap.add_argument("out_md")
     ap.add_argument("--top-n", type=int, default=25)
     ap.add_argument("--checked-summaries", nargs="*", metavar="[LABEL=]FILE")
+    ap.add_argument("--usefulness", nargs="*", metavar="LABEL=FILE", help="judge_usefulness.py output per run label")
     a = ap.parse_args()
     with open(a.flagged_csv) as f:
         rows = list(csv.DictReader(f))
     truth = json.load(open(a.truth_json))
-    md = render(evaluate(rows, truth, a.top_n), a.top_n, parse_runs(a.checked_summaries), truth)
+    useful = {}
+    for it in a.usefulness or []:
+        label, _, path = it.partition("=")
+        useful[label] = [json.loads(line) for line in open(path) if line.strip()]
+    md = render(evaluate(rows, truth, a.top_n), a.top_n, parse_runs(a.checked_summaries), truth, useful)
     os.makedirs(os.path.dirname(os.path.abspath(a.out_md)), exist_ok=True)
     open(a.out_md, "w").write(md)
     print(md)

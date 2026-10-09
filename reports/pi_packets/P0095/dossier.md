@@ -15,11 +15,11 @@
 
 ## Case summary (advisory)
 
-**P0095 (Family Practice, GA): 99215 billing is concentrated on low-complexity patients, and 25 of 27 documented 99215 claims are not supported, a pattern consistent with upcoding**
+**P0095 (Family Practice, GA): 99215 share well above complexity-adjusted expectation, and 25 of 27 documented 99215 claims are unsupported; pattern consistent with upcoding**
 
-Leaning: pattern consistent with upcoding. Citations checked: 10/10 valid.
+Leaning: pattern consistent with upcoding. Citations checked: 8/8 valid.
 
-P0095 billed 99215 on 9.6% of 1,015 claims. Given this panel's patient complexity, about 2.3% would be expected (risk-adjusted score 5.51). The raw z vs peers is modest (0.62), so it is the risk adjustment that drives the flag. The excess is on simpler patients. The 99215 share is 6.8% vs 2.1% for all providers on patients with 0 chronic conditions and 11.3% vs 3.4% on patients with 1. On patients with 4+ conditions it is at or below the all-provider rate. Sampled 99215 claims on low-complexity patients include routine diagnoses such as upper respiratory infection (C0048602, C0048948, C0048998) and low back pain (C0048381). Documentation, available for 30% of claims, points the same way. 25 of 27 documented 99215 claims (92.6%) do not support the billed level, against an all-provider rate of 24.2%. Examples are C0048719 and C0049258, each billed 99215 with moderate MDM and about 35 minutes documented. 99214 is also elevated at 22.1% unsupported vs 8.4%, e.g. C0048956 and C0049119 with low MDM documented. A few 99215 claims are supported (C0048506, C0049159), but they are the exception. Only 27 99215 claims have records, and the claim lists are samples, so the full extent is not established. This is a pattern consistent with upcoding, not a finding of fraud.
+P0095 billed 99215 on 9.6% of 1,015 claims versus an expected 2.3% given patient complexity (risk-adjusted score 5.51), although the raw peer z-score is only 0.62. The excess is concentrated in the simplest patients. 99215 share is 6.8% at 0 chronic conditions (peers 2.1%) and 11.3% at 1 condition (peers 3.4%). At 4+ conditions the provider is at or below peers. The sampled low-complexity 99215s include routine-looking diagnoses such as URI (C0048602, C0048948), low back pain (C0048625, C0049007) and rash (C0048730). Documentation is the strongest signal. 25 of 27 documented 99215 claims (92.6%) do not support the billed level, against 24.2% across all providers; examples are C0048719 and C0049258, both documented as moderate MDM at about 35 minutes. The 99214 unsupported rate is also elevated (22.1% vs 8.4%). Only a few 99215s are documented as supported (e.g., C0048506, high MDM, 46 minutes). Caveats: 27 documented 99215s is a modest sample, records cover about 30% of claims, documentation is noisy, and the claim lists are random samples. This is a pattern consistent with upcoding, not a finding of fraud.
 
 ## Evidence chart
 
@@ -44,11 +44,11 @@ Documentation is on file for 303 claims (30% of this provider's claims).
 
 Suggested follow-ups from the case summary:
 
-- Request full medical records for a larger random sample of 99215 and 99214 claims, focused on patients with 0-1 chronic conditions, to confirm the unsupported rate.
-- Have a certified coder re-score MDM and time on the 25 unsupported 99215 claims to estimate the overpayment from billing 99215 instead of 99214 or 99213.
-- Check whether the unsupported claims cluster by date, rendering clinician, or billing staff, and whether templates or EHR auto-coding inflate the level.
-- Review the provider's time-based billing practices, since documented minutes on the sampled unsupported 99215 claims (about 35-36) fall below the 99215 time threshold.
-- Consider provider education or prepayment review for 99215/99214, depending on how the expanded sample comes out.
+- Pull full records for the 25 unsupported 99215 claims and confirm MDM level and time against 2021+ E/M guidelines.
+- Expand documentation review to more undocumented 99215 claims, prioritizing 0-1 chronic-condition patients, to firm up the 92.6% rate.
+- Review the 99214 claims with low documented MDM (e.g., C0049073, C0049119) to assess whether level inflation extends beyond 99215.
+- Check whether time-based billing, prolonged services, or same-day procedures could explain any high-level codes.
+- Compare this provider's E/M mix over time and against same-practice colleagues for template or EHR-default effects.
 
 ## Limits
 

@@ -86,6 +86,22 @@ def test_shared_caveat_sentence_alone_does_not_flag():
     assert not res["flagged"] and res["boilerplate_sentences"] >= 1
 
 
+def test_usefulness_line_reports_mean_distribution_and_target():
+    rows = [{"score": 4}, {"score": 5}, {"score": 3}, {"score": 4}]
+    line = run_eval.usefulness_line(rows)
+    assert "mean 4.00" in line and "target >= 4: met" in line and "3: 1" in line
+    assert "NOT met" in run_eval.usefulness_line([{"score": 3}, {"score": 4}])
+
+
+def test_report_shows_usefulness_for_a_labeled_run():
+    res = run_eval.evaluate([{k: str(v) for k, v in r.items()} for r in ROWS], TRUTH, top_n=10)
+    roles = {p: v["role"] for p, v in TRUTH["providers"].items()}
+    p0 = next(p for p, r in roles.items() if r == "upcoder")
+    runs = [("run A", [_record(p0, "pattern_consistent_with_upcoding")])]
+    md = run_eval.render(res, 10, runs, TRUTH, {"run A": [{"score": 3}, {"score": 4}]})
+    assert "mean 3.50" in md and "usefulness (1-5, see eval/rubric.md): pending" not in md
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

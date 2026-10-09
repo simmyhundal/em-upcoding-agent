@@ -79,8 +79,10 @@ def results():
     ev = run_eval.evaluate(flagged, truth, 25)["Combined list"]
     honest_flagged = ev["hard_neg_flagged"] + ev["normal_flagged"]
     runs = []
-    for label, folder in (("AI summaries,\nno records evidence", "cold_agent_25_rerun"), ("AI summaries, with\nrecords evidence*", "cold_agent_25_docs")):
-        recs = run_eval.load_checked(os.path.join(ROOT, "experiments", folder, "summaries_checked.jsonl"))
+    for label, rel in (("AI summaries (chat),\nno records evidence", "experiments/cold_agent_25_rerun/summaries_checked.jsonl"),
+                       ("AI summaries (chat),\nwith records evidence*", "experiments/cold_agent_25_docs/summaries_checked.jsonl"),
+                       ("Live API run,\nwith records evidence*", "reports/live/case_summaries_checked.jsonl")):
+        recs = run_eval.load_checked(os.path.join(ROOT, rel))
         L = run_eval.leaning_stats(recs, truth)
         runs.append((label, L["honest_called_upcoding"], L["true_upcoders_called"], L["honest_total"]))
     bars = [("Screen alone\n(no AI review)", honest_flagged, ev["upcoders_found"], honest_flagged)] + runs
@@ -106,7 +108,7 @@ def results():
             s.append(f'<text x="{cx:.0f}" y="{y0 + ph + 24 + j * 16}" text-anchor="middle" font-size="12.5" fill="{INK}">{escape(line)}</text>')
     s += [f'<rect x="{W - 330}" y="72" width="12" height="12" fill="{RED}"/><text x="{W - 312}" y="83" font-size="12" fill="{INK}">honest doctors accused (of 17)</text>',
           f'<rect x="{W - 330}" y="90" width="12" height="12" fill="{GREEN}"/><text x="{W - 312}" y="101" font-size="12" fill="{INK}">real upcoders caught (of 8)</text>',
-          f'<text x="30" y="{H - 38}" font-size="11.5" fill="{MUTED}">Synthetic data, one random seed, small counts. Summaries were written by AI agents in a chat session, not by the production API step (still to be run).</text>',
+          f'<text x="30" y="{H - 38}" font-size="11.5" fill="{MUTED}">Synthetic data, one random seed, small counts. The first two AI bars were written by agents in a chat session; the last is the project pipeline itself calling the API.</text>',
           f'<text x="30" y="{H - 20}" font-size="11.5" fill="{MUTED}">*The records-review evidence is generated from the same hidden truth that defines an upcoded visit, so this bar shows a ceiling, not a real-world estimate.</text>',
           "</svg>"]
     write("results.svg", "\n".join(s))

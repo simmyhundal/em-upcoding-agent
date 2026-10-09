@@ -214,7 +214,7 @@ def call_anthropic(system, user):
     client = anthropic.Anthropic()
     resp = client.beta.messages.create(
         model=MODEL, max_tokens=4000,
-        betas=[FALLBACK_BETA], fallbacks="default",
+        betas=[FALLBACK_BETA], extra_body={"fallbacks": "default"},
         output_config={"effort": "medium", "format": {"type": "json_schema", "schema": SCHEMA}},
         system=system, messages=[{"role": "user", "content": user}],
     )

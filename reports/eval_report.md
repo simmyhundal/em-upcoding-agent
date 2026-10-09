@@ -11,6 +11,21 @@
 
 ## LLM summary metrics
 
+### Live API run: claude-opus-5-5, with documentation evidence
+- Templating check: no templating detected (boilerplate share 0%, similarity median 0.05 / p90 0.09)
+- Citation accuracy: 100.0% (261/261); 25/25 summaries passed the guardrail. Target: 100%.
+
+| Actual role (summaries scored) | upcoding | high-acuity panel | inconclusive |
+|---|---|---|---|
+| Upcoder (8) | 8 | 0 | 0 |
+| Hard negative (3) | 0 | 3 | 0 |
+| Normal (14) | 0 | 9 | 5 |
+
+- "Upcoding" calls: 8; precision 100%, recall 100% (8 of 8 upcoders).
+- Honest providers labeled upcoding: 0 of 17.
+- Summaries rejected by the guardrail and not scored: 0.
+- Summary usefulness (LLM judge, 1-5, eval/rubric.md): mean 3.44 over 25 summaries (scores 1: 0, 2: 0, 3: 15, 4: 9, 5: 1); target >= 4: NOT met. The judge is itself an LLM, so treat this as a rough rubric check.
+
 ### Experiment 1: single agent, templated (no documentation)
 - Templating check: TEMPLATED - do not score quality on this run (boilerplate share 77%, similarity median 0.30 / p90 1.00)
 - Citation accuracy: 100.0% (112/112); 25/25 summaries passed the guardrail. Target: 100%.
@@ -52,11 +67,11 @@
 - "Upcoding" calls: 8; precision 100%, recall 100% (8 of 8 upcoders).
 - Honest providers labeled upcoding: 0 of 17.
 - Summaries rejected by the guardrail and not scored: 0.
-- Summary usefulness (1-5, see eval/rubric.md): pending. Target: average >= 4.
 
 ## Target check
 - Recall >= 7/8: met (combined list)
 - Hard-negative false flags lower than plain z-score: NOT met (3 vs 3)
+- Live API run: claude-opus-5-5, with documentation evidence: citation accuracy 100%: met (261/261); summary usefulness >= 4: NOT met (mean 3.44)
 
 ## Caveats
 - Synthetic data. Billed level depends on patient complexity by construction, so the risk-adjusted detector is helped by how the data was built; results do not transfer directly to real claims.

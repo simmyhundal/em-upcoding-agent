@@ -48,7 +48,8 @@ Results on the synthetic data (one random seed, small counts, so read them as di
 - AI summaries that only see billing patterns still wrongly accuse **14 of the 17** honest doctors. From billing data alone, an honest high biller and an upcoder can look the same.
 - Adding a sample of **records-review evidence** (what the medical record says the visit supported) brings that to **0 of 17**, with the AI saying "inconclusive" when too few records exist. **This last result is a ceiling, not a forecast:** the records evidence is generated from the same hidden truth that defines an upcoded visit, so it makes the problem easier by construction.
 - In the latest run every cited visit was real: **230 of 230** citations passed the check. The check confirms the visits exist and belong to the doctor, not that each one supports the sentence citing it.
-- The AI summaries in these runs were written by fresh Claude agents in a chat session, **not** by the project's API step, which is still to be run.
+- **The real pipeline run:** the project's own API step (Claude Opus 5.5) wrote the 25 summaries with the records evidence and got the same result: all 8 real upcoders called upcoding, 0 of 17 honest doctors, 3 of 3 sicker-panel doctors read as a heavy panel, and **261 of 261** citations real. The first two AI bars above came from agents in a chat session.
+- **Quality is not yet at the bar I set.** An independent AI grader (a different model, using a written 1-to-5 rubric) averaged **3.4 out of 5** on how useful the summaries are, against a target of 4. The usual complaints were small numeric slips, a cited visit that does not quite fit the sentence citing it, and headlines that lean a little too hard. The grader is itself an AI and makes mistakes, so this is a rough check, not a verdict.
 
 ## Built responsibly
 - **Synthetic data only.** No real patients, doctors or claims, and no real provider is ever flagged.
@@ -168,14 +169,17 @@ has not been built.
 - **Milestone 2 - Path A (parked):** the LLM judges from synthetic clinical notes. Not being worked on.
 
 ### Status
-Done: synthetic data generator (with a records-review documentation sample), both baselines, flagging, case-summary step, citation guardrail, eval harness (scores detectors and the LLM's leanings against the answer key).
+Done: synthetic data generator (with a records-review documentation sample), both baselines, flagging, case-summary step (run live on the API), citation guardrail, evidence charts and case pages, Payment Integrity packet, eval harness (detectors, LLM leanings, templating check, LLM-judge usefulness).
 
-The live API run of the summary step is still pending (needs an API key in `.env`). In its place, three in-session experiments (`experiments/`) exercised the step with fresh agents; they are not API runs. Headline from `reports/eval_report.md` (seed 42, top 25 flagged):
+Headline from `reports/eval_report.md` (seed 42, top 25 flagged):
 
-| Run | Upcoders called upcoding | Honest providers called upcoding |
-|---|---|---|
-| Plain z-score flags only (no summaries) | 7 / 8 flagged | 18 flagged (3 hard negatives + 15 normal providers) |
-| Experiment 2: summaries without documentation | 8 / 8 | 14 / 17 flagged honest |
-| Experiment 3: summaries with documentation evidence | 8 / 8 | 0 / 17 flagged honest |
+| Run | Upcoders called upcoding | Honest providers called upcoding | Citations valid | Usefulness (1-5) |
+|---|---|---|---|---|
+| Screen flags only (no summaries) | 8 / 8 flagged | 17 flagged | n/a | n/a |
+| Experiment 2: chat agents, no documentation | 8 / 8 | 14 / 17 | 287 / 287 | not scored |
+| Experiment 3: chat agents, with documentation | 8 / 8 | 0 / 17 | 230 / 230 | not scored |
+| **Live API run (Claude Opus 5.5), with documentation** | **8 / 8** | **0 / 17** | **261 / 261** | **3.44 (target 4: not met)** |
 
-Experiment 3 is easier by construction (documentation is generated from the same hidden level that defines an upcoded visit); read it as a ceiling on what records-review evidence can do, not a real-world estimate.
+Documentation-based rows are easier by construction (documentation is generated from the same hidden level that defines an upcoded visit); read them as a ceiling on what records-review evidence can do, not a real-world estimate. Usefulness is scored by an LLM judge (`eval/judge_usefulness.py`, a different model from the writer), so it is a rough rubric check.
+
+The live run's outputs are in `reports/live/` (summaries, guardrail-checked summaries, judge scores, case pages).
