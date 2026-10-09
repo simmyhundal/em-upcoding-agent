@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 500" width="920" height="500" font-family="Helvetica, Arial, sans-serif">
+<rect width="920" height="500" fill="#ffffff"/>
+<text x="30" y="34" font-size="20" font-weight="bold" fill="#1f2937">How the project works</text>
+<text x="30" y="56" font-size="13" fill="#6b7280">Statistics decide who gets flagged. The AI explains. Code checks the AI. People decide what happens next.</text>
+<rect x="30" y="80" width="200" height="150" rx="10" fill="#f9fafb" stroke="#2563eb" stroke-width="2"/>
+<circle cx="54" cy="106" r="14" fill="#2563eb"/>
+<text x="54" y="111" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">1</text>
+<text x="76" y="111" font-size="14" font-weight="bold" fill="#1f2937">Billing data</text>
+<text x="46" y="142" font-size="12.5" fill="#6b7280">Fake (synthetic) claims</text>
+<text x="46" y="160" font-size="12.5" fill="#6b7280">modelled on public Medicare</text>
+<text x="46" y="178" font-size="12.5" fill="#6b7280">numbers</text>
+<rect x="248" y="80" width="200" height="150" rx="10" fill="#f9fafb" stroke="#2563eb" stroke-width="2"/>
+<circle cx="272" cy="106" r="14" fill="#2563eb"/>
+<text x="272" y="111" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">2</text>
+<text x="294" y="111" font-size="14" font-weight="bold" fill="#1f2937">Statistical screen</text>
+<text x="264" y="142" font-size="12.5" fill="#6b7280">Flags doctors who bill the top</text>
+<text x="264" y="160" font-size="12.5" fill="#6b7280">visit code unusually often,</text>
+<text x="264" y="178" font-size="12.5" fill="#6b7280">adjusted for how sick their</text>
+<text x="264" y="196" font-size="12.5" fill="#6b7280">patients are</text>
+<rect x="466" y="80" width="200" height="150" rx="10" fill="#f9fafb" stroke="#2563eb" stroke-width="2"/>
+<circle cx="490" cy="106" r="14" fill="#2563eb"/>
+<text x="490" y="111" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">3</text>
+<text x="512" y="111" font-size="14" font-weight="bold" fill="#1f2937">Review list</text>
+<text x="482" y="142" font-size="12.5" fill="#6b7280">The 25 most unusual providers</text>
+<text x="482" y="160" font-size="12.5" fill="#6b7280">go to a reviewer</text>
+<rect x="684" y="80" width="200" height="150" rx="10" fill="#f9fafb" stroke="#c2410c" stroke-width="2"/>
+<circle cx="708" cy="106" r="14" fill="#c2410c"/>
+<text x="708" y="111" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">4</text>
+<text x="730" y="111" font-size="14" font-weight="bold" fill="#1f2937">AI case summary</text>
+<text x="700" y="142" font-size="12.5" fill="#6b7280">An AI writes a short</text>
+<text x="700" y="160" font-size="12.5" fill="#6b7280">explanation and cites the</text>
+<text x="700" y="178" font-size="12.5" fill="#6b7280">exact claims it relies on</text>
+<rect x="139.0" y="300" width="200" height="150" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2"/>
+<circle cx="163.0" cy="326" r="14" fill="#15803d"/>
+<text x="163.0" y="331" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">5</text>
+<text x="185.0" y="331" font-size="14" font-weight="bold" fill="#1f2937">Citation check</text>
+<text x="155.0" y="362" font-size="12.5" fill="#6b7280">Plain code rejects any summary</text>
+<text x="155.0" y="380" font-size="12.5" fill="#6b7280">that cites a claim that does</text>
+<text x="155.0" y="398" font-size="12.5" fill="#6b7280">not exist or belongs to</text>
+<text x="155.0" y="416" font-size="12.5" fill="#6b7280">someone else</text>
+<rect x="357.0" y="300" width="200" height="150" rx="10" fill="#f9fafb" stroke="#c2410c" stroke-width="2"/>
+<circle cx="381.0" cy="326" r="14" fill="#c2410c"/>
+<text x="381.0" y="331" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">6</text>
+<text x="403.0" y="331" font-size="14" font-weight="bold" fill="#1f2937">Case page</text>
+<text x="373.0" y="362" font-size="12.5" fill="#6b7280">One page per provider: the</text>
+<text x="373.0" y="380" font-size="12.5" fill="#6b7280">summary, its citations and a</text>
+<text x="373.0" y="398" font-size="12.5" fill="#6b7280">chart against peers</text>
+<rect x="575.0" y="300" width="200" height="150" rx="10" fill="#f9fafb" stroke="#c2410c" stroke-width="2"/>
+<circle cx="599.0" cy="326" r="14" fill="#c2410c"/>
+<text x="599.0" y="331" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">7</text>
+<text x="621.0" y="331" font-size="14" font-weight="bold" fill="#1f2937">Recovery packet</text>
+<text x="591.0" y="362" font-size="12.5" fill="#6b7280">Draft material for the team</text>
+<text x="591.0" y="380" font-size="12.5" fill="#6b7280">that recovers money: records</text>
+<text x="591.0" y="398" font-size="12.5" fill="#6b7280">to request and a sample plan</text>
+<path d="M232 160 L244 160" stroke="#6b7280" stroke-width="2" marker-end="url(#a)"/>
+<path d="M450 160 L462 160" stroke="#6b7280" stroke-width="2" marker-end="url(#a)"/>
+<path d="M668 160 L680 160" stroke="#6b7280" stroke-width="2" marker-end="url(#a)"/>
+<path d="M784.0 230 L784.0 275 L239.0 275 L239.0 298" fill="none" stroke="#6b7280" stroke-width="2" marker-end="url(#a)"/>
+<path d="M341.0 380 L353.0 380" stroke="#6b7280" stroke-width="2" marker-end="url(#a)"/>
+<path d="M559.0 380 L571.0 380" stroke="#6b7280" stroke-width="2" marker-end="url(#a)"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#6b7280"/></marker></defs>
+<rect x="30" y="472" width="14" height="14" rx="3" fill="none" stroke="#2563eb" stroke-width="2"/>
+<text x="50" y="484" font-size="12" fill="#6b7280">statistics</text>
+<rect x="130" y="472" width="14" height="14" rx="3" fill="none" stroke="#c2410c" stroke-width="2"/>
+<text x="150" y="484" font-size="12" fill="#6b7280">AI and write-ups</text>
+<rect x="270" y="472" width="14" height="14" rx="3" fill="none" stroke="#15803d" stroke-width="2"/>
+<text x="290" y="484" font-size="12" fill="#6b7280">safety check</text>
+</svg>

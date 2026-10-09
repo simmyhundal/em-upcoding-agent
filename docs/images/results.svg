@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 470" width="920" height="470" font-family="Helvetica, Arial, sans-serif">
+<rect width="920" height="470" fill="#ffffff"/>
+<text x="30" y="34" font-size="20" font-weight="bold" fill="#1f2937">Honest doctors still accused after review</text>
+<text x="30" y="56" font-size="13" fill="#6b7280">Of the 25 providers the screen flags, 8 are real (planted) upcoders and 17 are honest. Lower red bars are better.</text>
+<line x1="80" y1="350" x2="880" y2="350" stroke="#eee"/>
+<text x="72" y="354" text-anchor="end" font-size="12" fill="#6b7280">0</text>
+<line x1="80" y1="291" x2="880" y2="291" stroke="#eee"/>
+<text x="72" y="295" text-anchor="end" font-size="12" fill="#6b7280">4</text>
+<line x1="80" y1="232" x2="880" y2="232" stroke="#eee"/>
+<text x="72" y="236" text-anchor="end" font-size="12" fill="#6b7280">8</text>
+<line x1="80" y1="174" x2="880" y2="174" stroke="#eee"/>
+<text x="72" y="178" text-anchor="end" font-size="12" fill="#6b7280">12</text>
+<line x1="80" y1="115" x2="880" y2="115" stroke="#eee"/>
+<text x="72" y="119" text-anchor="end" font-size="12" fill="#6b7280">16</text>
+<rect x="143" y="100" width="62" height="250" rx="3" fill="#b91c1c"/>
+<text x="174" y="92" text-anchor="middle" font-size="16" font-weight="bold" fill="#b91c1c">17</text>
+<rect x="221" y="232" width="62" height="118" rx="3" fill="#15803d"/>
+<text x="252" y="224" text-anchor="middle" font-size="16" font-weight="bold" fill="#15803d">8</text>
+<text x="213" y="374" text-anchor="middle" font-size="12.5" fill="#1f2937">Screen alone</text>
+<text x="213" y="390" text-anchor="middle" font-size="12.5" fill="#1f2937">(no AI review)</text>
+<rect x="410" y="144" width="62" height="206" rx="3" fill="#b91c1c"/>
+<text x="441" y="136" text-anchor="middle" font-size="16" font-weight="bold" fill="#b91c1c">14</text>
+<rect x="488" y="232" width="62" height="118" rx="3" fill="#15803d"/>
+<text x="519" y="224" text-anchor="middle" font-size="16" font-weight="bold" fill="#15803d">8</text>
+<text x="480" y="374" text-anchor="middle" font-size="12.5" fill="#1f2937">AI summaries,</text>
+<text x="480" y="390" text-anchor="middle" font-size="12.5" fill="#1f2937">no records evidence</text>
+<rect x="677" y="350" width="62" height="0" rx="3" fill="#b91c1c"/>
+<text x="708" y="342" text-anchor="middle" font-size="16" font-weight="bold" fill="#b91c1c">0</text>
+<rect x="755" y="232" width="62" height="118" rx="3" fill="#15803d"/>
+<text x="786" y="224" text-anchor="middle" font-size="16" font-weight="bold" fill="#15803d">8</text>
+<text x="747" y="374" text-anchor="middle" font-size="12.5" fill="#1f2937">AI summaries, with</text>
+<text x="747" y="390" text-anchor="middle" font-size="12.5" fill="#1f2937">records evidence*</text>
+<rect x="590" y="72" width="12" height="12" fill="#b91c1c"/><text x="608" y="83" font-size="12" fill="#1f2937">honest doctors accused (of 17)</text>
+<rect x="590" y="90" width="12" height="12" fill="#15803d"/><text x="608" y="101" font-size="12" fill="#1f2937">real upcoders caught (of 8)</text>
+<text x="30" y="432" font-size="11.5" fill="#6b7280">Synthetic data, one random seed, small counts. Summaries were written by AI agents in a chat session, not by the production API step (still to be run).</text>
+<text x="30" y="450" font-size="11.5" fill="#6b7280">*The records-review evidence is generated from the same hidden truth that defines an upcoded visit, so this bar shows a ceiling, not a real-world estimate.</text>
+</svg>
