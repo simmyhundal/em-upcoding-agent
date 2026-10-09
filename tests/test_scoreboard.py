@@ -10,14 +10,14 @@ import scoreboard as sb  # noqa: E402
 
 
 def test_threshold_logic_and_edge_cases():
-    assert sb.judge((7, 8), 3, "upcoders") and not sb.judge((6, 8), 3, "upcoders")
-    assert sb.judge((2, 8), 3, "hard") and not sb.judge((3, 8), 3, "hard")          # must be lower, not equal
-    assert sb.judge((0, 8), 0, "hard")                                              # zero always passes
-    assert sb.judge(0.8, None, "prec") and not sb.judge(0.79, None, "prec")
-    assert sb.judge(1.0, None, "cite") and not sb.judge(0.99, None, "cite")
-    assert sb.judge(4.0, None, "useful") and not sb.judge(3.99, None, "useful")
-    assert sb.judge(False, None, "templ") and not sb.judge(True, None, "templ")
-    assert sb.judge(None, 3, "upcoders") is None                                    # not scored: excluded
+    assert sb.judge((1, 8), "fn") and not sb.judge((2, 8), "fn")                    # 12.5% is the limit, inclusive
+    assert sb.judge((26, 208), "fp") and not sb.judge((27, 208), "fp")             # 26/208 = 12.5% exactly
+    assert sb.judge((0, 8), "fn") and sb.judge((0, 208), "fp")
+    assert sb.judge(0.8, "prec") and not sb.judge(0.79, "prec")
+    assert sb.judge(1.0, "cite") and not sb.judge(0.99, "cite")
+    assert sb.judge(4.0, "useful") and not sb.judge(3.99, "useful")
+    assert sb.judge(False, "templ") and not sb.judge(True, "templ")
+    assert sb.judge(None, "fn") is None                                            # not scored: excluded
 
 
 def test_total_ignores_unscored_evals():

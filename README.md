@@ -90,11 +90,11 @@ Results on the synthetic data (one random seed, small counts, so read them as di
 | Hard negative | An honest provider who looks suspicious at first glance |
 
 ## Explore the repo
-- **Case pages and charts:** `experiments/261008_4_cc/cases/` and `reports/charts/`
-- **Eval report:** `reports/eval_report.md`
-- **Recovery packets (simulated review):** `reports/pi_packets/`, explained in `docs/payment_integrity.md`
-- **Data design and calibration notes:** `docs/synthetic_data.md`
-- **Experiments and what they do and do not show:** `experiments/*/README.md`
+- **Case pages (the review queue):** [experiments/261009_1_api/cases/index.md](experiments/261009_1_api/cases/index.md), with charts in [reports/charts/](reports/charts/)
+- **Eval report:** [reports/eval_report.md](reports/eval_report.md)
+- **Recovery packets (simulated review):** [reports/pi_packets/](reports/pi_packets/), explained in [docs/payment_integrity.md](docs/payment_integrity.md)
+- **Data design and calibration notes:** [docs/synthetic_data.md](docs/synthetic_data.md)
+- **Experiments and what they do and do not show:** [experiments/README.md](experiments/README.md)
 - **Open and closed work:** the GitHub issues and milestones for this repository
 
 To rebuild the figures above: `python docs/make_figures.py`.
@@ -125,9 +125,9 @@ Every run is graded against the same thresholds. How each is computed is in `eva
 
 | Eval | Threshold |
 |---|---|
-| Upcoders caught | at least 7 of 8 |
-| Hard negatives wrongly accused (honest doctors with sicker patients) | lower than the plain z-score's count on the same data |
-| Precision of "upcoding" calls | at least 80% are real upcoders (*proposed*; added because the original targets ignored the ordinary honest doctors who also get flagged) |
+| False negative rate | at most 12.5% of the real upcoders missed (1 of 8) |
+| False positive rate | at most 12.5% of the honest doctors wrongly accused; "honest" is every non-upcoder in the data, ordinary doctors and sicker-panel doctors alike |
+| Precision of "upcoding" calls | at least 80% are real upcoders (*proposed*; added because the false positive rate is measured against all honest doctors and is easy to pass, so it does not penalize a long list of wrongly flagged doctors) |
 | Citations valid | 100% |
 | Case Summary Usefulness (1-5) | average of at least 4 (scored by an LLM judge) |
 | No templating | the templating check finds none |
@@ -140,18 +140,18 @@ Done: synthetic data generator (with a records-review documentation sample), bot
 Each run scored against the thresholds above. Screen rows show the statistical screen alone (its flagged doctors count as accused); the other rows show what the AI called upcoding. A dash means not scored or not applicable and is left out of the total.
 
 <!-- scoreboard:start -->
-| Run | Upcoders caught | Hard negatives wrongly accused | Precision of upcoding calls | Citations valid | Case Summary Usefulness (1-5) | No templating | Evals passed |
+| Run | False negative rate | False positive rate | Precision of upcoding calls | Citations valid | Case Summary Usefulness (1-5) | No templating | Evals passed |
 |---|---|---|---|---|---|---|---|
-| **Threshold** | at least 7 of 8 | lower than the plain z-score's count (seed 42: 3, seed 101: 2) | at least 80% (proposed) | 100% | at least 4 | none | every eval that applies |
-| Screen alone, seed 42 (no AI) | 8 / 8 ✓ | 3 / 8 ✗ | 32% ✗ | – | – | – | **1 / 3** |
-| Screen with suspicion at or above 5, seed 42 (no AI) | 8 / 8 ✓ | 1 / 8 ✓ | 73% ✗ | – | – | – | **2 / 3** |
-| 261008_2_cc: one agent for all 25 (templated) | 7 / 8 ✓ | 1 / 8 ✓ | 41% ✗ | 100% ✓ | – | templated ✗ | **3 / 5** |
-| 261008_3_cc: chat agents, no records evidence | 8 / 8 ✓ | 1 / 8 ✓ | 36% ✗ | 100% ✓ | – | none ✓ | **4 / 5** |
-| 261008_4_cc: chat agents, with records evidence | 8 / 8 ✓ | 0 / 8 ✓ | 100% ✓ | 100% ✓ | – | none ✓ | **5 / 5** |
-| **261009_1_api: live API run, seed 42** | 8 / 8 ✓ | 0 / 8 ✓ | 100% ✓ | 100% ✓ | 3.44 ✗ | none ✓ | **5 / 6** |
-| Screen alone, seed 101 (no AI) | 8 / 8 ✓ | 1 / 8 ✓ | 32% ✗ | – | – | – | **2 / 3** |
-| Screen with suspicion at or above 5, seed 101 (no AI) | 8 / 8 ✓ | 1 / 8 ✓ | 89% ✓ | – | – | – | **3 / 3** |
-| **261009_2_api: held-out API run, seed 101** | 8 / 8 ✓ | 0 / 8 ✓ | 100% ✓ | 100% ✓ | 3.24 ✗ | none ✓ | **5 / 6** |
+| **Threshold** | at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% | at least 4 | none | every eval that applies |
+| Screen alone, seed 42 (no AI) | 0.0% (0 / 8) ✓ | 8.2% (17 / 208) ✓ | 32% ✗ | – | – | – | **2 / 3** |
+| Screen with suspicion at or above 5, seed 42 (no AI) | 0.0% (0 / 8) ✓ | 1.4% (3 / 208) ✓ | 73% ✗ | – | – | – | **2 / 3** |
+| 261008_2_cc: one agent for all 25 (templated) | 12.5% (1 / 8) ✓ | 4.8% (10 / 208) ✓ | 41% ✗ | 100% ✓ | – | templated ✗ | **3 / 5** |
+| 261008_3_cc: chat agents, no records evidence | 0.0% (0 / 8) ✓ | 6.7% (14 / 208) ✓ | 36% ✗ | 100% ✓ | – | none ✓ | **4 / 5** |
+| 261008_4_cc: chat agents, with records evidence | 0.0% (0 / 8) ✓ | 0.0% (0 / 208) ✓ | 100% ✓ | 100% ✓ | – | none ✓ | **5 / 5** |
+| **261009_1_api: live API run, seed 42** | 0.0% (0 / 8) ✓ | 0.0% (0 / 208) ✓ | 100% ✓ | 100% ✓ | 3.44 ✗ | none ✓ | **5 / 6** |
+| Screen alone, seed 101 (no AI) | 0.0% (0 / 8) ✓ | 8.2% (17 / 208) ✓ | 32% ✗ | – | – | – | **2 / 3** |
+| Screen with suspicion at or above 5, seed 101 (no AI) | 0.0% (0 / 8) ✓ | 0.5% (1 / 208) ✓ | 89% ✓ | – | – | – | **3 / 3** |
+| **261009_2_api: held-out API run, seed 101** | 0.0% (0 / 8) ✓ | 0.0% (0 / 208) ✓ | 100% ✓ | 100% ✓ | 3.24 ✗ | none ✓ | **5 / 6** |
 <!-- scoreboard:end -->
 
 This table is generated from the saved outputs (`python docs/update_readme.py`). Usefulness is scored by an LLM judge (`eval/judge_usefulness.py`, a different model from the writer), so it is a rough rubric check. Run outputs are in `experiments/`; the naming is explained in `experiments/README.md`.

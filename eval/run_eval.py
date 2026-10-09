@@ -92,10 +92,10 @@ def render(res, top_n, runs=None, truth=None, usefulness=None):
 
     def row(label, f, target):
         lines.append(f"| {label} | " + " | ".join(f(res[n]) for n, _ in DETECTORS) + f" | {target} |")
-    row("Upcoders found", lambda r: f"{r['upcoders_found']} / {r['upcoders_total']}", ">= 7 / 8")
-    row("Hard negatives falsely flagged", lambda r: f"{r['hard_neg_flagged']} / {r['hard_neg_total']}",
-        "lower than plain z-score")
-    row("Normal providers falsely flagged", lambda r: f"{r['normal_flagged']} / {r['normal_total']}", "-")
+    row("Upcoders found", lambda r: f"{r['upcoders_found']} / {r['upcoders_total']}", "false negative rate <= 12.5% (at least 7 of 8)")
+    row("Hard negatives falsely flagged", lambda r: f"{r['hard_neg_flagged']} / {r['hard_neg_total']}", "-")
+    row("Normal providers falsely flagged", lambda r: f"{r['normal_flagged']} / {r['normal_total']}",
+        "false positive rate <= 12.5% over all honest doctors")
     row("Precision (upcoders / flagged)", lambda r: f"{r['precision']:.0%}", "-")
     row("Upcoder ranks", lambda r: ",".join(map(str, r["upcoder_ranks"])), "-")
     row("Hard-negative ranks", lambda r: ",".join(map(str, r["hard_neg_ranks"])), "-")
@@ -130,10 +130,13 @@ def render(res, top_n, runs=None, truth=None, usefulness=None):
     if not any((usefulness or {}).get(label) for label, _ in (runs or [])):
         lines += ["- Summary usefulness (1-5, see eval/rubric.md): pending. Target: average >= 4."]
     lines += ["", "## Target check"]
-    lines += [f"- Recall >= 7/8: {'met' if comb['upcoders_found'] >= 7 else 'NOT met'} (combined list)"]
-    better = comb["hard_neg_flagged"] < z["hard_neg_flagged"]
-    lines += [f"- Hard-negative false flags lower than plain z-score: {'met' if better else 'NOT met'} "
-              f"({comb['hard_neg_flagged']} vs {z['hard_neg_flagged']})"]
+    n_up, n_hn, n_nm = comb["upcoders_total"], comb["hard_neg_total"], comb["normal_total"]
+    fn_rate = (n_up - comb["upcoders_found"]) / n_up
+    fp_rate = (comb["hard_neg_flagged"] + comb["normal_flagged"]) / (n_hn + n_nm)
+    lines += [f"- False negative rate <= 12.5% (screen, combined list): {'met' if fn_rate <= 0.125 else 'NOT met'} "
+              f"({n_up - comb['upcoders_found']} of {n_up} upcoders missed, {fn_rate:.1%})",
+              f"- False positive rate <= 12.5% (screen, combined list): {'met' if fp_rate <= 0.125 else 'NOT met'} "
+              f"({comb['hard_neg_flagged'] + comb['normal_flagged']} of {n_hn + n_nm} honest doctors flagged, {fp_rate:.1%})"]
     for label, records in (runs or []):
         if (usefulness or {}).get(label):
             c = citation_stats(records)

@@ -2,9 +2,9 @@
 
 | Metric | Plain z-score | Risk-adjusted | Combined list | Target |
 |---|---|---|---|---|
-| Upcoders found | 8 / 8 | 8 / 8 | 8 / 8 | >= 7 / 8 |
-| Hard negatives falsely flagged | 2 / 8 | 1 / 8 | 1 / 8 | lower than plain z-score |
-| Normal providers falsely flagged | 15 / 200 | 16 / 200 | 16 / 200 | - |
+| Upcoders found | 8 / 8 | 8 / 8 | 8 / 8 | false negative rate <= 12.5% (at least 7 of 8) |
+| Hard negatives falsely flagged | 2 / 8 | 1 / 8 | 1 / 8 | - |
+| Normal providers falsely flagged | 15 / 200 | 16 / 200 | 16 / 200 | false positive rate <= 12.5% over all honest doctors |
 | Precision (upcoders / flagged) | 32% | 32% | 32% | - |
 | Upcoder ranks | 1,7,8,9,10,11,15,16 | 1,2,3,4,5,6,7,8 | 1,2,4,6,7,8,9,10 | - |
 | Hard-negative ranks | 3,18,28,53,74,111,189,202 | 9,40,58,78,136,181,188,201 | 3,29,52,63,122,127,186,201 | - |
@@ -27,8 +27,8 @@
 - Summary usefulness (LLM judge, 1-5, eval/rubric.md): mean 3.24 over 25 summaries (scores 1: 0, 2: 3, 3: 13, 4: 9, 5: 0); target >= 4: NOT met. The judge is itself an LLM, so treat this as a rough rubric check.
 
 ## Target check
-- Recall >= 7/8: met (combined list)
-- Hard-negative false flags lower than plain z-score: met (1 vs 2)
+- False negative rate <= 12.5% (screen, combined list): met (0 of 8 upcoders missed, 0.0%)
+- False positive rate <= 12.5% (screen, combined list): met (17 of 208 honest doctors flagged, 8.2%)
 - Held-out API run (261009_2_api, seed 101): claude-opus-5-5, with documentation evidence: citation accuracy 100%: met (278/278); summary usefulness >= 4: NOT met (mean 3.24)
 
 ## Caveats

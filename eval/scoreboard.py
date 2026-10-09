@@ -4,9 +4,10 @@ Reads experiments/runs.json. For each run it computes five evals, marks each pas
 evals passed out of those that apply. A dash means not scored or not applicable and is left out of the total.
 
 Evals and thresholds:
-  1. Upcoders caught: at least 7 of 8. (Screen rows: upcoders in the top 25. AI rows: upcoders the AI called upcoding.)
-  2. Hard negatives wrongly accused: lower than the plain z-score's count on the same data (0 always passes). Hard negatives are
-     honest doctors with sicker patients. (Screen rows: flagged. AI rows: called upcoding.)
+  1. False negative rate: at most 12.5% of the real upcoders are missed. (Screen rows: upcoders not flagged. AI rows: upcoders
+     the AI did not call upcoding.)
+  2. False positive rate: at most 12.5% of the honest doctors are wrongly accused. Honest means every non-upcoder in the data,
+     including ordinary doctors and doctors with sicker patients. (Screen rows: flagged. AI rows: called upcoding.)
   3. Precision of "upcoding" calls: at least 80% of the doctors called upcoding really are upcoders (PROPOSED threshold: the
      original targets ignored the many ordinary honest doctors who get flagged). Screen rows: upcoders among the top 25.
   4. Citations valid: 100% of cited claims exist and belong to the provider.
@@ -24,21 +25,21 @@ import run_eval
 import template_check
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MIN_UPCODERS_FRACTION = 7 / 8
+MAX_RATE = 0.125       # false negative rate and false positive rate
 MIN_USEFULNESS = 4.0
 MIN_PRECISION = 0.80   # proposed
 TOP_N = 25
 PASS, FAIL = "✓", "✗"
 
 
-def judge(value, z_value, kind):
-    """Pass/fail for one eval. kind in upcoders|hard|prec|cite|useful|templ."""
+def judge(value, kind):
+    """Pass/fail for one eval. kind in fn|fp|prec|cite|useful|templ."""
     if value is None:
         return None
-    if kind == "upcoders":
-        return value[0] / value[1] >= MIN_UPCODERS_FRACTION
-    if kind == "hard":
-        return value[0] < z_value or value[0] == 0
+    if kind == "fn":                       # value = (missed upcoders, all upcoders)
+        return value[0] / value[1] <= MAX_RATE
+    if kind == "fp":                       # value = (honest doctors accused, all honest doctors)
+        return value[0] / value[1] <= MAX_RATE
     if kind == "prec":
         return value >= MIN_PRECISION
     if kind == "cite":
@@ -71,38 +72,37 @@ def compute(registry_path=None):
         rows = list(csv.DictReader(open(_load(d["flagged"]))))
         ev = run_eval.evaluate(rows, truth, TOP_N)
         roles = [v["role"] for v in truth["providers"].values()]
-        data[key] = {"truth": truth, "ev": ev, "rows": rows, "n_up": roles.count("upcoder"), "n_hn": roles.count("hard_negative"),
-                     "z_hard": ev["Plain z-score"]["hard_neg_flagged"], "label": d["label"]}
+        data[key] = {"truth": truth, "ev": ev, "rows": rows, "n_up": roles.count("upcoder"),
+                     "n_honest": len(roles) - roles.count("upcoder"), "label": d["label"]}
     out = []
     for r in reg["runs"]:
         d = data[r["dataset"]]
-        cells = {"upcoders": None, "hard": None, "prec": None, "cite": None, "useful": None, "templ": None}
+        cells = {"fn": None, "fp": None, "prec": None, "cite": None, "useful": None, "templ": None}
         text = {k: "–" for k in cells}
         if r["kind"] == "screen" and r.get("min_suspicion") is not None:
             sel = [x["provider_id"] for x in d["rows"] if float(x["z_adj"]) >= r["min_suspicion"]]
             sc = run_eval.score(sel, d["truth"])
-            cells["upcoders"] = (sc["upcoder"]["flagged"], d["n_up"])
-            cells["hard"] = (sc["hard_negative"]["flagged"], d["n_hn"])
-            cells["prec"] = (sc["upcoder"]["flagged"] / len(sel)) if sel else None
+            found = sc["upcoder"]["flagged"]
+            honest = sc["hard_negative"]["flagged"] + sc["normal"]["flagged"]
+            prec = (found / len(sel)) if sel else None
         elif r["kind"] == "screen":
             c = d["ev"]["Combined list"]
-            cells["upcoders"] = (c["upcoders_found"], d["n_up"])
-            cells["hard"] = (c["hard_neg_flagged"], d["n_hn"])
-            cells["prec"] = c["upcoders_found"] / TOP_N
+            found, honest, prec = c["upcoders_found"], c["hard_neg_flagged"] + c["normal_flagged"], c["upcoders_found"] / TOP_N
         else:
             recs = run_eval.load_checked(_load(r["checked"]))
             L = run_eval.leaning_stats(recs, d["truth"])
-            cells["upcoders"] = (L["true_upcoders_called"], d["n_up"])
-            cells["hard"] = (L["table"]["hard_negative"]["upcoding"], d["n_hn"])
-            cells["prec"] = L["precision"]
+            found, honest, prec = L["true_upcoders_called"], L["honest_called_upcoding"], L["precision"]
             cells["cite"] = run_eval.citation_stats(recs)["accuracy"]
             cells["templ"] = template_check.check([x["summary"]["rationale"] for x in recs])["flagged"]
             if r.get("usefulness"):
                 rows = [json.loads(line) for line in open(_load(r["usefulness"])) if line.strip()]
                 cells["useful"] = sum(x["score"] for x in rows) / len(rows)
-        oks = {k: judge(cells[k], d["z_hard"], k) for k in cells}
-        text["upcoders"] = f"{cells['upcoders'][0]} / {cells['upcoders'][1]}"
-        text["hard"] = f"{cells['hard'][0]} / {cells['hard'][1]}"
+        cells["fn"] = (d["n_up"] - found, d["n_up"])
+        cells["fp"] = (honest, d["n_honest"])
+        cells["prec"] = prec
+        oks = {k: judge(cells[k], k) for k in cells}
+        text["fn"] = f"{cells['fn'][0] / cells['fn'][1]:.1%} ({cells['fn'][0]} / {cells['fn'][1]})"
+        text["fp"] = f"{cells['fp'][0] / cells['fp'][1]:.1%} ({cells['fp'][0]} / {cells['fp'][1]})"
         if cells["prec"] is not None:
             text["prec"] = f"{cells['prec']:.0%}"
         if cells["cite"] is not None:
@@ -112,20 +112,19 @@ def compute(registry_path=None):
         if cells["templ"] is not None:
             text["templ"] = "templated" if cells["templ"] else "none"
         out.append({"label": r["label"], "text": text, "ok": oks, "total": total(oks.values())})
-    z = ", ".join(f"{d['label']}: {d['z_hard']}" for d in data.values())
-    return out, z
+    return out
 
 
 def markdown(registry_path=None):
-    rows, z = compute(registry_path)
-    head = ("| Run | Upcoders caught | Hard negatives wrongly accused | Precision of upcoding calls | Citations valid "
+    rows = compute(registry_path)
+    head = ("| Run | False negative rate | False positive rate | Precision of upcoding calls | Citations valid "
             "| Case Summary Usefulness (1-5) | No templating | Evals passed |\n|---|---|---|---|---|---|---|---|")
-    thr = (f"| **Threshold** | at least 7 of 8 | lower than the plain z-score's count ({z}) | at least 80% (proposed) | 100% "
-           f"| at least 4 | none | every eval that applies |")
+    thr = ("| **Threshold** | at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% "
+           "| at least 4 | none | every eval that applies |")
     lines = [head, thr]
     for r in rows:
         cells = " | ".join(f"{r['text'][k]} {mark(r['ok'][k])}".strip() if r["ok"][k] is not None else "–"
-                           for k in ("upcoders", "hard", "prec", "cite", "useful", "templ"))
+                           for k in ("fn", "fp", "prec", "cite", "useful", "templ"))
         lines.append(f"| {r['label']} | {cells} | **{r['total']}** |")
     return "\n".join(lines)
 

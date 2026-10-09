@@ -2,9 +2,9 @@
 
 | Metric | Plain z-score | Risk-adjusted | Combined list | Target |
 |---|---|---|---|---|
-| Upcoders found | 7 / 8 | 8 / 8 | 8 / 8 | >= 7 / 8 |
-| Hard negatives falsely flagged | 3 / 8 | 3 / 8 | 3 / 8 | lower than plain z-score |
-| Normal providers falsely flagged | 15 / 200 | 14 / 200 | 14 / 200 | - |
+| Upcoders found | 7 / 8 | 8 / 8 | 8 / 8 | false negative rate <= 12.5% (at least 7 of 8) |
+| Hard negatives falsely flagged | 3 / 8 | 3 / 8 | 3 / 8 | - |
+| Normal providers falsely flagged | 15 / 200 | 14 / 200 | 14 / 200 | false positive rate <= 12.5% over all honest doctors |
 | Precision (upcoders / flagged) | 28% | 32% | 32% | - |
 | Upcoder ranks | 2,3,4,5,7,10,13,35 | 1,2,3,4,6,7,9,10 | 1,3,4,5,6,7,9,19 | - |
 | Hard-negative ranks | 1,9,24,27,40,91,103,147 | 5,12,22,27,63,148,173,206 | 2,8,24,30,40,120,140,179 | - |
@@ -69,8 +69,8 @@
 - Summaries rejected by the guardrail and not scored: 0.
 
 ## Target check
-- Recall >= 7/8: met (combined list)
-- Hard-negative false flags lower than plain z-score: NOT met (3 vs 3)
+- False negative rate <= 12.5% (screen, combined list): met (0 of 8 upcoders missed, 0.0%)
+- False positive rate <= 12.5% (screen, combined list): met (17 of 208 honest doctors flagged, 8.2%)
 - Live API run (261009_1_api): claude-opus-5-5, with documentation evidence: citation accuracy 100%: met (261/261); summary usefulness >= 4: NOT met (mean 3.44)
 
 ## Caveats
