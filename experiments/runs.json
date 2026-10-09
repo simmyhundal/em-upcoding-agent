@@ -1,15 +1,70 @@
 {
   "datasets": {
-    "s42": {"label": "seed 42", "flagged": "reports/flagged.csv", "truth": "eval/answer_key/ground_truth.json"},
-    "s101": {"label": "seed 101", "flagged": "experiments/261009_2_api/flagged.csv", "truth": "eval/answer_key/ground_truth_s101.json"}
+    "s42": {
+      "label": "seed 42",
+      "flagged": "reports/flagged.csv",
+      "truth": "eval/answer_key/ground_truth.json"
+    },
+    "s101": {
+      "label": "seed 101",
+      "flagged": "experiments/261009_2_api/flagged.csv",
+      "truth": "eval/answer_key/ground_truth_s101.json"
+    }
   },
   "runs": [
-    {"label": "Screen alone, seed 42 (no AI)", "dataset": "s42", "kind": "screen"},
-    {"label": "261008_2_cc: one agent for all 25 (templated)", "dataset": "s42", "kind": "summaries", "checked": "experiments/261008_2_cc/summaries_checked.jsonl"},
-    {"label": "261008_3_cc: chat agents, no records evidence", "dataset": "s42", "kind": "summaries", "checked": "experiments/261008_3_cc/summaries_checked.jsonl"},
-    {"label": "261008_4_cc: chat agents, with records evidence", "dataset": "s42", "kind": "summaries", "checked": "experiments/261008_4_cc/summaries_checked.jsonl"},
-    {"label": "**261009_1_api: live API run, seed 42**", "dataset": "s42", "kind": "summaries", "checked": "experiments/261009_1_api/case_summaries_checked.jsonl", "usefulness": "experiments/261009_1_api/usefulness.jsonl"},
-    {"label": "Screen alone, seed 101 (no AI)", "dataset": "s101", "kind": "screen"},
-    {"label": "**261009_2_api: held-out API run, seed 101**", "dataset": "s101", "kind": "summaries", "checked": "experiments/261009_2_api/case_summaries_checked.jsonl", "usefulness": "experiments/261009_2_api/usefulness.jsonl"}
+    {
+      "label": "Screen alone, seed 42 (no AI)",
+      "dataset": "s42",
+      "kind": "screen"
+    },
+    {
+      "label": "Screen with suspicion at or above 5, seed 42 (no AI)",
+      "dataset": "s42",
+      "kind": "screen",
+      "min_suspicion": 5
+    },
+    {
+      "label": "261008_2_cc: one agent for all 25 (templated)",
+      "dataset": "s42",
+      "kind": "summaries",
+      "checked": "experiments/261008_2_cc/summaries_checked.jsonl"
+    },
+    {
+      "label": "261008_3_cc: chat agents, no records evidence",
+      "dataset": "s42",
+      "kind": "summaries",
+      "checked": "experiments/261008_3_cc/summaries_checked.jsonl"
+    },
+    {
+      "label": "261008_4_cc: chat agents, with records evidence",
+      "dataset": "s42",
+      "kind": "summaries",
+      "checked": "experiments/261008_4_cc/summaries_checked.jsonl"
+    },
+    {
+      "label": "**261009_1_api: live API run, seed 42**",
+      "dataset": "s42",
+      "kind": "summaries",
+      "checked": "experiments/261009_1_api/case_summaries_checked.jsonl",
+      "usefulness": "experiments/261009_1_api/usefulness.jsonl"
+    },
+    {
+      "label": "Screen alone, seed 101 (no AI)",
+      "dataset": "s101",
+      "kind": "screen"
+    },
+    {
+      "label": "Screen with suspicion at or above 5, seed 101 (no AI)",
+      "dataset": "s101",
+      "kind": "screen",
+      "min_suspicion": 5
+    },
+    {
+      "label": "**261009_2_api: held-out API run, seed 101**",
+      "dataset": "s101",
+      "kind": "summaries",
+      "checked": "experiments/261009_2_api/case_summaries_checked.jsonl",
+      "usefulness": "experiments/261009_2_api/usefulness.jsonl"
+    }
   ]
 }

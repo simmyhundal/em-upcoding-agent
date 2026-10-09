@@ -71,14 +71,20 @@ def compute(registry_path=None):
         rows = list(csv.DictReader(open(_load(d["flagged"]))))
         ev = run_eval.evaluate(rows, truth, TOP_N)
         roles = [v["role"] for v in truth["providers"].values()]
-        data[key] = {"truth": truth, "ev": ev, "n_up": roles.count("upcoder"), "n_hn": roles.count("hard_negative"),
+        data[key] = {"truth": truth, "ev": ev, "rows": rows, "n_up": roles.count("upcoder"), "n_hn": roles.count("hard_negative"),
                      "z_hard": ev["Plain z-score"]["hard_neg_flagged"], "label": d["label"]}
     out = []
     for r in reg["runs"]:
         d = data[r["dataset"]]
         cells = {"upcoders": None, "hard": None, "prec": None, "cite": None, "useful": None, "templ": None}
         text = {k: "–" for k in cells}
-        if r["kind"] == "screen":
+        if r["kind"] == "screen" and r.get("min_suspicion") is not None:
+            sel = [x["provider_id"] for x in d["rows"] if float(x["z_adj"]) >= r["min_suspicion"]]
+            sc = run_eval.score(sel, d["truth"])
+            cells["upcoders"] = (sc["upcoder"]["flagged"], d["n_up"])
+            cells["hard"] = (sc["hard_negative"]["flagged"], d["n_hn"])
+            cells["prec"] = (sc["upcoder"]["flagged"] / len(sel)) if sel else None
+        elif r["kind"] == "screen":
             c = d["ev"]["Combined list"]
             cells["upcoders"] = (c["upcoders_found"], d["n_up"])
             cells["hard"] = (c["hard_neg_flagged"], d["n_hn"])

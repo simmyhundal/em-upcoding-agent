@@ -13,7 +13,7 @@ The hard part: a doctor who bills the top code often is **not necessarily cheati
 
 ## What does this project do?
 1. **Builds realistic practice data.** It generates a fake population of 216 family doctors in Georgia (about 100,000 visits), shaped to match public Medicare statistics. Eight are planted upcoders, eight are honest but treat unusually sick patients, and the rest are typical. Because the answer is known, the tools can be graded.
-2. **Screens for outliers.** Statistics flag doctors who bill the top code unusually often, adjusted for how sick their patients are. The 25 most unusual go to a reviewer.
+2. **Screens for outliers.** Statistics flag doctors who bill the top code unusually often, adjusted for how sick their patients are. The most unusual go to a reviewer: the top 25, or everyone above a chosen suspicion level.
 3. **Writes a case summary and a recommendation.** An AI reads each flagged doctor's billing pattern and records evidence, writes a short explanation that **cites the exact visits** it relies on, and advises whether the case looks like upcoding, like a sicker patient base, or is unclear.
 4. **Checks the AI.** Plain code rejects any summary that cites a visit that does not exist or belongs to a different doctor.
 5. **Shows the evidence.** Each case gets a chart comparing the doctor to peers, and a case page a reviewer can read in a minute.
@@ -116,7 +116,7 @@ In the live runs most of the separation came from the records-review evidence, n
 3. **Detectors** (the main metric is each provider's 99215 share):
    - *Baseline 1*: plain z-score of 99215 share against peers.
    - *Baseline 2*: risk-adjusted observed-versus-expected, using patient complexity (visit-weighted chronic-condition count).
-4. **Flagging** - rank providers and take the top N for review.
+4. **Flagging** - choose who goes to review: by default the top N (25), or every provider at or above a chosen suspicion level (`python src/flagging.py ... --min-suspicion 5`, with optional `--max-flagged` and `--min-claims`). A threshold flags fewer, better-targeted providers and cuts the number of AI calls; see `docs/threshold_sweep.md` for what each cutoff would flag.
 5. **Case summaries (LLM)** - for each flagged provider, summarise the claims and patient complexity as `{decision_rationale, cited_claim_ids[]}`. The LLM does not set the flag (the screen does); it advises, and its advice gates the recovery packet.
 6. **Guardrail** - rejects any summary citing claim IDs that don't exist for that provider.
 
@@ -144,11 +144,13 @@ Each run scored against the thresholds above. Screen rows show the statistical s
 |---|---|---|---|---|---|---|---|
 | **Threshold** | at least 7 of 8 | lower than the plain z-score's count (seed 42: 3, seed 101: 2) | at least 80% (proposed) | 100% | at least 4 | none | every eval that applies |
 | Screen alone, seed 42 (no AI) | 8 / 8 ✓ | 3 / 8 ✗ | 32% ✗ | – | – | – | **1 / 3** |
+| Screen with suspicion at or above 5, seed 42 (no AI) | 8 / 8 ✓ | 1 / 8 ✓ | 73% ✗ | – | – | – | **2 / 3** |
 | 261008_2_cc: one agent for all 25 (templated) | 7 / 8 ✓ | 1 / 8 ✓ | 41% ✗ | 100% ✓ | – | templated ✗ | **3 / 5** |
 | 261008_3_cc: chat agents, no records evidence | 8 / 8 ✓ | 1 / 8 ✓ | 36% ✗ | 100% ✓ | – | none ✓ | **4 / 5** |
 | 261008_4_cc: chat agents, with records evidence | 8 / 8 ✓ | 0 / 8 ✓ | 100% ✓ | 100% ✓ | – | none ✓ | **5 / 5** |
 | **261009_1_api: live API run, seed 42** | 8 / 8 ✓ | 0 / 8 ✓ | 100% ✓ | 100% ✓ | 3.44 ✗ | none ✓ | **5 / 6** |
 | Screen alone, seed 101 (no AI) | 8 / 8 ✓ | 1 / 8 ✓ | 32% ✗ | – | – | – | **2 / 3** |
+| Screen with suspicion at or above 5, seed 101 (no AI) | 8 / 8 ✓ | 1 / 8 ✓ | 89% ✓ | – | – | – | **3 / 3** |
 | **261009_2_api: held-out API run, seed 101** | 8 / 8 ✓ | 0 / 8 ✓ | 100% ✓ | 100% ✓ | 3.24 ✗ | none ✓ | **5 / 6** |
 <!-- scoreboard:end -->
 
