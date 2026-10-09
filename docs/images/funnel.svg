@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 600" width="920" height="600" font-family="Helvetica, Arial, sans-serif">
+<rect width="920" height="600" fill="#ffffff"/>
+<text x="30" y="34" font-size="20" font-weight="bold" fill="#1f2937">From 216 doctors to a few cases for recovery</text>
+<text x="30" y="56" font-size="13" fill="#6b7280">Each step narrows the group with a different tool. People make the final decisions.</text>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#6b7280"/></marker></defs>
+<rect x="30" y="80" width="860" height="84" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+<text x="48" y="118" font-size="30" font-weight="bold" fill="#2563eb">216 doctors</text>
+<text x="48" y="142" font-size="13" fill="#6b7280">Every provider in the data. The statistical screen ranks them by how often they bill the top visit code, adjusted for how</text>
+<text x="48" y="159" font-size="13" fill="#6b7280">sick their patients are.</text>
+<path d="M460 164 L460 196" stroke="#6b7280" stroke-width="2" marker-end="url(#a)"/>
+<text x="470" y="184.0" font-size="12" fill="#6b7280">keep the 25 most unusual</text>
+<rect x="130" y="198" width="660" height="84" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+<text x="148" y="236" font-size="30" font-weight="bold" fill="#2563eb">25 flagged for review</text>
+<text x="148" y="260" font-size="13" fill="#6b7280">Unusual, not necessarily guilty. Many are honest doctors who treat sicker patients or code</text>
+<text x="148" y="277" font-size="13" fill="#6b7280">high for reasons the claims do not show.</text>
+<path d="M460 282 L460 314" stroke="#6b7280" stroke-width="2" marker-end="url(#a)"/>
+<text x="470" y="302.0" font-size="12" fill="#6b7280">AI writes a case summary for each; the citation check passes 25 of 25</text>
+<rect x="30" y="318" width="260" height="104" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="2"/>
+<text x="48" y="360" font-size="30" font-weight="bold" fill="#c2410c">8</text>
+<text x="77" y="360" font-size="15" font-weight="bold" fill="#1f2937">look like upcoding</text>
+<text x="48" y="386" font-size="13" fill="#6b7280">Move on to recovery.</text>
+<rect x="330" y="318" width="260" height="104" rx="10" fill="#f0fdf4" stroke="#15803d" stroke-width="2"/>
+<text x="348" y="360" font-size="30" font-weight="bold" fill="#15803d">12</text>
+<text x="396" y="360" font-size="15" font-weight="bold" fill="#1f2937">look like sicker patients</text>
+<text x="348" y="386" font-size="13" fill="#6b7280">Set aside: the records support the</text>
+<text x="348" y="403" font-size="13" fill="#6b7280">billing.</text>
+<rect x="630" y="318" width="260" height="104" rx="10" fill="#f9fafb" stroke="#6b7280" stroke-width="2"/>
+<text x="648" y="360" font-size="30" font-weight="bold" fill="#6b7280">5</text>
+<text x="677" y="360" font-size="15" font-weight="bold" fill="#1f2937">unclear</text>
+<text x="648" y="386" font-size="13" fill="#6b7280">Not enough records to tell.</text>
+<text x="648" y="403" font-size="13" fill="#6b7280">Request more.</text>
+<path d="M160 422 L160 454" stroke="#6b7280" stroke-width="2" marker-end="url(#a)"/>
+<rect x="30" y="456" width="560" height="104" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="2"/>
+<text x="48" y="494" font-size="30" font-weight="bold" fill="#c2410c">8 recovery packets</text>
+<text x="48" y="518" font-size="13" fill="#6b7280">Records to request, a reproducible sample, and an overpayment estimator. A</text>
+<text x="48" y="535" font-size="13" fill="#6b7280">person reviews the records and decides what happens next.</text>
+<text x="620" y="486" font-size="13" font-weight="bold" fill="#1f2937">Not accused</text>
+<text x="620" y="506" font-size="13" fill="#6b7280">The set-aside and unclear cases</text>
+<text x="620" y="523" font-size="13" fill="#6b7280">are not accused of anything. The</text>
+<text x="620" y="540" font-size="13" fill="#6b7280">AI's lean is advice to a reviewer,</text>
+<text x="620" y="557" font-size="13" fill="#6b7280">not a verdict.</text>
+</svg>

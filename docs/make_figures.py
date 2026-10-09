@@ -3,6 +3,7 @@
   docs/images/pipeline.svg   the pipeline in plain English
   docs/images/results.svg    honest providers still accused after review, from the checked summaries and the answer key
   docs/images/case_card.svg  one real case summary with its evidence chart
+  docs/images/funnel.svg     the filtering steps with the live run's counts
 
 The results figure needs the answer key (eval/answer_key/ground_truth.json), which is gitignored; regenerate it with
 src/generate_synthetic.py first. Numbers come from the same functions the eval report uses.
@@ -156,9 +157,62 @@ def case_card(pid="P0215"):
     write("case_card.svg", "\n".join(s))
 
 
+def funnel():
+    import csv
+    n_all = sum(1 for _ in csv.DictReader(open(os.path.join(ROOT, "data", "synthetic", "providers.csv"))))
+    flagged = [r for r in csv.DictReader(open(os.path.join(ROOT, "reports", "flagged.csv"))) if r["flagged"] == "True"]
+    recs = run_eval.load_checked(os.path.join(ROOT, "reports", "live", "case_summaries_checked.jsonl"))
+    passed = sum(r["citation_check"]["passed"] for r in recs)
+    lean = {"up": 0, "acute": 0, "unclear": 0}
+    for r in recs:
+        if r["citation_check"]["passed"]:
+            k = {"pattern_consistent_with_upcoding": "up", "pattern_consistent_with_high_acuity_panel": "acute"}.get(r["summary"]["leaning"], "unclear")
+            lean[k] += 1
+    packets = sum(1 for d in os.listdir(os.path.join(ROOT, "reports", "pi_packets")) if os.path.isdir(os.path.join(ROOT, "reports", "pi_packets", d)))
+    W, H = 920, 600
+    s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>',
+         f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
+         f'<text x="30" y="34" font-size="20" font-weight="bold" fill="{INK}">From {n_all} doctors to a few cases for recovery</text>',
+         f'<text x="30" y="56" font-size="13" fill="{MUTED}">Each step narrows the group with a different tool. People make the final decisions.</text>']
+
+    def bar(x, y, w, h, fill, stroke, big, small, big_col=INK):
+        s.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="10" fill="{fill}" stroke="{stroke}" stroke-width="2"/>')
+        s.append(f'<text x="{x + 18}" y="{y + 38}" font-size="30" font-weight="bold" fill="{big_col}">{big}</text>')
+        for j, line in enumerate(textwrap.wrap(small, int(w / 7.1))):
+            s.append(f'<text x="{x + 18}" y="{y + 62 + j * 17}" font-size="13" fill="{MUTED}">{escape(line)}</text>')
+
+    def arrow(x1, y1, x2, y2, label=""):
+        s.append(f'<path d="M{x1} {y1} L{x2} {y2}" stroke="{MUTED}" stroke-width="2" marker-end="url(#a)"/>')
+        if label:
+            s.append(f'<text x="{x1 + 10}" y="{(y1 + y2) / 2 + 4}" font-size="12" fill="{MUTED}">{escape(label)}</text>')
+    s.append(f'<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="{MUTED}"/></marker></defs>')
+    bar(30, 80, 860, 84, "#eff6ff", BLUE, f"{n_all} doctors", "Every provider in the data. The statistical screen ranks them by how often they bill the top visit code, adjusted for how sick their patients are.", BLUE)
+    arrow(460, 164, 460, 196, "keep the 25 most unusual")
+    bar(130, 198, 660, 84, "#eff6ff", BLUE, f"{len(flagged)} flagged for review", "Unusual, not necessarily guilty. Many are honest doctors who treat sicker patients or code high for reasons the claims do not show.", BLUE)
+    arrow(460, 282, 460, 314, f"AI writes a case summary for each; the citation check passes {passed} of {len(recs)}")
+    cols = [("up", f"{lean['up']}", "look like upcoding", "Move on to recovery.", "#fff7ed", ORANGE),
+            ("acute", f"{lean['acute']}", "look like sicker patients", "Set aside: the records support the billing.", "#f0fdf4", GREEN),
+            ("unclear", f"{lean['unclear']}", "unclear", "Not enough records to tell. Request more.", "#f9fafb", MUTED)]
+    xs = [30, 330, 630]
+    for (k, big, title, body, fill, col), x in zip(cols, xs):
+        s.append(f'<rect x="{x}" y="318" width="260" height="104" rx="10" fill="{fill}" stroke="{col}" stroke-width="2"/>')
+        s.append(f'<text x="{x + 18}" y="360" font-size="30" font-weight="bold" fill="{col}">{big}</text>')
+        s.append(f'<text x="{x + 18 + 19 * len(big) + 10}" y="360" font-size="15" font-weight="bold" fill="{INK}">{escape(title)}</text>')
+        for j, line in enumerate(textwrap.wrap(body, 34)):
+            s.append(f'<text x="{x + 18}" y="{386 + j * 17}" font-size="13" fill="{MUTED}">{escape(line)}</text>')
+    arrow(160, 422, 160, 454, "")
+    bar(30, 456, 560, 104, "#fff7ed", ORANGE, f"{packets} recovery packets", "Records to request, a reproducible sample, and an overpayment estimator. A person reviews the records and decides what happens next.", ORANGE)
+    s.append(f'<text x="620" y="486" font-size="13" font-weight="bold" fill="{INK}">Not accused</text>')
+    for j, line in enumerate(textwrap.wrap("The set-aside and unclear cases are not accused of anything. The AI's lean is advice to a reviewer, not a verdict.", 34)):
+        s.append(f'<text x="620" y="{506 + j * 17}" font-size="13" fill="{MUTED}">{escape(line)}</text>')
+    s.append("</svg>")
+    write("funnel.svg", "\n".join(s))
+
+
 if __name__ == "__main__":
     os.makedirs(os.path.join(ROOT, "docs", "images"), exist_ok=True)
     pipeline()
+    funnel()
     print("results:", results())
     case_card()
     print("figures written to docs/images/")
