@@ -52,6 +52,12 @@ the other providers' 99215 share varies at each patient-complexity level, and th
 (thin levels are hollow and dashed). `python src/case_report.py CHECKED_SUMMARIES CHARTS_DIR OUT_DIR` builds a markdown page per
 provider that combines the summary, its cited claims and the chart; see `experiments/cold_agent_25_docs/cases/` for an example.
 
+## Payment Integrity packet
+`src/pi_packet.py` turns an "upcoding" case into draft material for the Payment Integrity team: a dossier, a reproducible sample of
+claims to request records for, a sampling plan, and an overpayment estimator that extrapolates a reviewed sample with a confidence
+interval. It does not draft letters or make findings. See `docs/payment_integrity.md`; worked examples (simulated review) are in
+`reports/pi_packets/`.
+
 ## Guardrail scope
 `src/guardrail.py` checks that every cited claim ID exists and belongs to the provider being summarized, and rejects summaries
 with no citations. It does **not** check that a cited claim supports the sentence that cites it. For example, a summary could
