@@ -62,7 +62,7 @@ The live API run of the summary step is still pending (needs an API key in `.env
 
 | Run | Upcoders called upcoding | Honest providers called upcoding |
 |---|---|---|
-| Plain z-score flags only | 7 / 8 flagged | 18 / 217 flagged (3 hard negatives + 15 normal) |
+| Plain z-score flags only (no summaries) | 7 / 8 flagged | 18 flagged (3 hard negatives + 15 normal providers) |
 | Experiment 2: summaries without documentation | 8 / 8 | 14 / 17 flagged honest |
 | Experiment 3: summaries with documentation evidence | 8 / 8 | 0 / 17 flagged honest |
 
