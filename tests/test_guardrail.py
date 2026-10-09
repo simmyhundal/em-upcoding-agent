@@ -10,7 +10,7 @@ import generate_synthetic as g  # noqa: E402
 import guardrail  # noqa: E402
 
 D = tempfile.mkdtemp()
-g.build(D, seed=3, n_normal=6, n_upcoders=1, n_hard_neg=1)
+g.build(D, os.path.join(tempfile.mkdtemp(), "gt.json"), seed=3, n_normal=6, n_upcoders=1, n_hard_neg=1)
 OWNER = guardrail.load_claim_owners(D)
 P1 = "P0001"
 P2 = "P0002"

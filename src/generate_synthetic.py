@@ -13,11 +13,11 @@ Model
 * Hard negatives are honest but have sicker panels, so they legitimately bill
   more 99214/99215.
 
-Ground truth (justified levels, provider roles) is written separately and is
-NOT part of what the agent sees.
+Ground truth (justified levels, provider roles) is written to a separate
+answer-key path outside the data folder and is NOT part of what the agent sees.
 
 Usage:
-    python src/generate_synthetic.py OUT_DIR [--seed 42]
+    python src/generate_synthetic.py OUT_DIR [--seed 42] [--answer-key eval/answer_key/ground_truth.json]
 """
 import argparse
 import json
@@ -26,6 +26,8 @@ from datetime import date, timedelta
 
 import numpy as np
 
+DEFAULT_ANSWER_KEY = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                  "eval", "answer_key", "ground_truth.json")
 CODES = ["99211", "99212", "99213", "99214", "99215"]
 
 CONDITIONS = [
@@ -91,7 +93,11 @@ def simulate_provider(rng, params, n_visits, lam_mult=1.0, upgrade_frac=0.0):
     return chronic, visit_pat, just, billed
 
 
-def build(out_dir, seed=42, n_normal=200, n_upcoders=8, n_hard_neg=8):
+def build(out_dir, answer_key_path, seed=42, n_normal=200, n_upcoders=8, n_hard_neg=8):
+    """Write agent-visible tables to out_dir and the answer key to answer_key_path (must be outside out_dir)."""
+    if os.path.commonpath([os.path.abspath(out_dir), os.path.abspath(answer_key_path)]) == os.path.abspath(out_dir):
+        raise ValueError("answer_key_path must be outside out_dir so agents reading the data cannot see it")
+    os.makedirs(os.path.dirname(os.path.abspath(answer_key_path)), exist_ok=True)
     rng = np.random.default_rng(seed)
     os.makedirs(out_dir, exist_ok=True)
     roles = ["normal"] * n_normal + ["upcoder"] * n_upcoders + ["hard_negative"] * n_hard_neg
@@ -163,7 +169,7 @@ def build(out_dir, seed=42, n_normal=200, n_upcoders=8, n_hard_neg=8):
     _write_csv(os.path.join(out_dir, "claims.csv"), claims,
                ["claim_id", "provider_id", "patient_id", "service_date", "cpt", "place_of_service", "diagnosis_codes"])
     # Ground truth (kept apart; never shown to the agent)
-    with open(os.path.join(out_dir, "ground_truth.json"), "w") as f:
+    with open(answer_key_path, "w") as f:
         json.dump({
             "seed": seed,
             "providers": {p["provider_id"]: {"role": p["_role"], "upgrade_fraction": p["_upgrade_fraction"],
@@ -185,6 +191,8 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("out_dir")
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--answer-key", default=DEFAULT_ANSWER_KEY,
+                    help="where to write the answer key (must be outside out_dir)")
     a = ap.parse_args()
-    provs = build(a.out_dir, a.seed)
-    print(f"wrote {len(provs)} providers to {a.out_dir}")
+    provs = build(a.out_dir, a.answer_key, a.seed)
+    print(f"wrote {len(provs)} providers to {a.out_dir}; answer key at {a.answer_key}")

@@ -13,8 +13,9 @@ import generate_synthetic as g  # noqa: E402
 import run_eval  # noqa: E402
 
 D = tempfile.mkdtemp()
-g.build(D, seed=5, n_normal=40, n_upcoders=3, n_hard_neg=3)
-TRUTH = json.load(open(os.path.join(D, "ground_truth.json")))
+KEY = os.path.join(tempfile.mkdtemp(), "ground_truth.json")
+g.build(D, KEY, seed=5, n_normal=40, n_upcoders=3, n_hard_neg=3)
+TRUTH = json.load(open(KEY))
 ROWS = flagging.flag(D, top_n=10)
 
 

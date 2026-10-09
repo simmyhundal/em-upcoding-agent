@@ -11,7 +11,7 @@ import flagging  # noqa: E402
 import generate_synthetic as g  # noqa: E402
 
 D = tempfile.mkdtemp()
-g.build(D, seed=11, n_normal=40, n_upcoders=3, n_hard_neg=3)
+g.build(D, os.path.join(tempfile.mkdtemp(), "gt.json"), seed=11, n_normal=40, n_upcoders=3, n_hard_neg=3)
 FLAGGED = os.path.join(D, "flagged.csv")
 import csv  # noqa: E402
 rows = flagging.flag(D, top_n=5)

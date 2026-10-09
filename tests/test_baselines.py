@@ -12,7 +12,7 @@ import baseline_zscore as bz  # noqa: E402
 import generate_synthetic as g  # noqa: E402
 
 D = tempfile.mkdtemp()
-g.build(D, seed=7, n_normal=30, n_upcoders=3, n_hard_neg=3)
+g.build(D, os.path.join(tempfile.mkdtemp(), "gt.json"), seed=7, n_normal=30, n_upcoders=3, n_hard_neg=3)
 
 
 def test_zscore_ranks_every_provider_once():

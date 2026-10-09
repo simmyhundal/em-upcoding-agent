@@ -1,7 +1,7 @@
 # Synthetic data: how it is built and how well it matches CMS
 
 Scope: Family Practice, Georgia. Everything is synthetic. Regenerate with
-`python src/generate_synthetic.py data/synthetic --seed 42` (identical output for the same seed).
+`python src/generate_synthetic.py data/synthetic --seed 42` (answer key goes to `eval/answer_key/ground_truth.json`, outside the data folder) (identical output for the same seed).
 
 ## Files
 | File | Who sees it | Contents |
@@ -9,7 +9,7 @@ Scope: Family Practice, Georgia. Everything is synthetic. Regenerate with
 | `providers.csv` | detectors, agent | provider id, specialty, state, claim and patient counts |
 | `patients.csv` | detectors, agent | age, chronic-condition count, condition list |
 | `claims.csv` | detectors, agent | one row per visit: claim id, provider, patient, date, billed CPT, diagnoses |
-| `ground_truth.json` | eval only (gitignored) | provider roles and the justified CPT for every claim |
+| `eval/answer_key/ground_truth.json` | eval only (gitignored; outside `data/`) | provider roles and the justified CPT for every claim |
 
 ## Model
 - Each patient has a chronic-condition count (complexity).

@@ -1,7 +1,7 @@
 """Eval harness: score each detector against ground truth and write a side-by-side report.
 
 Detectors compared (all use the same top-N cutoff): plain z-score, risk-adjusted, combined list.
-Reads reports/flagged.csv (from flagging.py) and ground_truth.json (eval only).
+Reads reports/flagged.csv (from flagging.py) and the answer key (eval/answer_key/ground_truth.json; eval only).
 Optionally reads a guardrail output file for citation accuracy.
 
 Usage:
