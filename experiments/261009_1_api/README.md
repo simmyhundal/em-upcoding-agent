@@ -4,7 +4,7 @@ The project's own pipeline calling the Anthropic API for all 25 flagged provider
 - Case summaries: `src/case_summary.py`, `claude-opus-5-5`, effort medium, one call per provider.
 - Citation check: `src/guardrail.py`. Usefulness: `eval/judge_usefulness.py`, `claude-sonnet-5-5` (a different model from the writer).
 
-Files: `case_summaries.jsonl` (raw), `case_summaries_checked.jsonl` (after the citation check), `usefulness.jsonl` (judge scores), `cases/` (one readable page per provider).
+Files: `case_summaries.jsonl` (raw), `case_summaries_checked.jsonl` (after the citation check), `usefulness.jsonl` (judge scores). Reviewer materials, built by `src/finalize_run.py`: `cases/` (one readable page per provider, starting at `cases/index.md`), `charts/` (the evidence charts) and `pi_packets/` (Payment Integrity packets with a simulated worked example).
 
 ## Results
 25/25 summaries passed the citation check (261/261 citations valid); no templating detected. Leanings against the answer key: 8/8 upcoders called upcoding, 3/3 hard negatives called a high-acuity panel, 0/14 normal providers called upcoding (9 high-acuity, 5 inconclusive). Usefulness (LLM judge): mean 3.44 of 5, target 4 not met. Full tables are in `reports/eval_report.md`.

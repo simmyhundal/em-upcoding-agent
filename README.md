@@ -31,8 +31,8 @@ Two doctors the screen flagged, drawn on the same axes. Each box shows how *othe
 
 <table>
 <tr>
-<td width="50%"><img src="reports/charts/P0215.svg" alt="Chart for provider P0215: billing of the top visit code sits well above peers at every patient-sickness level"></td>
-<td width="50%"><img src="reports/charts/P0014.svg" alt="Chart for provider P0014: billing is high but tracks a much sicker patient panel"></td>
+<td width="50%"><img src="experiments/261009_1_api/charts/P0215.svg" alt="Chart for provider P0215: billing of the top visit code sits well above peers at every patient-sickness level"></td>
+<td width="50%"><img src="experiments/261009_1_api/charts/P0014.svg" alt="Chart for provider P0014: billing is high but tracks a much sicker patient panel"></td>
 </tr>
 <tr>
 <td><b>P0215 (a planted upcoder).</b> Bills the top code far more than peers at every level, even for patients with no chronic conditions: 18% of those visits against 2.1% for all doctors. The AI's summary and the records sample point the same way.</td>
@@ -90,9 +90,9 @@ Results on the synthetic data (one random seed, small counts, so read them as di
 | Hard negative | An honest provider who looks suspicious at first glance |
 
 ## Explore the repo
-- **Case pages (the review queue):** [experiments/261009_1_api/cases/index.md](experiments/261009_1_api/cases/index.md), with charts in [reports/charts/](reports/charts/)
+- **Case pages (the review queue):** [experiments/261009_1_api/cases/index.md](experiments/261009_1_api/cases/index.md), with charts in [experiments/261009_1_api/charts/](experiments/261009_1_api/charts/)
 - **Eval report:** [reports/eval_report.md](reports/eval_report.md)
-- **Recovery packets (simulated review):** [reports/pi_packets/](reports/pi_packets/), explained in [docs/payment_integrity.md](docs/payment_integrity.md)
+- **Recovery packets (simulated review):** [experiments/261009_1_api/pi_packets/](experiments/261009_1_api/pi_packets/), explained in [docs/payment_integrity.md](docs/payment_integrity.md). Each run keeps its own charts, case pages and packets in its folder, so a later run never overwrites them.
 - **Data design and calibration notes:** [docs/synthetic_data.md](docs/synthetic_data.md)
 - **Experiments and what they do and do not show:** [experiments/README.md](experiments/README.md)
 - **Open and closed work:** the GitHub issues and milestones for this repository
@@ -126,8 +126,8 @@ Every run is graded against the same thresholds. How each is computed is in `eva
 | Eval | Threshold |
 |---|---|
 | False negative rate | at most 12.5% of the real upcoders missed (1 of 8) |
-| False positive rate | at most 12.5% of the honest doctors wrongly accused; "honest" is every non-upcoder in the data, ordinary doctors and sicker-panel doctors alike |
-| Precision of "upcoding" calls | at least 80% are real upcoders (*proposed*; added because the false positive rate is measured against all honest doctors and is easy to pass, so it does not penalize a long list of wrongly flagged doctors) |
+| False positive rate | at most 12.5% of the honest doctors a step examines are wrongly accused. For the screen that is all honest doctors in the data; for the AI step it is the honest doctors the screen sent to it. "Honest" means every non-upcoder, ordinary doctors and sicker-panel doctors alike |
+| Precision of "upcoding" calls | at least 80% are real upcoders (*proposed*; the end-to-end check on how trustworthy an accusation is, which the screen's false positive rate does not capture) |
 | Citations valid | 100% |
 | Case Summary Usefulness (1-5) | average of at least 4 (scored by an LLM judge) |
 | No templating | the templating check finds none |
@@ -145,13 +145,13 @@ Each run scored against the thresholds above. Screen rows show the statistical s
 | **Threshold** | at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% | at least 4 | none | every eval that applies |
 | Screen alone, seed 42 (no AI) | 0.0% (0 / 8) ✓ | 8.2% (17 / 208) ✓ | 32% ✗ | – | – | – | **2 / 3** |
 | Screen with suspicion at or above 5, seed 42 (no AI) | 0.0% (0 / 8) ✓ | 1.4% (3 / 208) ✓ | 73% ✗ | – | – | – | **2 / 3** |
-| 261008_2_cc: one agent for all 25 (templated) | 12.5% (1 / 8) ✓ | 4.8% (10 / 208) ✓ | 41% ✗ | 100% ✓ | – | templated ✗ | **3 / 5** |
-| 261008_3_cc: chat agents, no records evidence | 0.0% (0 / 8) ✓ | 6.7% (14 / 208) ✓ | 36% ✗ | 100% ✓ | – | none ✓ | **4 / 5** |
-| 261008_4_cc: chat agents, with records evidence | 0.0% (0 / 8) ✓ | 0.0% (0 / 208) ✓ | 100% ✓ | 100% ✓ | – | none ✓ | **5 / 5** |
-| **261009_1_api: live API run, seed 42** | 0.0% (0 / 8) ✓ | 0.0% (0 / 208) ✓ | 100% ✓ | 100% ✓ | 3.44 ✗ | none ✓ | **5 / 6** |
+| 261008_2_cc: one agent for all 25 (templated) | 12.5% (1 / 8) ✓ | 58.8% (10 / 17) ✗ | 41% ✗ | 100% ✓ | – | templated ✗ | **2 / 5** |
+| 261008_3_cc: chat agents, no records evidence | 0.0% (0 / 8) ✓ | 82.4% (14 / 17) ✗ | 36% ✗ | 100% ✓ | – | none ✓ | **3 / 5** |
+| 261008_4_cc: chat agents, with records evidence | 0.0% (0 / 8) ✓ | 0.0% (0 / 17) ✓ | 100% ✓ | 100% ✓ | – | none ✓ | **5 / 5** |
+| **261009_1_api: live API run, seed 42** | 0.0% (0 / 8) ✓ | 0.0% (0 / 17) ✓ | 100% ✓ | 100% ✓ | 3.44 ✗ | none ✓ | **5 / 6** |
 | Screen alone, seed 101 (no AI) | 0.0% (0 / 8) ✓ | 8.2% (17 / 208) ✓ | 32% ✗ | – | – | – | **2 / 3** |
 | Screen with suspicion at or above 5, seed 101 (no AI) | 0.0% (0 / 8) ✓ | 0.5% (1 / 208) ✓ | 89% ✓ | – | – | – | **3 / 3** |
-| **261009_2_api: held-out API run, seed 101** | 0.0% (0 / 8) ✓ | 0.0% (0 / 208) ✓ | 100% ✓ | 100% ✓ | 3.24 ✗ | none ✓ | **5 / 6** |
+| **261009_2_api: held-out API run, seed 101** | 0.0% (0 / 8) ✓ | 0.0% (0 / 17) ✓ | 100% ✓ | 100% ✓ | 3.24 ✗ | none ✓ | **5 / 6** |
 <!-- scoreboard:end -->
 
 This table is generated from the saved outputs (`python docs/update_readme.py`). Usefulness is scored by an LLM judge (`eval/judge_usefulness.py`, a different model from the writer), so it is a rough rubric check. Run outputs are in `experiments/`; the naming is explained in `experiments/README.md`.

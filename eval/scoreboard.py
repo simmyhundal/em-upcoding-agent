@@ -6,8 +6,10 @@ evals passed out of those that apply. A dash means not scored or not applicable 
 Evals and thresholds:
   1. False negative rate: at most 12.5% of the real upcoders are missed. (Screen rows: upcoders not flagged. AI rows: upcoders
      the AI did not call upcoding.)
-  2. False positive rate: at most 12.5% of the honest doctors are wrongly accused. Honest means every non-upcoder in the data,
-     including ordinary doctors and doctors with sicker patients. (Screen rows: flagged. AI rows: called upcoding.)
+  2. False positive rate: at most 12.5% of the honest doctors are wrongly accused, counted out of the honest doctors that step
+     actually faced. Screen rows: honest doctors flagged out of all honest doctors in the data. AI rows: honest doctors the AI
+     called upcoding out of the honest doctors the screen sent to it. "Honest" means every non-upcoder, ordinary doctors and
+     doctors with sicker patients alike.
   3. Precision of "upcoding" calls: at least 80% of the doctors called upcoding really are upcoders (PROPOSED threshold: the
      original targets ignored the many ordinary honest doctors who get flagged). Screen rows: upcoders among the top 25.
   4. Citations valid: 100% of cited claims exist and belong to the provider.
@@ -79,6 +81,7 @@ def compute(registry_path=None):
         d = data[r["dataset"]]
         cells = {"fn": None, "fp": None, "prec": None, "cite": None, "useful": None, "templ": None}
         text = {k: "–" for k in cells}
+        honest_in_scope = None
         if r["kind"] == "screen" and r.get("min_suspicion") is not None:
             sel = [x["provider_id"] for x in d["rows"] if float(x["z_adj"]) >= r["min_suspicion"]]
             sc = run_eval.score(sel, d["truth"])
@@ -92,13 +95,14 @@ def compute(registry_path=None):
             recs = run_eval.load_checked(_load(r["checked"]))
             L = run_eval.leaning_stats(recs, d["truth"])
             found, honest, prec = L["true_upcoders_called"], L["honest_called_upcoding"], L["precision"]
+            honest_in_scope = L["honest_total"]
             cells["cite"] = run_eval.citation_stats(recs)["accuracy"]
             cells["templ"] = template_check.check([x["summary"]["rationale"] for x in recs])["flagged"]
             if r.get("usefulness"):
                 rows = [json.loads(line) for line in open(_load(r["usefulness"])) if line.strip()]
                 cells["useful"] = sum(x["score"] for x in rows) / len(rows)
         cells["fn"] = (d["n_up"] - found, d["n_up"])
-        cells["fp"] = (honest, d["n_honest"])
+        cells["fp"] = (honest, d["n_honest"] if r["kind"] == "screen" else honest_in_scope)
         cells["prec"] = prec
         oks = {k: judge(cells[k], k) for k in cells}
         text["fn"] = f"{cells['fn'][0] / cells['fn'][1]:.1%} ({cells['fn'][0]} / {cells['fn'][1]})"

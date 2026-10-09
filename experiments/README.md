@@ -16,4 +16,4 @@ Each folder has a README saying what the run was and what it does and does not s
 | `261009_1_api` | First real API run (Claude Opus 5.5 writer, Claude Sonnet 5.5 judge) | seed 42, 25 providers |
 | `261009_2_api` | Held-out run: pipeline frozen, fresh dataset, run once | seed 101, 25 providers |
 
-The eval report for the main runs is `reports/eval_report.md`.
+Each run folder is self-contained: its summaries and scores plus (built by `src/finalize_run.py`) `cases/`, `charts/` and `pi_packets/`, so a later run never overwrites them. The eval report for the main runs is `reports/eval_report.md`; `reports/charts` and `reports/pi_packets` are only the latest default output.

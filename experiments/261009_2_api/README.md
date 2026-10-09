@@ -7,7 +7,7 @@
 - Data: `python src/generate_synthetic.py data/synthetic_s101 --seed 101 --answer-key eval/answer_key/ground_truth_s101.json` (the CSVs and the answer key are gitignored and regenerate from the seed).
 - Run once, in this order: screen and flagging (`baseline_zscore`, `baseline_riskadj`, `flagging`), 25 API summaries (`case_summary.py`, `claude-opus-5-5`), citation check, templating check, usefulness judge (`claude-sonnet-5-5`), `run_eval.py`. No test calls and no retries.
 
-Files: `flagged.csv` and the two ranking files, `case_summaries.jsonl`, `case_summaries_checked.jsonl`, `usefulness.jsonl`, `eval_report.md` (full tables).
+Files: `flagged.csv` and the two ranking files, `case_summaries.jsonl`, `case_summaries_checked.jsonl`, `usefulness.jsonl`, `eval_report.md` (full tables). Reviewer materials were built after the run with `src/finalize_run.py` (no API calls, no change to the frozen pipeline): `cases/`, `charts/`, `pi_packets/`. The simulated recovery estimates covered the true overpayment in 8 of 8 packets.
 
 ## Results (seed 101) next to seed 42
 | | Seed 42 (tuned on) | Seed 101 (held out) |

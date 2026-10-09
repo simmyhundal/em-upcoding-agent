@@ -127,7 +127,7 @@ def case_card(pid="P0215"):
     fl = {r["provider_id"]: r for r in csv.DictReader(open(os.path.join(ROOT, "reports", "flagged.csv")))}
     pk = cs.build_packet(pid, fl[pid], chronic, age, cond, claims, cs.peer_rates(claims, chronic), docs, cs.doc_peer_rates(claims, docs))
     unsup = next(t for t in pk["documentation_review"]["by_billed_level"] if t["billed_cpt"] == "99215")
-    chart = open(os.path.join(ROOT, "reports", "charts", f"{pid}.svg")).read()
+    chart = open(os.path.join(ROOT, "experiments", "261009_1_api", "charts", f"{pid}.svg")).read()
     inner = re.sub(r"^<svg[^>]*>", "", chart.strip()).rsplit("</svg>", 1)[0]
     W, H = 920, 880
     tiles = [(f"{pk['share_99215']:.0%}", "of visits billed at the top code"),

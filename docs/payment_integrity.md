@@ -4,12 +4,12 @@ After an investigator reads a case summary and decides to pursue a provider, Pay
 `src/pi_packet.py` prepares draft material for the providers whose summaries lean "upcoding" and passed the citation guardrail.
 It is a starting point for people, not a finding.
 
-## What each provider gets (`reports/pi_packets/<provider>/`)
+## What each provider gets (`experiments/<run>/pi_packets/<provider>/`, for example `experiments/261009_1_api/pi_packets/`)
 - `dossier.md`: provider overview, billed vs expected, the case summary and evidence chart, the records-review sample so far, next steps, limits.
 - `record_request_list.csv`: a seeded random sample of the provider's 99215 claims to request records for (patient, date, billed code, diagnoses). Documentation facts are deliberately not included.
 - `sampling_plan.md` and `plan.json`: the frame, sample size, seed and formula. Sample size is for a proportion within +/-10% at 90% confidence (assume 50%), with finite-population correction; frames of 30 or fewer claims are reviewed in full. `--codes 99215,99214` samples both codes as separate strata.
 - `reviewed_example.csv` and `example_estimate.md`: a SIMULATED review (supported level taken from the synthetic documentation sample; sampled claims without documentation count as records not received).
-- `reports/pi_packets/tracker.csv`: a status row per provider (not started, records requested, received, reviewed, notice sent, resolved).
+- `pi_packets/tracker.csv` in the run folder: a status row per provider (not started, records requested, received, reviewed, notice sent, resolved).
 
 ## Estimator (`src/pi_estimate.py`)
 Per-claim overpayment is allowed(billed) minus allowed(supported) when the supported level is lower, else 0 (underbilling is ignored).
@@ -33,7 +33,7 @@ Allowed amounts are GA Family Practice averages from the public CMS file (`data/
 
 Intervals covering the true value: 6 of 8
 
-Six of eight 90% intervals covering the truth is consistent with the nominal rate for eight providers, but eight is too few to judge.
+Six of eight 90% intervals covering the truth is consistent with the nominal rate for eight providers, but eight is too few to judge. On the held-out dataset (seed 101, `experiments/261009_2_api/pi_packets/`) all 8 of 8 covered, so 14 of 16 across both runs.
 The simulated documentation is off by one level 15% of the time, which adds a small upward bias for honest claims; the review step in a real case replaces it.
 
 ## Not in scope, on purpose
