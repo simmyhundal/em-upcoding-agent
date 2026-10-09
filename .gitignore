@@ -3,6 +3,6 @@ __pycache__/
 .venv/
 .env
 data/baselines/*.csv
-data/synthetic/*.csv
+data/synthetic*/*.csv
 .DS_Store
 eval/answer_key/

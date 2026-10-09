@@ -90,7 +90,7 @@ Results on the synthetic data (one random seed, small counts, so read them as di
 | Hard negative | An honest provider who looks suspicious at first glance |
 
 ## Explore the repo
-- **Case pages and charts:** `experiments/cold_agent_25_docs/cases/` and `reports/charts/`
+- **Case pages and charts:** `experiments/261008_4_cc/cases/` and `reports/charts/`
 - **Eval report:** `reports/eval_report.md`
 - **Recovery packets (simulated review):** `reports/pi_packets/`, explained in `docs/payment_integrity.md`
 - **Data design and calibration notes:** `docs/synthetic_data.md`
@@ -149,7 +149,7 @@ reports/          results and failure-mode write-ups
 `python src/evidence_chart.py data/synthetic reports/flagged.csv reports/charts` draws one SVG per flagged provider: boxes show how
 the other providers' 99215 share varies at each patient-complexity level, and the provider is a point with a 95% Wilson interval
 (thin levels are hollow and dashed). `python src/case_report.py CHECKED_SUMMARIES CHARTS_DIR OUT_DIR` builds a markdown page per
-provider that combines the summary, its cited claims and the chart; see `experiments/cold_agent_25_docs/cases/` for an example.
+provider that combines the summary, its cited claims and the chart; see `experiments/261008_4_cc/cases/` for an example.
 
 ### Payment Integrity packet
 `src/pi_packet.py` turns an "upcoding" case into draft material for the Payment Integrity team: a dossier, a reproducible sample of
@@ -188,4 +188,4 @@ Headline from `reports/eval_report.md` (seed 42, top 25 flagged):
 
 Documentation-based rows are easier by construction (documentation is generated from the same hidden level that defines an upcoded visit); read them as a ceiling on what records-review evidence can do, not a real-world estimate. Usefulness is scored by an LLM judge (`eval/judge_usefulness.py`, a different model from the writer), so it is a rough rubric check.
 
-The live run's outputs are in `reports/live/` (summaries, guardrail-checked summaries, judge scores, case pages).
+The live run's outputs are in `experiments/261009_1_api/` (summaries, guardrail-checked summaries, judge scores, case pages).

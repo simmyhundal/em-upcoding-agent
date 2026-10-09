@@ -80,7 +80,7 @@ def test_template_check_flags_templated_and_passes_varied_text():
 
 def test_shared_caveat_sentence_alone_does_not_flag():
     # Real, varied rationales from the committed experiment, each with one identical caveat sentence added.
-    path = os.path.join(HERE, "..", "experiments", "cold_agent_25_docs", "summaries.jsonl")
+    path = os.path.join(HERE, "..", "experiments", "261008_4_cc", "summaries.jsonl")
     real = [json.loads(line)["summary"]["rationale"] for line in open(path)][:12]
     res = template_check.check([r + " No clinical documentation is in the packet." for r in real])
     assert not res["flagged"] and res["boilerplate_sentences"] >= 1

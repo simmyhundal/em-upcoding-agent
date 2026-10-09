@@ -80,9 +80,9 @@ def results():
     ev = run_eval.evaluate(flagged, truth, 25)["Combined list"]
     honest_flagged = ev["hard_neg_flagged"] + ev["normal_flagged"]
     runs = []
-    for label, rel in (("AI summaries (chat),\nno records evidence", "experiments/cold_agent_25_rerun/summaries_checked.jsonl"),
-                       ("AI summaries (chat),\nwith records evidence*", "experiments/cold_agent_25_docs/summaries_checked.jsonl"),
-                       ("Live API run,\nwith records evidence*", "reports/live/case_summaries_checked.jsonl")):
+    for label, rel in (("AI summaries (chat),\nno records evidence", "experiments/261008_3_cc/summaries_checked.jsonl"),
+                       ("AI summaries (chat),\nwith records evidence*", "experiments/261008_4_cc/summaries_checked.jsonl"),
+                       ("Live API run,\nwith records evidence*", "experiments/261009_1_api/case_summaries_checked.jsonl")):
         recs = run_eval.load_checked(os.path.join(ROOT, rel))
         L = run_eval.leaning_stats(recs, truth)
         runs.append((label, L["honest_called_upcoding"], L["true_upcoders_called"], L["honest_total"]))
@@ -118,7 +118,7 @@ def results():
 
 def case_card(pid="P0215"):
     import case_summary as cs
-    recs = {json.loads(l)["provider_id"]: json.loads(l) for l in open(os.path.join(ROOT, "experiments", "cold_agent_25_docs", "summaries_checked.jsonl"))}
+    recs = {json.loads(l)["provider_id"]: json.loads(l) for l in open(os.path.join(ROOT, "experiments", "261008_4_cc", "summaries_checked.jsonl"))}
     rec = recs[pid]["summary"]
     d = os.path.join(ROOT, "data", "synthetic")
     chronic, age, cond, claims = cs.load(d)
@@ -161,7 +161,7 @@ def funnel():
     import csv
     n_all = sum(1 for _ in csv.DictReader(open(os.path.join(ROOT, "data", "synthetic", "providers.csv"))))
     flagged = [r for r in csv.DictReader(open(os.path.join(ROOT, "reports", "flagged.csv"))) if r["flagged"] == "True"]
-    recs = run_eval.load_checked(os.path.join(ROOT, "reports", "live", "case_summaries_checked.jsonl"))
+    recs = run_eval.load_checked(os.path.join(ROOT, "experiments", "261009_1_api", "case_summaries_checked.jsonl"))
     passed = sum(r["citation_check"]["passed"] for r in recs)
     lean = {"up": 0, "acute": 0, "unclear": 0}
     for r in recs:

@@ -11,7 +11,7 @@
 
 ## LLM summary metrics
 
-### Live API run: claude-opus-5-5, with documentation evidence
+### Live API run (261009_1_api): claude-opus-5-5, with documentation evidence
 - Templating check: no templating detected (boilerplate share 0%, similarity median 0.05 / p90 0.09)
 - Citation accuracy: 100.0% (261/261); 25/25 summaries passed the guardrail. Target: 100%.
 
@@ -26,7 +26,7 @@
 - Summaries rejected by the guardrail and not scored: 0.
 - Summary usefulness (LLM judge, 1-5, eval/rubric.md): mean 3.44 over 25 summaries (scores 1: 0, 2: 0, 3: 15, 4: 9, 5: 1); target >= 4: NOT met. The judge is itself an LLM, so treat this as a rough rubric check.
 
-### Experiment 1: single agent, templated (no documentation)
+### Experiment 261008_2_cc: single agent, templated (no documentation)
 - Templating check: TEMPLATED - do not score quality on this run (boilerplate share 77%, similarity median 0.30 / p90 1.00)
 - Citation accuracy: 100.0% (112/112); 25/25 summaries passed the guardrail. Target: 100%.
 
@@ -40,7 +40,7 @@
 - Honest providers labeled upcoding: 10 of 17.
 - Summaries rejected by the guardrail and not scored: 0.
 
-### Experiment 2: one agent per provider (no documentation)
+### Experiment 261008_3_cc: one agent per provider (no documentation)
 - Templating check: no templating detected (boilerplate share 0%, similarity median 0.04 / p90 0.08)
 - Citation accuracy: 100.0% (287/287); 25/25 summaries passed the guardrail. Target: 100%.
 
@@ -54,7 +54,7 @@
 - Honest providers labeled upcoding: 14 of 17.
 - Summaries rejected by the guardrail and not scored: 0.
 
-### Experiment 3: one agent per provider, with documentation evidence
+### Experiment 261008_4_cc: one agent per provider, with documentation evidence
 - Templating check: no templating detected (boilerplate share 0%, similarity median 0.05 / p90 0.08)
 - Citation accuracy: 100.0% (230/230); 25/25 summaries passed the guardrail. Target: 100%.
 
@@ -71,7 +71,7 @@
 ## Target check
 - Recall >= 7/8: met (combined list)
 - Hard-negative false flags lower than plain z-score: NOT met (3 vs 3)
-- Live API run: claude-opus-5-5, with documentation evidence: citation accuracy 100%: met (261/261); summary usefulness >= 4: NOT met (mean 3.44)
+- Live API run (261009_1_api): claude-opus-5-5, with documentation evidence: citation accuracy 100%: met (261/261); summary usefulness >= 4: NOT met (mean 3.44)
 
 ## Caveats
 - Synthetic data. Billed level depends on patient complexity by construction, so the risk-adjusted detector is helped by how the data was built; results do not transfer directly to real claims.
