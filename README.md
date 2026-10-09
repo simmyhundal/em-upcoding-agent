@@ -46,6 +46,14 @@ reports/          results and failure-mode write-ups
 - **Office-visit codes only.** Established-patient 99211-99215; new-patient codes (99202-99205) are excluded.
 - **Privacy.** NPIs are used only to group rows, then replaced by a discarded salted hash. Only aggregate distributions are saved; no provider-level rows.
 
+## Guardrail scope
+`src/guardrail.py` checks that every cited claim ID exists and belongs to the provider being summarized, and rejects summaries
+with no citations. It does **not** check that a cited claim supports the sentence that cites it. For example, a summary could
+call a visit "high-acuity" while citing a claim on a patient with no chronic conditions, and still pass. So 100% citation
+accuracy means "no invented or misattributed claims", not "every statement is supported". Reviewers should treat the cited
+claims as pointers to check. A lightweight support check (verifying numeric attributes a rationale states about cited claims)
+has not been built.
+
 ## Ground rules
 - Synthetic data only. No real claims, no PHI.
 - Never flag real, named providers, even from public data.

@@ -1,6 +1,7 @@
 """Citation guardrail: reject summaries that cite claims that don't exist for that provider.
 
-Plain lookup, no model involved. For every summary it checks that:
+Plain lookup, no model involved. It checks existence and ownership only, NOT that a cited claim supports the
+sentence citing it (for example a high-acuity argument that cites a claim on a patient with no chronic conditions). For every summary it checks that:
   1. at least one claim ID is cited,
   2. every cited ID exists in claims.csv, and
   3. every cited ID belongs to the provider the summary is about.

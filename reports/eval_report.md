@@ -12,6 +12,7 @@
 ## LLM summary metrics
 
 ### Experiment 1: single agent, templated (no documentation)
+- Templating check: TEMPLATED - do not score quality on this run (boilerplate share 77%, similarity median 0.30 / p90 1.00)
 - Citation accuracy: 100.0% (112/112); 25/25 summaries passed the guardrail. Target: 100%.
 
 | Actual role (summaries scored) | upcoding | high-acuity panel | inconclusive |
@@ -25,6 +26,7 @@
 - Summaries rejected by the guardrail and not scored: 0.
 
 ### Experiment 2: one agent per provider (no documentation)
+- Templating check: no templating detected (boilerplate share 0%, similarity median 0.04 / p90 0.08)
 - Citation accuracy: 100.0% (287/287); 25/25 summaries passed the guardrail. Target: 100%.
 
 | Actual role (summaries scored) | upcoding | high-acuity panel | inconclusive |
@@ -38,6 +40,7 @@
 - Summaries rejected by the guardrail and not scored: 0.
 
 ### Experiment 3: one agent per provider, with documentation evidence
+- Templating check: no templating detected (boilerplate share 0%, similarity median 0.05 / p90 0.08)
 - Citation accuracy: 100.0% (230/230); 25/25 summaries passed the guardrail. Target: 100%.
 
 | Actual role (summaries scored) | upcoding | high-acuity panel | inconclusive |
@@ -59,4 +62,5 @@
 - Synthetic data. Billed level depends on patient complexity by construction, so the risk-adjusted detector is helped by how the data was built; results do not transfer directly to real claims.
 - One seed, 8 upcoders and 8 hard negatives: small counts, so one provider moves a rate a lot.
 - The CMS file hides small cells; the synthetic data is calibrated to it only in the upper tail (see docs/synthetic_data.md).
+- A 100% citation accuracy means every cited claim exists and belongs to the provider; it does not mean each cited claim supports the sentence that cites it (see "Guardrail scope" in the README).
 - Summary runs listed here come from in-session agents, not the API step, unless labeled otherwise; see each experiment's README for what it is and is not.

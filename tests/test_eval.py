@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.join(HERE, "..", "eval"))
 import flagging  # noqa: E402
 import generate_synthetic as g  # noqa: E402
 import run_eval  # noqa: E402
+import template_check  # noqa: E402
 
 D = tempfile.mkdtemp()
 KEY = os.path.join(tempfile.mkdtemp(), "ground_truth.json")
@@ -61,6 +62,28 @@ def test_report_includes_leaning_table_and_multiple_runs():
     runs = [("run A", [_record(p0, "pattern_consistent_with_upcoding")]), ("run B", [_record(p0, "inconclusive")])]
     md = run_eval.render(res, 10, runs, TRUTH)
     assert "### run A" in md and "### run B" in md and "Honest providers labeled upcoding" in md
+
+
+def test_template_check_flags_templated_and_passes_varied_text():
+    templated = [f"Provider P{i:04d} billed {10 + i} of {100 + i} claims as 99215. The pattern is consistent with upcoding. "
+                 f"No clinical documentation is in the packet, so this cannot be confirmed." for i in range(8)]
+    varied = ["The first provider shows an elevated share concentrated among healthy patients with minor complaints.",
+              "Documentation for most reviewed visits supports the billed level, which points to a complex panel.",
+              "Thin evidence here: only a handful of documented visits exist, and the rate is within normal range.",
+              "Billing rises with complexity in a way peers also show; the gap sits in the sickest band only.",
+              "Several simple acute diagnoses carry the top code, and nothing in the notes supports that level.",
+              "A modest excess at every level, with no single stratum driving it, and no strong documentation signal."]
+    assert template_check.check(templated)["flagged"]
+    assert not template_check.check(varied)["flagged"]
+    assert "skipped" in template_check.check(varied[:3])["note"]
+
+
+def test_shared_caveat_sentence_alone_does_not_flag():
+    # Real, varied rationales from the committed experiment, each with one identical caveat sentence added.
+    path = os.path.join(HERE, "..", "experiments", "cold_agent_25_docs", "summaries.jsonl")
+    real = [json.loads(line)["summary"]["rationale"] for line in open(path)][:12]
+    res = template_check.check([r + " No clinical documentation is in the packet." for r in real])
+    assert not res["flagged"] and res["boilerplate_sentences"] >= 1
 
 
 if __name__ == "__main__":
