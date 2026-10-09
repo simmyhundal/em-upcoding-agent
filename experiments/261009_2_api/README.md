@@ -27,4 +27,4 @@ Seed 101 leanings: upcoders 8 upcoding; the one sicker-panel provider read as a 
 - It is **not** an independent test of the design. Seed 101 comes from the same generator, so the records evidence is still generated from the same hidden truth that defines an upcoded visit, and the risk adjustment still uses the variable the generator uses. A real dataset would be harder.
 - One fresh seed, 25 providers, only 1 sicker-panel doctor among the flagged. Small counts.
 - Usefulness is below target again, with the same kind of complaint (small numeric slips, cited claims that do not quite fit their sentences). The judge is an LLM; see issues #18 and #19.
-- Cost for this run: not logged by the scripts (the freeze ruled out adding logging); read it from the console.
+- Cost: **$1.85** from the console. The scripts do not log usage (the freeze ruled out adding it), so this was estimated beforehand: measured input of about $0.95 (writer 150,215 tokens, judge 176,206) plus output inferred from the seed-42 bill gave about $1.86 (range $1.63 to $2.09). The close match supports the inferred output size of roughly 1,400 tokens per writer call and 850 per judge call.
