@@ -1,0 +1,540 @@
+SYSTEM PROMPT:
+You assist a Special Investigations Unit reviewing outpatient E/M billing (CPT 99211-99215).
+All data is synthetic. A statistical screen has already flagged this provider; you do not decide that.
+Your job is to explain, for an investigator, whether the billing pattern looks like upcoding or like a
+legitimately sicker patient panel, using only the evidence packet you are given.
+
+Rules:
+- The claim lists in the packet are random samples, not every claim. Do not generalize from them beyond what the tables show.
+- For some claims the packet includes documentation facts from a records review (documented MDM level and minutes). Records exist for only a sample of each provider's claims, and the documentation is itself noisy, so a small share of honest claims will show a mismatch. A billed level above the documented level is unsupported. A high unsupported rate among documented 99215 claims, well above the all-provider rate, is strong evidence of upcoding; a high 99215 share whose documented claims support the billed level is consistent with a legitimately complex panel. Without enough documented claims, say the documentation is too thin to judge.
+- Ground every factual statement in the packet. Cite claim IDs only from the packet's claim lists, and never invent one.
+- Compare billed level to patient complexity: a high 99215 share on complex patients is expected; the same share
+  on low-complexity patients is the concern.
+- Use cautious language ("pattern consistent with"). You are not asserting fraud.
+- Say what is missing (for example clinical documentation) and what a reviewer should check next.
+- Keep the rationale to a short paragraph a busy reviewer can read in under a minute.
+
+USER MESSAGE:
+Evidence packet (JSON):
+{
+ "provider_id": "P0136",
+ "specialty": "Family Practice",
+ "state": "GA",
+ "n_claims": 222,
+ "n_patients": 88,
+ "billed_mix": {
+  "99211": 0,
+  "99212": 1,
+  "99213": 60,
+  "99214": 128,
+  "99215": 33
+ },
+ "share_99215": 0.14865,
+ "expected_share_given_patient_complexity": 0.01959,
+ "z_vs_peers": 1.4353,
+ "risk_adjusted_score": 5.0209,
+ "flagged_by": "zscore+riskadj",
+ "99215_share_by_patient_complexity": [
+  {
+   "chronic_conditions": "0",
+   "visits": 97,
+   "n_99215": 12,
+   "provider_99215_share": 0.124,
+   "all_provider_99215_share": 0.021
+  },
+  {
+   "chronic_conditions": "1",
+   "visits": 97,
+   "n_99215": 14,
+   "provider_99215_share": 0.144,
+   "all_provider_99215_share": 0.034
+  },
+  {
+   "chronic_conditions": "2",
+   "visits": 19,
+   "n_99215": 4,
+   "provider_99215_share": 0.211,
+   "all_provider_99215_share": 0.056
+  },
+  {
+   "chronic_conditions": "3",
+   "visits": 6,
+   "n_99215": 1,
+   "provider_99215_share": 0.167,
+   "all_provider_99215_share": 0.087
+  },
+  {
+   "chronic_conditions": "4",
+   "visits": 3,
+   "n_99215": 2,
+   "provider_99215_share": 0.667,
+   "all_provider_99215_share": 0.139
+  }
+ ],
+ "99215_claims_on_low_complexity_patients_0_or_1_conditions": [
+  {
+   "claim_id": "C0063969",
+   "cpt": "99215",
+   "date": "2024-01-16",
+   "patient_id": "P0136-N0025",
+   "age": 55,
+   "chronic_conditions": 1,
+   "conditions": "hyperlipidemia",
+   "diagnosis_codes": "E78.5;N39.0"
+  },
+  {
+   "claim_id": "C0063976",
+   "cpt": "99215",
+   "date": "2024-12-23",
+   "patient_id": "P0136-N0011",
+   "age": 71,
+   "chronic_conditions": 1,
+   "conditions": "obesity",
+   "diagnosis_codes": "E66.9"
+  },
+  {
+   "claim_id": "C0063984",
+   "cpt": "99215",
+   "date": "2024-02-02",
+   "patient_id": "P0136-N0005",
+   "age": 28,
+   "chronic_conditions": 0,
+   "conditions": "",
+   "diagnosis_codes": "M54.50"
+  },
+  {
+   "claim_id": "C0064003",
+   "cpt": "99215",
+   "date": "2024-07-25",
+   "patient_id": "P0136-N0005",
+   "age": 28,
+   "chronic_conditions": 0,
+   "conditions": "",
+   "diagnosis_codes": "N39.0"
+  },
+  {
+   "claim_id": "C0064016",
+   "cpt": "99215",
+   "date": "2024-07-04",
+   "patient_id": "P0136-N0054",
+   "age": 37,
+   "chronic_conditions": 1,
+   "conditions": "hypertension",
+   "diagnosis_codes": "I10;N39.0"
+  },
+  {
+   "claim_id": "C0064025",
+   "cpt": "99215",
+   "date": "2024-01-24",
+   "patient_id": "P0136-N0087",
+   "age": 40,
+   "chronic_conditions": 0,
+   "conditions": "",
+   "diagnosis_codes": "J06.9"
+  },
+  {
+   "claim_id": "C0064028",
+   "cpt": "99215",
+   "date": "2024-02-13",
+   "patient_id": "P0136-N0081",
+   "age": 69,
+   "chronic_conditions": 0,
+   "conditions": "",
+   "diagnosis_codes": "N39.0"
+  },
+  {
+   "claim_id": "C0064031",
+   "cpt": "99215",
+   "date": "2024-08-26",
+   "patient_id": "P0136-N0061",
+   "age": 55,
+   "chronic_conditions": 0,
+   "conditions": "",
+   "diagnosis_codes": "R21"
+  },
+  {
+   "claim_id": "C0064032",
+   "cpt": "99215",
+   "date": "2024-04-01",
+   "patient_id": "P0136-N0002",
+   "age": 48,
+   "chronic_conditions": 1,
+   "conditions": "chronic kidney disease",
+   "diagnosis_codes": "N18.3"
+  },
+  {
+   "claim_id": "C0064037",
+   "cpt": "99215",
+   "date": "2024-04-22",
+   "patient_id": "P0136-N0035",
+   "age": 45,
+   "chronic_conditions": 0,
+   "conditions": "",
+   "diagnosis_codes": "N39.0"
+  },
+  {
+   "claim_id": "C0064038",
+   "cpt": "99215",
+   "date": "2024-05-17",
+   "patient_id": "P0136-N0003",
+   "age": 52,
+   "chronic_conditions": 1,
+   "conditions": "hyperlipidemia",
+   "diagnosis_codes": "E78.5"
+  },
+  {
+   "claim_id": "C0064060",
+   "cpt": "99215",
+   "date": "2024-09-11",
+   "patient_id": "P0136-N0067",
+   "age": 63,
+   "chronic_conditions": 1,
+   "conditions": "chronic kidney disease",
+   "diagnosis_codes": "N18.3;R21"
+  },
+  {
+   "claim_id": "C0064064",
+   "cpt": "99215",
+   "date": "2024-12-27",
+   "patient_id": "P0136-N0061",
+   "age": 55,
+   "chronic_conditions": 0,
+   "conditions": "",
+   "diagnosis_codes": "R10.9"
+  },
+  {
+   "claim_id": "C0064100",
+   "cpt": "99215",
+   "date": "2024-02-01",
+   "patient_id": "P0136-N0011",
+   "age": 71,
+   "chronic_conditions": 1,
+   "conditions": "obesity",
+   "diagnosis_codes": "E66.9"
+  },
+  {
+   "claim_id": "C0064124",
+   "cpt": "99215",
+   "date": "2024-02-05",
+   "patient_id": "P0136-N0028",
+   "age": 57,
+   "chronic_conditions": 1,
+   "conditions": "hypertension",
+   "diagnosis_codes": "I10"
+  },
+  {
+   "claim_id": "C0064135",
+   "cpt": "99215",
+   "date": "2024-09-20",
+   "patient_id": "P0136-N0032",
+   "age": 70,
+   "chronic_conditions": 0,
+   "conditions": "",
+   "diagnosis_codes": "R10.9"
+  },
+  {
+   "claim_id": "C0064144",
+   "cpt": "99215",
+   "date": "2024-01-12",
+   "patient_id": "P0136-N0053",
+   "age": 32,
+   "chronic_conditions": 1,
+   "conditions": "COPD",
+   "diagnosis_codes": "J44.9;R21"
+  },
+  {
+   "claim_id": "C0064169",
+   "cpt": "99215",
+   "date": "2024-04-12",
+   "patient_id": "P0136-N0006",
+   "age": 29,
+   "chronic_conditions": 1,
+   "conditions": "chronic kidney disease",
+   "diagnosis_codes": "N18.3;M54.50"
+  },
+  {
+   "claim_id": "C0064171",
+   "cpt": "99215",
+   "date": "2024-11-06",
+   "patient_id": "P0136-N0046",
+   "age": 47,
+   "chronic_conditions": 0,
+   "conditions": "",
+   "diagnosis_codes": "R10.9"
+  },
+  {
+   "claim_id": "C0064176",
+   "cpt": "99215",
+   "date": "2024-01-11",
+   "patient_id": "P0136-N0083",
+   "age": 37,
+   "chronic_conditions": 0,
+   "conditions": "",
+   "diagnosis_codes": "J06.9"
+  },
+  {
+   "claim_id": "C0064177",
+   "cpt": "99215",
+   "date": "2024-04-17",
+   "patient_id": "P0136-N0093",
+   "age": 58,
+   "chronic_conditions": 0,
+   "conditions": "",
+   "diagnosis_codes": "R10.9"
+  },
+  {
+   "claim_id": "C0064178",
+   "cpt": "99215",
+   "date": "2024-09-23",
+   "patient_id": "P0136-N0010",
+   "age": 54,
+   "chronic_conditions": 1,
+   "conditions": "obesity",
+   "diagnosis_codes": "E66.9"
+  },
+  {
+   "claim_id": "C0064183",
+   "cpt": "99215",
+   "date": "2024-02-14",
+   "patient_id": "P0136-N0091",
+   "age": 65,
+   "chronic_conditions": 1,
+   "conditions": "hyperlipidemia",
+   "diagnosis_codes": "E78.5"
+  },
+  {
+   "claim_id": "C0064186",
+   "cpt": "99215",
+   "date": "2024-09-02",
+   "patient_id": "P0136-N0015",
+   "age": 22,
+   "chronic_conditions": 0,
+   "conditions": "",
+   "diagnosis_codes": "Z09"
+  },
+  {
+   "claim_id": "C0064189",
+   "cpt": "99215",
+   "date": "2024-03-29",
+   "patient_id": "P0136-N0060",
+   "age": 40,
+   "chronic_conditions": 1,
+   "conditions": "hyperlipidemia",
+   "diagnosis_codes": "E78.5;Z09"
+  }
+ ],
+ "99215_claims_on_high_complexity_patients_4_plus_conditions": [
+  {
+   "claim_id": "C0064181",
+   "cpt": "99215",
+   "date": "2024-06-14",
+   "patient_id": "P0136-N0072",
+   "age": 53,
+   "chronic_conditions": 4,
+   "conditions": "osteoarthritis;type 2 diabetes;hyperlipidemia;obesity",
+   "diagnosis_codes": "M19.90;E11.9;J06.9"
+  },
+  {
+   "claim_id": "C0064188",
+   "cpt": "99215",
+   "date": "2024-12-13",
+   "patient_id": "P0136-N0072",
+   "age": 53,
+   "chronic_conditions": 4,
+   "conditions": "osteoarthritis;type 2 diabetes;hyperlipidemia;obesity",
+   "diagnosis_codes": "M19.90;E11.9;N39.0"
+  }
+ ],
+ "comparison_claims_other_than_99215_random_sample": [
+  {
+   "claim_id": "C0063970",
+   "cpt": "99214",
+   "date": "2024-10-07",
+   "patient_id": "P0136-N0077",
+   "age": 58,
+   "chronic_conditions": 3,
+   "conditions": "type 2 diabetes;heart failure;depression",
+   "diagnosis_codes": "E11.9;I50.9;F32.9;R21"
+  },
+  {
+   "claim_id": "C0064023",
+   "cpt": "99214",
+   "date": "2024-01-30",
+   "patient_id": "P0136-N0085",
+   "age": 81,
+   "chronic_conditions": 2,
+   "conditions": "hypertension;type 2 diabetes",
+   "diagnosis_codes": "I10;J06.9"
+  },
+  {
+   "claim_id": "C0064045",
+   "cpt": "99214",
+   "date": "2024-12-18",
+   "patient_id": "P0136-N0006",
+   "age": 29,
+   "chronic_conditions": 1,
+   "conditions": "chronic kidney disease",
+   "diagnosis_codes": "N18.3"
+  },
+  {
+   "claim_id": "C0064048",
+   "cpt": "99214",
+   "date": "2024-07-17",
+   "patient_id": "P0136-N0023",
+   "age": 35,
+   "chronic_conditions": 1,
+   "conditions": "heart failure",
+   "diagnosis_codes": "I50.9;R21"
+  },
+  {
+   "claim_id": "C0064052",
+   "cpt": "99214",
+   "date": "2024-11-18",
+   "patient_id": "P0136-N0075",
+   "age": 78,
+   "chronic_conditions": 3,
+   "conditions": "type 2 diabetes;hyperlipidemia;hypothyroidism",
+   "diagnosis_codes": "E11.9;R10.9"
+  },
+  {
+   "claim_id": "C0064071",
+   "cpt": "99214",
+   "date": "2024-06-04",
+   "patient_id": "P0136-N0021",
+   "age": 49,
+   "chronic_conditions": 2,
+   "conditions": "heart failure;atrial fibrillation",
+   "diagnosis_codes": "I50.9;R10.9"
+  },
+  {
+   "claim_id": "C0064142",
+   "cpt": "99213",
+   "date": "2024-11-06",
+   "patient_id": "P0136-N0015",
+   "age": 22,
+   "chronic_conditions": 0,
+   "conditions": "",
+   "diagnosis_codes": "M54.50"
+  },
+  {
+   "claim_id": "C0064155",
+   "cpt": "99214",
+   "date": "2024-04-05",
+   "patient_id": "P0136-N0072",
+   "age": 53,
+   "chronic_conditions": 4,
+   "conditions": "osteoarthritis;type 2 diabetes;hyperlipidemia;obesity",
+   "diagnosis_codes": "M19.90;M54.50"
+  },
+  {
+   "claim_id": "C0064163",
+   "cpt": "99214",
+   "date": "2024-05-22",
+   "patient_id": "P0136-N0017",
+   "age": 32,
+   "chronic_conditions": 0,
+   "conditions": "",
+   "diagnosis_codes": "Z09"
+  },
+  {
+   "claim_id": "C0064166",
+   "cpt": "99213",
+   "date": "2024-03-29",
+   "patient_id": "P0136-N0044",
+   "age": 59,
+   "chronic_conditions": 0,
+   "conditions": "",
+   "diagnosis_codes": "R21"
+  }
+ ],
+ "documentation_review": {
+  "claims_with_documentation": 59,
+  "share_of_claims_documented": 0.266,
+  "by_billed_level": [
+   {
+    "billed_cpt": "99213",
+    "documented_claims": 16,
+    "documentation_does_not_support_billed_level": 3,
+    "unsupported_rate": 0.188,
+    "all_provider_unsupported_rate": 0.075
+   },
+   {
+    "billed_cpt": "99214",
+    "documented_claims": 38,
+    "documentation_does_not_support_billed_level": 2,
+    "unsupported_rate": 0.053,
+    "all_provider_unsupported_rate": 0.084
+   },
+   {
+    "billed_cpt": "99215",
+    "documented_claims": 4,
+    "documentation_does_not_support_billed_level": 0,
+    "unsupported_rate": 0.0,
+    "all_provider_unsupported_rate": 0.242
+   }
+  ],
+  "examples_documentation_below_billed_level": [
+   {
+    "claim_id": "C0063995",
+    "billed_cpt": "99213",
+    "documented_mdm_level": "straightforward",
+    "documented_minutes": 11
+   },
+   {
+    "claim_id": "C0064020",
+    "billed_cpt": "99214",
+    "documented_mdm_level": "low",
+    "documented_minutes": 29
+   },
+   {
+    "claim_id": "C0064041",
+    "billed_cpt": "99213",
+    "documented_mdm_level": "straightforward",
+    "documented_minutes": 13
+   },
+   {
+    "claim_id": "C0064057",
+    "billed_cpt": "99214",
+    "documented_mdm_level": "low",
+    "documented_minutes": 25
+   },
+   {
+    "claim_id": "C0064109",
+    "billed_cpt": "99213",
+    "documented_mdm_level": "straightforward",
+    "documented_minutes": 14
+   }
+  ],
+  "examples_99215_documentation_supports": [
+   {
+    "claim_id": "C0064003",
+    "billed_cpt": "99215",
+    "documented_mdm_level": "high",
+    "documented_minutes": 43
+   },
+   {
+    "claim_id": "C0064060",
+    "billed_cpt": "99215",
+    "documented_mdm_level": "high",
+    "documented_minutes": 48
+   },
+   {
+    "claim_id": "C0064124",
+    "billed_cpt": "99215",
+    "documented_mdm_level": "high",
+    "documented_minutes": 46
+   },
+   {
+    "claim_id": "C0064186",
+    "billed_cpt": "99215",
+    "documented_mdm_level": "high",
+    "documented_minutes": 48
+   }
+  ]
+ }
+}
+
+Write the case summary as JSON matching the schema.
+
+OUTPUT SCHEMA (JSON):
+{"type": "object", "properties": {"headline": {"type": "string"}, "leaning": {"type": "string", "enum": ["pattern_consistent_with_upcoding", "pattern_consistent_with_high_acuity_panel", "inconclusive"]}, "rationale": {"type": "string"}, "cited_claim_ids": {"type": "array", "items": {"type": "string"}}, "next_steps": {"type": "array", "items": {"type": "string"}}}, "required": ["headline", "leaning", "rationale", "cited_claim_ids", "next_steps"], "additionalProperties": false}
