@@ -14,12 +14,12 @@ The hard part: a doctor who bills the top code often is **not necessarily cheati
 ## What does this project do?
 1. **Builds realistic practice data.** It generates a fake population of 216 family doctors in Georgia (about 100,000 visits), shaped to match public Medicare statistics. Eight are planted upcoders, eight are honest but treat unusually sick patients, and the rest are typical. Because the answer is known, the tools can be graded.
 2. **Screens for outliers.** Statistics flag doctors who bill the top code unusually often, adjusted for how sick their patients are. The 25 most unusual go to a reviewer.
-3. **Writes a case summary.** An AI reads each flagged doctor's billing pattern and writes a short explanation that **cites the exact visits** it relies on.
+3. **Writes a case summary and a recommendation.** An AI reads each flagged doctor's billing pattern and records evidence, writes a short explanation that **cites the exact visits** it relies on, and advises whether the case looks like upcoding, like a sicker patient base, or is unclear.
 4. **Checks the AI.** Plain code rejects any summary that cites a visit that does not exist or belongs to a different doctor.
 5. **Shows the evidence.** Each case gets a chart comparing the doctor to peers, and a case page a reviewer can read in a minute.
 6. **Hands off to recovery.** For the cases that look like upcoding, it prepares draft material for the team that recovers money: which records to request, a reproducible sampling plan, and a way to estimate the overpayment with a confidence range.
 
-The statistics decide who is flagged. The AI only explains. People decide what happens next.
+Statistics choose who gets a close look. The AI then reads each flagged doctor's evidence and advises whether the case looks like upcoding or like sicker patients. That advice is what moves a case on to the recovery step, but it is advice: people review the records and make every real decision.
 
 ## How the filtering works
 ![Funnel: 216 doctors, 25 flagged by statistics, then 8 that look like upcoding, 12 that look like sicker patients and 5 that are unclear; the 8 get recovery packets](docs/images/funnel.svg)
@@ -59,7 +59,7 @@ Results on the synthetic data (one random seed, small counts, so read them as di
 
 ## Built responsibly
 - **Synthetic data only.** No real patients, doctors or claims, and no real provider is ever flagged.
-- **The AI explains; it does not decide.** Statistics choose who is reviewed. The AI's lean ("pattern consistent with upcoding" or not) is advisory.
+- **The AI advises; people decide.** Statistics choose who is reviewed. The AI sorts the flagged cases (upcoding, sicker patients, or unclear) as advice to a reviewer, and nothing happens to anyone without a person checking the records.
 - **A guardrail on the AI.** Invented evidence is rejected automatically.
 - **Honest reporting.** The reports state what is easier by construction, what is simulated, and where the data is thin.
 - **Nothing here accuses anyone.** The recovery packet is draft material for human, compliance and legal review. It does not write demand letters or make findings.
@@ -72,7 +72,7 @@ Results on the synthetic data (one random seed, small counts, so read them as di
 - Building for the downstream user: charts a reviewer can read, and a packet the recovery team can act on.
 - Test-driven delivery: 7 test files, and work tracked as GitHub issues grouped into milestones.
 
-## Plain-English glossary
+## Glossary
 | Term | Meaning |
 |---|---|
 | E/M visit | An ordinary office visit (evaluation and management) that a doctor bills by complexity |
@@ -104,9 +104,11 @@ To rebuild the figures above: `python docs/make_figures.py`.
 ## For technical readers
 
 ### The bet
-Statistics find outliers, but a raw outlier is not an upcoder: some providers legitimately see sicker patients. The key signal is **billed level versus justified level**, meaning what a provider billed against what their patients' complexity would predict. That comparison is numeric, so **statistics make the call**. The LLM's job is to turn each flagged provider's claims into a grounded case summary that cites specific claim lines.
+Statistics find outliers, but a raw outlier is not an upcoder: some providers legitimately see sicker patients. Two jobs, two tools:
+- **The statistical screen selects.** It uses the numeric signal, billed level versus what patient complexity predicts, to choose who gets a close look.
+- **The LLM then reads and sorts.** For each selected provider it reads structured evidence (patient complexity, sample visits, and a records-review sample giving each sampled visit's documented level and minutes) and writes a cited summary with an advisory leaning (upcoding, high-acuity panel, or inconclusive). That leaning is what separates real upcoders from honest doctors with sicker patients, and it decides which cases move on to the recovery packet. It does not set the flag, and it is not a verdict: people review the records.
 
-This is "Path B". An alternative where the LLM makes the call from clinical notes ("Path A") is parked; see Milestones.
+In the live runs most of the separation came from the records-review evidence, not from the billing numbers alone. "Path A", an LLM judging from free-text clinical notes, is parked (see Roadmap); today's evidence is structured, not free text.
 
 ### Approach
 1. **Baselines** - realistic E/M level mix for Family Practice in GA, from CMS's public *Medicare Physician & Other Practitioners - by Provider and Service* file (aggregated, no PHI).
@@ -115,7 +117,7 @@ This is "Path B". An alternative where the LLM makes the call from clinical note
    - *Baseline 1*: plain z-score of 99215 share against peers.
    - *Baseline 2*: risk-adjusted observed-versus-expected, using patient complexity (visit-weighted chronic-condition count).
 4. **Flagging** - rank providers and take the top N for review.
-5. **Case summaries (LLM)** - for each flagged provider, summarise the claims and patient complexity as `{decision_rationale, cited_claim_ids[]}`. The LLM does not set the flag.
+5. **Case summaries (LLM)** - for each flagged provider, summarise the claims and patient complexity as `{decision_rationale, cited_claim_ids[]}`. The LLM does not set the flag (the screen does); it advises, and its advice gates the recovery packet.
 6. **Guardrail** - rejects any summary citing claim IDs that don't exist for that provider.
 
 ### Eval
@@ -171,22 +173,24 @@ has not been built.
 - Synthetic claims are cleaner than real ones, and patient complexity is a simplified proxy for documentation. Results don't transfer directly to production.
 
 ### Roadmap
-- **Milestone 1 - PoC (Path B):** statistics decide, the LLM writes case summaries. In progress.
-- **Milestone 2 - Path A (parked):** the LLM judges from synthetic clinical notes. Not being worked on.
+- **Milestone 1 - PoC (Path B):** statistics select, the AI explains and advises. Done.
+- **Milestone 2 - Path A (parked):** the LLM judges from synthetic free-text clinical notes. Not being worked on.
+- **Milestone 3 - Enhancements to Path B:** evidence charts, the Payment Integrity packet, README, and eval additions. Done.
+- **Milestone 4 - Reduce API cost:** measure and cut the cost per run behind the eval quality gate. In progress.
 
 ### Status
 Done: synthetic data generator (with a records-review documentation sample), both baselines, flagging, case-summary step (run live on the API), citation guardrail, evidence charts and case pages, Payment Integrity packet, eval harness (detectors, LLM leanings, templating check, LLM-judge usefulness).
 
 Headline from `reports/eval_report.md` (seed 42, top 25 flagged):
 
-| Run | Upcoders called upcoding | Honest providers called upcoding | Citations valid | Usefulness (1-5) |
+| Run | Upcoders called upcoding | Honest providers called upcoding | Citations valid | Case Summary Usefulness (1-5) |
 |---|---|---|---|---|
 | Screen flags only (no summaries) | 8 / 8 flagged | 17 flagged | n/a | n/a |
 | Experiment 2: chat agents, no documentation | 8 / 8 | 14 / 17 | 287 / 287 | not scored |
 | Experiment 3: chat agents, with documentation | 8 / 8 | 0 / 17 | 230 / 230 | not scored |
-| **Live API run (Claude Opus 5.5), with documentation** | **8 / 8** | **0 / 17** | **261 / 261** | **3.44 (target 4: not met)** |
-| Held-out run, fresh data (seed 101), pipeline frozen | 8 / 8 | 0 / 17 | 278 / 278 | 3.24 (not met) |
+| **Live API run (Claude Opus 5.5), with documentation** | **8 / 8** | **0 / 17** | **261 / 261** | **3.44** |
+| Held-out run, fresh data (seed 101), pipeline frozen | 8 / 8 | 0 / 17 | 278 / 278 | 3.24 |
 
-Documentation-based rows are easier by construction (documentation is generated from the same hidden level that defines an upcoded visit); read them as a ceiling on what records-review evidence can do, not a real-world estimate. Usefulness is scored by an LLM judge (`eval/judge_usefulness.py`, a different model from the writer), so it is a rough rubric check.
+Usefulness is scored by an LLM judge (`eval/judge_usefulness.py`, a different model from the writer), so it is a rough rubric check.
 
 The live run's outputs are in `experiments/261009_1_api/` (summaries, guardrail-checked summaries, judge scores, case pages).

@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 500" width="920" height="500" font-family="Helvetica, Arial, sans-serif">
 <rect width="920" height="500" fill="#ffffff"/>
 <text x="30" y="34" font-size="20" font-weight="bold" fill="#1f2937">How the project works</text>
-<text x="30" y="56" font-size="13" fill="#6b7280">Statistics decide who gets flagged. The AI explains. Code checks the AI. People decide what happens next.</text>
+<text x="30" y="56" font-size="13" fill="#6b7280">Statistics choose who gets a look. The AI explains and advises. Code checks the AI. People decide what happens next.</text>
 <rect x="30" y="80" width="200" height="150" rx="10" fill="#f9fafb" stroke="#2563eb" stroke-width="2"/>
 <circle cx="54" cy="106" r="14" fill="#2563eb"/>
 <text x="54" y="111" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">1</text>

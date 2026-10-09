@@ -45,7 +45,7 @@ def pipeline():
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>',
          f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
          f'<text x="30" y="34" font-size="20" font-weight="bold" fill="{INK}">How the project works</text>',
-         f'<text x="30" y="56" font-size="13" fill="{MUTED}">Statistics decide who gets flagged. The AI explains. Code checks the AI. People decide what happens next.</text>']
+         f'<text x="30" y="56" font-size="13" fill="{MUTED}">Statistics choose who gets a look. The AI explains and advises. Code checks the AI. People decide what happens next.</text>']
     bw, bh, gap = 200, 120, 18
     pos = [(30 + i * (bw + gap), 80) for i in range(4)] + [(30 + i * (bw + gap) + (bw + gap) / 2, 300) for i in range(3)]
     for (n, title, body, col), (x, y) in zip(steps, pos):
