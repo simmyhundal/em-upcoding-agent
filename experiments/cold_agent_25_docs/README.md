@@ -21,8 +21,7 @@ Results below cover the 20 that finished and should not be read as the full 25.
 "Upcoding" leanings: 8, all real upcoders (100% precision). No honest provider was labeled upcoding.
 
 ## Same 20 providers, previous run (no documentation)
-Upcoders 8/8 labeled upcoding, but 11 of 12 honest providers were also labeled upcoding or left inconclusive (10 normal + 1 hard
-negative labeled upcoding). "Upcoding" leanings: 19, of which 8 were real upcoders (42% precision).
+Upcoders 8/8 labeled upcoding, but 11 of the 12 honest providers (all 10 normal and 1 of the 2 hard negatives) were also labeled upcoding, and the other hard negative was left inconclusive. "Upcoding" leanings: 19, of which 8 were real upcoders (42% precision).
 
 ## What this shows, and what it does not
 - Given records-review evidence, the agents used it well: they read the unsupported rate against the all-provider rate, weighed
