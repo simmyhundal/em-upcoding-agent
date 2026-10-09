@@ -64,7 +64,7 @@ def test_answer_key_is_outside_the_data_folder():
 
 def test_agent_visible_files_do_not_leak_ground_truth():
     d, key = _build()
-    for name in ("providers.csv", "patients.csv", "claims.csv"):
+    for name in ("providers.csv", "patients.csv", "claims.csv", "documentation.csv"):
         cols = set(_rows(d, name)[0])
         assert not {c for c in cols if "role" in c or "justified" in c or "upgrade" in c or c.startswith("_")}
 
@@ -81,6 +81,38 @@ def test_only_upcoders_bill_above_justified():
         if b > j:
             over[role[c["provider_id"]]] += 1
     assert over["normal"] == 0 and over["hard_negative"] == 0 and over["upcoder"] > 0
+
+
+def test_documentation_sample_coverage_and_signal():
+    d, key = _build()
+    gt = json.load(open(key))
+    role = {k: v["role"] for k, v in gt["providers"].items()}
+    claims = {c["claim_id"]: c for c in _rows(d, "claims.csv")}
+    docs = _rows(d, "documentation.csv")
+    assert 0.2 < len(docs) / len(claims) < 0.4
+    lv = {n: i for i, n in enumerate(g.MDM_LEVELS)}
+    code = {c: i for i, c in enumerate(g.CODES)}
+    rate = {"upcoder": [0, 0], "other": [0, 0]}
+    for r in docs:
+        c = claims[r["claim_id"]]
+        if c["cpt"] == "99215":
+            k = "upcoder" if role[c["provider_id"]] == "upcoder" else "other"
+            rate[k][0] += 1
+            rate[k][1] += lv[r["documented_mdm_level"]] < code[c["cpt"]]
+    up, other = rate["upcoder"][1] / rate["upcoder"][0], rate["other"][1] / rate["other"][0]
+    assert up > 0.4 and other < 0.2 and up > 2 * other
+
+
+def test_documentation_does_not_change_claims():
+    import csv as _csv
+    a, _ = _build(5)
+    b = tempfile.mkdtemp()
+    g.DOC_COVERAGE, old = 0.0, g.DOC_COVERAGE      # documentation uses its own random stream
+    try:
+        g.build(b, os.path.join(tempfile.mkdtemp(), "k.json"), seed=5, **SMALL)
+    finally:
+        g.DOC_COVERAGE = old
+    assert open(os.path.join(a, "claims.csv")).read() == open(os.path.join(b, "claims.csv")).read()
 
 
 if __name__ == "__main__":

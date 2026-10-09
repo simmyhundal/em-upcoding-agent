@@ -9,6 +9,7 @@ Scope: Family Practice, Georgia. Everything is synthetic. Regenerate with
 | `providers.csv` | detectors, agent | provider id, specialty, state, claim and patient counts |
 | `patients.csv` | detectors, agent | age, chronic-condition count, condition list |
 | `claims.csv` | detectors, agent | one row per visit: claim id, provider, patient, date, billed CPT, diagnoses |
+| `documentation.csv` | agent | records-review sample for about 30% of claims: documented MDM level and minutes |
 | `eval/answer_key/ground_truth.json` | eval only (gitignored; outside `data/`) | provider roles and the justified CPT for every claim |
 
 ## Model
@@ -43,3 +44,13 @@ A plain z-score on 99215 share puts 7 of 8 upcoders, 3 of 8 hard negatives and 1
 Top 25 flagged: 8 of 8 upcoders, 3 of 8 hard negatives, 14 of 200 normal providers. Upcoder ranks 1-10 (plain z-score: 2-35). Hard negatives still rank 5, 12 and 22.
 
 Why risk adjustment does not clear the hard negatives: it only uses the chronic-condition count. In the generator, providers also differ in a legitimate way that complexity does not explain (a coding-style effect and a separate provider-level propensity for 99215). Those providers look like outliers even after adjusting for patient complexity. That is a property of how the data was built, not a bug in the baseline.
+
+## Documentation sample (Issue 16)
+`documentation.csv` simulates a records review of a random ~30% of claims. The documented level equals the visit's justified
+level, off by one in 15% of cases; minutes are drawn from a typical band for that level. It uses its own random stream, so
+`claims.csv` is identical with or without it. On the seed-42 data, documented 99215 claims show documentation below the billed
+level 69% of the time for upcoders and 8% for everyone else (counts: 468 upcoder, 1,318 other documented 99215s).
+
+Caveat: documentation is generated from the same hidden level that defines an upcoded visit, so this makes the problem
+easier by construction. It measures how well the summarizer uses records-review evidence, not how well it would do on real claims.
+Providers with few documented claims (many honest ones have fewer than 10) give noisy rates, which the summarizer has to weigh.

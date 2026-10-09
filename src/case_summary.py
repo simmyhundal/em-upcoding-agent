@@ -24,6 +24,10 @@ LOW_COMPLEXITY_SAMPLE = 25    # 99215 claims on the least complex patients
 HIGH_COMPLEXITY_SAMPLE = 10   # 99215 claims on the most complex patients
 COMPARISON_SAMPLE = 10        # non-99215 claims, stratified by complexity, for comparison
 SAMPLER_SEED = "case-summary-v1"
+MDM_LEVELS = ["minimal", "straightforward", "low", "moderate", "high"]
+BILLED_LEVEL = {"99211": 0, "99212": 1, "99213": 2, "99214": 3, "99215": 4}
+DOC_UNSUPPORTED_SAMPLE = 8
+DOC_SUPPORTED_SAMPLE = 4
 
 SCHEMA = {
     "type": "object",
@@ -48,6 +52,7 @@ legitimately sicker patient panel, using only the evidence packet you are given.
 
 Rules:
 - The claim lists in the packet are random samples, not every claim. Do not generalize from them beyond what the tables show.
+- For some claims the packet includes documentation facts from a records review (documented MDM level and minutes). Records exist for only a sample of each provider's claims, and the documentation is itself noisy, so a small share of honest claims will show a mismatch. A billed level above the documented level is unsupported. A high unsupported rate among documented 99215 claims, well above the all-provider rate, is strong evidence of upcoding; a high 99215 share whose documented claims support the billed level is consistent with a legitimately complex panel. Without enough documented claims, say the documentation is too thin to judge.
 - Ground every factual statement in the packet. Cite claim IDs only from the packet's claim lists, and never invent one.
 - Compare billed level to patient complexity: a high 99215 share on complex patients is expected; the same share
   on low-complexity patients is the concern.
@@ -68,6 +73,17 @@ def load(data_dir):
         for r in csv.DictReader(f):
             claims[r["provider_id"]].append(r)
     return chronic, age, conditions, claims
+
+
+def load_docs(data_dir):
+    """claim_id -> (documented level index 0-4, minutes); empty if no documentation file."""
+    path = os.path.join(data_dir, "documentation.csv")
+    docs = {}
+    if os.path.exists(path):
+        with open(path) as f:
+            for r in csv.DictReader(f):
+                docs[r["claim_id"]] = (MDM_LEVELS.index(r["documented_mdm_level"]), int(r["documented_minutes"]))
+    return docs
 
 
 def bucket(c):
@@ -108,7 +124,40 @@ def sample_claims(rng, rows, k, stratum):
     return sorted(picked, key=lambda r: r["claim_id"])
 
 
-def build_packet(pid, flag_row, chronic, age, conditions, claims, peer_rate):
+def doc_peer_rates(claims, docs):
+    tot, bad = Counter(), Counter()
+    for rows in claims.values():
+        for r in rows:
+            if r["claim_id"] in docs:
+                tot[r["cpt"]] += 1
+                bad[r["cpt"]] += docs[r["claim_id"]][0] < BILLED_LEVEL[r["cpt"]]
+    return {c: (bad[c] / tot[c] if tot[c] else None) for c in tot}
+
+
+def doc_section(rows, docs, rng, peer_doc):
+    got = [r for r in rows if r["claim_id"] in docs]
+    table = []
+    for cpt in ["99213", "99214", "99215"]:
+        d = [r for r in got if r["cpt"] == cpt]
+        if d:
+            bad = sum(docs[r["claim_id"]][0] < BILLED_LEVEL[cpt] for r in d)
+            table.append({"billed_cpt": cpt, "documented_claims": len(d), "documentation_does_not_support_billed_level": bad,
+                          "unsupported_rate": round(bad / len(d), 3),
+                          "all_provider_unsupported_rate": round(peer_doc[cpt], 3) if peer_doc.get(cpt) is not None else None})
+
+    def card(r):
+        lvl, mins = docs[r["claim_id"]]
+        return {"claim_id": r["claim_id"], "billed_cpt": r["cpt"], "documented_mdm_level": MDM_LEVELS[lvl],
+                "documented_minutes": mins}
+    unsup = [r for r in got if docs[r["claim_id"]][0] < BILLED_LEVEL[r["cpt"]]]
+    sup = [r for r in got if r["cpt"] == "99215" and docs[r["claim_id"]][0] >= 4]
+    return {"claims_with_documentation": len(got), "share_of_claims_documented": round(len(got) / len(rows), 3),
+            "by_billed_level": table,
+            "examples_documentation_below_billed_level": [card(r) for r in sample_claims(rng, unsup, DOC_UNSUPPORTED_SAMPLE, lambda r: r["cpt"])],
+            "examples_99215_documentation_supports": [card(r) for r in sample_claims(rng, sup, DOC_SUPPORTED_SAMPLE, lambda r: 0)]}
+
+
+def build_packet(pid, flag_row, chronic, age, conditions, claims, peer_rate, docs=None, peer_doc=None):
     rows = claims[pid]
     mix = Counter(r["cpt"] for r in rows)
     by_bucket = defaultdict(lambda: [0, 0])
@@ -150,6 +199,7 @@ def build_packet(pid, flag_row, chronic, age, conditions, claims, peer_rate):
         "99215_claims_on_low_complexity_patients_0_or_1_conditions": low,
         "99215_claims_on_high_complexity_patients_4_plus_conditions": high,
         "comparison_claims_other_than_99215_random_sample": comparison,
+        **({"documentation_review": doc_section(rows, docs, rng, peer_doc or {})} if docs else {}),
     }
 
 
@@ -186,13 +236,15 @@ def peer_rates(claims, chronic):
 def run(data_dir, flagged_csv, out_path, limit=None, dry_run=False, llm=call_anthropic):
     chronic, age, conditions, claims = load(data_dir)
     rates = peer_rates(claims, chronic)
+    docs = load_docs(data_dir)
+    peer_doc = doc_peer_rates(claims, docs) if docs else None
     with open(flagged_csv) as f:
         flagged = [r for r in csv.DictReader(f) if r["flagged"] == "True"]
     if limit:
         flagged = flagged[:limit]
     out = []
     for fr in flagged:
-        packet = build_packet(fr["provider_id"], fr, chronic, age, conditions, claims, rates)
+        packet = build_packet(fr["provider_id"], fr, chronic, age, conditions, claims, rates, docs, peer_doc)
         if dry_run:
             out.append({"provider_id": fr["provider_id"], "prompt_chars": len(make_prompt(packet)), "packet": packet})
             continue

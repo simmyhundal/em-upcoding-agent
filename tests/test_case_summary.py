@@ -77,6 +77,15 @@ def test_sample_claims_stratifies_and_prefers_distinct_patients():
     assert len(only_two) == 5 and len({r["patient_id"] for r in only_two}) == 2
 
 
+def test_packet_has_documentation_review():
+    for p in _packets():
+        d = p["documentation_review"]
+        assert 0.15 < d["share_of_claims_documented"] < 0.45 and d["by_billed_level"]
+        for row in d["by_billed_level"]:
+            assert row["documentation_does_not_support_billed_level"] <= row["documented_claims"]
+        assert all(e["billed_cpt"] for e in d["examples_documentation_below_billed_level"])
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

@@ -63,6 +63,11 @@ UPCODER_FRACTION = (0.15, 0.40)  # share of visits upgraded by one level
 VOLUME_MEDIAN, VOLUME_SIGMA = 283.0, 1.13   # lognormal, from CMS GA FP
 VOLUME_MIN, VOLUME_MAX = 60, 2500
 VISITS_PER_PATIENT = 2.3
+# Records-review sample ("documentation on file") for a share of claims.
+DOC_COVERAGE = 0.30          # share of claims with documentation on file
+DOC_NOISE = 0.15             # chance the documented level is off by one from the justified level
+MDM_LEVELS = ["minimal", "straightforward", "low", "moderate", "high"]
+DOC_MINUTES = [(2, 9), (10, 19), (20, 29), (30, 39), (40, 54)]   # typical time by level
 
 
 def justified_levels(rng, chronic, eta, params, top_shift=0.0):
@@ -103,7 +108,8 @@ def build(out_dir, answer_key_path, seed=42, n_normal=200, n_upcoders=8, n_hard_
     roles = ["normal"] * n_normal + ["upcoder"] * n_upcoders + ["hard_negative"] * n_hard_neg
     rng.shuffle(roles)
 
-    providers, patients, claims, truth = [], [], [], {}
+    providers, patients, claims, truth, docs = [], [], [], {}, []
+    drng = np.random.default_rng([seed, 7])   # separate stream: claims.csv is unchanged by documentation
     pid_counter = 0
     claim_counter = 0
     start = date(2024, 1, 1)
@@ -151,6 +157,13 @@ def build(out_dir, answer_key_path, seed=42, n_normal=200, n_upcoders=8, n_hard_
                 "diagnosis_codes": ";".join(dx),
             })
             truth[cid] = CODES[int(just[v])]
+            if drng.random() < DOC_COVERAGE:
+                d = int(just[v])
+                if drng.random() < DOC_NOISE:
+                    d = int(np.clip(d + (1 if drng.random() < 0.5 else -1), 0, 4))
+                lo, hi = DOC_MINUTES[d]
+                docs.append({"claim_id": cid, "documented_mdm_level": MDM_LEVELS[d],
+                             "documented_minutes": int(drng.integers(lo, hi + 1))})
 
         providers.append({
             "provider_id": prov,
@@ -168,6 +181,7 @@ def build(out_dir, answer_key_path, seed=42, n_normal=200, n_upcoders=8, n_hard_
     _write_csv(os.path.join(out_dir, "patients.csv"), patients, ["patient_id", "provider_id", "age", "chronic_condition_count", "conditions"])
     _write_csv(os.path.join(out_dir, "claims.csv"), claims,
                ["claim_id", "provider_id", "patient_id", "service_date", "cpt", "place_of_service", "diagnosis_codes"])
+    _write_csv(os.path.join(out_dir, "documentation.csv"), docs, ["claim_id", "documented_mdm_level", "documented_minutes"])
     # Ground truth (kept apart; never shown to the agent)
     with open(answer_key_path, "w") as f:
         json.dump({
