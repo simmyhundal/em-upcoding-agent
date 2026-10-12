@@ -15,7 +15,7 @@
  },
  "runs": [
   {
-   "run": "Screen only, suspicion at or above 5",
+   "run": "Screen only",
    "dataset": "s42",
    "kind": "screen",
    "min_suspicion": 5
@@ -30,7 +30,6 @@
   },
   {
    "run": "261008_3_cc",
-   "note": "chat agents",
    "dataset": "s42",
    "kind": "summaries",
    "records": false,
@@ -38,7 +37,6 @@
   },
   {
    "run": "261008_4_cc",
-   "note": "chat agents",
    "dataset": "s42",
    "kind": "summaries",
    "records": true,
@@ -46,7 +44,6 @@
   },
   {
    "run": "261009_1_api",
-   "note": "live API run",
    "bold": true,
    "dataset": "s42",
    "kind": "summaries",
@@ -55,7 +52,7 @@
    "usefulness": "experiments/261009_1_api/usefulness.jsonl"
   },
   {
-   "run": "Screen only, suspicion at or above 5",
+   "run": "Screen only",
    "dataset": "s101",
    "kind": "screen",
    "min_suspicion": 5

@@ -89,7 +89,7 @@ def _ai_cells(d, r):
     return cells
 
 
-def _row(run, seed, stage, records, cells):
+def _row(run, seed, stage, tuning, records, cells):
     cells = {**{k: None for k in ("fn", "fp", "prec", "cite", "useful", "templ")}, **cells}
     oks = {k: judge(cells[k], k) for k in cells}
     text = {k: None for k in cells}
@@ -103,7 +103,7 @@ def _row(run, seed, stage, records, cells):
         text["useful"] = f"{cells['useful']:.2f}"
     if cells["templ"] is not None:
         text["templ"] = "templated" if cells["templ"] else "none"
-    return {"run": run, "seed": seed, "stage": stage, "records": records, "text": text, "ok": oks,
+    return {"run": run, "seed": seed, "stage": stage, "tuning": tuning, "records": records, "text": text, "ok": oks,
             "total": total(oks.values())}
 
 
@@ -124,9 +124,12 @@ def compute(registry_path=None):
         name = r["run"] + (f"<br>{r['note']}" if r.get("note") else "")
         if r.get("bold"):
             name = f"**{r['run']}**" + (f"<br>{r['note']}" if r.get("note") else "")
-        out.append(_row(name, d["seed"], "Screen", "No", _screen_cells(d, r)))
+        screen_tuning = (f"Suspicion at or above {r['min_suspicion']:g}" if r.get("min_suspicion") is not None
+                         else f"Top {TOP_N} upcoding outliers")
+        out.append(_row(name, d["seed"], "Screen", screen_tuning, "No", _screen_cells(d, r)))
         if r["kind"] == "summaries":
-            out.append(_row(name, d["seed"], "AI", "Yes" if r["records"] else "No", _ai_cells(d, r)))
+            out.append(_row(name, d["seed"], "AI", f"AI calls upcoding (screen: {screen_tuning[0].lower() + screen_tuning[1:]})",
+                            "Yes" if r["records"] else "No", _ai_cells(d, r)))
     return out
 
 
@@ -136,15 +139,15 @@ def cell(text, ok):
 
 def markdown(registry_path=None):
     rows = compute(registry_path)
-    head = ("| Run | Seed | Screen / AI | Records evidence | False negative rate | False positive rate "
+    head = ("| Run | Seed | Screen / AI | Tuning | Records evidence | False negative rate | False positive rate "
             "| Precision of upcoding calls | Citations valid | Case Summary Usefulness (1-5) | No templating "
-            "| Evals passed |\n|---|---|---|---|---|---|---|---|---|---|---|")
-    thr = ("| **Threshold** | | | | at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% "
+            "| Evals passed |\n|---|---|---|---|---|---|---|---|---|---|---|---|")
+    thr = ("| **Threshold** | | | | | at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% "
            "| at least 4 | none | |")
     lines = [head, thr]
     for r in rows:
         cells = " | ".join(cell(r["text"][k], r["ok"][k]) for k in ("fn", "fp", "prec", "cite", "useful", "templ"))
-        lines.append(f"| {r['run']} | {r['seed']} | {r['stage']} | {r['records']} | {cells} | **{r['total']}** |")
+        lines.append(f"| {r['run']} | {r['seed']} | {r['stage']} | {r['tuning']} | {r['records']} | {cells} | **{r['total']}** |")
     return "\n".join(lines)
 
 
