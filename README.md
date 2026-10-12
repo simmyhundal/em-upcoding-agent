@@ -156,7 +156,7 @@ Each run has a **Screen** row (the statistical screen's flagged doctors count as
 | Run | Seed | Screen / AI | Tuning | Records evidence | False negative rate | False positive rate | Precision of upcoding calls | Citations valid | Case Summary Usefulness (1-5) | No templating | Evals passed |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | **Threshold** | | | | | at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% | at least 4 | none | |
-| Screen only | 42 | Screen | Suspicion at or above 5 | No | 🟩 0.0%<br>(0 / 8) | 🟩 1.4%<br>(3 / 208) | 🟥 73% | – | – | – | **2 / 3** |
+| Screen only | 42 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟩 0.0%<br>(0 / 8) | 🟩 1.4%<br>(3 / 208) | 🟥 73% | – | – | – | **2 / 3** |
 | 261008_2_cc<br>one agent for all 25 | 42 | Screen | Top 25 upcoding outliers | No | 🟩 0.0%<br>(0 / 8) | 🟩 8.2%<br>(17 / 208) | 🟥 32% | – | – | – | **2 / 3** |
 | 261008_2_cc<br>one agent for all 25 | 42 | AI | AI calls upcoding (screen: top 25 upcoding outliers) | No | 🟩 12.5%<br>(1 / 8) | 🟥 58.8%<br>(10 / 17) | 🟥 41% | 🟩 100% | – | 🟥 templated | **2 / 5** |
 | 261008_3_cc | 42 | Screen | Top 25 upcoding outliers | No | 🟩 0.0%<br>(0 / 8) | 🟩 8.2%<br>(17 / 208) | 🟥 32% | – | – | – | **2 / 3** |
@@ -165,7 +165,7 @@ Each run has a **Screen** row (the statistical screen's flagged doctors count as
 | 261008_4_cc | 42 | AI | AI calls upcoding (screen: top 25 upcoding outliers) | Yes | 🟩 0.0%<br>(0 / 8) | 🟩 0.0%<br>(0 / 17) | 🟩 100% | 🟩 100% | – | 🟩 none | **5 / 5** |
 | **261009_1_api** | 42 | Screen | Top 25 upcoding outliers | No | 🟩 0.0%<br>(0 / 8) | 🟩 8.2%<br>(17 / 208) | 🟥 32% | – | – | – | **2 / 3** |
 | **261009_1_api** | 42 | AI | AI calls upcoding (screen: top 25 upcoding outliers) | Yes | 🟩 0.0%<br>(0 / 8) | 🟩 0.0%<br>(0 / 17) | 🟩 100% | 🟩 100% | 🟥 3.44 | 🟩 none | **5 / 6** |
-| Screen only | 101 | Screen | Suspicion at or above 5 | No | 🟩 0.0%<br>(0 / 8) | 🟩 0.5%<br>(1 / 208) | 🟩 89% | – | – | – | **3 / 3** |
+| Screen only | 101 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟩 0.0%<br>(0 / 8) | 🟩 0.5%<br>(1 / 208) | 🟩 89% | – | – | – | **3 / 3** |
 | **261009_2_api**<br>held-out API run | 101 | Screen | Top 25 upcoding outliers | No | 🟩 0.0%<br>(0 / 8) | 🟩 8.2%<br>(17 / 208) | 🟥 32% | – | – | – | **2 / 3** |
 | **261009_2_api**<br>held-out API run | 101 | AI | AI calls upcoding (screen: top 25 upcoding outliers) | Yes | 🟩 0.0%<br>(0 / 8) | 🟩 0.0%<br>(0 / 17) | 🟩 100% | 🟩 100% | 🟥 3.24 | 🟩 none | **5 / 6** |
 <!-- scoreboard:end -->

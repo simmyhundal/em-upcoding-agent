@@ -124,7 +124,7 @@ def compute(registry_path=None):
         name = r["run"] + (f"<br>{r['note']}" if r.get("note") else "")
         if r.get("bold"):
             name = f"**{r['run']}**" + (f"<br>{r['note']}" if r.get("note") else "")
-        screen_tuning = (f"Suspicion at or above {r['min_suspicion']:g}" if r.get("min_suspicion") is not None
+        screen_tuning = (f"Z-score of risk-adjusted coding >= {r['min_suspicion']:g}" if r.get("min_suspicion") is not None
                          else f"Top {TOP_N} upcoding outliers")
         out.append(_row(name, d["seed"], "Screen", screen_tuning, "No", _screen_cells(d, r)))
         if r["kind"] == "summaries":
