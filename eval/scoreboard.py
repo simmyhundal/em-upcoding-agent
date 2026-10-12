@@ -124,7 +124,7 @@ def compute(registry_path=None):
         name = r["run"] + (f"<br>{r['note']}" if r.get("note") else "")
         if r.get("bold"):
             name = f"**{r['run']}**" + (f"<br>{r['note']}" if r.get("note") else "")
-        out.append(_row(name, d["seed"], "Screen", "–", _screen_cells(d, r)))
+        out.append(_row(name, d["seed"], "Screen", "No", _screen_cells(d, r)))
         if r["kind"] == "summaries":
             out.append(_row(name, d["seed"], "AI", "Yes" if r["records"] else "No", _ai_cells(d, r)))
     return out
