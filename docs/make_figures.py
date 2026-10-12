@@ -79,6 +79,44 @@ def pipeline():
     write("pipeline.svg", "\n".join(s))
 
 
+def em_levels():
+    """How an office-visit level is really chosen and how it is checked later."""
+    W, H = 1000, 405
+    s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>',
+         f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
+         f'<text x="30" y="38" font-size="19" font-weight="bold" fill="{INK}">How an office-visit level is chosen, and checked later</text>',
+         f'<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">'
+         f'<path d="M0 0 L10 5 L0 10 z" fill="{MUTED}"/></marker></defs>']
+
+    def box(x, y, w, h, col, title, lines):
+        s.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="10" fill="#f9fafb" stroke="{col}" stroke-width="2.5"/>')
+        s.append(f'<text x="{x + 16}" y="{y + 28}" font-size="14.5" font-weight="bold" fill="{INK}">{escape(title)}</text>')
+        for j, line in enumerate(lines):
+            s.append(f'<text x="{x + 16}" y="{y + 54 + j * 20}" font-size="12.5" fill="{MUTED}">{escape(line)}</text>')
+
+    def arrow(x1, y1, x2, y2):
+        s.append(f'<path d="M{x1} {y1} L{x2} {y2}" stroke="{MUTED}" stroke-width="2" marker-end="url(#a)"/>')
+    s.append(f'<text x="30" y="72" font-size="13" font-weight="bold" fill="{BLUE}">1. At the visit: the doctor picks one method</text>')
+    box(30, 84, 300, 150, BLUE, "Medical decision making", ["Three elements, two of three must match:",
+        "- how serious the problems are", "- how much data was reviewed or ordered",
+        "- risk of the treatment (e.g. prescriptions)"])
+    box(30, 248, 300, 110, BLUE, "Or: total time that day", ["About 10 / 20 / 30 / 40+ minutes of the",
+        "doctor's own time for 99212 to 99215.", "History and exam no longer set the level."])
+    arrow(330, 190, 392, 190)
+    s.append(f'<text x="400" y="72" font-size="13" font-weight="bold" fill="{ORANGE}">2. The code on the claim</text>')
+    box(400, 84, 200, 274, ORANGE, "Level billed", ["99212  straightforward", "99213  low", "99214  moderate", "99215  high",
+        "", "99211 is a nurse visit", "with no decision-making", "requirement."])
+    arrow(600, 190, 662, 190)
+    s.append(f'<text x="670" y="72" font-size="13" font-weight="bold" fill="{GREEN}">3. After payment: someone re-scores it</text>')
+    box(670, 84, 300, 274, GREEN, "Contractors and auditors", ["Pull the record for a sample of visits.",
+        "Coders and nurses re-score the note", "against the same rules.", "",
+        "Typical finding: the note does not", "support the level (or supports a higher", "one). Big audits extrapolate the", "overpayment from the sample."])
+    s.append(f'<text x="30" y="386" font-size="12.5" fill="{MUTED}">This project simplifies step 1 to a documented MDM level plus minutes. '
+             f'It does not model the two-of-three rule or real notes.</text>')
+    s.append("</svg>")
+    write("em_levels.svg", "\n".join(s))
+
+
 def results():
     truth = json.load(open(os.path.join(ROOT, "eval", "answer_key", "ground_truth.json")))
     flagged = [r for r in __import__("csv").DictReader(open(os.path.join(ROOT, "reports", "flagged.csv")))]
@@ -217,6 +255,7 @@ def funnel():
 if __name__ == "__main__":
     os.makedirs(os.path.join(ROOT, "docs", "images"), exist_ok=True)
     pipeline()
+    em_levels()
     funnel()
     print("results:", results())
     case_card()
