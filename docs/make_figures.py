@@ -34,43 +34,48 @@ def write(name, svg):
 
 
 def pipeline():
-    steps = [("1", "Billing data", "Fake (synthetic) claims modelled on public Medicare numbers", BLUE),
-             ("2", "Statistical screen", "Flags doctors who bill the top visit code unusually often, adjusted for how sick their patients are", BLUE),
-             ("3", "Review list", "The 25 most unusual providers go to a reviewer", BLUE),
-             ("4", "AI case summary", "An AI writes a short explanation and cites the exact claims it relies on", ORANGE),
-             ("5", "Citation check", "Plain code rejects any summary that cites a claim that does not exist or belongs to someone else", GREEN),
-             ("6", "Case page", "One page per provider: the summary, its citations and a chart against peers", ORANGE),
-             ("7", "Recovery packet", "Draft material for the team that recovers money: records to request and a sample plan", ORANGE)]
-    W, H = 920, 500
+    """Eight steps, colored by who does the work: statistics, AI, plain code and checks, people."""
+    PEOPLE = "#7c3aed"
+    steps = [("1", "Billing data", "Claims data. Here: synthetic claims shaped like public Medicare numbers.", GREEN),
+             ("2", "Statistical screen", "Flags doctors who bill the top visit code unusually often for their patients. The most unusual go on.", BLUE),
+             ("3", "AI review", "Reads each flagged doctor's evidence and writes a short explanation citing the exact visits.", ORANGE),
+             ("4", "AI filter", "In the same call, suggests: looks like upcoding, sicker patients, or unclear. Only 'upcoding' moves on.", ORANGE),
+             ("5", "Citation check", "Code rejects any summary that cites a visit that does not exist or belongs to someone else.", GREEN),
+             ("6", "Case pages", "One page per flagged doctor: the summary, its cited visits and a chart against peers.", GREEN),
+             ("7", "Recovery packets", "For suspected upcoders only: records to request, a sample plan, an overpayment estimate.", GREEN),
+             ("8", "People review", "SIU reviewers read the cases. Payment integrity requests records and decides what happens next.", PEOPLE)]
+    W, H = 1000, 470
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>',
          f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
-         f'<text x="30" y="34" font-size="20" font-weight="bold" fill="{INK}">How the project works</text>',
-         f'<text x="30" y="56" font-size="13" fill="{MUTED}">Statistics choose who gets a look. The AI explains and advises. Code checks the AI. People decide what happens next.</text>']
-    bw, bh, gap = 200, 120, 18
-    pos = [(30 + i * (bw + gap), 80) for i in range(4)] + [(30 + i * (bw + gap) + (bw + gap) / 2, 300) for i in range(3)]
-    for (n, title, body, col), (x, y) in zip(steps, pos):
-        s.append(f'<rect x="{x}" y="{y}" width="{bw}" height="{bh + 30}" rx="10" fill="#f9fafb" stroke="{col}" stroke-width="2"/>')
-        s.append(f'<circle cx="{x + 24}" cy="{y + 26}" r="14" fill="{col}"/>')
-        s.append(f'<text x="{x + 24}" y="{y + 31}" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">{n}</text>')
-        s.append(f'<text x="{x + 46}" y="{y + 31}" font-size="14" font-weight="bold" fill="{INK}">{escape(title)}</text>')
-        for j, line in enumerate(textwrap.wrap(body, 30)[:6]):
-            s.append(f'<text x="{x + 16}" y="{y + 62 + j * 18}" font-size="12.5" fill="{MUTED}">{escape(line)}</text>')
-    for i in range(3):
-        x = pos[i][0] + bw
-        s.append(f'<path d="M{x + 2} 160 L{x + gap - 4} 160" stroke="{MUTED}" stroke-width="2" marker-end="url(#a)"/>')
-    s.append(f'<path d="M{pos[3][0] + bw / 2} {pos[3][1] + bh + 30} L{pos[3][0] + bw / 2} 275 L{pos[4][0] + bw / 2} 275 L{pos[4][0] + bw / 2} 298" '
-             f'fill="none" stroke="{MUTED}" stroke-width="2" marker-end="url(#a)"/>')
-    for i in range(4, 6):
-        x = pos[i][0] + bw
-        s.append(f'<path d="M{x + 2} 380 L{x + gap - 4} 380" stroke="{MUTED}" stroke-width="2" marker-end="url(#a)"/>')
+         f'<text x="30" y="40" font-size="19" font-weight="bold" fill="{INK}">Statistics screens upcoders then AI suggests and explains. Humans review generated cases.</text>']
+    bw, bh, gap, x0 = 225, 150, 20, 30
+    rows_y = (74, 268)
+    pos = [(x0 + (i % 4) * (bw + gap), rows_y[i // 4]) for i in range(8)]
     s.append(f'<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">'
              f'<path d="M0 0 L10 5 L0 10 z" fill="{MUTED}"/></marker></defs>')
-    s += [f'<rect x="30" y="472" width="14" height="14" rx="3" fill="none" stroke="{BLUE}" stroke-width="2"/>',
-          f'<text x="50" y="484" font-size="12" fill="{MUTED}">statistics</text>',
-          f'<rect x="130" y="472" width="14" height="14" rx="3" fill="none" stroke="{ORANGE}" stroke-width="2"/>',
-          f'<text x="150" y="484" font-size="12" fill="{MUTED}">AI and write-ups</text>',
-          f'<rect x="270" y="472" width="14" height="14" rx="3" fill="none" stroke="{GREEN}" stroke-width="2"/>',
-          f'<text x="290" y="484" font-size="12" fill="{MUTED}">safety check</text>', "</svg>"]
+    for (n, title, body, col), (x, y) in zip(steps, pos):
+        s.append(f'<rect x="{x}" y="{y}" width="{bw}" height="{bh}" rx="10" fill="#f9fafb" stroke="{col}" stroke-width="2.5"/>')
+        s.append(f'<circle cx="{x + 24}" cy="{y + 26}" r="14" fill="{col}"/>')
+        s.append(f'<text x="{x + 24}" y="{y + 31}" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">{n}</text>')
+        s.append(f'<text x="{x + 46}" y="{y + 31}" font-size="14.5" font-weight="bold" fill="{INK}">{escape(title)}</text>')
+        for j, line in enumerate(textwrap.wrap(body, 30)[:6]):
+            s.append(f'<text x="{x + 16}" y="{y + 62 + j * 18}" font-size="12.5" fill="{MUTED}">{escape(line)}</text>')
+    for r in (0, 1):
+        for i in range(3):
+            x = pos[r * 4 + i][0] + bw
+            y = rows_y[r] + bh / 2
+            s.append(f'<path d="M{x + 2} {y} L{x + gap - 4} {y}" stroke="{MUTED}" stroke-width="2" marker-end="url(#a)"/>')
+    cx4 = pos[3][0] + bw / 2
+    cx5 = pos[4][0] + bw / 2
+    ymid = (rows_y[0] + bh + rows_y[1]) / 2
+    s.append(f'<path d="M{cx4} {rows_y[0] + bh} L{cx4} {ymid} L{cx5} {ymid} L{cx5} {rows_y[1] - 2}" fill="none" stroke="{MUTED}" '
+             f'stroke-width="2" marker-end="url(#a)"/>')
+    ly = H - 30
+    for k, (col, label) in enumerate(((BLUE, "statistics"), (ORANGE, "AI"), (GREEN, "plain code and checks"), (PEOPLE, "people"))):
+        lx = 30 + [0, 110, 170, 350][k]
+        s.append(f'<rect x="{lx}" y="{ly - 11}" width="14" height="14" rx="3" fill="none" stroke="{col}" stroke-width="2.5"/>')
+        s.append(f'<text x="{lx + 20}" y="{ly + 1}" font-size="12.5" fill="{MUTED}">{label}</text>')
+    s.append("</svg>")
     write("pipeline.svg", "\n".join(s))
 
 

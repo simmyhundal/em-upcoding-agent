@@ -4,27 +4,29 @@
 
 Everything here runs on **synthetic (invented) data** shaped like real Medicare billing. No real patients, doctors or claims are used.
 
-![How the project works: synthetic billing data, a statistical screen, a review list, an AI case summary, a citation check, a case page and a recovery packet](docs/images/pipeline.svg)
-
 ## What problem does this solve?
 When you see a doctor for an ordinary office visit, the doctor bills your insurer using one of five codes (99211 to 99215). Higher codes mean a longer, more complex visit and **pay more**. **Upcoding** is billing a higher code than the visit justified. It costs health insurers and Medicare money, and teams called *payment integrity* or *special investigations* look for it.
 
 The hard part: a doctor who bills the top code often is **not necessarily cheating**. They may just see sicker patients. A useful tool has to tell those two cases apart, and it has to show its evidence, because a wrong accusation is costly.
 
 ## What does this project do?
-1. **Builds realistic practice data.** It generates a fake population of 216 family doctors in Georgia (about 100,000 visits), shaped to match public Medicare statistics. Eight are planted upcoders, eight are honest but treat unusually sick patients, and the rest are typical. Because the answer is known, the tools can be graded.
-2. **Screens for outliers.** Statistics flag doctors who bill the top code unusually often, adjusted for how sick their patients are. The most unusual go to a reviewer: the top 25, or everyone above a chosen suspicion level.
-3. **Writes a case summary and a recommendation.** An AI reads each flagged doctor's billing pattern and records evidence, writes a short explanation that **cites the exact visits** it relies on, and advises whether the case looks like upcoding, like a sicker patient base, or is unclear.
-4. **Checks the AI.** Plain code rejects any summary that cites a visit that does not exist or belongs to a different doctor.
-5. **Shows the evidence.** Each case gets a chart comparing the doctor to peers, and a case page a reviewer can read in a minute.
-6. **Hands off to recovery.** For the cases that look like upcoding, it prepares draft material for the team that recovers money: which records to request, a reproducible sampling plan, and a way to estimate the overpayment with a confidence range.
+![Statistics screens upcoders then AI suggests and explains. Humans review generated cases. Eight steps: billing data, statistical screen, AI review, AI filter, citation check, case pages, recovery packets, people review.](docs/images/pipeline.svg)
 
-Statistics choose who gets a close look. The AI then reads each flagged doctor's evidence and advises whether the case looks like upcoding or like sicker patients. That advice is what moves a case on to the recovery step, but it is advice: people review the records and make every real decision.
+1. **Billing data.** A fake (synthetic) population of 216 family doctors in Georgia, about 100,000 visits, shaped to match public Medicare statistics. Eight doctors are planted upcoders, eight are honest but treat unusually sick patients, and the rest are typical. Because the answer is known, the tools can be graded.
+2. **Statistical screen.** Statistics flag doctors who bill the top visit code unusually often, adjusted for how sick their patients are. The most unusual go on: the top 25, or everyone above a chosen suspicion level. It is a wide net: it catches the upcoders but also many honest doctors.
+3. **AI review.** An AI reads each flagged doctor's billing pattern and the records sample, and writes a short explanation that **cites the exact visits** it relies on.
+4. **AI filter.** In the same call, the AI suggests whether each flagged doctor looks like upcoding, like a sicker patient base, or unclear. **This is the second filter: the doctors it calls upcoding are the suspected upcoders, and only they move on.** On this synthetic data it kept all 8 planted upcoders and set aside all 17 honest doctors; see [Limitations](#limitations-of-this-version) for why that is optimistic.
+5. **Citation check.** Plain code rejects any summary that cites a visit that does not exist or belongs to a different doctor.
+6. **Case pages.** One page per flagged doctor: the summary, its cited visits, and a chart comparing the doctor to peers.
+7. **Recovery packets.** For the suspected upcoders only: draft material for the team that recovers money, namely which records to request, a reproducible sampling plan, and a way to estimate the overpayment with a confidence range.
+8. **People review.** SIU reviewers read the cases, payment integrity requests records, and people make every real decision. Nothing happens to a doctor without a person checking the records.
+
+In short: statistics cast a wide net, the AI is the second filter that decides who the suspected upcoders are, and people decide what happens next. The AI's call is advice, not a verdict, and its accuracy here rests on a records sample that a payer would not normally have at this point (see [Limitations](#limitations-of-this-version)).
 
 ## How the filtering works
 ![Funnel: 216 doctors, 25 flagged by statistics, then 8 that look like upcoding, 12 that look like sicker patients and 5 that are unclear; the 8 get recovery packets](docs/images/funnel.svg)
 
-The screen only says "unusual", and many honest doctors are unusual, so a second step sorts the flagged group. On this synthetic data the 8 that moved on were exactly the 8 planted upcoders; a real team would not have that answer key, which is why a person reviews the records before anything happens.
+The screen only says "unusual", and many honest doctors are unusual, so the AI acts as a second filter and sorts the flagged group. On this synthetic data the 8 that moved on were exactly the 8 planted upcoders; a real team would not have that answer key, which is why a person reviews the records before anything happens.
 
 ## A worked example
 Two doctors the screen flagged, drawn on the same axes. Each box shows how *other* doctors bill the top code at each patient-sickness level (0, 1, 2 ... chronic conditions); the orange dot with a bar is this doctor, with a 95% confidence range.
@@ -51,11 +53,17 @@ Results on the synthetic data (one random seed, small counts, so read them as di
 
 - The screen (statistics only) puts **8 of 8 planted upcoders** in the top 25, along with 17 honest doctors, so the screen alone cannot tell them apart.
 - AI summaries that only see billing patterns still wrongly accuse **14 of the 17** honest doctors. From billing data alone, an honest high biller and an upcoder can look the same.
-- Adding a sample of **records-review evidence** (what the medical record says the visit supported) brings that to **0 of 17**, with the AI saying "inconclusive" when too few records exist. **This last result is a ceiling, not a forecast:** the records evidence is generated from the same hidden truth that defines an upcoded visit, so it makes the problem easier by construction.
+- Adding a sample of **records-review evidence** (what the medical record says the visit supported) brings that to **0 of 17**, with the AI saying "inconclusive" when too few records exist (this records evidence is the unrealistic part; see [Limitations](#limitations-of-this-version)). **This last result is a ceiling, not a forecast:** the records evidence is generated from the same hidden truth that defines an upcoded visit, so it makes the problem easier by construction.
 - In the latest run every cited visit was real: **230 of 230** citations passed the check. The check confirms the visits exist and belong to the doctor, not that each one supports the sentence citing it.
 - **The real pipeline run:** the project's own API step (Claude Opus 5.5) wrote the 25 summaries with the records evidence and got the same result: all 8 real upcoders called upcoding, 0 of 17 honest doctors, 3 of 3 sicker-panel doctors read as a heavy panel, and **261 of 261** citations real. The first two AI bars above came from agents in a chat session.
 - **A held-out check:** I froze the code, generated a brand-new dataset and ran the whole pipeline once, with no tuning. The headline held: all 8 real upcoders called upcoding, 0 of 17 honest doctors accused, 278 of 278 citations real. It is still the same data generator and the same kind of records evidence, so it is a check on tuning, not on real-world difficulty (details in `experiments/261009_2_api/`).
 - **Quality is not yet at the bar I set.** An independent AI grader (a different model, using a written 1-to-5 rubric) averaged **3.4 out of 5** on how useful the summaries are, against a target of 4. The usual complaints were small numeric slips, a cited visit that does not quite fit the sentence citing it, and headlines that lean a little too hard. The grader is itself an AI and makes mistakes, so this is a rough check, not a verdict.
+
+## Limitations of this version
+- **The inputs are unrealistic: the AI sees records a payer would not have yet.** A payer normally screens on claims data alone. Medical records (the equivalent of this project's `documentation.csv`) reach a payer only after it requests them from the fee-for-service primary care physician, and that request usually comes after a provider is already suspected. Here, a records sample is handed to the AI *before* it decides. It stands in for a first records request, but the order of events is not how it works in practice.
+- **Why that matters.** The AI's filtering power comes largely from that sample. With it the AI accused 0 of 17 honest doctors; without it (the chat-session runs) it accused 14 of 17. So read the results as what the AI can do once records are in hand, not as detection from claims alone. Put another way, in this version the AI turns a records sample into a cited, checkable case file, and it is also the filter that decides which flagged doctors move on, but its accuracy rests on that sample.
+- **What is planned.** [Milestone 5](https://github.com/simmyhundal/em-upcoding-agent/milestone/5) rebuilds the inputs the way a payer would actually receive them (claims, members, providers, reference tables), models records requests as a later step, and re-runs the evaluation.
+- **Other limits.** Synthetic data from one generator; two seeds; the usefulness score comes from an AI grader and is below its target; the citation check confirms cited visits exist, not that each one supports its sentence.
 
 ## Built responsibly
 - **Synthetic data only.** No real patients, doctors or claims, and no real provider is ever flagged.
@@ -96,6 +104,7 @@ Results on the synthetic data (one random seed, small counts, so read them as di
 - **Data design and calibration notes:** [docs/synthetic_data.md](docs/synthetic_data.md)
 - **Experiments and what they do and do not show:** [experiments/README.md](experiments/README.md)
 - **Open and closed work:** the GitHub issues and milestones for this repository
+- **For AI agents working on this repo:** [CLAUDE.md](CLAUDE.md)
 
 To rebuild the figures above: `python docs/make_figures.py`.
 
@@ -164,6 +173,7 @@ Live from this repository's [milestones](https://github.com/simmyhundal/em-upcod
 - ![Path A (parked): LLM judges from clinical notes](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/2) An LLM judges from synthetic free-text clinical notes instead of structured evidence.
 - ![M3: Enhancements to Path B](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/3) Follow-on features once the Path B PoC (Milestone 1) is evaluated: evidence visuals for reviewers and a downstream artifact for the Payment Integrity team.
 - ![M4: Reduce API cost](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/4) Cut the cost per run (about $2.14 for the first full run: $1.49 Claude Opus 5.5 writer, $0.65 Claude Sonnet 5.5 judge) without losing quality.
+- ![M5: Realistic plan inputs (v2 data model)](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/5) A new version of the tool whose inputs look like what a health plan actually holds, in the shapes plans store them, instead of the simplified CSVs used so far.
 <!-- roadmap:end -->
 
 ### Repo layout
