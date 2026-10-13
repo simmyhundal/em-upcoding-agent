@@ -80,6 +80,24 @@
    "data_version": "v2",
    "seed_status": "development",
    "view": "data/synthetic_v2_261012_7_code/view"
+  },
+  "r202": {
+   "label": "seed 202",
+   "seed": 202,
+   "flagged": "experiments/261013_4_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261013_4_code.json",
+   "view": "data/synthetic_v2_261013_4_code/view",
+   "data_version": "v2",
+   "seed_status": "reserved"
+  },
+  "r303": {
+   "label": "seed 303",
+   "seed": 303,
+   "flagged": "experiments/261013_5_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261013_5_code.json",
+   "view": "data/synthetic_v2_261013_5_code/view",
+   "data_version": "v2",
+   "seed_status": "reserved"
   }
  },
  "runs": [
@@ -328,6 +346,156 @@
    "records": true,
    "checked": "experiments/261013_3_api/case_summaries_checked.jsonl",
    "transcript": "experiments/261013_3_api/office_transcript.jsonl"
+  },
+  {
+   "run": "261013_6_api",
+   "dataset": "r202",
+   "kind": "v2",
+   "min_suspicion": 5,
+   "source": "api",
+   "notes": "v2.0 as frozen with the single-draw records request (continuity only, not the fair baseline)",
+   "rules": [
+    {
+     "tuning": "Documented level below billed in over 15% of returned charts",
+     "sent": "experiments/261013_4_code/flagged_threshold.csv",
+     "selected": "experiments/261013_4_code/rules_documented_below_billed.csv"
+    },
+    {
+     "tuning": "Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts",
+     "sent": "experiments/261013_4_code/flagged_threshold.csv",
+     "selected": "experiments/261013_4_code/rules_data_without_tests.csv"
+    }
+   ],
+   "ai": {
+    "checked": "experiments/261013_6_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261013_6_api/usefulness.jsonl"
+   }
+  },
+  {
+   "run": "261013_7_api",
+   "dataset": "r303",
+   "kind": "v2",
+   "min_suspicion": 5,
+   "source": "api",
+   "notes": "v2.0 as frozen with the single-draw records request (continuity only, not the fair baseline)",
+   "rules": [
+    {
+     "tuning": "Documented level below billed in over 15% of returned charts",
+     "sent": "experiments/261013_5_code/flagged_threshold.csv",
+     "selected": "experiments/261013_5_code/rules_documented_below_billed.csv"
+    },
+    {
+     "tuning": "Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts",
+     "sent": "experiments/261013_5_code/flagged_threshold.csv",
+     "selected": "experiments/261013_5_code/rules_data_without_tests.csv"
+    }
+   ],
+   "ai": {
+    "checked": "experiments/261013_7_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261013_7_api/usefulness.jsonl"
+   }
+  },
+  {
+   "run": "261013_12_api",
+   "dataset": "r202",
+   "kind": "v2",
+   "source": "api",
+   "notes": "workflow with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261013_12_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261013_12_api/usefulness.jsonl",
+    "transcript": "experiments/261013_12_api/office_transcript.jsonl"
+   },
+   "sent": "experiments/261013_12_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261013_13_api",
+   "dataset": "r303",
+   "kind": "v2",
+   "source": "api",
+   "notes": "workflow with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261013_13_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261013_13_api/usefulness.jsonl",
+    "transcript": "experiments/261013_13_api/office_transcript.jsonl"
+   },
+   "sent": "experiments/261013_13_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261013_14_api",
+   "dataset": "r202",
+   "kind": "v2",
+   "source": "api",
+   "notes": "workflow with the provider office, screen top 25",
+   "ai": {
+    "checked": "experiments/261013_14_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261013_14_api/usefulness.jsonl",
+    "transcript": "experiments/261013_14_api/office_transcript.jsonl"
+   },
+   "sent": "experiments/261013_14_api/flagged.csv"
+  },
+  {
+   "run": "261013_15_api",
+   "dataset": "r303",
+   "kind": "v2",
+   "source": "api",
+   "notes": "workflow with the provider office, screen top 25",
+   "ai": {
+    "checked": "experiments/261013_15_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261013_15_api/usefulness.jsonl",
+    "transcript": "experiments/261013_15_api/office_transcript.jsonl"
+   },
+   "sent": "experiments/261013_15_api/flagged.csv"
+  },
+  {
+   "run": "261013_8_api",
+   "dataset": "r202",
+   "kind": "agent",
+   "source": "api",
+   "version": "agent-dev",
+   "tuning": "Agent with the screen tool",
+   "notes": "investigator agent, reserved seed",
+   "records": true,
+   "checked": "experiments/261013_8_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261013_8_api/office_transcript.jsonl"
+  },
+  {
+   "run": "261013_9_api",
+   "dataset": "r303",
+   "kind": "agent",
+   "source": "api",
+   "version": "agent-dev",
+   "tuning": "Agent with the screen tool",
+   "notes": "investigator agent, reserved seed",
+   "records": true,
+   "checked": "experiments/261013_9_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261013_9_api/office_transcript.jsonl"
+  },
+  {
+   "run": "261013_10_api",
+   "dataset": "r202",
+   "kind": "agent",
+   "source": "api",
+   "version": "agent-dev",
+   "tuning": "Agent without the screen tool",
+   "notes": "investigator agent, reserved seed",
+   "records": true,
+   "checked": "experiments/261013_10_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261013_10_api/office_transcript.jsonl"
+  },
+  {
+   "run": "261013_11_api",
+   "dataset": "r303",
+   "kind": "agent",
+   "source": "api",
+   "version": "agent-dev",
+   "tuning": "Agent without the screen tool",
+   "notes": "investigator agent, reserved seed",
+   "records": true,
+   "checked": "experiments/261013_11_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261013_11_api/office_transcript.jsonl"
   }
  ],
  "data_descriptions": {

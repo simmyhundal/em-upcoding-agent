@@ -11,7 +11,7 @@ Rebuild the file from the saved run outputs and the answer keys (gitignored) wit
 | `tuning` | How the list was chosen at that stage. |
 | `records_evidence` | Whether the stage used chart evidence (the screen never does). |
 | `code_version` | `v1.0` or `v2.0` (see `docs/versioning.md`). |
-| `seed`, `seed_status` | The data seed, and whether it was a **development** seed (used to build and tune the workflow) or **held-out** (generated or scored after those settings were frozen). |
+| `seed`, `seed_status` | The data seed, and whether it was a **development** seed (used to build and tune the workflow) **held-out** (generated or scored after those settings were frozen), or **reserved** (held back, never looked at, until the Milestone 6 evaluation). |
 | `source` | `api` = the project's own pipeline calling the API; `cc` = mimicked with Claude Code agents; `code` = no model. |
 | `agents` | Separate model calls or chat agents that wrote summaries, for AI rows. Summaries written by code do not count. |
 | `data_version`, `data_description` | Which data model the run used and what it contains (`runs.json` holds the text). |

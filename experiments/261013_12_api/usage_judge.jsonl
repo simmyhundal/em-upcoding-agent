@@ -1,0 +1,12 @@
+{"id": "1000000151", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 4507, "output_tokens": 612, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00757}
+{"id": "1000000201", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 4635, "output_tokens": 622, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00775}
+{"id": "1000000085", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 4062, "output_tokens": 596, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00704}
+{"id": "1000000067", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 4046, "output_tokens": 629, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00719}
+{"id": "1000000018", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 4002, "output_tokens": 754, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00777}
+{"id": "1000000093", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 3886, "output_tokens": 633, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00705}
+{"id": "1000000012", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 3915, "output_tokens": 544, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00664}
+{"id": "1000000074", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 4505, "output_tokens": 833, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00867}
+{"id": "1000000131", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 4187, "output_tokens": 683, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.0076}
+{"id": "1000000092", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 3624, "output_tokens": 614, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00669}
+{"id": "1000000078", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 3640, "output_tokens": 624, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00676}
+{"id": "1000000143", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 4070, "output_tokens": 695, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00754}

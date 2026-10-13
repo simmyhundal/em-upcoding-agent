@@ -38,7 +38,7 @@ def sh(*args):
         raise SystemExit(f"failed: {' '.join(args[:2])}")
 
 
-def run(rid, src, note, view_name="view"):
+def run(rid, src, note, view_name="view", flagged_name="flagged_threshold.csv"):
     """view_name: a folder under the data dir holding documentation.csv and records_requests.csv from a different records request
     (the sample-size sweep); the screen always comes from the code-only run `src`."""
     out = os.path.join(ROOT, "experiments", rid)
@@ -49,7 +49,7 @@ def run(rid, src, note, view_name="view"):
         shutil.copy(os.path.join(s, name), os.path.join(out, name))
     for name in ("documentation.csv", "records_requests.csv"):
         shutil.copy(os.path.join(view if view_name != "view" else s, name), os.path.join(out, name))
-    flagged = os.path.join(out, "flagged_threshold.csv")
+    flagged = os.path.join(out, flagged_name)
     summaries, checked = os.path.join(out, "case_summaries.jsonl"), os.path.join(out, "case_summaries_checked.jsonl")
     sh("src/case_summary.py", view, flagged, summaries, "--cache-dir", os.path.join(out, "llm_cache"),
        "--usage-jsonl", os.path.join(out, "usage_writer.jsonl"))

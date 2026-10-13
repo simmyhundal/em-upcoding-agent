@@ -242,7 +242,8 @@ def compute(registry_path=None):
             selected = [x["provider_id"] for x in csv.DictReader(open(_load(rule["selected"])))]
             out.append(_row(meta, "Rules", rule["tuning"], "Yes", _selection_cells(d, selected, honest_sent), d, sent=sent))
         if r.get("ai") and r["kind"] == "v2":
-            sent_v2 = [x["provider_id"] for x in csv.DictReader(open(_load(r["rules"][0]["sent"]))) if x["flagged"] == "True"]
+            sent_file = r.get("sent") or r["rules"][0]["sent"]
+            sent_v2 = [x["provider_id"] for x in csv.DictReader(open(_load(sent_file))) if x["flagged"] == "True"]
             out.append(_row({**meta, "agents": _agents(r)}, "AI", ai_tuning, "Yes", _ai_cells(d, r["ai"]), d, sent=sent_v2,
                             transcript=r["ai"].get("transcript")))
             if r.get("rules"):
@@ -325,7 +326,7 @@ def markdown_from_csv(path=CSV_PATH):
     for r in rows:
         descs.setdefault(r["data_version"], r["data_description"])
     lines += ["", "Columns: **Seed status**: development = the seed used to build and tune the workflow, held-out = generated or scored after "
-              "those settings were frozen. **Source**: api = the project's own pipeline calling the API, cc = mimicked with Claude Code "
+              "those settings were frozen, reserved = held back and never looked at until the Milestone 6 evaluation. **Source**: api = the project's own pipeline calling the API, cc = mimicked with Claude Code "
               "agents, code = no model. **Evals scored**: how many of the evals applied to that row (a screen row has 3; an AI row has 4, or 5 when the usefulness judge ran), so compare passes only between rows with the same count; the templating check was removed, which lowered AI rows' count by one. **Agents**: separate model calls or chat agents that wrote summaries (code-written ones do not count). "
               "**Upcoders in data**: the share of providers that are real upcoders (the prevalence; \"baseline\" is used only for a comparison arm). **Honest doctors sent records requests** and **Request rounds**: the burden on practices (a round is the first request or one follow-up). **Dollars overpaid to upcoders**: what upcoders were paid above what the justified levels would have paid (answer key). **Dollars at stake in upcoders called**: the same dollars for only the upcoders that stage called, an upper bound on what recovery could reach. **Upcoder clone level**: the share of upcoders whose notes "
               "are cloned to match the bill. Source of truth: `experiments/results.csv`.", ""]
