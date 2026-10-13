@@ -1,7 +1,7 @@
 """Refresh the generated parts of the README so they cannot go stale.
 
-  * the scoreboard table (between <!-- scoreboard:start --> and <!-- scoreboard:end -->), computed from the saved outputs
-    listed in experiments/runs.json by eval/scoreboard.py;
+  * the scoreboard table (between <!-- scoreboard:start --> and <!-- scoreboard:end -->), rendered from experiments/results.csv (the source of truth, written
+    from the saved outputs listed in experiments/runs.json by `python eval/scoreboard.py --write`);
   * the roadmap (between <!-- roadmap:start --> and <!-- roadmap:end -->), built from this repository's GitHub milestones.
     Each milestone is a live progress badge, so title and open/closed counts update on their own; running this script
     also picks up milestones created later.

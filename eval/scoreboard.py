@@ -1,6 +1,7 @@
 """Scoreboard: every run against the thresholds, generated from the saved outputs (never typed by hand).
 
-Reads experiments/runs.json. For each run it computes five evals, marks each pass or fail against its threshold, and totals the
+Reads experiments/runs.json and writes experiments/results.csv, the source of truth for results; the README table is rendered from
+that file. For each run it computes five evals, marks each pass or fail against its threshold, and totals the
 evals passed out of those that apply. A dash means not scored or not applicable and is left out of the total.
 
 Evals and thresholds:
@@ -16,11 +17,13 @@ Evals and thresholds:
   5. Case Summary Usefulness (1-5): average of at least 4 (LLM judge).
 
 Usage:
-    python eval/scoreboard.py            # prints the markdown table
+    python eval/scoreboard.py --write    # recompute from saved outputs and rewrite experiments/results.csv (needs the answer keys)
+    python eval/scoreboard.py            # prints the README table, rendered from experiments/results.csv
 """
 import csv
 import json
 import os
+import sys
 
 import run_eval
 
@@ -95,27 +98,44 @@ def _selection_cells(d, selected, honest_sent):
             "prec": (found / len(selected)) if selected else None}
 
 
-def _row(run, seed, stage, tuning, records, cells, version="v1.0"):
+COLUMNS = ["run_id", "stage", "tuning", "records_evidence", "code_version", "seed", "seed_status", "source", "agents", "data_version",
+           "data_description", "upcoder_baseline", "upcoder_clone_level",
+           "fn_missed", "fn_total", "fn_rate", "fn_pass", "fp_count", "fp_total", "fp_rate", "fp_pass",
+           "precision", "precision_pass", "citations_valid", "citations_pass", "usefulness", "usefulness_pass",
+           "evals_passed", "evals_applicable", "notes"]
+CSV_PATH = os.path.join(ROOT, "experiments", "results.csv")
+VERDICT = {True: "pass", False: "fail", None: ""}
+
+
+def _row(meta, stage, tuning, records, cells):
+    """One results row: run metadata plus the raw numbers and a pass/fail for each eval."""
     cells = {**{k: None for k in ("fn", "fp", "prec", "cite", "useful")}, **cells}
     if cells["fp"] and cells["fp"][1] == 0:       # no honest doctors were in scope: the rate is undefined
         cells["fp"] = None
     oks = {k: judge(cells[k], k) for k in cells}
-    text = {k: None for k in cells}
-    text["fn"] = f"{cells['fn'][0] / cells['fn'][1]:.1%}<br>({cells['fn'][0]} / {cells['fn'][1]})"
-    if cells["fp"]:
-        text["fp"] = f"{cells['fp'][0] / cells['fp'][1]:.1%}<br>({cells['fp'][0]} / {cells['fp'][1]})"
-    if cells["prec"] is not None:
-        text["prec"] = f"{cells['prec']:.0%}"
-    if cells["cite"] is not None:
-        text["cite"] = f"{cells['cite']:.0%}"
-    if cells["useful"] is not None:
-        text["useful"] = f"{cells['useful']:.2f}"
-    return {"run": run, "seed": seed, "version": version, "stage": stage, "tuning": tuning, "records": records, "text": text, "ok": oks,
-            "total": total(oks.values())}
+    app = [o for o in oks.values() if o is not None]
+    fn, fp = cells["fn"], cells["fp"]
+    f = lambda v, nd=6: "" if v is None else round(v, nd)
+    return {**meta, "stage": stage, "tuning": tuning, "records_evidence": records,
+            "fn_missed": fn[0], "fn_total": fn[1], "fn_rate": f(fn[0] / fn[1]), "fn_pass": VERDICT[oks["fn"]],
+            "fp_count": "" if fp is None else fp[0], "fp_total": "" if fp is None else fp[1],
+            "fp_rate": "" if fp is None else f(fp[0] / fp[1]), "fp_pass": VERDICT[oks["fp"]],
+            "precision": f(cells["prec"]), "precision_pass": VERDICT[oks["prec"]],
+            "citations_valid": f(cells["cite"]), "citations_pass": VERDICT[oks["cite"]],
+            "usefulness": f(cells["useful"], 2), "usefulness_pass": VERDICT[oks["useful"]],
+            "evals_passed": sum(app), "evals_applicable": len(app)}
+
+
+def _agents(r):
+    """Separate model calls (or chat agents) that wrote summaries for an AI row; rules-written summaries do not count."""
+    if r.get("agents") is not None:
+        return r["agents"]
+    recs = [json.loads(line) for line in open(_load((r.get("ai") or r)["checked"])) if line.strip()]
+    return sum(1 for x in recs if x.get("source", "llm") == "llm")
 
 
 def compute(registry_path=None):
-    """One row for the screen and, for runs with AI summaries, a second row for the AI's selection."""
+    """One row for the screen and, for runs with more stages, further rows (rules, AI, hybrid). Needs the answer keys."""
     reg = json.load(open(registry_path or os.path.join(ROOT, "experiments", "runs.json")))
     data = {}
     for key, d in reg["datasets"].items():
@@ -123,60 +143,108 @@ def compute(registry_path=None):
         rows = list(csv.DictReader(open(_load(d["flagged"]))))
         ev = run_eval.evaluate(rows, truth, TOP_N)
         roles = [v["role"] for v in truth["providers"].values()]
-        data[key] = {"truth": truth, "ev": ev, "rows": rows, "n_up": roles.count("upcoder"),
-                     "n_honest": len(roles) - roles.count("upcoder"), "seed": d["seed"]}
+        data[key] = {"truth": truth, "ev": ev, "rows": rows, "n_up": roles.count("upcoder"), "n_all": len(roles),
+                     "n_honest": len(roles) - roles.count("upcoder"), "seed": d["seed"], "meta": d}
     out = []
     for r in reg["runs"]:
         d = data[r["dataset"]]
+        ds = d["meta"]
         ver = r.get("version") or ("v2.0" if r["kind"] == "v2" else "v1.0")
-        name = r["run"] + (f"<br>{r['note']}" if r.get("note") else "")
-        if r.get("bold"):
-            name = f"**{r['run']}**" + (f"<br>{r['note']}" if r.get("note") else "")
+        clone = d["truth"].get("clone_share")
+        meta = {"run_id": r["run"], "code_version": ver, "seed": d["seed"], "seed_status": ds["seed_status"], "source": r["source"],
+                "agents": "", "data_version": ds["data_version"], "data_description": reg["data_descriptions"][ds["data_version"]],
+                "upcoder_baseline": f"{d['n_up'] / d['n_all']:.1%} ({d['n_up']} of {d['n_all']})",
+                "upcoder_clone_level": "n/a" if clone is None else f"{clone:.0%}", "notes": r.get("notes", "")}
+        lc = lambda t: t[0].lower() + t[1:]
         screen_tuning = (f"Z-score of risk-adjusted coding >= {r['min_suspicion']:g}" if r.get("min_suspicion") is not None
                          else f"Top {TOP_N} upcoding outliers")
-        out.append(_row(name, d["seed"], "Screen", screen_tuning, "No", _screen_cells(d, r), ver))
+        ai_tuning = f"AI calls upcoding (screen: {lc(screen_tuning)})"
+        out.append(_row(meta, "Screen", screen_tuning, "No", _screen_cells(d, r)))
         for rule in r.get("rules", []):
             sent = [x["provider_id"] for x in csv.DictReader(open(_load(rule["sent"]))) if x["flagged"] == "True"]
             roles = d["truth"]["providers"]
             honest_sent = sum(roles[p]["role"] != "upcoder" for p in sent)
             selected = [x["provider_id"] for x in csv.DictReader(open(_load(rule["selected"])))]
-            out.append(_row(name, d["seed"], "Rules", rule["tuning"], "Yes", _selection_cells(d, selected, honest_sent), ver))
+            out.append(_row(meta, "Rules", rule["tuning"], "Yes", _selection_cells(d, selected, honest_sent)))
         if r.get("ai") and r["kind"] == "v2":
-            out.append(_row(name, d["seed"], "AI", f"AI calls upcoding (screen: {screen_tuning[0].lower() + screen_tuning[1:]})", "Yes",
-                            _ai_cells(d, r["ai"]), ver))
-        if r.get("ai") and r["kind"] == "v2" and r.get("rules"):
-            # Hybrid (issue 49): the chart rule decides first; where it is silent the summary rules and model decide.
-            # Computed from the saved outputs: union of the chart rule's providers and the AI step's upcoding calls.
-            chart = {x["provider_id"] for x in csv.DictReader(open(_load(r["rules"][0]["selected"])))}
-            ai_up = {x["provider_id"] for x in map(json.loads, open(_load(r["ai"]["checked"])))
-                     if x["summary"]["leaning"] == "pattern_consistent_with_upcoding"}
-            sent = [x["provider_id"] for x in csv.DictReader(open(_load(r["rules"][0]["sent"]))) if x["flagged"] == "True"]
-            honest_sent = sum(d["truth"]["providers"][p]["role"] != "upcoder" for p in sent)
-            out.append(_row(name, d["seed"], "Hybrid", "Chart rule first, then summary rules and model", "Yes",
-                            _selection_cells(d, sorted(chart | ai_up), honest_sent), ver))
+            out.append(_row({**meta, "agents": _agents(r)}, "AI", ai_tuning, "Yes", _ai_cells(d, r["ai"])))
+            if r.get("rules"):
+                # Hybrid (issue 49): the chart rule decides first; where it is silent the summary rules and model decide.
+                # Computed from the saved outputs: union of the chart rule's providers and the AI step's upcoding calls.
+                chart = {x["provider_id"] for x in csv.DictReader(open(_load(r["rules"][0]["selected"])))}
+                ai_up = {x["provider_id"] for x in map(json.loads, open(_load(r["ai"]["checked"])))
+                         if x["summary"]["leaning"] == "pattern_consistent_with_upcoding"}
+                sent = [x["provider_id"] for x in csv.DictReader(open(_load(r["rules"][0]["sent"]))) if x["flagged"] == "True"]
+                honest_sent = sum(d["truth"]["providers"][p]["role"] != "upcoder" for p in sent)
+                out.append(_row(meta, "Hybrid", "Chart rule first, then summary rules and model", "Yes",
+                                _selection_cells(d, sorted(chart | ai_up), honest_sent)))
         if r["kind"] == "summaries":
-            out.append(_row(name, d["seed"], "AI", f"AI calls upcoding (screen: {screen_tuning[0].lower() + screen_tuning[1:]})",
-                            "Yes" if r["records"] else "No", _ai_cells(d, r), ver))
+            out.append(_row({**meta, "agents": _agents(r)}, "AI", ai_tuning, "Yes" if r["records"] else "No", _ai_cells(d, r)))
     return out
 
 
-def cell(text, ok):
-    return "–" if ok is None else f"{PASS if ok else FAIL} {text}"
-
-
-def markdown(registry_path=None):
+def write_csv(path=CSV_PATH, registry_path=None):
     rows = compute(registry_path)
-    head = ("| Run | Seed | Code version | Screen / AI | Tuning | Records evidence | False negative rate | False positive rate "
-            "| Precision of upcoding calls | Citations valid | Case Summary Usefulness (1-5) "
-            "| Evals passed |\n|---|---|---|---|---|---|---|---|---|---|---|---|")
-    thr = ("| **Threshold** | | | | | | at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% "
-           "| at least 4 | |")
+    with open(path, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=COLUMNS)
+        w.writeheader()
+        w.writerows(rows)
+    return rows
+
+
+def read_csv(path=CSV_PATH):
+    with open(path, newline="") as f:
+        return list(csv.DictReader(f))
+
+
+def _cell(row, kind):
+    """Rendered cell: a coloured square for pass/fail, then the value; a dash when not scored."""
+    verdict = row[{"fn": "fn_pass", "fp": "fp_pass", "prec": "precision_pass", "cite": "citations_pass", "useful": "usefulness_pass"}[kind]]
+    if not verdict:
+        return "–"
+    sq = PASS if verdict == "pass" else FAIL
+    if kind == "fn":
+        return f"{sq} {int(row['fn_missed']) / int(row['fn_total']):.1%}<br>({row['fn_missed']} / {row['fn_total']})"
+    if kind == "fp":
+        return f"{sq} {int(row['fp_count']) / int(row['fp_total']):.1%}<br>({row['fp_count']} / {row['fp_total']})"
+    if kind == "prec":
+        return f"{sq} {float(row['precision']):.0%}"
+    if kind == "cite":
+        return f"{sq} {float(row['citations_valid']):.0%}"
+    return f"{sq} {float(row['usefulness']):.2f}"
+
+
+def markdown_from_csv(path=CSV_PATH):
+    """The README table, rendered from the committed results file (the source of truth), never recomputed."""
+    rows = read_csv(path)
+    head = ("| Run | Seed | Seed status | Source | Agents | Code version | Data version | Upcoder baseline | Upcoder clone level "
+            "| Screen / AI | Tuning | Records evidence | False negative rate | False positive rate | Precision of upcoding calls "
+            "| Citations valid | Case Summary Usefulness (1-5) | Evals passed |\n" + "|---" * 18 + "|")
+    thr = "| **Threshold** |" + " |" * 11 + " at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% | at least 4 | |"
     lines = [head, thr]
     for r in rows:
-        cells = " | ".join(cell(r["text"][k], r["ok"][k]) for k in ("fn", "fp", "prec", "cite", "useful"))
-        lines.append(f"| {r['run']} | {r['seed']} | {r['version']} | {r['stage']} | {r['tuning']} | {r['records']} | {cells} | **{r['total']}** |")
+        lines.append(f"| {r['run_id']} | {r['seed']} | {r['seed_status']} | {r['source']} | {r['agents'] or '–'} | {r['code_version']} "
+                     f"| {r['data_version']} | {r['upcoder_baseline']} | {r['upcoder_clone_level']} | {r['stage']} | {r['tuning']} "
+                     f"| {r['records_evidence']} | " + " | ".join(_cell(r, k) for k in ("fn", "fp", "prec", "cite", "useful"))
+                     + f" | **{r['evals_passed']} / {r['evals_applicable']}** |")
+    descs = {}
+    for r in rows:
+        descs.setdefault(r["data_version"], r["data_description"])
+    lines += ["", "Columns: **Seed status**: development = the seed used to build and tune the workflow, held-out = generated or scored after "
+              "those settings were frozen. **Source**: api = the project's own pipeline calling the API, cc = mimicked with Claude Code "
+              "agents, code = no model. **Agents**: separate model calls or chat agents that wrote summaries (code-written ones do not count). "
+              "**Upcoder baseline**: the share of providers that are real upcoders. **Upcoder clone level**: the share of upcoders whose notes "
+              "are cloned to match the bill. Source of truth: `experiments/results.csv`.", ""]
+    lines += [f"- **{k}**: {v}" for k, v in sorted(descs.items())]
     return "\n".join(lines)
 
 
+def markdown(registry_path=None):
+    return markdown_from_csv(CSV_PATH)
+
+
 if __name__ == "__main__":
-    print(markdown())
+    if "--write" in sys.argv:
+        print(f"{len(write_csv())} rows -> {CSV_PATH}")
+    else:
+        print(markdown())

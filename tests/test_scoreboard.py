@@ -24,17 +24,37 @@ def test_total_ignores_unscored_evals():
     assert sb.total([None, None]) == "0 / 0"
 
 
-def test_readme_scoreboard_is_current():
+def test_readme_table_is_rendered_from_the_results_file():
+    text = open(os.path.join(ROOT, "README.md")).read()
+    start = text.index("<!-- scoreboard:start -->") + len("<!-- scoreboard:start -->")
+    end = text.index("<!-- scoreboard:end -->")
+    assert text[start:end].strip() == sb.markdown_from_csv().strip(), "README table is stale: run python docs/update_readme.py"
+
+
+def test_results_file_matches_the_saved_outputs():
     import json
     reg = json.load(open(os.path.join(ROOT, "experiments", "runs.json")))
     needed = [os.path.join(ROOT, d["truth"]) for d in reg["datasets"].values()]
     if not all(os.path.exists(p) for p in needed):
         print("skipped: answer keys are gitignored; regenerate them first")
         return
-    text = open(os.path.join(ROOT, "README.md")).read()
-    start = text.index("<!-- scoreboard:start -->") + len("<!-- scoreboard:start -->")
-    end = text.index("<!-- scoreboard:end -->")
-    assert text[start:end].strip() == sb.markdown().strip(), "README scoreboard is stale: run python docs/update_readme.py"
+    import csv
+    now = sb.compute()
+    committed = list(csv.DictReader(open(sb.CSV_PATH)))
+    assert len(now) == len(committed)
+    for a, b in zip(now, committed):
+        assert {k: str(v) for k, v in a.items()} == b, f"experiments/results.csv is stale for {b['run_id']} {b['stage']}: run python eval/scoreboard.py --write"
+
+
+def test_results_rows_have_the_metadata_columns():
+    import csv
+    rows = list(csv.DictReader(open(sb.CSV_PATH)))
+    assert set(sb.COLUMNS) == set(rows[0])
+    for r in rows:
+        assert " " not in r["run_id"] and r["seed_status"] in ("development", "held-out") and r["source"] in ("api", "cc", "code")
+        assert r["data_version"] in ("v1", "v2") and r["data_description"] and r["upcoder_baseline"] and r["upcoder_clone_level"]
+        if r["stage"] == "AI":
+            assert r["agents"] != ""
 
 
 if __name__ == "__main__":

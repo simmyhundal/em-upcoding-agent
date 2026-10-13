@@ -15,7 +15,8 @@ Statistics screen, the AI filters and explains, code checks the AI, people decid
 ## Run, test, regenerate
 ```bash
 for t in tests/test_*.py; do python3 $t >/dev/null 2>&1 && echo ok $t || echo FAIL $t; done   # no pytest installed; tests are plain scripts
-python3 docs/update_readme.py          # refresh the generated scoreboard and roadmap blocks in README.md (test fails if stale)
+python3 eval/scoreboard.py --write     # recompute experiments/results.csv (the source of truth for results) from saved outputs; needs the answer keys
+python3 docs/update_readme.py          # render the README scoreboard from results.csv and refresh the roadmap (test fails if stale)
 python3 docs/make_figures.py           # rebuild README figures from saved outputs
 # gitignored data and answer keys, regenerate from seeds (needed by eval code and some tests):
 python3 src/generate_synthetic.py data/synthetic --seed 42
@@ -28,7 +29,7 @@ Full pipeline for a run: generate data, `flagging.py`, `case_summary.py` (API), 
 - **Answer key is eval-only.** `eval/answer_key/` is gitignored and outside `data/`. Only `eval/` code may read it. Never put roles, "justified" levels or labels in anything an agent or the model sees; tests check this.
 - **Money and keys.** Model calls go through the Batch API by default (half price) with a response cache under each run folder, and token usage plus estimated dollars are written next to the outputs (`usage_writer.jsonl`, `usage_judge.jsonl`). Code writes the numeric facts, cited claims and next steps, and decides obvious leanings by rule (`src/summary_rules.py`); the model sees a compact card and writes only a headline, a leaning and an interpretation for ambiguous cases. Run `python src/case_summary.py ... --estimate` first (token counting is free) and expect roughly $0.15 to $0.30 for a v2 writer run; the older v1 runs cost about $2. Do not start paid runs without the user's OK. The key is in `.env` (gitignored): never print, log, commit or ask for it; do not paste keys into chat.
 - **Be honest in outputs.** Report misses (usefulness is below its 4.0 target), say what is easier by construction (the documentation signal is generated from the same hidden truth that defines an upcoded visit), and say what is simulated. Do not tune a run after seeing it and then call it held out.
-- **Experiments are named `YYMMDD_X_Y`** (date, run number that day, `api` = the real pipeline, `cc` = mimicked with Claude Code agents). Each run folder is self-contained and never overwritten; `experiments/README.md` has the index, `experiments/runs.json` feeds the scoreboard. The held-out run used tag `heldout-freeze-261009`.
+- **Experiments are named `YYMMDD_X_Y`** (date, run number that day, `api` = the real pipeline, `cc` = mimicked with Claude Code agents). Each run folder is self-contained and never overwritten; `experiments/README.md` has the index, `experiments/runs.json` registers runs and `experiments/results.csv` holds their results (`docs/results_table.md`). The held-out run used tag `heldout-freeze-261009`.
 - **Work through issues.** One issue per change, tied to a milestone, closed from the commit message (`Closes #N`). End every commit with `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`. Commit and push only when asked or when the pattern in the conversation clearly calls for it.
 - **Scoreboard thresholds** (README "Eval"): false negative rate and false positive rate at most 12.5% (false positive rate counts honest doctors a step actually faced), precision of "upcoding" calls at least 80% (proposed), citations 100%, usefulness at least 4. Templated or code-written summary text is fine (the templating check was removed on purpose).
 

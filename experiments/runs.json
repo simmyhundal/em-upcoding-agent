@@ -4,114 +4,144 @@
    "label": "seed 42",
    "flagged": "reports/flagged.csv",
    "truth": "eval/answer_key/ground_truth.json",
-   "seed": 42
+   "seed": 42,
+   "data_version": "v1",
+   "seed_status": "development"
   },
   "s101": {
    "label": "seed 101",
    "flagged": "experiments/261009_2_api/flagged.csv",
    "truth": "eval/answer_key/ground_truth_s101.json",
-   "seed": 101
+   "seed": 101,
+   "data_version": "v1",
+   "seed_status": "held-out"
   },
   "v2_1": {
    "label": "seed 42",
    "seed": 42,
    "flagged": "experiments/261012_1_code/flagged.csv",
-   "truth": "eval/answer_key/ground_truth_v2_261012_1_code.json"
+   "truth": "eval/answer_key/ground_truth_v2_261012_1_code.json",
+   "data_version": "v2",
+   "seed_status": "development"
   },
   "v2_2": {
    "label": "seed 101",
    "seed": 101,
    "flagged": "experiments/261012_2_code/flagged.csv",
-   "truth": "eval/answer_key/ground_truth_v2_261012_2_code.json"
+   "truth": "eval/answer_key/ground_truth_v2_261012_2_code.json",
+   "data_version": "v2",
+   "seed_status": "held-out"
   },
   "v2_3": {
    "label": "seed 7",
    "seed": 7,
    "flagged": "experiments/261012_3_code/flagged.csv",
-   "truth": "eval/answer_key/ground_truth_v2_261012_3_code.json"
+   "truth": "eval/answer_key/ground_truth_v2_261012_3_code.json",
+   "data_version": "v2",
+   "seed_status": "held-out"
   },
   "v2_4": {
    "label": "seed 7",
    "seed": 7,
    "flagged": "experiments/261012_4_code/flagged.csv",
-   "truth": "eval/answer_key/ground_truth_v2_261012_4_code.json"
+   "truth": "eval/answer_key/ground_truth_v2_261012_4_code.json",
+   "data_version": "v2",
+   "seed_status": "held-out"
   },
   "v2_5": {
    "label": "seed 7",
    "seed": 7,
    "flagged": "experiments/261012_5_code/flagged.csv",
-   "truth": "eval/answer_key/ground_truth_v2_261012_5_code.json"
+   "truth": "eval/answer_key/ground_truth_v2_261012_5_code.json",
+   "data_version": "v2",
+   "seed_status": "held-out"
   },
   "v2_6": {
    "label": "seed 42",
    "seed": 42,
    "flagged": "experiments/261012_6_code/flagged.csv",
-   "truth": "eval/answer_key/ground_truth_v2_261012_6_code.json"
+   "truth": "eval/answer_key/ground_truth_v2_261012_6_code.json",
+   "data_version": "v2",
+   "seed_status": "development"
   },
   "v2_7": {
    "label": "seed 42",
    "seed": 42,
    "flagged": "experiments/261012_7_code/flagged.csv",
-   "truth": "eval/answer_key/ground_truth_v2_261012_7_code.json"
+   "truth": "eval/answer_key/ground_truth_v2_261012_7_code.json",
+   "data_version": "v2",
+   "seed_status": "development"
   }
  },
  "runs": [
   {
-   "run": "Screen only",
+   "run": "screen_v1_s42",
    "dataset": "s42",
    "kind": "screen",
-   "min_suspicion": 5
+   "min_suspicion": 5,
+   "notes": "",
+   "source": "code"
   },
   {
    "run": "261008_2_cc",
-   "note": "one agent for all 25",
    "dataset": "s42",
    "kind": "summaries",
    "records": false,
-   "checked": "experiments/261008_2_cc/summaries_checked.jsonl"
+   "checked": "experiments/261008_2_cc/summaries_checked.jsonl",
+   "notes": "one agent wrote all 25 summaries",
+   "agents": 1,
+   "source": "cc"
   },
   {
    "run": "261008_3_cc",
    "dataset": "s42",
    "kind": "summaries",
    "records": false,
-   "checked": "experiments/261008_3_cc/summaries_checked.jsonl"
+   "checked": "experiments/261008_3_cc/summaries_checked.jsonl",
+   "notes": "one fresh chat agent per provider",
+   "agents": 25,
+   "source": "cc"
   },
   {
    "run": "261008_4_cc",
    "dataset": "s42",
    "kind": "summaries",
    "records": true,
-   "checked": "experiments/261008_4_cc/summaries_checked.jsonl"
+   "checked": "experiments/261008_4_cc/summaries_checked.jsonl",
+   "notes": "one fresh chat agent per provider, with records evidence",
+   "agents": 25,
+   "source": "cc"
   },
   {
    "run": "261009_1_api",
-   "bold": true,
    "dataset": "s42",
    "kind": "summaries",
    "records": true,
    "checked": "experiments/261009_1_api/case_summaries_checked.jsonl",
-   "usefulness": "experiments/261009_1_api/usefulness.jsonl"
+   "usefulness": "experiments/261009_1_api/usefulness.jsonl",
+   "notes": "first live API run",
+   "source": "api"
   },
   {
-   "run": "Screen only",
+   "run": "screen_v1_s101",
    "dataset": "s101",
    "kind": "screen",
-   "min_suspicion": 5
+   "min_suspicion": 5,
+   "notes": "",
+   "source": "code"
   },
   {
    "run": "261009_2_api",
-   "note": "held-out API run",
-   "bold": true,
    "dataset": "s101",
    "kind": "summaries",
    "records": true,
    "checked": "experiments/261009_2_api/case_summaries_checked.jsonl",
-   "usefulness": "experiments/261009_2_api/usefulness.jsonl"
+   "usefulness": "experiments/261009_2_api/usefulness.jsonl",
+   "notes": "held-out API run, pipeline frozen, run once",
+   "source": "api"
   },
   {
    "run": "261012_8_api",
-   "note": "v2 data, 3.7% upcoders (8 of 216), half clone notes",
    "dataset": "v2_1",
    "kind": "v2",
    "min_suspicion": 5,
@@ -130,11 +160,12 @@
    "ai": {
     "checked": "experiments/261012_8_api/case_summaries_checked.jsonl",
     "usefulness": "experiments/261012_8_api/usefulness.jsonl"
-   }
+   },
+   "notes": "v2 data, 3.7% upcoders (8 of 216), half clone notes",
+   "source": "api"
   },
   {
    "run": "261012_9_api",
-   "note": "v2 data, held-out seed, 3.7% upcoders, half clone notes",
    "dataset": "v2_2",
    "kind": "v2",
    "min_suspicion": 5,
@@ -153,11 +184,12 @@
    "ai": {
     "checked": "experiments/261012_9_api/case_summaries_checked.jsonl",
     "usefulness": "experiments/261012_9_api/usefulness.jsonl"
-   }
+   },
+   "notes": "v2 data, held-out seed, 3.7% upcoders, half clone notes",
+   "source": "api"
   },
   {
    "run": "261012_12_api",
-   "note": "v2 data, 0.5% upcoders (3 of 600), half clone notes",
    "dataset": "v2_3",
    "kind": "v2",
    "min_suspicion": 5,
@@ -176,11 +208,12 @@
    "ai": {
     "checked": "experiments/261012_12_api/case_summaries_checked.jsonl",
     "usefulness": "experiments/261012_12_api/usefulness.jsonl"
-   }
+   },
+   "notes": "v2 data, 0.5% upcoders (3 of 600), half clone notes",
+   "source": "api"
   },
   {
    "run": "261012_13_api",
-   "note": "v2 data, 1% upcoders (6 of 600), half clone notes",
    "dataset": "v2_4",
    "kind": "v2",
    "min_suspicion": 5,
@@ -199,11 +232,12 @@
    "ai": {
     "checked": "experiments/261012_13_api/case_summaries_checked.jsonl",
     "usefulness": "experiments/261012_13_api/usefulness.jsonl"
-   }
+   },
+   "notes": "v2 data, 1% upcoders (6 of 600), half clone notes",
+   "source": "api"
   },
   {
    "run": "261012_14_api",
-   "note": "v2 data, 2% upcoders (12 of 600), half clone notes",
    "dataset": "v2_5",
    "kind": "v2",
    "min_suspicion": 5,
@@ -222,11 +256,12 @@
    "ai": {
     "checked": "experiments/261012_14_api/case_summaries_checked.jsonl",
     "usefulness": "experiments/261012_14_api/usefulness.jsonl"
-   }
+   },
+   "notes": "v2 data, 2% upcoders (12 of 600), half clone notes",
+   "source": "api"
   },
   {
    "run": "261012_10_api",
-   "note": "v2 data, 3.7% upcoders, nobody clones notes",
    "dataset": "v2_6",
    "kind": "v2",
    "min_suspicion": 5,
@@ -245,11 +280,12 @@
    "ai": {
     "checked": "experiments/261012_10_api/case_summaries_checked.jsonl",
     "usefulness": "experiments/261012_10_api/usefulness.jsonl"
-   }
+   },
+   "notes": "v2 data, 3.7% upcoders, nobody clones notes",
+   "source": "api"
   },
   {
    "run": "261012_11_api",
-   "note": "v2 data, 3.7% upcoders, every upcoder clones notes",
    "dataset": "v2_7",
    "kind": "v2",
    "min_suspicion": 5,
@@ -268,7 +304,14 @@
    "ai": {
     "checked": "experiments/261012_11_api/case_summaries_checked.jsonl",
     "usefulness": "experiments/261012_11_api/usefulness.jsonl"
-   }
+   },
+   "notes": "v2 data, 3.7% upcoders, every upcoder clones notes",
+   "source": "api"
   }
- ]
+ ],
+ "data_descriptions": {
+  "v1": "Version 1 synthetic data: provider, patient and claim tables with a stored chronic-condition count, plus a records-review sample (documentation.csv, about 30% of claims) handed to the AI up front.",
+  "v2": "Version 2 synthetic data: plan-shaped tables (members, providers, claim headers and lines, remittance with denials, replacements and voids); conditions derived from claims; charts only by records request (limited, late or missing responses, coder disagreement); separate MDM elements and minutes; some upcoders clone their notes."
+ },
+ "seed_status_meaning": "development = the seed used to build and tune the workflow (screen cutoff, rule thresholds); held-out = generated or scored after those settings were frozen."
 }

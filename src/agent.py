@@ -50,7 +50,8 @@ def _cost(usage, price=(4.00, 20.00)):
 
 
 def run_agent(env, task, client=None, model=MODEL, max_tool_calls=MAX_TOOL_CALLS, max_turns=MAX_TURNS, max_usd=MAX_USD,
-              out_dir=None, effort="medium", log=print):
+              out_dir=None, effort="medium", price_scale=1.0, log=print):
+    """price_scale multiplies the Opus 5.5 list prices (use 0.025 for Haiku 5.5) so the dollar cap means dollars for the model used."""
     """Run the loop. Returns a dict with the stop reason, counts, dollars and the audit log."""
     if client is None:
         import anthropic
@@ -68,7 +69,7 @@ def run_agent(env, task, client=None, model=MODEL, max_tool_calls=MAX_TOOL_CALLS
         turn += 1
         resp = client.messages.create(model=model, max_tokens=8000, system=SYSTEM, tools=tools, messages=messages,
                                       output_config={"effort": effort}, extra_body={"cache_control": {"type": "ephemeral"}})
-        usd += _cost(resp.usage)
+        usd += _cost(resp.usage) * price_scale
         messages.append({"role": "assistant", "content": resp.content})
         texts += [b.text for b in resp.content if b.type == "text" and b.text.strip()]
         if resp.stop_reason == "refusal":
