@@ -144,6 +144,16 @@ def compute(registry_path=None):
         if r.get("ai") and r["kind"] == "v2":
             out.append(_row(name, d["seed"], "AI", f"AI calls upcoding (screen: {screen_tuning[0].lower() + screen_tuning[1:]})", "Yes",
                             _ai_cells(d, r["ai"]), ver))
+        if r.get("ai") and r["kind"] == "v2" and r.get("rules"):
+            # Hybrid (issue 49): the chart rule decides first; where it is silent the summary rules and model decide.
+            # Computed from the saved outputs: union of the chart rule's providers and the AI step's upcoding calls.
+            chart = {x["provider_id"] for x in csv.DictReader(open(_load(r["rules"][0]["selected"])))}
+            ai_up = {x["provider_id"] for x in map(json.loads, open(_load(r["ai"]["checked"])))
+                     if x["summary"]["leaning"] == "pattern_consistent_with_upcoding"}
+            sent = [x["provider_id"] for x in csv.DictReader(open(_load(r["rules"][0]["sent"]))) if x["flagged"] == "True"]
+            honest_sent = sum(d["truth"]["providers"][p]["role"] != "upcoder" for p in sent)
+            out.append(_row(name, d["seed"], "Hybrid", "Chart rule first, then summary rules and model", "Yes",
+                            _selection_cells(d, sorted(chart | ai_up), honest_sent), ver))
         if r["kind"] == "summaries":
             out.append(_row(name, d["seed"], "AI", f"AI calls upcoding (screen: {screen_tuning[0].lower() + screen_tuning[1:]})",
                             "Yes" if r["records"] else "No", _ai_cells(d, r), ver))
