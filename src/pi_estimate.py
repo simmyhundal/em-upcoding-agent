@@ -31,14 +31,22 @@ def t_crit(df, confidence):
     return table[df - 1] if 1 <= df <= 30 else z
 
 
-def overpay(billed, supported, allowed):
+def overpay(billed, supported, allowed, amounts=None):
+    """Overpayment for one claim. With `amounts` = (allowed, paid) from the claim itself (v2 data), the difference between the
+    claim's allowed amount and the fee-schedule allowed amount for the supported level is scaled by the share of the allowed
+    amount the plan actually paid, so cost sharing is not counted as plan money. Without it, fee-schedule averages are used."""
     if LEVEL[supported] >= LEVEL[billed]:
         return 0.0
+    if amounts and amounts[0] > 0:
+        claim_allowed, paid = amounts
+        return max(claim_allowed - allowed[supported], 0.0) * (paid / claim_allowed)
     return allowed[billed] - allowed[supported]
 
 
-def estimate(plan, reviewed, allowed, confidence=0.90, missing="exclude"):
-    """plan: sampling plan dict; reviewed: {claim_id: supported_cpt or ''}; allowed: {cpt: dollars}."""
+def estimate(plan, reviewed, allowed, confidence=0.90, missing="exclude", claim_amounts=None):
+    """plan: sampling plan dict; reviewed: {claim_id: supported_cpt or ''}; allowed: {cpt: dollars};
+    claim_amounts: optional {claim_id: (allowed, paid)} from v2 claim lines."""
+    claim_amounts = claim_amounts or {}
     billed = plan["sampled_claims"]                       # claim_id -> billed cpt
     strata = {}
     for code, N in plan["frame_sizes"].items():
@@ -52,7 +60,7 @@ def estimate(plan, reviewed, allowed, confidence=0.90, missing="exclude"):
                     s = CODES[max(LEVEL[b] - 1, 0)]
                 else:
                     continue
-            vals.append(overpay(b, s, allowed))
+            vals.append(overpay(b, s, allowed, claim_amounts.get(cid)))
         strata[code] = (N, vals)
     total = var = 0.0
     n_all = k = 0

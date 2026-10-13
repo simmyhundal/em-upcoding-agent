@@ -70,7 +70,7 @@ def plan_markdown(plan, allowed):
         "(blank = records not received / not reviewed).",
         "2. Run `python src/pi_estimate.py plan.json reviewed.csv ALLOWED_JSON` to extrapolate an overpayment estimate "
         "with a confidence interval.",
-        f"- Allowed amounts used (GA Family Practice average, CMS public file): {amts}. Real recoupment uses each claim's actual allowed amount.",
+        f"- Allowed amounts used (GA Family Practice average, CMS public file): {amts}. Real recoupment uses each claim's actual allowed amount; with v2 data the estimate uses each sampled claim's own allowed and paid amounts.",
         "- Per-claim overpayment = allowed(billed) - allowed(supported) when the supported level is lower; underbilling is ignored.",
         "- The estimate is only as good as the review. Missing records, a non-random sample or a wrong frame change the answer."]) + "\n"
 
@@ -136,7 +136,11 @@ def build(data_dir, flagged_csv, checked_path, charts_dir, allowed_path, out_dir
           codes=("99215",), margin=0.10, confidence=0.90, example=False):
     chronic, age, conditions, claims = cs.load(data_dir)
     docs = cs.load_docs(data_dir)
-    rates, peer_doc = cs.peer_rates(claims, chronic), (cs.doc_peer_rates(claims, docs) if docs else None)
+    rates = cs.peer_rates(claims, chronic)
+    peer_doc = cs.doc_peer_rates(claims, docs, cs.control_providers(data_dir)) if docs else None
+    facts = cs.load_doc_facts(data_dir)
+    amounts = {r['claim_id']: (float(r['allowed_amount']), float(r['paid_amount']))
+               for rows in claims.values() for r in rows if r.get('allowed_amount')}
     allowed_doc = json.load(open(allowed_path))
     allowed = {c: v["allowed_amount"] for c, v in allowed_doc["codes"].items()}
     flags = {r["provider_id"]: r for r in csv.DictReader(open(flagged_csv))}
@@ -162,7 +166,7 @@ def build(data_dir, flagged_csv, checked_path, charts_dir, allowed_path, out_dir
                             "place_of_service": r["place_of_service"], "status": "not requested"})
         json.dump(plan, open(os.path.join(pdir, "plan.json"), "w"), indent=1)
         open(os.path.join(pdir, "sampling_plan.md"), "w").write(plan_markdown(plan, allowed_doc))
-        packet = cs.build_packet(pid, flags[pid], chronic, age, conditions, claims, rates, docs, peer_doc)
+        packet = cs.build_packet(pid, flags[pid], chronic, age, conditions, claims, rates, docs, peer_doc, facts)
         chart_rel = os.path.relpath(os.path.join(charts_dir, f"{pid}.svg"), pdir)
         open(os.path.join(pdir, "dossier.md"), "w").write(dossier(packet, flags[pid], rec, chart_rel, plan))
         if example and docs:
@@ -172,7 +176,7 @@ def build(data_dir, flagged_csv, checked_path, charts_dir, allowed_path, out_dir
                 w.writerow(["claim_id", "supported_cpt"])
                 for cid in sorted(reviewed):
                     w.writerow([cid, reviewed[cid]])
-            res = pe.estimate(plan, reviewed, allowed, confidence)
+            res = pe.estimate(plan, reviewed, allowed, confidence, claim_amounts=amounts)
             open(os.path.join(pdir, "example_estimate.md"), "w").write(
                 "# SIMULATED worked example (not a real review)\n\nSupported levels come from the synthetic documentation "
                 "sample; sampled claims without documentation count as records not received.\n\n```\n"
