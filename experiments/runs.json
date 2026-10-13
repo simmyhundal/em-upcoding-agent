@@ -307,6 +307,17 @@
    },
    "notes": "v2 data, 3.7% upcoders, every upcoder clones notes",
    "source": "api"
+  },
+  {
+   "run": "261013_3_api",
+   "dataset": "v2_1",
+   "kind": "agent",
+   "source": "api",
+   "version": "agent-dev",
+   "tuning": "Agent chose: combined rank, top 25; records for 10 providers",
+   "notes": "pilot of the investigator agent on the development seed; usefulness not judged",
+   "records": true,
+   "checked": "experiments/261013_3_api/case_summaries_checked.jsonl"
   }
  ],
  "data_descriptions": {

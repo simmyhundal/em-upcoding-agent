@@ -149,7 +149,7 @@ def compute(registry_path=None):
     for r in reg["runs"]:
         d = data[r["dataset"]]
         ds = d["meta"]
-        ver = r.get("version") or ("v2.0" if r["kind"] == "v2" else "v1.0")
+        ver = r.get("version") or ("v2.0" if r["kind"] in ("v2", "agent") else "v1.0")
         clone = d["truth"].get("clone_share")
         meta = {"run_id": r["run"], "code_version": ver, "seed": d["seed"], "seed_status": ds["seed_status"], "source": r["source"],
                 "agents": "", "data_version": ds["data_version"], "data_description": reg["data_descriptions"][ds["data_version"]],
@@ -159,6 +159,11 @@ def compute(registry_path=None):
         screen_tuning = (f"Z-score of risk-adjusted coding >= {r['min_suspicion']:g}" if r.get("min_suspicion") is not None
                          else f"Top {TOP_N} upcoding outliers")
         ai_tuning = f"AI calls upcoding (screen: {lc(screen_tuning)})"
+        if r["kind"] == "agent":
+            # Milestone 6: the agent chose its own screening, so there is no fixed Screen row. Its false positives count the honest
+            # providers it reported on; false negatives count against all upcoders.
+            out.append(_row({**meta, "agents": 1}, "Agent", r["tuning"], "Yes", _ai_cells(d, r)))
+            continue
         out.append(_row(meta, "Screen", screen_tuning, "No", _screen_cells(d, r)))
         for rule in r.get("rules", []):
             sent = [x["provider_id"] for x in csv.DictReader(open(_load(rule["sent"]))) if x["flagged"] == "True"]
@@ -219,20 +224,20 @@ def markdown_from_csv(path=CSV_PATH):
     rows = read_csv(path)
     head = ("| Run | Seed | Seed status | Source | Agents | Code version | Data version | Upcoder baseline | Upcoder clone level "
             "| Screen / AI | Tuning | Records evidence | False negative rate | False positive rate | Precision of upcoding calls "
-            "| Citations valid | Case Summary Usefulness (1-5) | Evals passed |\n" + "|---" * 18 + "|")
-    thr = "| **Threshold** |" + " |" * 11 + " at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% | at least 4 | |"
+            "| Citations valid | Case Summary Usefulness (1-5) | Evals passed | Evals scored |\n" + "|---" * 19 + "|")
+    thr = "| **Threshold** |" + " |" * 11 + " at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% | at least 4 | | |"
     lines = [head, thr]
     for r in rows:
         lines.append(f"| {r['run_id']} | {r['seed']} | {r['seed_status']} | {r['source']} | {r['agents'] or '–'} | {r['code_version']} "
                      f"| {r['data_version']} | {r['upcoder_baseline']} | {r['upcoder_clone_level']} | {r['stage']} | {r['tuning']} "
                      f"| {r['records_evidence']} | " + " | ".join(_cell(r, k) for k in ("fn", "fp", "prec", "cite", "useful"))
-                     + f" | **{r['evals_passed']} / {r['evals_applicable']}** |")
+                     + f" | **{r['evals_passed']}** | {r['evals_applicable']} |")
     descs = {}
     for r in rows:
         descs.setdefault(r["data_version"], r["data_description"])
     lines += ["", "Columns: **Seed status**: development = the seed used to build and tune the workflow, held-out = generated or scored after "
               "those settings were frozen. **Source**: api = the project's own pipeline calling the API, cc = mimicked with Claude Code "
-              "agents, code = no model. **Agents**: separate model calls or chat agents that wrote summaries (code-written ones do not count). "
+              "agents, code = no model. **Evals scored**: how many of the evals applied to that row (a screen row has 3; an AI row has 4, or 5 when the usefulness judge ran), so compare passes only between rows with the same count; the templating check was removed, which lowered AI rows' count by one. **Agents**: separate model calls or chat agents that wrote summaries (code-written ones do not count). "
               "**Upcoder baseline**: the share of providers that are real upcoders. **Upcoder clone level**: the share of upcoders whose notes "
               "are cloned to match the bill. Source of truth: `experiments/results.csv`.", ""]
     lines += [f"- **{k}**: {v}" for k, v in sorted(descs.items())]

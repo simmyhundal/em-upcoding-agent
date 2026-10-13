@@ -18,7 +18,7 @@ Rebuild the file from the saved run outputs and the answer keys (gitignored) wit
 | `upcoder_baseline` | The share of providers that are real upcoders, with counts. |
 | `upcoder_clone_level` | The share of upcoders whose notes are cloned to match the bill (`n/a` on version 1, which had no cloning). |
 | `fn_*`, `fp_*`, `precision*`, `citations_*`, `usefulness*` | The raw numbers behind each eval and a `pass`/`fail` against its threshold (blank = not scored). |
-| `evals_passed`, `evals_applicable` | The count shown in the README's last column. |
+| `evals_passed`, `evals_applicable` | Evals passed and the denominator, how many evals applied to the row (the README shows them as "Evals passed" and "Evals scored"). Screen rows have 3; AI rows have 4, or 5 when the usefulness judge ran. Earlier tables had one more eval (templating, since removed), so old scores like 5/5 are now 4/4. |
 | `notes` | Free text about the run. |
 
 Adding a run: add it to `experiments/runs.json` (dataset, source, notes, pointers to its outputs), run `python eval/scoreboard.py --write`, then `python docs/update_readme.py`.
