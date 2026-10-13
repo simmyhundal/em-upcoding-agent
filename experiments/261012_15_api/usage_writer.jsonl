@@ -1,0 +1,11 @@
+{"id": "1000000143", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 4036, "output_tokens": 745, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01552}
+{"id": "1000000064", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3900, "output_tokens": 450, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.0123}
+{"id": "1000000181", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3988, "output_tokens": 379, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01177}
+{"id": "1000000041", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3211, "output_tokens": 615, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01257}
+{"id": "1000000018", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 4016, "output_tokens": 381, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01184}
+{"id": "1000000112", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3701, "output_tokens": 719, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01459}
+{"id": "1000000095", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3215, "output_tokens": 394, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01037}
+{"id": "1000000183", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3950, "output_tokens": 418, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01208}
+{"id": "1000000016", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3997, "output_tokens": 443, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01242}
+{"id": "1000000161", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3865, "output_tokens": 441, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01214}
+{"id": "1000000175", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3945, "output_tokens": 439, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01228}

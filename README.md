@@ -47,7 +47,7 @@ This is what a reviewer sees for one case (summary, key numbers, cited visits an
 ![Example case page for provider P0215 with three key numbers, the AI's shortened explanation, cited claims and the evidence chart](docs/images/case_card.svg)
 
 ## Does it work?
-Results on the synthetic data (one random seed, small counts, so read them as directional):
+**These first results are from version 1 of the data** (`v1.0`, one random seed, small counts, so read them as directional). The version 2 results, which are closer to what a payer holds and are the current baseline, are in [Version 2](#version-2-inputs-closer-to-what-a-payer-holds-milestone-5) below and in the Eval table.
 
 ![Bar chart: of 17 honest doctors in the flagged list, 17 are accused by the screen alone, 14 after AI summaries without records evidence, and 0 after AI summaries with records evidence; all 8 real upcoders are caught in each case](docs/images/results.svg)
 
@@ -98,6 +98,7 @@ What the code-only runs show (no AI yet; rows are in the Eval table above, thres
   - **At lower base rates the AI step breaks down.** With 600 doctors (seed 7), the AI found 0 of 3 upcoders at a 0.5% rate and accused 5 of the 20 honest doctors the screen sent (precision 0%); at 1% it found 2 of 6 and accused 3 of 17 (precision 40%); at 2% it found 4 of 12 and accused 1 of 13 (precision 80%). The thinner the real signal, the more the model reads patterns into honest doctors. This is the clearest reason not to trust the 3.7% results as a forecast. Cost for these three runs: $1.33.
   - **The biggest loss is upstream:** the screen at suspicion 5 sends only 4 to 6 of the 8 upcoders on for review, and no later step can recover the rest.
   - **Read with care:** 8 upcoders per run, so one doctor moves a rate by 12.5 points; thresholds for the rules were set on seed 42; the cloned-notes mechanism is an assumption.
+- **Asking for more charts barely helps** ([sample-size sweep](docs/sample_size_sweep.md)): requesting 10, 20, 30, 60 or 100 charts per flagged provider, the AI called 0, 2, 2, 2 and 3 of the 8 upcoders on seed 42 with no honest doctor accused, and the chart rule found 1 to 2. The limit is upstream: the screen sent only 6 of the 8, and 4 of those clone their notes.
 - Caveats: same generator family, small counts, and the cloned-notes mechanism and its prevalence are assumptions.
 
 ## Built responsibly

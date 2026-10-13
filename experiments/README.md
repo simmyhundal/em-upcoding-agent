@@ -20,6 +20,7 @@ Each folder has a README saying what the run was and what it does and does not s
 | `261012_8_api` | v2 data with the AI step (rules plus Claude Opus 5.5 via the Batch API, judge Sonnet 5.5): screen from `261012_1_code` | v2 seed 42, half clone notes |
 | `261012_9_api` | Same, held-out seed (screen from `261012_2_code`) | v2 seed 101 |
 | `261012_10_api` / `_11_api` | Same, nobody clones notes / every upcoder clones (screens from `261012_6_code`, `_7_code`) | v2 seed 42 |
+| `261012_15_api` to `_18_api` | Records-request sample-size sweep with the AI step: 10, 20, 60 and 100 charts per flagged provider (30 is `261012_8_api`); see `docs/sample_size_sweep.md` | v2 seed 42 |
 | `261012_12_api` / `_13_` / `_14_` | Base-rate sweep with the AI step: 0.5%, 1%, 2% upcoders (screens and rules from `261012_3_code`, `_4_`, `_5_`) | v2 seed 7, 600 providers |
 | `261012_6_code` / `_7_` | Cloned-notes sweep: nobody clones, everybody clones | v2 seed 42, 216 providers |
 

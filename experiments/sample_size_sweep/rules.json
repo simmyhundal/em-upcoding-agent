@@ -1,0 +1,152 @@
+{
+ "seed 42|10": {
+  "requested": 130,
+  "returned": 78,
+  "returned_per_provider": 6.0,
+  "rules": {
+   "documented_below_billed": {
+    "upcoders": 1,
+    "honest": 0
+   },
+   "data_without_tests": {
+    "upcoders": 1,
+    "honest": 1
+   }
+  }
+ },
+ "seed 42|20": {
+  "requested": 260,
+  "returned": 158,
+  "returned_per_provider": 12.153846153846153,
+  "rules": {
+   "documented_below_billed": {
+    "upcoders": 1,
+    "honest": 0
+   },
+   "data_without_tests": {
+    "upcoders": 2,
+    "honest": 2
+   }
+  }
+ },
+ "seed 42|30": {
+  "requested": 390,
+  "returned": 241,
+  "returned_per_provider": 18.53846153846154,
+  "rules": {
+   "documented_below_billed": {
+    "upcoders": 2,
+    "honest": 0
+   },
+   "data_without_tests": {
+    "upcoders": 3,
+    "honest": 1
+   }
+  }
+ },
+ "seed 42|60": {
+  "requested": 780,
+  "returned": 455,
+  "returned_per_provider": 35.0,
+  "rules": {
+   "documented_below_billed": {
+    "upcoders": 2,
+    "honest": 0
+   },
+   "data_without_tests": {
+    "upcoders": 2,
+    "honest": 1
+   }
+  }
+ },
+ "seed 42|100": {
+  "requested": 1300,
+  "returned": 756,
+  "returned_per_provider": 58.15384615384615,
+  "rules": {
+   "documented_below_billed": {
+    "upcoders": 2,
+    "honest": 0
+   },
+   "data_without_tests": {
+    "upcoders": 3,
+    "honest": 1
+   }
+  }
+ },
+ "seed 101|10": {
+  "requested": 90,
+  "returned": 58,
+  "returned_per_provider": 6.444444444444445,
+  "rules": {
+   "documented_below_billed": {
+    "upcoders": 0,
+    "honest": 0
+   },
+   "data_without_tests": {
+    "upcoders": 1,
+    "honest": 1
+   }
+  }
+ },
+ "seed 101|20": {
+  "requested": 180,
+  "returned": 117,
+  "returned_per_provider": 13.0,
+  "rules": {
+   "documented_below_billed": {
+    "upcoders": 2,
+    "honest": 1
+   },
+   "data_without_tests": {
+    "upcoders": 2,
+    "honest": 2
+   }
+  }
+ },
+ "seed 101|30": {
+  "requested": 270,
+  "returned": 158,
+  "returned_per_provider": 17.555555555555557,
+  "rules": {
+   "documented_below_billed": {
+    "upcoders": 1,
+    "honest": 0
+   },
+   "data_without_tests": {
+    "upcoders": 2,
+    "honest": 0
+   }
+  }
+ },
+ "seed 101|60": {
+  "requested": 540,
+  "returned": 324,
+  "returned_per_provider": 36.0,
+  "rules": {
+   "documented_below_billed": {
+    "upcoders": 0,
+    "honest": 0
+   },
+   "data_without_tests": {
+    "upcoders": 1,
+    "honest": 0
+   }
+  }
+ },
+ "seed 101|100": {
+  "requested": 900,
+  "returned": 532,
+  "returned_per_provider": 59.111111111111114,
+  "rules": {
+   "documented_below_billed": {
+    "upcoders": 2,
+    "honest": 0
+   },
+   "data_without_tests": {
+    "upcoders": 2,
+    "honest": 0
+   }
+  }
+ }
+}

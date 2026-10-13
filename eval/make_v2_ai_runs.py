@@ -21,7 +21,11 @@ RUNS = [("261012_8_api", "261012_1_code", "v2 seed 42, half of the upcoders clon
         ("261012_11_api", "261012_7_code", "v2 seed 42, every upcoder clones notes"),
         ("261012_12_api", "261012_3_code", "v2 seed 7, 0.5% upcoders (3 of 600), half clone notes"),
         ("261012_13_api", "261012_4_code", "v2 seed 7, 1% upcoders (6 of 600), half clone notes"),
-        ("261012_14_api", "261012_5_code", "v2 seed 7, 2% upcoders (12 of 600), half clone notes")]
+        ("261012_14_api", "261012_5_code", "v2 seed 7, 2% upcoders (12 of 600), half clone notes"),
+        ("261012_15_api", "261012_1_code", "v2 seed 42, half clone; records request of 10 charts per flagged provider", "view_n10"),
+        ("261012_16_api", "261012_1_code", "v2 seed 42, half clone; records request of 20 charts per flagged provider", "view_n20"),
+        ("261012_17_api", "261012_1_code", "v2 seed 42, half clone; records request of 60 charts per flagged provider", "view_n60"),
+        ("261012_18_api", "261012_1_code", "v2 seed 42, half clone; records request of 100 charts per flagged provider", "view_n100")]
 
 
 def sh(*args):
@@ -32,13 +36,17 @@ def sh(*args):
         raise SystemExit(f"failed: {' '.join(args[:2])}")
 
 
-def run(rid, src, note):
+def run(rid, src, note, view_name="view"):
+    """view_name: a folder under the data dir holding documentation.csv and records_requests.csv from a different records request
+    (the sample-size sweep); the screen always comes from the code-only run `src`."""
     out = os.path.join(ROOT, "experiments", rid)
     os.makedirs(out, exist_ok=True)
     s = os.path.join(ROOT, "experiments", src)
-    for name in ("flagged.csv", "flagged_threshold.csv", "documentation.csv", "records_requests.csv"):
+    view = os.path.join(ROOT, "data", f"synthetic_v2_{src}", view_name)
+    for name in ("flagged.csv", "flagged_threshold.csv"):
         shutil.copy(os.path.join(s, name), os.path.join(out, name))
-    view = os.path.join(ROOT, "data", f"synthetic_v2_{src}", "view")
+    for name in ("documentation.csv", "records_requests.csv"):
+        shutil.copy(os.path.join(view if view_name != "view" else s, name), os.path.join(out, name))
     flagged = os.path.join(out, "flagged_threshold.csv")
     summaries, checked = os.path.join(out, "case_summaries.jsonl"), os.path.join(out, "case_summaries_checked.jsonl")
     sh("src/case_summary.py", view, flagged, summaries, "--cache-dir", os.path.join(out, "llm_cache"),
@@ -49,7 +57,7 @@ def run(rid, src, note):
     sh("src/finalize_run.py", out, view, flagged, checked)
     open(os.path.join(out, "README.md"), "w").write(
         f"# {rid}\n\nv2 data, the full pipeline with the AI step. {note}.\n\n"
-        f"- Screen and records request: copied from `experiments/{src}/` (`flagged_threshold.csv`, `documentation.csv`, `records_requests.csv`).\n"
+        f"- Screen from `experiments/{src}/` (`flagged_threshold.csv`); records request in `documentation.csv` and `records_requests.csv`.\n"
         "- Summaries: obvious cases decided and written by rules (`src/summary_rules.py`), the rest by Claude Opus 5.5 through the Batch API "
         "(headline, leaning and interpretation only). Each record says which (`source`) and what the rule said (`rule_leaning`).\n"
         "- Judge: Claude Sonnet 5.5 through the Batch API, with a deterministic number check; templating is no longer checked.\n"
@@ -61,8 +69,8 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", nargs="*")
     a = ap.parse_args()
-    for rid, src, note in RUNS:
+    for rid, src, note, *view in RUNS:
         if not a.only or rid in a.only:
             print("start", rid, flush=True)
-            run(rid, src, note)
+            run(rid, src, note, *view)
             print("done", rid, flush=True)
