@@ -140,6 +140,9 @@ def compute(registry_path=None):
             honest_sent = sum(roles[p]["role"] != "upcoder" for p in sent)
             selected = [x["provider_id"] for x in csv.DictReader(open(_load(rule["selected"])))]
             out.append(_row(name, d["seed"], "Rules", rule["tuning"], "Yes", _selection_cells(d, selected, honest_sent)))
+        if r.get("ai") and r["kind"] == "v2":
+            out.append(_row(name, d["seed"], "AI", f"AI calls upcoding (screen: {screen_tuning[0].lower() + screen_tuning[1:]})", "Yes",
+                            _ai_cells(d, r["ai"])))
         if r["kind"] == "summaries":
             out.append(_row(name, d["seed"], "AI", f"AI calls upcoding (screen: {screen_tuning[0].lower() + screen_tuning[1:]})",
                             "Yes" if r["records"] else "No", _ai_cells(d, r)))

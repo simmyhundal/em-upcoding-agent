@@ -1,0 +1,8 @@
+{"id": "1000000043", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 4036, "output_tokens": 755, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01562}
+{"id": "1000000133", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 4030, "output_tokens": 766, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01572}
+{"id": "1000000031", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3866, "output_tokens": 430, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01203}
+{"id": "1000000123", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3945, "output_tokens": 417, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01206}
+{"id": "1000000193", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3204, "output_tokens": 797, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01438}
+{"id": "1000000149", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3991, "output_tokens": 454, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01252}
+{"id": "1000000054", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3677, "output_tokens": 405, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.0114}
+{"id": "1000000115", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3445, "output_tokens": 426, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01115}

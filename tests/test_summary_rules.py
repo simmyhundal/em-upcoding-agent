@@ -58,6 +58,13 @@ def test_numcheck_accepts_card_numbers_and_flags_invented_ones():
     assert set(numcheck.verify(bad, p)["unverified"]) == {"4321", "77.7"}
 
 
+def test_numcheck_ignores_plural_cpt_codes_and_ten_digit_provider_ids():
+    p = packet(bad=6)
+    good = sr.assemble(p, sr.UPCODING)
+    ok = dict(good, rationale=good["rationale"] + " Provider 1000000043 has many 99215s and some 99214s.")
+    assert numcheck.verify(ok, p)["unverified"] == []
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

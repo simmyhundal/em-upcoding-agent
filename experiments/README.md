@@ -17,6 +17,9 @@ Each folder has a README saying what the run was and what it does and does not s
 | `261009_2_api` | Held-out run: pipeline frozen, fresh dataset, run once | seed 101, 25 providers |
 | `261012_1_code` | v2 data: screen from derived risk, records request, two rules baselines (no AI) | v2 seed 42, 216 providers, half the upcoders clone notes |
 | `261012_2_code` | Same, held-out seed (rule thresholds frozen from seed 42) | v2 seed 101, 216 providers |
+| `261012_8_api` | v2 data with the AI step (rules plus Claude Opus 5.5 via the Batch API, judge Sonnet 5.5): screen from `261012_1_code` | v2 seed 42, half clone notes |
+| `261012_9_api` | Same, held-out seed (screen from `261012_2_code`) | v2 seed 101 |
+| `261012_10_api` / `_11_api` | Same, nobody clones notes / every upcoder clones (screens from `261012_6_code`, `_7_code`) | v2 seed 42 |
 | `261012_3_code` / `_4_` / `_5_` | Base-rate sweep: 0.5%, 1%, 2% upcoders | v2 seed 7, 600 providers |
 | `261012_6_code` / `_7_` | Cloned-notes sweep: nobody clones, everybody clones | v2 seed 42, 216 providers |
 

@@ -17,7 +17,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "src"))
 import summary_rules as sr  # noqa: E402
 
-IGNORE = [r"\bC\d{7}\b", r"\bP\d{4}(?:-N\d{4})?\b", r"\b\d{5}\b", r"\b[A-Z]\d{2}(?:\.\d+)?\b", r"\b\d{4}-\d{2}-\d{2}\b",
+IGNORE = [r"\bC\d{7}\b", r"\bP\d{4}(?:-N\d{4})?\b", r"(?<![\w.])\d{5}(?!\d)", r"\b\d{10}\b", r"\b[A-Z]\d{2}(?:\.\d+)?\b", r"\b\d{4}-\d{2}-\d{2}\b",
           r"\b[A-Z]\d{2}\.\d+\b"]
 NUM = re.compile(r"(?<![\w.])(\d{1,3}(?:,\d{3})+|\d+)(\.\d+)?")
 
@@ -79,4 +79,5 @@ if __name__ == "__main__":
     allowed = {621.0, 0.1423}
     assert _matches(14.2, 1, allowed) and _matches(14, 0, allowed) and _matches(621, 0, allowed) and not _matches(15.9, 1, allowed)
     assert [lit for _, _, lit in numbers_in("C0012345 billed 99215 for P0001-N0012 on 2024-03-02 (E11.9): 3 of 12, 1,234")] == ["3", "12", "1,234"]
+    assert [lit for _, _, lit in numbers_in("The 99215s from 1000000043 and 99214 claims, 7 of them")] == ["7"]
     print("numcheck self-check ok")
