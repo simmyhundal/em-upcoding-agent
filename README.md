@@ -59,6 +59,12 @@ Results on the synthetic data (one random seed, small counts, so read them as di
 - **A held-out check:** I froze the code, generated a brand-new dataset and ran the whole pipeline once, with no tuning. The headline held: all 8 real upcoders called upcoding, 0 of 17 honest doctors accused, 278 of 278 citations real. It is still the same data generator and the same kind of records evidence, so it is a check on tuning, not on real-world difficulty (details in `experiments/261009_2_api/`).
 - **Quality is not yet at the bar I set.** An independent AI grader (a different model, using a written 1-to-5 rubric) averaged **3.4 out of 5** on how useful the summaries are, against a target of 4. The usual complaints were small numeric slips, a cited visit that does not quite fit the sentence citing it, and headlines that lean a little too hard. The grader is itself an AI and makes mistakes, so this is a rough check, not a verdict.
 
+**Level billed versus level the records support** (records-review sample only, about 30% of visits):
+
+![Three grids of expected level versus billed level for upcoders, normal doctors and high-acuity panels](docs/images/expected_billed.svg)
+
+Upcoders bill above the documented level on 30% of their documented visits; normal doctors and high-acuity panels do so on about 7.5%, which is the background noise built into the data. This grid is an illustration of how the data was built, not proof the method works: the documented level is a noisy copy of the hidden truth, and the documented minutes always match it.
+
 ## How are office-visit levels really chosen?
 In practice nobody grades a visit when it is billed. The doctor picks the level, the claim is paid, and any checking happens later.
 
@@ -70,6 +76,7 @@ Since 2021 the level (99212 to 99215) comes from **either** the medical decision
 - **The inputs are unrealistic: the AI sees records a payer would not have yet.** A payer normally screens on claims data alone. Medical records (the equivalent of this project's `documentation.csv`) reach a payer only after it requests them from the fee-for-service primary care physician, and that request usually comes after a provider is already suspected. Here, a records sample is handed to the AI *before* it decides. It stands in for a first records request, but the order of events is not how it works in practice.
 - **Why that matters.** The AI's filtering power comes largely from that sample. With it the AI accused 0 of 17 honest doctors; without it (the chat-session runs) it accused 14 of 17. So read the results as what the AI can do once records are in hand, not as detection from claims alone. Put another way, in this version the AI turns a records sample into a cited, checkable case file, and it is also the filter that decides which flagged doctors move on, but its accuracy rests on that sample.
 - **What is planned.** [Milestone 5](https://github.com/simmyhundal/em-upcoding-agent/milestone/5) rebuilds the inputs the way a payer would actually receive them (claims, members, providers, reference tables), models records requests as a later step, and re-runs the evaluation.
+- **The documentation signal is cleaner than real records.** In this data the documented level is a noisy copy of the hidden truth, and the documented minutes are filled in to match it exactly, so time never disagrees with the decision-making level. Real records are messier: upcoding practices may also inflate the documentation, and time and decision making are recorded independently. [Issue 45](https://github.com/simmyhundal/em-upcoding-agent/issues/45) tracks a more realistic model.
 - **Other limits.** Synthetic data from one generator; two seeds; the usefulness score comes from an AI grader and is below its target; the citation check confirms cited visits exist, not that each one supports its sentence.
 
 ## Built responsibly
