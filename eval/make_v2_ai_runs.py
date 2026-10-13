@@ -22,6 +22,8 @@ RUNS = [("261012_8_api", "261012_1_code", "v2 seed 42, half of the upcoders clon
         ("261012_12_api", "261012_3_code", "v2 seed 7, 0.5% upcoders (3 of 600), half clone notes"),
         ("261012_13_api", "261012_4_code", "v2 seed 7, 1% upcoders (6 of 600), half clone notes"),
         ("261012_14_api", "261012_5_code", "v2 seed 7, 2% upcoders (12 of 600), half clone notes"),
+        ("261013_6_api", "261013_4_code", "v2 reserved seed 202, half clone; frozen v2.0 workflow"),
+        ("261013_7_api", "261013_5_code", "v2 reserved seed 303, half clone; frozen v2.0 workflow"),
         ("261012_15_api", "261012_1_code", "v2 seed 42, half clone; records request of 10 charts per flagged provider", "view_n10"),
         ("261012_16_api", "261012_1_code", "v2 seed 42, half clone; records request of 20 charts per flagged provider", "view_n20"),
         ("261012_17_api", "261012_1_code", "v2 seed 42, half clone; records request of 60 charts per flagged provider", "view_n60"),

@@ -37,6 +37,9 @@ RUNS = [
     ("261012_5_code", 7, 600, 12, 18, 0.5, "2% upcoders (12 of 600), half clone"),
     ("261012_6_code", 42, 216, 8, 8, 0.0, "seed 42, nobody clones notes"),
     ("261012_7_code", 42, 216, 8, 8, 1.0, "seed 42, every upcoder clones notes"),
+    # reserved seeds for the Milestone 6 evaluation (docs/versioning.md): same settings as 261012_1_code, never tuned on
+    ("261013_4_code", 202, 216, 8, 8, 0.5, "reserved seed 202, 3.7% upcoders, half clone notes"),
+    ("261013_5_code", 303, 216, 8, 8, 0.5, "reserved seed 303, 3.7% upcoders, half clone notes"),
 ]
 
 
