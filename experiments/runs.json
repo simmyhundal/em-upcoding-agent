@@ -11,6 +11,48 @@
    "flagged": "experiments/261009_2_api/flagged.csv",
    "truth": "eval/answer_key/ground_truth_s101.json",
    "seed": 101
+  },
+  "v2_1": {
+   "label": "seed 42",
+   "seed": 42,
+   "flagged": "experiments/261012_1_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261012_1_code.json"
+  },
+  "v2_2": {
+   "label": "seed 101",
+   "seed": 101,
+   "flagged": "experiments/261012_2_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261012_2_code.json"
+  },
+  "v2_3": {
+   "label": "seed 7",
+   "seed": 7,
+   "flagged": "experiments/261012_3_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261012_3_code.json"
+  },
+  "v2_4": {
+   "label": "seed 7",
+   "seed": 7,
+   "flagged": "experiments/261012_4_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261012_4_code.json"
+  },
+  "v2_5": {
+   "label": "seed 7",
+   "seed": 7,
+   "flagged": "experiments/261012_5_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261012_5_code.json"
+  },
+  "v2_6": {
+   "label": "seed 42",
+   "seed": 42,
+   "flagged": "experiments/261012_6_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261012_6_code.json"
+  },
+  "v2_7": {
+   "label": "seed 42",
+   "seed": 42,
+   "flagged": "experiments/261012_7_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261012_7_code.json"
   }
  },
  "runs": [
@@ -66,6 +108,139 @@
    "records": true,
    "checked": "experiments/261009_2_api/case_summaries_checked.jsonl",
    "usefulness": "experiments/261009_2_api/usefulness.jsonl"
+  },
+  {
+   "run": "261012_1_code",
+   "note": "v2 data, 3.7% upcoders (8 of 216), half clone notes",
+   "dataset": "v2_1",
+   "kind": "v2",
+   "min_suspicion": 5,
+   "rules": [
+    {
+     "tuning": "Documented level below billed in over 15% of returned charts",
+     "sent": "experiments/261012_1_code/flagged_threshold.csv",
+     "selected": "experiments/261012_1_code/rules_documented_below_billed.csv"
+    },
+    {
+     "tuning": "Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts",
+     "sent": "experiments/261012_1_code/flagged_threshold.csv",
+     "selected": "experiments/261012_1_code/rules_data_without_tests.csv"
+    }
+   ]
+  },
+  {
+   "run": "261012_2_code",
+   "note": "v2 data, held-out seed, 3.7% upcoders, half clone notes",
+   "dataset": "v2_2",
+   "kind": "v2",
+   "min_suspicion": 5,
+   "rules": [
+    {
+     "tuning": "Documented level below billed in over 15% of returned charts",
+     "sent": "experiments/261012_2_code/flagged_threshold.csv",
+     "selected": "experiments/261012_2_code/rules_documented_below_billed.csv"
+    },
+    {
+     "tuning": "Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts",
+     "sent": "experiments/261012_2_code/flagged_threshold.csv",
+     "selected": "experiments/261012_2_code/rules_data_without_tests.csv"
+    }
+   ]
+  },
+  {
+   "run": "261012_3_code",
+   "note": "v2 data, 0.5% upcoders (3 of 600), half clone notes",
+   "dataset": "v2_3",
+   "kind": "v2",
+   "min_suspicion": 5,
+   "rules": [
+    {
+     "tuning": "Documented level below billed in over 15% of returned charts",
+     "sent": "experiments/261012_3_code/flagged_threshold.csv",
+     "selected": "experiments/261012_3_code/rules_documented_below_billed.csv"
+    },
+    {
+     "tuning": "Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts",
+     "sent": "experiments/261012_3_code/flagged_threshold.csv",
+     "selected": "experiments/261012_3_code/rules_data_without_tests.csv"
+    }
+   ]
+  },
+  {
+   "run": "261012_4_code",
+   "note": "v2 data, 1% upcoders (6 of 600), half clone notes",
+   "dataset": "v2_4",
+   "kind": "v2",
+   "min_suspicion": 5,
+   "rules": [
+    {
+     "tuning": "Documented level below billed in over 15% of returned charts",
+     "sent": "experiments/261012_4_code/flagged_threshold.csv",
+     "selected": "experiments/261012_4_code/rules_documented_below_billed.csv"
+    },
+    {
+     "tuning": "Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts",
+     "sent": "experiments/261012_4_code/flagged_threshold.csv",
+     "selected": "experiments/261012_4_code/rules_data_without_tests.csv"
+    }
+   ]
+  },
+  {
+   "run": "261012_5_code",
+   "note": "v2 data, 2% upcoders (12 of 600), half clone notes",
+   "dataset": "v2_5",
+   "kind": "v2",
+   "min_suspicion": 5,
+   "rules": [
+    {
+     "tuning": "Documented level below billed in over 15% of returned charts",
+     "sent": "experiments/261012_5_code/flagged_threshold.csv",
+     "selected": "experiments/261012_5_code/rules_documented_below_billed.csv"
+    },
+    {
+     "tuning": "Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts",
+     "sent": "experiments/261012_5_code/flagged_threshold.csv",
+     "selected": "experiments/261012_5_code/rules_data_without_tests.csv"
+    }
+   ]
+  },
+  {
+   "run": "261012_6_code",
+   "note": "v2 data, 3.7% upcoders, nobody clones notes",
+   "dataset": "v2_6",
+   "kind": "v2",
+   "min_suspicion": 5,
+   "rules": [
+    {
+     "tuning": "Documented level below billed in over 15% of returned charts",
+     "sent": "experiments/261012_6_code/flagged_threshold.csv",
+     "selected": "experiments/261012_6_code/rules_documented_below_billed.csv"
+    },
+    {
+     "tuning": "Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts",
+     "sent": "experiments/261012_6_code/flagged_threshold.csv",
+     "selected": "experiments/261012_6_code/rules_data_without_tests.csv"
+    }
+   ]
+  },
+  {
+   "run": "261012_7_code",
+   "note": "v2 data, 3.7% upcoders, every upcoder clones notes",
+   "dataset": "v2_7",
+   "kind": "v2",
+   "min_suspicion": 5,
+   "rules": [
+    {
+     "tuning": "Documented level below billed in over 15% of returned charts",
+     "sent": "experiments/261012_7_code/flagged_threshold.csv",
+     "selected": "experiments/261012_7_code/rules_documented_below_billed.csv"
+    },
+    {
+     "tuning": "Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts",
+     "sent": "experiments/261012_7_code/flagged_threshold.csv",
+     "selected": "experiments/261012_7_code/rules_data_without_tests.csv"
+    }
+   ]
   }
  ]
 }

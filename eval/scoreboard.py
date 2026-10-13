@@ -89,12 +89,25 @@ def _ai_cells(d, r):
     return cells
 
 
+def _selection_cells(d, selected, honest_sent):
+    """Cells for a rules row: providers a rule flagged among those the screen sent for records. False negatives count against
+    all upcoders; false positives count against the honest doctors that were sent (the ones the rule faced)."""
+    sc = run_eval.score(selected, d["truth"])
+    found = sc["upcoder"]["flagged"]
+    honest = sc["hard_negative"]["flagged"] + sc["normal"]["flagged"]
+    return {"fn": (d["n_up"] - found, d["n_up"]), "fp": (honest, honest_sent),
+            "prec": (found / len(selected)) if selected else None}
+
+
 def _row(run, seed, stage, tuning, records, cells):
     cells = {**{k: None for k in ("fn", "fp", "prec", "cite", "useful", "templ")}, **cells}
+    if cells["fp"] and cells["fp"][1] == 0:       # no honest doctors were in scope: the rate is undefined
+        cells["fp"] = None
     oks = {k: judge(cells[k], k) for k in cells}
     text = {k: None for k in cells}
     text["fn"] = f"{cells['fn'][0] / cells['fn'][1]:.1%}<br>({cells['fn'][0]} / {cells['fn'][1]})"
-    text["fp"] = f"{cells['fp'][0] / cells['fp'][1]:.1%}<br>({cells['fp'][0]} / {cells['fp'][1]})"
+    if cells["fp"]:
+        text["fp"] = f"{cells['fp'][0] / cells['fp'][1]:.1%}<br>({cells['fp'][0]} / {cells['fp'][1]})"
     if cells["prec"] is not None:
         text["prec"] = f"{cells['prec']:.0%}"
     if cells["cite"] is not None:
@@ -127,6 +140,12 @@ def compute(registry_path=None):
         screen_tuning = (f"Z-score of risk-adjusted coding >= {r['min_suspicion']:g}" if r.get("min_suspicion") is not None
                          else f"Top {TOP_N} upcoding outliers")
         out.append(_row(name, d["seed"], "Screen", screen_tuning, "No", _screen_cells(d, r)))
+        for rule in r.get("rules", []):
+            sent = [x["provider_id"] for x in csv.DictReader(open(_load(rule["sent"]))) if x["flagged"] == "True"]
+            roles = d["truth"]["providers"]
+            honest_sent = sum(roles[p]["role"] != "upcoder" for p in sent)
+            selected = [x["provider_id"] for x in csv.DictReader(open(_load(rule["selected"])))]
+            out.append(_row(name, d["seed"], "Rules", rule["tuning"], "Yes", _selection_cells(d, selected, honest_sent)))
         if r["kind"] == "summaries":
             out.append(_row(name, d["seed"], "AI", f"AI calls upcoding (screen: {screen_tuning[0].lower() + screen_tuning[1:]})",
                             "Yes" if r["records"] else "No", _ai_cells(d, r)))

@@ -26,8 +26,9 @@ def test_total_ignores_unscored_evals():
 
 
 def test_readme_scoreboard_is_current():
-    needed = [os.path.join(ROOT, "eval", "answer_key", "ground_truth.json"),
-              os.path.join(ROOT, "eval", "answer_key", "ground_truth_s101.json")]
+    import json
+    reg = json.load(open(os.path.join(ROOT, "experiments", "runs.json")))
+    needed = [os.path.join(ROOT, d["truth"]) for d in reg["datasets"].values()]
     if not all(os.path.exists(p) for p in needed):
         print("skipped: answer keys are gitignored; regenerate them first")
         return

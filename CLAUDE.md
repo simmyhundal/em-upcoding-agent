@@ -10,7 +10,7 @@ Statistics screen, the AI filters and explains, code checks the AI, people decid
 4. `evidence_chart.py`, `case_report.py`, `pi_packet.py`, `pi_estimate.py`, `finalize_run.py`: reviewer materials and the Payment Integrity packet. Draft material for humans; never letters, findings or accusations.
 5. `eval/`: scores everything against an answer key (`run_eval.py`, `scoreboard.py`, `judge_usefulness.py`, `template_check.py`, `threshold_sweep.py`).
 
-**Known big limitation (state it, never hide it):** the AI is given a records-review sample (`documentation.csv`) before it decides. A real payer has only claims at screening time; records arrive after it requests them from the physician. Without that sample the AI accused 14 of 17 honest doctors; with it, 0 of 17. Results are therefore a ceiling. Milestone 5 rebuilds the inputs realistically.
+**Known big limitation (state it, never hide it):** the AI is given a records-review sample (`documentation.csv`) before it decides. A real payer has only claims at screening time; records arrive after it requests them from the physician. Without that sample the AI accused 14 of 17 honest doctors; with it, 0 of 17. Results are therefore a ceiling. Version 2 data (`src/generate_v2.py`, `src/derive.py`, `src/records.py`, `docs/v2_schemas.md`) models records requests realistically; the AI has not yet been re-run on it.
 
 ## Run, test, regenerate
 ```bash
@@ -35,7 +35,7 @@ Full pipeline for a run: generate data, `flagging.py`, `case_summary.py` (API), 
 ## Where things are
 | Path | What |
 |---|---|
-| `src/` | pipeline code (screen, flagging, summaries, guardrail, charts, packets) |
+| `src/` | pipeline code (screen, flagging, summaries, guardrail, charts, packets); v2: `generate_v2.py`, `derive.py` (conditions and risk from claims, detector view), `records.py` (records requests, rules baselines) |
 | `eval/` | harness, scoreboard, judge, rubric, templating check, sweeps; `answer_key/` is gitignored |
 | `data/baselines/` | small CMS-derived files (specialty mix, allowed amounts); `data/synthetic*/` gitignored |
 | `experiments/` | one folder per run plus `runs.json` and an index README |
@@ -53,4 +53,4 @@ Full pipeline for a run: generate data, `flagging.py`, `case_summary.py` (API), 
 - The CMS file hides rows with 10 or fewer patients (small-cell suppression), so real shares are biased; the generator is calibrated only to the upper tail. Issue 8 is deprioritized on purpose.
 
 ## Open work
-Milestone 4 reduces API cost (log usage first: Issue 21). Milestone 5 makes inputs realistic (v2 data model, records requests as a later step). Issues 18 and 19 improve the claim-support check and calibrate the AI grader against a person. Path A (LLM judges free-text clinical notes) is parked as Milestone 2.
+Milestone 4 reduces API cost (log usage first: Issue 21). Milestone 5 is built except the AI re-run on v2 data (`eval/make_v2_runs.py` builds the code-only runs; #36 and #37 stay open for the paid AI runs). Milestone 6 is the autonomous agent. Issues 18 and 19 improve the claim-support check and calibrate the AI grader against a person. Path A (LLM judges free-text clinical notes) is parked as Milestone 2.
