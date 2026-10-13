@@ -52,6 +52,9 @@ Full pipeline for a run: generate data, `flagging.py`, `case_summary.py` (API), 
 - Public CMS pages (ameli, data.cms.gov documents) may block scripted downloads; do not try to bypass bot checks.
 - The CMS file hides rows with 10 or fewer patients (small-cell suppression), so real shares are biased; the generator is calibrated only to the upper tail. Issue 8 is deprioritized on purpose.
 
+## The agent (Milestone 6)
+`src/agent.py` (loop, caps, audit log), `src/agent_tools.py` (tools; payer-visible data only), `src/provider_sim.py` (simulated provider office), `eval/run_agent.py` (runs and scores one agent run; costs real money, capped at $3 by default; ask first), `docs/agent_tools.md`. The agent may never read `eval/answer_key/`; a test enforces it. The workflow baseline is `v2.0`.
+
 ## Versions (read before changing code or data)
 `v1.0` is the held-out freeze of the version-1 workflow (commit 25f5ade); `v2.0` is the version-2 workflow (plan-shaped data, records requests, code-written summary parts, rules plus model). Every scoreboard row carries its code version. After `v2.0` the workflow is frozen: change it only as a `v2.x` patch that re-runs the affected rows, and never tune thresholds on the seeds already used (42, 101, 7). Seeds 202, 303 and 404 are reserved, ungenerated, for the Milestone 6 evaluation. Details: `docs/versioning.md`.
 

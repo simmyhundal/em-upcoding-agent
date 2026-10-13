@@ -21,3 +21,8 @@ Seeds 202, 303 and 404 are not generated or looked at. They exist for the Milest
 
 ## Reproduction
 `python eval/make_v2_runs.py` rebuilds the code-only runs (checked: rebuilding run 261012_1_code reproduced the committed files exactly). `python eval/make_v2_ai_runs.py` reruns the AI step; the response caches in each run folder make unchanged runs free.
+
+## Patches since v2.0 (no results changed)
+- `summary_rules._rule_headline` crashed or mis-worded when the pooled 99214/99215 rule decided; it now states the pooled counts. Four stored headlines (runs 261012_9_api and 261012_10_api) kept their older wording; no leaning, citation or score changed (regenerated from the response cache and compared).
+- `summary_rules.pick_citations` always cites something from the packet's own samples, so a rule-decided summary can no longer be rejected for citing nothing.
+- `records.read_chart` was split out of `request_records` so the provider simulator reads charts the same way (outputs verified identical).

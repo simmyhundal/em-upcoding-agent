@@ -1,0 +1,123 @@
+"""The investigator agent loop (issues 40 and 41).
+
+The model gets the tools in agent_tools.py and decides what to do: which screen to run and where to put the cutoff, which providers
+to look at, whether to ask for records, what to do about a deficient response, and when to stop. Code only enforces limits and
+logs everything. A manual tool-use loop (no forced tool choice, thinking blocks passed back unchanged).
+
+Guardrails (issue 41):
+  * read-only scope: the environment exposes payer-visible data only (tests check the answer key is never opened)
+  * hard caps: tool calls, turns and dollars; the agent is told as it nears them and the run ends at the cap
+  * a log of every tool call and result (`audit.jsonl`), so a reviewer can follow the path
+  * outputs are drafts for human review; the citation guardrail checks every cited claim afterwards (eval/run_agent.py)
+  * records requests are budgeted per provider, because each one burdens a practice
+"""
+import json
+import os
+import time
+
+import llm as llm_mod
+
+MODEL = os.environ.get("AGENT_MODEL", "claude-opus-5-5")
+MAX_TOOL_CALLS, MAX_TURNS, MAX_USD = 60, 80, 3.00
+RESULT_CHARS = 14000          # a longer tool result is cut and says so
+PRICE_CACHE_READ, PRICE_CACHE_WRITE = 0.20, 5.00   # $ per MTok for Opus 5.5 (cache read, 5-minute write)
+
+SYSTEM = """You are an investigator assistant for a health plan's payment integrity team. The data is synthetic. Your job is to find
+primary care providers who are likely upcoding office visits (billing 99214 or 99215 when the visit supported a lower level), and to say
+who looks like a legitimately sicker panel instead. People review everything you produce; you do not accuse anyone.
+
+You are not given a list of providers. You choose how to screen the claims book, where to draw the cutoff, which providers to look at
+closely, and whether and how to ask a provider's office for charts. Think about the trade-offs:
+- A lower cutoff reaches more real upcoders but sends records requests to more honest doctors. Each provider you request records from is
+  a burden on a practice and counts against a budget; ask only where the claims give a reason.
+- Charts are the strongest evidence, but a request can come back partial, late, unusable or not at all. Read the deficiencies and decide
+  whether a follow-up is worth it. Non-response is never evidence of upcoding.
+- A random sample supports an overpayment estimate; a targeted one does not.
+- A high 99215 share on sick patients is expected. The same share on healthy patients, or charts that support a lower level than billed,
+  is the concern. Notes can also be inflated to match the bill; claims that do not show the work a note describes are weak evidence.
+- Use only what the tools return. Do not guess about anything you have not seen.
+
+When you are done, call submit_findings once with every provider you examined closely and your leaning for each. Use
+pattern_consistent_with_upcoding only when the evidence supports it. Be economical with tool calls."""
+
+
+def _cost(usage, price=(4.00, 20.00)):
+    inp = getattr(usage, "input_tokens", 0) or 0
+    out = getattr(usage, "output_tokens", 0) or 0
+    cr = getattr(usage, "cache_read_input_tokens", 0) or 0
+    cw = getattr(usage, "cache_creation_input_tokens", 0) or 0
+    return (inp * price[0] + out * price[1] + cr * PRICE_CACHE_READ + cw * PRICE_CACHE_WRITE) / 1e6
+
+
+def run_agent(env, task, client=None, model=MODEL, max_tool_calls=MAX_TOOL_CALLS, max_turns=MAX_TURNS, max_usd=MAX_USD,
+              out_dir=None, effort="medium", log=print):
+    """Run the loop. Returns a dict with the stop reason, counts, dollars and the audit log."""
+    if client is None:
+        import anthropic
+        client = anthropic.Anthropic()
+    tools = env.tool_schemas()
+    messages = [{"role": "user", "content": task}]
+    audit, usd, calls, turn, reason, nudged, texts = [], 0.0, 0, 0, "", False, []
+    while True:
+        if turn >= max_turns:
+            reason = "turn cap"
+            break
+        if usd >= max_usd:
+            reason = "dollar cap"
+            break
+        turn += 1
+        resp = client.messages.create(model=model, max_tokens=8000, system=SYSTEM, tools=tools, messages=messages,
+                                      output_config={"effort": effort}, extra_body={"cache_control": {"type": "ephemeral"}})
+        usd += _cost(resp.usage)
+        messages.append({"role": "assistant", "content": resp.content})
+        texts += [b.text for b in resp.content if b.type == "text" and b.text.strip()]
+        if resp.stop_reason == "refusal":
+            reason = "model refused"
+            break
+        uses = [b for b in resp.content if b.type == "tool_use"]
+        if not uses:
+            if env.findings or nudged:
+                reason = "finished"
+                break
+            nudged = True
+            messages.append({"role": "user", "content": "Please call submit_findings now with what you have."})
+            continue
+        results, done = [], False
+        for u in uses:
+            calls += 1
+            if calls > max_tool_calls:
+                results.append({"type": "tool_result", "tool_use_id": u.id, "is_error": True,
+                                "content": json.dumps({"error": "tool-call budget exhausted; call submit_findings"})})
+                continue
+            out = env.call(u.name, dict(u.input))
+            text = json.dumps(out)
+            if len(text) > RESULT_CHARS:
+                text = text[:RESULT_CHARS] + '..."[truncated]"'
+            audit.append({"turn": turn, "tool": u.name, "args": dict(u.input), "result_chars": len(text), "result": text[:3000],
+                          "usd_so_far": round(usd, 4)})
+            results.append({"type": "tool_result", "tool_use_id": u.id, "content": text, "is_error": "error" in out})
+            if u.name == "submit_findings" and "error" not in out:
+                done = True
+        note = []
+        if calls >= 0.8 * max_tool_calls or usd >= 0.8 * max_usd:
+            note.append({"type": "text", "text": f"Budget notice: {calls}/{max_tool_calls} tool calls and ${usd:.2f}/${max_usd:.2f} used. "
+                                                 "Wrap up and call submit_findings."})
+        messages.append({"role": "user", "content": results + note})
+        if done:
+            reason = "submitted"
+            break
+        if calls > max_tool_calls + 3:
+            reason = "tool-call cap"
+            break
+    summary = {"stop_reason": reason, "turns": turn, "tool_calls": calls, "estimated_usd": round(usd, 4), "model": model,
+               "findings": len(env.findings), "records_providers_requested": len(env.requested), "model_spend_in_tools_usd": round(env.spent_usd, 4)}
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
+        with open(os.path.join(out_dir, "audit.jsonl"), "w") as f:
+            for a in audit:
+                f.write(json.dumps(a) + "\n")
+        json.dump(summary, open(os.path.join(out_dir, "agent_run.json"), "w"), indent=1)
+        open(os.path.join(out_dir, "agent_notes.txt"), "w").write("\n\n".join(texts))
+        env.office.write_transcript(os.path.join(out_dir, "office_transcript.jsonl"))
+    summary["audit"] = audit
+    return summary

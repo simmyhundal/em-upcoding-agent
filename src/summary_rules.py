@@ -140,6 +140,8 @@ def pick_citations(packet, leaning):
         picks = supports[:3] + high[:2]
     else:
         picks = below[:2] + low[:2]
+    if not picks:                                    # always cite something from the packet's own samples
+        picks = [c["claim_id"] for key in (LOW_KEY, HIGH_KEY, COMPARE_KEY) for c in packet.get(key, [])[:2]]
     seen, out = set(), []
     for c in picks:
         if c not in seen:
@@ -196,9 +198,15 @@ def _rule_headline(packet, leaning):
     if leaning == INCONCLUSIVE:
         return f"{pid}: too few returned records to judge"
     if leaning == UPCODING:
-        return (f"{pid}: {row['documentation_does_not_support_billed_level']} of {row['documented_claims']} documented 99215 claims "
-                f"({row['unsupported_rate']:.0%}) are documented below the billed level")
-    return f"{pid}: documented 99215 claims mostly support the level billed ({row['unsupported_rate']:.0%} below)"
+        if row and row["documented_claims"] >= MIN_DOCS_99215:
+            return (f"{pid}: {row['documentation_does_not_support_billed_level']} of {row['documented_claims']} documented 99215 claims "
+                    f"({row['unsupported_rate']:.0%}) are documented below the billed level")
+        rows = [r for r in (packet.get("documentation_review") or {}).get("by_billed_level", []) if r["billed_cpt"] in ("99214", "99215")]
+        n, k = sum(r["documented_claims"] for r in rows), sum(r["documentation_does_not_support_billed_level"] for r in rows)
+        return f"{pid}: {k} of {n} documented 99214 and 99215 claims ({k / n:.0%}) are documented below the billed level" if n else f"{pid}: documentation below the billed level"
+    if row:
+        return f"{pid}: documented 99215 claims mostly support the level billed ({row['unsupported_rate']:.0%} below)"
+    return f"{pid}: documentation supports the level billed"
 
 
 def assemble(packet, leaning, headline=None, interpretation=None):
