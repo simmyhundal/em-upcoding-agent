@@ -25,3 +25,5 @@ Each folder has a README saying what the run was and what it does and does not s
 | `261012_6_code` / `_7_` | Cloned-notes sweep: nobody clones, everybody clones | v2 seed 42, 216 providers |
 
 Each run folder is self-contained: its summaries and scores plus (built by `src/finalize_run.py`) `cases/`, `charts/` and `pi_packets/`, so a later run never overwrites them. The eval report for the main runs is `reports/eval_report.md`; `reports/charts` and `reports/pi_packets` are only the latest default output.
+
+| `261013_1_code` / `_2_code` | Fixed-policy workflow against the simulated provider office (no AI) | v2 seed 42 / seed 101 |

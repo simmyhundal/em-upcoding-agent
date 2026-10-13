@@ -1,0 +1,18 @@
+{
+ "run": "261013_2_code",
+ "screen_run": "261012_2_code",
+ "correlation": 0.0,
+ "providers_requested": 9,
+ "end_states": {
+  "complete": 5,
+  "partial": 1,
+  "non_responsive": 3
+ },
+ "mean_usable_charts": 19.333333333333332,
+ "mean_rounds": 1.5555555555555556,
+ "mean_days": 38.44444444444444,
+ "requests_to_honest": 5,
+ "rounds_on_honest": 8,
+ "chart_rule_upcoders_found": 0,
+ "chart_rule_honest_accused": 0
+}

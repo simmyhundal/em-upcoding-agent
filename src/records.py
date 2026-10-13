@@ -58,6 +58,16 @@ def _rows(path):
         return list(csv.DictReader(f))
 
 
+def read_chart(u, rng, coder_noise=CODER_NOISE):
+    """What a reviewer takes from one chart (a records-universe row): the MDM-derived level, with coder disagreement."""
+    p, d, r = int(u["problems_level"]), int(u["data_level"]), int(u["risk_level"])
+    lvl = mdm_level(p, d, r)
+    if rng.random() < coder_noise:                        # coders disagree on borderline calls
+        lvl = max(0, min(4, lvl + rng.choice([-1, 1])))
+    return {"claim_id": u["claim_id"], "documented_mdm_level": MDM_LEVELS[lvl], "documented_minutes": u["documented_minutes"],
+            "documented_problems_level": p, "documented_data_level": d, "documented_risk_level": r}
+
+
 def request_records(v2_dir, view_dir, provider_ids, sample_n, rng, response_rate=0.8, deadline=DEADLINE_DAYS,
                     coder_noise=CODER_NOISE):
     """Simulate a records request. Returns (documentation rows, one status row per provider)."""
@@ -77,13 +87,7 @@ def request_records(v2_dir, view_dir, provider_ids, sample_n, rng, response_rate
             if rng.randint(10, 60) > deadline:
                 late += 1
                 continue
-            u = universe[cid]
-            p, d, r = int(u["problems_level"]), int(u["data_level"]), int(u["risk_level"])
-            lvl = mdm_level(p, d, r)
-            if rng.random() < coder_noise:                        # coders disagree on borderline calls
-                lvl = max(0, min(4, lvl + rng.choice([-1, 1])))
-            docs.append({"claim_id": cid, "documented_mdm_level": MDM_LEVELS[lvl], "documented_minutes": u["documented_minutes"],
-                         "documented_problems_level": p, "documented_data_level": d, "documented_risk_level": r})
+            docs.append(read_chart(universe[cid], rng, coder_noise))
             got += 1
         status.append({"provider_id": pid, "requested": len(pick), "received": got, "late": late, "no_response": missing})
     return docs, status
