@@ -156,7 +156,7 @@
    }
   },
   {
-   "run": "261012_3_code",
+   "run": "261012_12_api",
    "note": "v2 data, 0.5% upcoders (3 of 600), half clone notes",
    "dataset": "v2_3",
    "kind": "v2",
@@ -172,10 +172,14 @@
      "sent": "experiments/261012_3_code/flagged_threshold.csv",
      "selected": "experiments/261012_3_code/rules_data_without_tests.csv"
     }
-   ]
+   ],
+   "ai": {
+    "checked": "experiments/261012_12_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261012_12_api/usefulness.jsonl"
+   }
   },
   {
-   "run": "261012_4_code",
+   "run": "261012_13_api",
    "note": "v2 data, 1% upcoders (6 of 600), half clone notes",
    "dataset": "v2_4",
    "kind": "v2",
@@ -191,10 +195,14 @@
      "sent": "experiments/261012_4_code/flagged_threshold.csv",
      "selected": "experiments/261012_4_code/rules_data_without_tests.csv"
     }
-   ]
+   ],
+   "ai": {
+    "checked": "experiments/261012_13_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261012_13_api/usefulness.jsonl"
+   }
   },
   {
-   "run": "261012_5_code",
+   "run": "261012_14_api",
    "note": "v2 data, 2% upcoders (12 of 600), half clone notes",
    "dataset": "v2_5",
    "kind": "v2",
@@ -210,7 +218,11 @@
      "sent": "experiments/261012_5_code/flagged_threshold.csv",
      "selected": "experiments/261012_5_code/rules_data_without_tests.csv"
     }
-   ]
+   ],
+   "ai": {
+    "checked": "experiments/261012_14_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261012_14_api/usefulness.jsonl"
+   }
   },
   {
    "run": "261012_10_api",

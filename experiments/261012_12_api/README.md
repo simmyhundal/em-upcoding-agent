@@ -1,0 +1,8 @@
+# 261012_12_api
+
+v2 data, the full pipeline with the AI step. v2 seed 7, 0.5% upcoders (3 of 600), half clone notes.
+
+- Screen and records request: copied from `experiments/261012_3_code/` (`flagged_threshold.csv`, `documentation.csv`, `records_requests.csv`).
+- Summaries: obvious cases decided and written by rules (`src/summary_rules.py`), the rest by Claude Opus 5.5 through the Batch API (headline, leaning and interpretation only). Each record says which (`source`) and what the rule said (`rule_leaning`).
+- Judge: Claude Sonnet 5.5 through the Batch API, with a deterministic number check; templating is no longer checked.
+- Cost: `usage_writer.jsonl` and `usage_judge.jsonl` (estimated from list prices, batch at half). Answer key: `eval/answer_key/ground_truth_v2_261012_3_code.json` (gitignored).

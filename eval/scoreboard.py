@@ -95,7 +95,7 @@ def _selection_cells(d, selected, honest_sent):
             "prec": (found / len(selected)) if selected else None}
 
 
-def _row(run, seed, stage, tuning, records, cells):
+def _row(run, seed, stage, tuning, records, cells, version="v1.0"):
     cells = {**{k: None for k in ("fn", "fp", "prec", "cite", "useful")}, **cells}
     if cells["fp"] and cells["fp"][1] == 0:       # no honest doctors were in scope: the rate is undefined
         cells["fp"] = None
@@ -110,7 +110,7 @@ def _row(run, seed, stage, tuning, records, cells):
         text["cite"] = f"{cells['cite']:.0%}"
     if cells["useful"] is not None:
         text["useful"] = f"{cells['useful']:.2f}"
-    return {"run": run, "seed": seed, "stage": stage, "tuning": tuning, "records": records, "text": text, "ok": oks,
+    return {"run": run, "seed": seed, "version": version, "stage": stage, "tuning": tuning, "records": records, "text": text, "ok": oks,
             "total": total(oks.values())}
 
 
@@ -128,24 +128,25 @@ def compute(registry_path=None):
     out = []
     for r in reg["runs"]:
         d = data[r["dataset"]]
+        ver = r.get("version") or ("v2.0" if r["kind"] == "v2" else "v1.0")
         name = r["run"] + (f"<br>{r['note']}" if r.get("note") else "")
         if r.get("bold"):
             name = f"**{r['run']}**" + (f"<br>{r['note']}" if r.get("note") else "")
         screen_tuning = (f"Z-score of risk-adjusted coding >= {r['min_suspicion']:g}" if r.get("min_suspicion") is not None
                          else f"Top {TOP_N} upcoding outliers")
-        out.append(_row(name, d["seed"], "Screen", screen_tuning, "No", _screen_cells(d, r)))
+        out.append(_row(name, d["seed"], "Screen", screen_tuning, "No", _screen_cells(d, r), ver))
         for rule in r.get("rules", []):
             sent = [x["provider_id"] for x in csv.DictReader(open(_load(rule["sent"]))) if x["flagged"] == "True"]
             roles = d["truth"]["providers"]
             honest_sent = sum(roles[p]["role"] != "upcoder" for p in sent)
             selected = [x["provider_id"] for x in csv.DictReader(open(_load(rule["selected"])))]
-            out.append(_row(name, d["seed"], "Rules", rule["tuning"], "Yes", _selection_cells(d, selected, honest_sent)))
+            out.append(_row(name, d["seed"], "Rules", rule["tuning"], "Yes", _selection_cells(d, selected, honest_sent), ver))
         if r.get("ai") and r["kind"] == "v2":
             out.append(_row(name, d["seed"], "AI", f"AI calls upcoding (screen: {screen_tuning[0].lower() + screen_tuning[1:]})", "Yes",
-                            _ai_cells(d, r["ai"])))
+                            _ai_cells(d, r["ai"]), ver))
         if r["kind"] == "summaries":
             out.append(_row(name, d["seed"], "AI", f"AI calls upcoding (screen: {screen_tuning[0].lower() + screen_tuning[1:]})",
-                            "Yes" if r["records"] else "No", _ai_cells(d, r)))
+                            "Yes" if r["records"] else "No", _ai_cells(d, r), ver))
     return out
 
 
@@ -155,15 +156,15 @@ def cell(text, ok):
 
 def markdown(registry_path=None):
     rows = compute(registry_path)
-    head = ("| Run | Seed | Screen / AI | Tuning | Records evidence | False negative rate | False positive rate "
+    head = ("| Run | Seed | Code version | Screen / AI | Tuning | Records evidence | False negative rate | False positive rate "
             "| Precision of upcoding calls | Citations valid | Case Summary Usefulness (1-5) "
-            "| Evals passed |\n|---|---|---|---|---|---|---|---|---|---|---|")
-    thr = ("| **Threshold** | | | | | at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% "
+            "| Evals passed |\n|---|---|---|---|---|---|---|---|---|---|---|---|")
+    thr = ("| **Threshold** | | | | | | at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% "
            "| at least 4 | |")
     lines = [head, thr]
     for r in rows:
         cells = " | ".join(cell(r["text"][k], r["ok"][k]) for k in ("fn", "fp", "prec", "cite", "useful"))
-        lines.append(f"| {r['run']} | {r['seed']} | {r['stage']} | {r['tuning']} | {r['records']} | {cells} | **{r['total']}** |")
+        lines.append(f"| {r['run']} | {r['seed']} | {r['version']} | {r['stage']} | {r['tuning']} | {r['records']} | {cells} | **{r['total']}** |")
     return "\n".join(lines)
 
 

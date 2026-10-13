@@ -18,7 +18,10 @@ PY = sys.executable
 RUNS = [("261012_8_api", "261012_1_code", "v2 seed 42, half of the upcoders clone their notes"),
         ("261012_9_api", "261012_2_code", "v2 held-out seed 101, half clone; code frozen before this seed was looked at"),
         ("261012_10_api", "261012_6_code", "v2 seed 42, nobody clones notes"),
-        ("261012_11_api", "261012_7_code", "v2 seed 42, every upcoder clones notes")]
+        ("261012_11_api", "261012_7_code", "v2 seed 42, every upcoder clones notes"),
+        ("261012_12_api", "261012_3_code", "v2 seed 7, 0.5% upcoders (3 of 600), half clone notes"),
+        ("261012_13_api", "261012_4_code", "v2 seed 7, 1% upcoders (6 of 600), half clone notes"),
+        ("261012_14_api", "261012_5_code", "v2 seed 7, 2% upcoders (12 of 600), half clone notes")]
 
 
 def sh(*args):
