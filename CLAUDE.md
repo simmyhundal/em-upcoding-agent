@@ -3,12 +3,12 @@
 Proof of concept that finds likely **E/M upcoding** (billing office-visit codes 99211-99215 higher than the visit justified) on **synthetic** Medicare-style claims. Read `README.md` first (plain English, with figures), then this file. The user keeps the work organized as GitHub issues grouped in milestones; follow that.
 
 ## What the system is (get this framing right)
-Statistics screen, the AI filters and explains, code checks the AI, people decide. It is a **workflow with one LLM step**, not an autonomous agent: code controls the flow, the model gets no tools and is called once per flagged provider.
+Statistics screen, the AI filters and explains, code checks the AI, people decide. It is a **workflow with one LLM step**, not an autonomous agent: code controls the flow, the model gets no tools and is called at most once per flagged provider.
 1. `baseline_zscore.py`, `baseline_riskadj.py`, `flagging.py`: the statistical screen. Flags the top 25 (default) or everyone at or above `--min-suspicion S`.
-2. `case_summary.py`: one API call per flagged provider. The model reads an evidence packet and returns a cited summary plus an advisory **leaning** (upcoding / high-acuity panel / inconclusive). **The leaning is the second filter**: providers it calls upcoding are the suspected upcoders and the only ones that get recovery packets.
+2. `case_summary.py` (with `summary_rules.py`): rules decide lopsided cases and write the summary by code; for the rest one model call per provider. The model reads a compact evidence card and returns a headline, an interpretation and an advisory **leaning** (upcoding / high-acuity panel / inconclusive). **The leaning is the second filter**: providers it calls upcoding are the suspected upcoders and the only ones that get recovery packets.
 3. `guardrail.py`: rejects summaries citing claims that do not exist or belong to another provider. It does NOT check that a cited claim supports the sentence citing it.
 4. `evidence_chart.py`, `case_report.py`, `pi_packet.py`, `pi_estimate.py`, `finalize_run.py`: reviewer materials and the Payment Integrity packet. Draft material for humans; never letters, findings or accusations.
-5. `eval/`: scores everything against an answer key (`run_eval.py`, `scoreboard.py`, `judge_usefulness.py`, `template_check.py`, `threshold_sweep.py`).
+5. `eval/`: scores everything against an answer key (`run_eval.py`, `scoreboard.py`, `judge_usefulness.py`, `numcheck.py`, `threshold_sweep.py`).
 
 **Known big limitation (state it, never hide it):** the AI is given a records-review sample (`documentation.csv`) before it decides. A real payer has only claims at screening time; records arrive after it requests them from the physician. Without that sample the AI accused 14 of 17 honest doctors; with it, 0 of 17. Results are therefore a ceiling. Version 2 data (`src/generate_v2.py`, `src/derive.py`, `src/records.py`, `docs/v2_schemas.md`) models records requests realistically; the AI has not yet been re-run on it.
 
@@ -26,17 +26,17 @@ Full pipeline for a run: generate data, `flagging.py`, `case_summary.py` (API), 
 
 ## Rules that matter
 - **Answer key is eval-only.** `eval/answer_key/` is gitignored and outside `data/`. Only `eval/` code may read it. Never put roles, "justified" levels or labels in anything an agent or the model sees; tests check this.
-- **Money and keys.** The API step costs about $1.85 to $2.14 per full run (25 writer calls on Opus 5.5 plus 25 judge calls on Sonnet 5.5) and takes about 6 plus 3 minutes. Do not start paid runs without the user's OK. The key is in `.env` (gitignored): never print, log, commit or ask for it; do not paste keys into chat.
+- **Money and keys.** Model calls go through the Batch API by default (half price) with a response cache under each run folder, and token usage plus estimated dollars are written next to the outputs (`usage_writer.jsonl`, `usage_judge.jsonl`). Code writes the numeric facts, cited claims and next steps, and decides obvious leanings by rule (`src/summary_rules.py`); the model sees a compact card and writes only a headline, a leaning and an interpretation for ambiguous cases. Run `python src/case_summary.py ... --estimate` first (token counting is free) and expect roughly $0.15 to $0.30 for a v2 writer run; the older v1 runs cost about $2. Do not start paid runs without the user's OK. The key is in `.env` (gitignored): never print, log, commit or ask for it; do not paste keys into chat.
 - **Be honest in outputs.** Report misses (usefulness is below its 4.0 target), say what is easier by construction (the documentation signal is generated from the same hidden truth that defines an upcoded visit), and say what is simulated. Do not tune a run after seeing it and then call it held out.
 - **Experiments are named `YYMMDD_X_Y`** (date, run number that day, `api` = the real pipeline, `cc` = mimicked with Claude Code agents). Each run folder is self-contained and never overwritten; `experiments/README.md` has the index, `experiments/runs.json` feeds the scoreboard. The held-out run used tag `heldout-freeze-261009`.
 - **Work through issues.** One issue per change, tied to a milestone, closed from the commit message (`Closes #N`). End every commit with `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`. Commit and push only when asked or when the pattern in the conversation clearly calls for it.
-- **Scoreboard thresholds** (README "Eval"): false negative rate and false positive rate at most 12.5% (false positive rate counts honest doctors a step actually faced), precision of "upcoding" calls at least 80% (proposed), citations 100%, usefulness at least 4, no templating.
+- **Scoreboard thresholds** (README "Eval"): false negative rate and false positive rate at most 12.5% (false positive rate counts honest doctors a step actually faced), precision of "upcoding" calls at least 80% (proposed), citations 100%, usefulness at least 4. Templated or code-written summary text is fine (the templating check was removed on purpose).
 
 ## Where things are
 | Path | What |
 |---|---|
 | `src/` | pipeline code (screen, flagging, summaries, guardrail, charts, packets); v2: `generate_v2.py`, `derive.py` (conditions and risk from claims, detector view), `records.py` (records requests, rules baselines) |
-| `eval/` | harness, scoreboard, judge, rubric, templating check, sweeps; `answer_key/` is gitignored |
+| `eval/` | harness, scoreboard, judge, rubric, number check, sweeps; `answer_key/` is gitignored |
 | `data/baselines/` | small CMS-derived files (specialty mix, allowed amounts); `data/synthetic*/` gitignored |
 | `experiments/` | one folder per run plus `runs.json` and an index README |
 | `reports/` | latest screen and eval outputs (`flagged.csv`, `eval_report.md`), default charts and packets |

@@ -1,15 +1,17 @@
-"""Case summaries: an LLM writes an investigator-facing note for each flagged provider.
+"""Case summaries: an investigator-facing note for each flagged provider.
 
-The statistics decide who is flagged (see flagging.py). The LLM does not set the
-flag; it explains the numbers, cites specific claims from an evidence packet, and
-gives an advisory leaning plus next steps. Citations are checked separately by
-the guardrail (Issue 6): this module only records what the model cited.
+The statistics decide who is flagged (see flagging.py). The numeric facts, the cited claims and the next steps are written by
+code (summary_rules.py). Where the evidence is lopsided, a rule also sets the advisory leaning and the whole summary is written
+by code; where it is ambiguous (or with --llm-all), the model reads a compact evidence card and returns a headline, a leaning and
+a short interpretation. The model is called through the Batch API by default (half price) with a response cache, and its token
+usage and estimated cost are logged. Citations are checked separately by the guardrail: this module only records what was cited.
 
 Reads only agent-visible files plus the flagging output. Never touches ground truth.
 
 Usage:
-    python src/case_summary.py DATA_DIR FLAGGED_CSV OUT_JSONL [--limit N] [--dry-run]
-Needs ANTHROPIC_API_KEY (environment or .env) unless --dry-run.
+    python src/case_summary.py DATA_DIR FLAGGED_CSV OUT_JSONL [--limit N] [--dry-run] [--estimate] [--llm-all] [--sync]
+                               [--cache-dir DIR] [--usage-jsonl FILE]
+Needs ANTHROPIC_API_KEY (environment or .env) unless --dry-run or --estimate is replaced by a cache hit.
 """
 import argparse
 import csv
@@ -18,6 +20,8 @@ import os
 import random
 from collections import Counter, defaultdict
 
+import llm as llm_mod
+import summary_rules as sr
 from records import level_from_minutes
 
 MODEL = os.environ.get("CASE_SUMMARY_MODEL", "claude-opus-5-5")
@@ -47,10 +51,26 @@ SCHEMA = {
     "additionalProperties": False,
 }
 
+LLM_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "headline": {"type": "string"},
+        "leaning": {"type": "string", "enum": [sr.UPCODING, sr.HIGH_ACUITY, sr.INCONCLUSIVE]},
+        "interpretation": {"type": "string"},
+    },
+    "required": ["headline", "leaning", "interpretation"],
+    "additionalProperties": False,
+}
+
 SYSTEM = """You assist a Special Investigations Unit reviewing outpatient E/M billing (CPT 99211-99215).
 All data is synthetic. A statistical screen has already flagged this provider; you do not decide that.
 Your job is to explain, for an investigator, whether the billing pattern looks like upcoding or like a
 legitimately sicker patient panel, using only the evidence packet you are given.
+
+Code has already written the numeric facts, will cite the example claims and will add standard next steps. You write only:
+a one-sentence headline, the advisory leaning, and an interpretation of 3 to 5 sentences that weighs the evidence, says what is
+ambiguous and what a reviewer should look at first. Do not repeat the numbers code already states; refer to them.
+The evidence card is compact JSON: each table is {"cols": [...], "rows": [[...]]}.
 
 Rules:
 - The claim lists in the packet are random samples, not every claim. Do not generalize from them beyond what the tables show.
@@ -238,24 +258,16 @@ def build_packet(pid, flag_row, chronic, age, conditions, claims, peer_rate, doc
     }
 
 
-def make_prompt(packet):
-    return ("Evidence packet (JSON):\n" + json.dumps(packet, indent=1) +
-            "\n\nWrite the case summary as JSON matching the schema.")
+def make_prompt(packet, rule_reason=""):
+    note = f"\nRule check: {rule_reason}." if rule_reason else ""
+    return ("Evidence card (compact JSON):\n" + sr.card_json(packet) +
+            "\n\nFacts already stated by code:\n" + "\n".join(sr.facts(packet)) + note +
+            "\n\nReturn the headline, leaning and interpretation as JSON matching the schema.")
 
 
 def call_anthropic(system, user):
-    """Real call. Returns the model's JSON text. Raises on refusal."""
-    import anthropic
-    client = anthropic.Anthropic()
-    resp = client.beta.messages.create(
-        model=MODEL, max_tokens=4000,
-        betas=[FALLBACK_BETA], extra_body={"fallbacks": "default"},
-        output_config={"effort": "medium", "format": {"type": "json_schema", "schema": SCHEMA}},
-        system=system, messages=[{"role": "user", "content": user}],
-    )
-    if resp.stop_reason == "refusal":
-        raise RuntimeError(f"model refused: {getattr(resp, 'stop_details', None)}")
-    return next(b.text for b in resp.content if b.type == "text")
+    """One synchronous call (used by tests' injection point and --sync). Returns the model's JSON text."""
+    return llm_mod.sync_call(MODEL, system, user, LLM_SCHEMA)[0]
 
 
 def peer_rates(claims, chronic):
@@ -268,7 +280,8 @@ def peer_rates(claims, chronic):
     return {b: hit[b] / tot[b] for b in tot}
 
 
-def run(data_dir, flagged_csv, out_path, limit=None, dry_run=False, llm=call_anthropic):
+def run(data_dir, flagged_csv, out_path, limit=None, dry_run=False, llm=None, batch=False, llm_all=False,
+        cache_dir=None, usage_path=None, estimate=False, assume_output_tokens=1000, log=print):
     chronic, age, conditions, claims = load(data_dir)
     rates = peer_rates(claims, chronic)
     docs = load_docs(data_dir)
@@ -278,20 +291,52 @@ def run(data_dir, flagged_csv, out_path, limit=None, dry_run=False, llm=call_ant
         flagged = [r for r in csv.DictReader(f) if r["flagged"] == "True"]
     if limit:
         flagged = flagged[:limit]
-    out = []
+    packets, plan = {}, []
     for fr in flagged:
-        packet = build_packet(fr["provider_id"], fr, chronic, age, conditions, claims, rates, docs, peer_doc, facts)
-        if dry_run:
-            out.append({"provider_id": fr["provider_id"], "prompt_chars": len(make_prompt(packet)), "packet": packet})
-            continue
-        summary = json.loads(llm(SYSTEM, make_prompt(packet)))
-        out.append({"provider_id": fr["provider_id"], "model": MODEL, "summary": summary,
-                    "citations_checked": False})
+        pid = fr["provider_id"]
+        packets[pid] = build_packet(pid, fr, chronic, age, conditions, claims, rates, docs, peer_doc, facts)
+        lean, reason = sr.rule_leaning(packets[pid])
+        plan.append((pid, lean, reason, lean is None or llm_all))
+    if dry_run:
+        out = [{"provider_id": pid, "prompt_chars": len(make_prompt(packets[pid], reason)), "packet": packets[pid],
+                "will_call_llm": call, "rule_leaning": lean} for pid, lean, reason, call in plan]
+        _write(out_path, out)
+        return out
+    items = [(pid, SYSTEM, make_prompt(packets[pid], reason)) for pid, lean, reason, call in plan if call]
+    if estimate:
+        n_in = [llm_mod.count_tokens(MODEL, s, u) for _, s, u in items]
+        usd = llm_mod.cost(MODEL, sum(n_in), assume_output_tokens * len(items), batch=True)
+        log(f"{len(items)} of {len(plan)} providers need the model; input {sum(n_in):,} tokens "
+            f"(mean {sum(n_in) // max(len(n_in), 1):,}); estimated ${usd:.2f} at batch price assuming {assume_output_tokens} output tokens each")
+        return {"calls": len(items), "providers": len(plan), "input_tokens": sum(n_in), "estimated_usd": usd}
+    got = {}
+    if items:
+        if llm is not None:                                  # injected function (tests): one call at a time, no cache
+            got = {pid: (llm(s, u), {"input_tokens": 0, "output_tokens": 0}, "sync") for pid, s, u in items}
+        else:
+            got = llm_mod.run_requests(items, MODEL, LLM_SCHEMA, cache_dir, batch=batch, log=log)
+    out = []
+    for pid, lean, reason, call in plan:
+        if call:
+            m = json.loads(got[pid][0])
+            summary = sr.assemble(packets[pid], m["leaning"], m["headline"], m["interpretation"])
+            out.append({"provider_id": pid, "model": MODEL, "summary": summary, "citations_checked": False,
+                        "source": "llm", "rule_leaning": lean, "rule_reason": reason})
+        else:
+            out.append({"provider_id": pid, "model": "rules", "summary": sr.assemble(packets[pid], lean),
+                        "citations_checked": False, "source": "rules", "rule_leaning": lean, "rule_reason": reason})
+    _write(out_path, out)
+    if usage_path and got:
+        total = llm_mod.write_usage(usage_path, MODEL, [(pid, u, via) for pid, (_, u, via) in got.items()])
+        log(f"estimated writer spend: ${total:.2f} ({len(got)} model calls; usage in {usage_path})")
+    return out
+
+
+def _write(out_path, rows):
     os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
     with open(out_path, "w") as f:
-        for row in out:
+        for row in rows:
             f.write(json.dumps(row) + "\n")
-    return out
 
 
 if __name__ == "__main__":
@@ -306,6 +351,16 @@ if __name__ == "__main__":
     ap.add_argument("out_jsonl")
     ap.add_argument("--limit", type=int)
     ap.add_argument("--dry-run", action="store_true", help="build packets only; no API call")
+    ap.add_argument("--estimate", action="store_true", help="count tokens (free) and print the estimated cost; no billed call")
+    ap.add_argument("--llm-all", action="store_true", help="call the model for every provider, even where a rule decides")
+    ap.add_argument("--sync", action="store_true", help="one request at a time instead of the Batch API")
+    ap.add_argument("--cache-dir", help="response cache folder (default: llm_cache next to the output)")
+    ap.add_argument("--usage-jsonl", help="where to write token usage and estimated cost (default: next to the output)")
     a = ap.parse_args()
-    res = run(a.data_dir, a.flagged_csv, a.out_jsonl, a.limit, a.dry_run)
-    print(f"{len(res)} {'packets' if a.dry_run else 'summaries'} -> {a.out_jsonl}")
+    base = os.path.dirname(os.path.abspath(a.out_jsonl))
+    res = run(a.data_dir, a.flagged_csv, a.out_jsonl, a.limit, a.dry_run, batch=not a.sync, llm_all=a.llm_all,
+              cache_dir=a.cache_dir or os.path.join(base, "llm_cache"),
+              usage_path=a.usage_jsonl or os.path.join(base, "usage_writer.jsonl"), estimate=a.estimate)
+    if not a.estimate:
+        calls = sum(1 for r in res if r.get("source") == "llm" or r.get("will_call_llm"))
+        print(f"{len(res)} {'packets' if a.dry_run else 'summaries'} ({calls} via the model) -> {a.out_jsonl}")

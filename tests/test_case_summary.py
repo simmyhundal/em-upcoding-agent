@@ -33,13 +33,31 @@ def test_packet_has_evidence_and_no_ground_truth():
 
 def test_fake_llm_roundtrip_records_citations_unchecked():
     def fake(system, user):
-        pkt = json.loads(user.split("Evidence packet (JSON):\n")[1].split("\n\nWrite the case")[0])
-        ids = [c["claim_id"] for c in pkt["99215_claims_on_low_complexity_patients_0_or_1_conditions"][:2]]
-        return json.dumps({"headline": "h", "leaning": "inconclusive", "rationale": "r",
-                           "cited_claim_ids": ids, "next_steps": ["review notes"]})
-    out = cs.run(D, FLAGGED, os.path.join(D, "s.jsonl"), limit=2, llm=fake)
-    assert len(out) == 2 and all(r["citations_checked"] is False for r in out)
+        return json.dumps({"headline": "h", "leaning": "inconclusive", "interpretation": "Looks thin."})
+    out = cs.run(D, FLAGGED, os.path.join(D, "s.jsonl"), limit=2, llm=fake, llm_all=True)
+    assert len(out) == 2 and all(r["citations_checked"] is False and r["source"] == "llm" for r in out)
     assert set(out[0]["summary"]) == set(cs.SCHEMA["properties"])
+    assert "Looks thin." in out[0]["summary"]["rationale"] and out[0]["summary"]["cited_claim_ids"]
+
+
+def test_rules_write_obvious_cases_without_calling_the_model():
+    calls = []
+
+    def fake(system, user):
+        calls.append(user)
+        return json.dumps({"headline": "h", "leaning": "inconclusive", "interpretation": "x"})
+    out = cs.run(D, FLAGGED, os.path.join(D, "r.jsonl"), llm=fake)
+    ruled = [r for r in out if r["source"] == "rules"]
+    assert len(calls) == len(out) - len(ruled)
+    assert all(r["model"] == "rules" and r["summary"]["next_steps"] and r["rule_leaning"] for r in ruled)
+    assert len(ruled) + len(calls) == 5
+
+
+def test_compact_card_is_smaller_than_the_pretty_packet_and_has_no_whitespace_padding():
+    import summary_rules as sr
+    for p in _packets():
+        pretty, card = json.dumps(p, indent=1), sr.card_json(p)
+        assert len(card) < 0.6 * len(pretty) and "\n" not in card and ": " not in card
 
 
 def _packets():

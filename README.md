@@ -90,6 +90,7 @@ What the code-only runs show (no AI yet; rows are in the Eval table above, thres
 - **The screen is weaker on v2.** At suspicion 5 it misses 2 of 8 upcoders on seed 42 and 4 of 8 on the held-out seed 101 (version 1 missed none), because risk derived from claims is noisier than a stored condition count. The top 25 still reaches all 8 on seed 42, with 17 honest doctors flagged beside them.
 - **Precision collapses as upcoding gets rarer.** Of the doctors the screen flags at suspicion 5, 46% are upcoders at a 3.7% base rate, 43% at 2%, 15% at 1% and 9% at 0.5%. A realistic base rate makes the second filter matter much more.
 - **A simple rule on the charts works until notes are cloned.** Flagging doctors whose charts support a lower level than billed finds every upcoder the screen sent when nobody clones notes, flags no honest doctor, and finds **none** when every upcoder clones. A rule that checks note claims against the claim itself (a "moderate data reviewed" note with no lab or test line on the claim) is a weak backstop: it accused honest doctors in several runs.
+- **Cheaper AI step.** Code now writes the numeric facts, the cited claims and the next steps, and a few plain rules decide the clear-cut cases outright (documented 99215 claims mostly unsupported, or mostly supported with a share close to expected). On the saved packets those rules decided about 16% of cases, 36% on version 1 and about 15% on version 2, and made no wrong call in 25 decisions; the rest still go to the model. The model reads a compact evidence card (about half the input tokens of the old pretty-printed packet) and calls run through the half-price Batch API with a response cache, so repeats cost nothing. A version 2 AI run is estimated at about $0.15 to $0.30, against about $2 before. A number checker (no model) verifies every figure in a summary against the card.
 - **Not yet done:** the AI has not been re-run on v2 data. The question for that run is whether it beats these simple rules, especially on cloned notes.
 - Caveats: same generator family, small counts, and the cloned-notes mechanism and its prevalence are assumptions.
 
@@ -167,12 +168,11 @@ Every run is graded against the same thresholds. How each is computed is in `eva
 | Precision of "upcoding" calls | at least 80% are real upcoders (*proposed*; the end-to-end check on how trustworthy an accusation is, which the screen's false positive rate does not capture) |
 | Citations valid | 100% |
 | Case Summary Usefulness (1-5) | average of at least 4 (scored by an LLM judge) |
-| No templating | the templating check finds none |
 
 Note that in the synthetic data, billed level depends on patient complexity by construction, so the risk-adjusted baseline is helped by how the data was built. Report that plainly.
 
 ### Status
-Done: synthetic data generator (with a records-review documentation sample), both baselines, flagging, case-summary step (run live on the API), citation guardrail, evidence charts and case pages, Payment Integrity packet, eval harness (detectors, LLM leanings, templating check, LLM-judge usefulness), a held-out run.
+Done: synthetic data generator (with a records-review documentation sample), both baselines, flagging, case-summary step (run live on the API), citation guardrail, evidence charts and case pages, Payment Integrity packet, eval harness (detectors, LLM leanings, deterministic number check, LLM-judge usefulness), a held-out run.
 
 **What is the suspicion score?** It is the risk-adjusted score from the statistical screen. For every doctor, the screen predicts how often they should bill the top visit code (99215) given how many chronic conditions their patients have, then compares that with what they billed: (billed - expected) / the statistical noise you would expect by chance. That raw score is then rescaled by the typical spread across all doctors, because honest doctors legitimately differ too. A score of 0 is the middle of the pack; in the seed-42 data a score of 5 is about where the top 5% of doctors begin, and the highest score is above 22. It is computed from claims and patient condition counts only, never from the records sample.
 
@@ -181,42 +181,42 @@ The **Tuning** column says how the list was chosen: the top 25 outliers, or ever
 Each run has a **Screen** row (the statistical screen's flagged doctors count as accused) and, when AI summaries were written, an **AI** row (what the AI called upcoding, out of the doctors the screen sent it). **Records evidence** says whether the AI was shown the records-review sample. 🟩 means the threshold was met, 🟥 means it was missed, and a dash means not scored or not applicable and is left out of the total.
 
 <!-- scoreboard:start -->
-| Run | Seed | Screen / AI | Tuning | Records evidence | False negative rate | False positive rate | Precision of upcoding calls | Citations valid | Case Summary Usefulness (1-5) | No templating | Evals passed |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Threshold** | | | | | at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% | at least 4 | none | |
-| Screen only | 42 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟩 0.0%<br>(0 / 8) | 🟩 1.4%<br>(3 / 208) | 🟥 73% | – | – | – | **2 / 3** |
-| 261008_2_cc<br>one agent for all 25 | 42 | Screen | Top 25 upcoding outliers | No | 🟩 0.0%<br>(0 / 8) | 🟩 8.2%<br>(17 / 208) | 🟥 32% | – | – | – | **2 / 3** |
-| 261008_2_cc<br>one agent for all 25 | 42 | AI | AI calls upcoding (screen: top 25 upcoding outliers) | No | 🟩 12.5%<br>(1 / 8) | 🟥 58.8%<br>(10 / 17) | 🟥 41% | 🟩 100% | – | 🟥 templated | **2 / 5** |
-| 261008_3_cc | 42 | Screen | Top 25 upcoding outliers | No | 🟩 0.0%<br>(0 / 8) | 🟩 8.2%<br>(17 / 208) | 🟥 32% | – | – | – | **2 / 3** |
-| 261008_3_cc | 42 | AI | AI calls upcoding (screen: top 25 upcoding outliers) | No | 🟩 0.0%<br>(0 / 8) | 🟥 82.4%<br>(14 / 17) | 🟥 36% | 🟩 100% | – | 🟩 none | **3 / 5** |
-| 261008_4_cc | 42 | Screen | Top 25 upcoding outliers | No | 🟩 0.0%<br>(0 / 8) | 🟩 8.2%<br>(17 / 208) | 🟥 32% | – | – | – | **2 / 3** |
-| 261008_4_cc | 42 | AI | AI calls upcoding (screen: top 25 upcoding outliers) | Yes | 🟩 0.0%<br>(0 / 8) | 🟩 0.0%<br>(0 / 17) | 🟩 100% | 🟩 100% | – | 🟩 none | **5 / 5** |
-| **261009_1_api** | 42 | Screen | Top 25 upcoding outliers | No | 🟩 0.0%<br>(0 / 8) | 🟩 8.2%<br>(17 / 208) | 🟥 32% | – | – | – | **2 / 3** |
-| **261009_1_api** | 42 | AI | AI calls upcoding (screen: top 25 upcoding outliers) | Yes | 🟩 0.0%<br>(0 / 8) | 🟩 0.0%<br>(0 / 17) | 🟩 100% | 🟩 100% | 🟥 3.44 | 🟩 none | **5 / 6** |
-| Screen only | 101 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟩 0.0%<br>(0 / 8) | 🟩 0.5%<br>(1 / 208) | 🟩 89% | – | – | – | **3 / 3** |
-| **261009_2_api**<br>held-out API run | 101 | Screen | Top 25 upcoding outliers | No | 🟩 0.0%<br>(0 / 8) | 🟩 8.2%<br>(17 / 208) | 🟥 32% | – | – | – | **2 / 3** |
-| **261009_2_api**<br>held-out API run | 101 | AI | AI calls upcoding (screen: top 25 upcoding outliers) | Yes | 🟩 0.0%<br>(0 / 8) | 🟩 0.0%<br>(0 / 17) | 🟩 100% | 🟩 100% | 🟥 3.24 | 🟩 none | **5 / 6** |
-| 261012_1_code<br>v2 data, 3.7% upcoders (8 of 216), half clone notes | 42 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟥 25.0%<br>(2 / 8) | 🟩 3.4%<br>(7 / 208) | 🟥 46% | – | – | – | **1 / 3** |
-| 261012_1_code<br>v2 data, 3.7% upcoders (8 of 216), half clone notes | 42 | Rules | Documented level below billed in over 15% of returned charts | Yes | 🟥 75.0%<br>(6 / 8) | 🟩 0.0%<br>(0 / 7) | 🟩 100% | – | – | – | **2 / 3** |
-| 261012_1_code<br>v2 data, 3.7% upcoders (8 of 216), half clone notes | 42 | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | Yes | 🟥 62.5%<br>(5 / 8) | 🟥 14.3%<br>(1 / 7) | 🟥 75% | – | – | – | **0 / 3** |
-| 261012_2_code<br>v2 data, held-out seed, 3.7% upcoders, half clone notes | 101 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟥 50.0%<br>(4 / 8) | 🟩 2.4%<br>(5 / 208) | 🟥 44% | – | – | – | **1 / 3** |
-| 261012_2_code<br>v2 data, held-out seed, 3.7% upcoders, half clone notes | 101 | Rules | Documented level below billed in over 15% of returned charts | Yes | 🟥 87.5%<br>(7 / 8) | 🟩 0.0%<br>(0 / 5) | 🟩 100% | – | – | – | **2 / 3** |
-| 261012_2_code<br>v2 data, held-out seed, 3.7% upcoders, half clone notes | 101 | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | Yes | 🟥 75.0%<br>(6 / 8) | 🟩 0.0%<br>(0 / 5) | 🟩 100% | – | – | – | **2 / 3** |
-| 261012_3_code<br>v2 data, 0.5% upcoders (3 of 600), half clone notes | 7 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟥 33.3%<br>(1 / 3) | 🟩 3.4%<br>(20 / 597) | 🟥 9% | – | – | – | **1 / 3** |
-| 261012_3_code<br>v2 data, 0.5% upcoders (3 of 600), half clone notes | 7 | Rules | Documented level below billed in over 15% of returned charts | Yes | 🟥 100.0%<br>(3 / 3) | 🟩 0.0%<br>(0 / 20) | – | – | – | – | **1 / 2** |
-| 261012_3_code<br>v2 data, 0.5% upcoders (3 of 600), half clone notes | 7 | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | Yes | 🟥 100.0%<br>(3 / 3) | 🟥 15.0%<br>(3 / 20) | 🟥 0% | – | – | – | **0 / 3** |
-| 261012_4_code<br>v2 data, 1% upcoders (6 of 600), half clone notes | 7 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟥 50.0%<br>(3 / 6) | 🟩 2.9%<br>(17 / 594) | 🟥 15% | – | – | – | **1 / 3** |
-| 261012_4_code<br>v2 data, 1% upcoders (6 of 600), half clone notes | 7 | Rules | Documented level below billed in over 15% of returned charts | Yes | 🟥 100.0%<br>(6 / 6) | 🟩 0.0%<br>(0 / 17) | – | – | – | – | **1 / 2** |
-| 261012_4_code<br>v2 data, 1% upcoders (6 of 600), half clone notes | 7 | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | Yes | 🟥 50.0%<br>(3 / 6) | 🟩 5.9%<br>(1 / 17) | 🟥 75% | – | – | – | **1 / 3** |
-| 261012_5_code<br>v2 data, 2% upcoders (12 of 600), half clone notes | 7 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟥 16.7%<br>(2 / 12) | 🟩 2.2%<br>(13 / 588) | 🟥 43% | – | – | – | **1 / 3** |
-| 261012_5_code<br>v2 data, 2% upcoders (12 of 600), half clone notes | 7 | Rules | Documented level below billed in over 15% of returned charts | Yes | 🟥 75.0%<br>(9 / 12) | 🟩 0.0%<br>(0 / 13) | 🟩 100% | – | – | – | **2 / 3** |
-| 261012_5_code<br>v2 data, 2% upcoders (12 of 600), half clone notes | 7 | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | Yes | 🟥 66.7%<br>(8 / 12) | 🟩 7.7%<br>(1 / 13) | 🟩 80% | – | – | – | **2 / 3** |
-| 261012_6_code<br>v2 data, 3.7% upcoders, nobody clones notes | 42 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟥 25.0%<br>(2 / 8) | 🟩 3.4%<br>(7 / 208) | 🟥 46% | – | – | – | **1 / 3** |
-| 261012_6_code<br>v2 data, 3.7% upcoders, nobody clones notes | 42 | Rules | Documented level below billed in over 15% of returned charts | Yes | 🟥 25.0%<br>(2 / 8) | 🟩 0.0%<br>(0 / 7) | 🟩 100% | – | – | – | **2 / 3** |
-| 261012_6_code<br>v2 data, 3.7% upcoders, nobody clones notes | 42 | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | Yes | 🟥 100.0%<br>(8 / 8) | 🟥 28.6%<br>(2 / 7) | 🟥 0% | – | – | – | **0 / 3** |
-| 261012_7_code<br>v2 data, 3.7% upcoders, every upcoder clones notes | 42 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟥 50.0%<br>(4 / 8) | 🟩 2.4%<br>(5 / 208) | 🟥 44% | – | – | – | **1 / 3** |
-| 261012_7_code<br>v2 data, 3.7% upcoders, every upcoder clones notes | 42 | Rules | Documented level below billed in over 15% of returned charts | Yes | 🟥 100.0%<br>(8 / 8) | 🟩 0.0%<br>(0 / 5) | – | – | – | – | **1 / 2** |
-| 261012_7_code<br>v2 data, 3.7% upcoders, every upcoder clones notes | 42 | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | Yes | 🟥 87.5%<br>(7 / 8) | 🟥 20.0%<br>(1 / 5) | 🟥 50% | – | – | – | **0 / 3** |
+| Run | Seed | Screen / AI | Tuning | Records evidence | False negative rate | False positive rate | Precision of upcoding calls | Citations valid | Case Summary Usefulness (1-5) | Evals passed |
+|---|---|---|---|---|---|---|---|---|---|---|
+| **Threshold** | | | | | at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% | at least 4 | |
+| Screen only | 42 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟩 0.0%<br>(0 / 8) | 🟩 1.4%<br>(3 / 208) | 🟥 73% | – | – | **2 / 3** |
+| 261008_2_cc<br>one agent for all 25 | 42 | Screen | Top 25 upcoding outliers | No | 🟩 0.0%<br>(0 / 8) | 🟩 8.2%<br>(17 / 208) | 🟥 32% | – | – | **2 / 3** |
+| 261008_2_cc<br>one agent for all 25 | 42 | AI | AI calls upcoding (screen: top 25 upcoding outliers) | No | 🟩 12.5%<br>(1 / 8) | 🟥 58.8%<br>(10 / 17) | 🟥 41% | 🟩 100% | – | **2 / 4** |
+| 261008_3_cc | 42 | Screen | Top 25 upcoding outliers | No | 🟩 0.0%<br>(0 / 8) | 🟩 8.2%<br>(17 / 208) | 🟥 32% | – | – | **2 / 3** |
+| 261008_3_cc | 42 | AI | AI calls upcoding (screen: top 25 upcoding outliers) | No | 🟩 0.0%<br>(0 / 8) | 🟥 82.4%<br>(14 / 17) | 🟥 36% | 🟩 100% | – | **2 / 4** |
+| 261008_4_cc | 42 | Screen | Top 25 upcoding outliers | No | 🟩 0.0%<br>(0 / 8) | 🟩 8.2%<br>(17 / 208) | 🟥 32% | – | – | **2 / 3** |
+| 261008_4_cc | 42 | AI | AI calls upcoding (screen: top 25 upcoding outliers) | Yes | 🟩 0.0%<br>(0 / 8) | 🟩 0.0%<br>(0 / 17) | 🟩 100% | 🟩 100% | – | **4 / 4** |
+| **261009_1_api** | 42 | Screen | Top 25 upcoding outliers | No | 🟩 0.0%<br>(0 / 8) | 🟩 8.2%<br>(17 / 208) | 🟥 32% | – | – | **2 / 3** |
+| **261009_1_api** | 42 | AI | AI calls upcoding (screen: top 25 upcoding outliers) | Yes | 🟩 0.0%<br>(0 / 8) | 🟩 0.0%<br>(0 / 17) | 🟩 100% | 🟩 100% | 🟥 3.44 | **4 / 5** |
+| Screen only | 101 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟩 0.0%<br>(0 / 8) | 🟩 0.5%<br>(1 / 208) | 🟩 89% | – | – | **3 / 3** |
+| **261009_2_api**<br>held-out API run | 101 | Screen | Top 25 upcoding outliers | No | 🟩 0.0%<br>(0 / 8) | 🟩 8.2%<br>(17 / 208) | 🟥 32% | – | – | **2 / 3** |
+| **261009_2_api**<br>held-out API run | 101 | AI | AI calls upcoding (screen: top 25 upcoding outliers) | Yes | 🟩 0.0%<br>(0 / 8) | 🟩 0.0%<br>(0 / 17) | 🟩 100% | 🟩 100% | 🟥 3.24 | **4 / 5** |
+| 261012_1_code<br>v2 data, 3.7% upcoders (8 of 216), half clone notes | 42 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟥 25.0%<br>(2 / 8) | 🟩 3.4%<br>(7 / 208) | 🟥 46% | – | – | **1 / 3** |
+| 261012_1_code<br>v2 data, 3.7% upcoders (8 of 216), half clone notes | 42 | Rules | Documented level below billed in over 15% of returned charts | Yes | 🟥 75.0%<br>(6 / 8) | 🟩 0.0%<br>(0 / 7) | 🟩 100% | – | – | **2 / 3** |
+| 261012_1_code<br>v2 data, 3.7% upcoders (8 of 216), half clone notes | 42 | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | Yes | 🟥 62.5%<br>(5 / 8) | 🟥 14.3%<br>(1 / 7) | 🟥 75% | – | – | **0 / 3** |
+| 261012_2_code<br>v2 data, held-out seed, 3.7% upcoders, half clone notes | 101 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟥 50.0%<br>(4 / 8) | 🟩 2.4%<br>(5 / 208) | 🟥 44% | – | – | **1 / 3** |
+| 261012_2_code<br>v2 data, held-out seed, 3.7% upcoders, half clone notes | 101 | Rules | Documented level below billed in over 15% of returned charts | Yes | 🟥 87.5%<br>(7 / 8) | 🟩 0.0%<br>(0 / 5) | 🟩 100% | – | – | **2 / 3** |
+| 261012_2_code<br>v2 data, held-out seed, 3.7% upcoders, half clone notes | 101 | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | Yes | 🟥 75.0%<br>(6 / 8) | 🟩 0.0%<br>(0 / 5) | 🟩 100% | – | – | **2 / 3** |
+| 261012_3_code<br>v2 data, 0.5% upcoders (3 of 600), half clone notes | 7 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟥 33.3%<br>(1 / 3) | 🟩 3.4%<br>(20 / 597) | 🟥 9% | – | – | **1 / 3** |
+| 261012_3_code<br>v2 data, 0.5% upcoders (3 of 600), half clone notes | 7 | Rules | Documented level below billed in over 15% of returned charts | Yes | 🟥 100.0%<br>(3 / 3) | 🟩 0.0%<br>(0 / 20) | – | – | – | **1 / 2** |
+| 261012_3_code<br>v2 data, 0.5% upcoders (3 of 600), half clone notes | 7 | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | Yes | 🟥 100.0%<br>(3 / 3) | 🟥 15.0%<br>(3 / 20) | 🟥 0% | – | – | **0 / 3** |
+| 261012_4_code<br>v2 data, 1% upcoders (6 of 600), half clone notes | 7 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟥 50.0%<br>(3 / 6) | 🟩 2.9%<br>(17 / 594) | 🟥 15% | – | – | **1 / 3** |
+| 261012_4_code<br>v2 data, 1% upcoders (6 of 600), half clone notes | 7 | Rules | Documented level below billed in over 15% of returned charts | Yes | 🟥 100.0%<br>(6 / 6) | 🟩 0.0%<br>(0 / 17) | – | – | – | **1 / 2** |
+| 261012_4_code<br>v2 data, 1% upcoders (6 of 600), half clone notes | 7 | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | Yes | 🟥 50.0%<br>(3 / 6) | 🟩 5.9%<br>(1 / 17) | 🟥 75% | – | – | **1 / 3** |
+| 261012_5_code<br>v2 data, 2% upcoders (12 of 600), half clone notes | 7 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟥 16.7%<br>(2 / 12) | 🟩 2.2%<br>(13 / 588) | 🟥 43% | – | – | **1 / 3** |
+| 261012_5_code<br>v2 data, 2% upcoders (12 of 600), half clone notes | 7 | Rules | Documented level below billed in over 15% of returned charts | Yes | 🟥 75.0%<br>(9 / 12) | 🟩 0.0%<br>(0 / 13) | 🟩 100% | – | – | **2 / 3** |
+| 261012_5_code<br>v2 data, 2% upcoders (12 of 600), half clone notes | 7 | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | Yes | 🟥 66.7%<br>(8 / 12) | 🟩 7.7%<br>(1 / 13) | 🟩 80% | – | – | **2 / 3** |
+| 261012_6_code<br>v2 data, 3.7% upcoders, nobody clones notes | 42 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟥 25.0%<br>(2 / 8) | 🟩 3.4%<br>(7 / 208) | 🟥 46% | – | – | **1 / 3** |
+| 261012_6_code<br>v2 data, 3.7% upcoders, nobody clones notes | 42 | Rules | Documented level below billed in over 15% of returned charts | Yes | 🟥 25.0%<br>(2 / 8) | 🟩 0.0%<br>(0 / 7) | 🟩 100% | – | – | **2 / 3** |
+| 261012_6_code<br>v2 data, 3.7% upcoders, nobody clones notes | 42 | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | Yes | 🟥 100.0%<br>(8 / 8) | 🟥 28.6%<br>(2 / 7) | 🟥 0% | – | – | **0 / 3** |
+| 261012_7_code<br>v2 data, 3.7% upcoders, every upcoder clones notes | 42 | Screen | Z-score of risk-adjusted coding >= 5 | No | 🟥 50.0%<br>(4 / 8) | 🟩 2.4%<br>(5 / 208) | 🟥 44% | – | – | **1 / 3** |
+| 261012_7_code<br>v2 data, 3.7% upcoders, every upcoder clones notes | 42 | Rules | Documented level below billed in over 15% of returned charts | Yes | 🟥 100.0%<br>(8 / 8) | 🟩 0.0%<br>(0 / 5) | – | – | – | **1 / 2** |
+| 261012_7_code<br>v2 data, 3.7% upcoders, every upcoder clones notes | 42 | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | Yes | 🟥 87.5%<br>(7 / 8) | 🟥 20.0%<br>(1 / 5) | 🟥 50% | – | – | **0 / 3** |
 <!-- scoreboard:end -->
 
 This table is generated from the saved outputs (`python docs/update_readme.py`). Usefulness is scored by an LLM judge (`eval/judge_usefulness.py`, a different model from the writer), so it is a rough rubric check. Run outputs are in `experiments/`; the naming is explained in `experiments/README.md`.

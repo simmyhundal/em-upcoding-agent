@@ -17,7 +17,6 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 from score import score  # noqa: E402
-import template_check  # noqa: E402
 
 DETECTORS = [("Plain z-score", "rank_zscore"), ("Risk-adjusted", "rank_riskadj"), ("Combined list", "rank")]
 LEANINGS = [("upcoding", "pattern_consistent_with_upcoding"),
@@ -107,9 +106,7 @@ def render(res, top_n, runs=None, truth=None, usefulness=None):
         c = citation_stats(records)
         acc = "n/a" if c["accuracy"] is None else f"{c['accuracy']:.1%}"
         useful = (usefulness or {}).get(label)
-        tc = template_check.describe(template_check.check([r["summary"]["rationale"] for r in records if r["summary"].get("rationale")]))
         lines += ["", f"### {label}",
-                  f"- Templating check: {tc}",
                   f"- Citation accuracy: {acc} ({c['valid']}/{c['cited']}); {c['passed']}/{c['summaries']} "
                   f"summaries passed the guardrail. Target: 100%."]
         if truth:

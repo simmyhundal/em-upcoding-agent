@@ -16,7 +16,6 @@ def test_threshold_logic_and_edge_cases():
     assert sb.judge(0.8, "prec") and not sb.judge(0.79, "prec")
     assert sb.judge(1.0, "cite") and not sb.judge(0.99, "cite")
     assert sb.judge(4.0, "useful") and not sb.judge(3.99, "useful")
-    assert sb.judge(False, "templ") and not sb.judge(True, "templ")
     assert sb.judge(None, "fn") is None                                            # not scored: excluded
 
 

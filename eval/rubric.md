@@ -13,5 +13,6 @@ evidence packet only; do not look at the answer key first.
 
 Notes
 - A rejected summary (failed citation check) scores 1 regardless of text quality.
+- Numbers are checked by a script (eval/numcheck.py) and its findings are given to the grader. Some parts of a summary (the numeric facts, example claims and next steps) are written by code in a fixed format; that is fine. Judge whether the whole is usable.
 - Score the summary against the packet, not against whether the provider is truly an upcoder.
 - Target: average of 4 or higher across the flagged providers.

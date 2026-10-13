@@ -41,7 +41,7 @@ def test_judge_prompt_has_rubric_packet_and_summary_but_no_answer_key():
     out = ju.run(D, FLAGGED, _checked([True, True, True]), os.path.join(D, "o.jsonl"), llm=fake)
     assert len(out) == 3 and all(r["score"] == 4 for r in out)
     for u in seen:
-        assert "RUBRIC" in u and "EVIDENCE PACKET" in u and "SUMMARY TO GRADE" in u
+        assert "RUBRIC" in u and "EVIDENCE CARD" in u and "SUMMARY TO GRADE" in u and "number check" in u
         for leak in ("hard_negative", "upgrade_fraction", "ground_truth"):
             assert leak not in u
 
@@ -54,6 +54,22 @@ def test_rejected_summaries_score_one_without_a_model_call():
         return json.dumps({"score": 5, "justification": "ok", "problems": []})
     out = ju.run(D, FLAGGED, _checked([True, False, True]), os.path.join(D, "o2.jsonl"), llm=fake)
     assert [r["score"] for r in out] == [5, 1, 5] and len(calls) == 2 and out[1]["judge"] is None
+
+
+def test_unverified_numbers_are_reported_to_the_judge_and_in_the_output():
+    path = os.path.join(D, "checked_bad.jsonl")
+    with open(path, "w") as f:
+        f.write(json.dumps({"provider_id": ROWS[0]["provider_id"], "citation_check": {"passed": True, "n_cited": 1, "n_valid": 1, "reason": ""},
+                            "summary": {"headline": "h", "leaning": "inconclusive", "rationale": "Billed 987654.32 of everything.",
+                                        "cited_claim_ids": ["C0000001"], "next_steps": []}}) + "\n")
+    seen = []
+
+    def fake(system, user):
+        seen.append(user)
+        return json.dumps({"score": 3, "justification": "ok", "problems": []})
+    out = ju.run(D, FLAGGED, path, os.path.join(D, "o3.jsonl"), llm=fake)
+    assert out[0]["unverified_numbers"] == ["987654.32"] and "987654.32" in seen[0]
+    assert ju.summarize(out)["summaries_with_all_numbers_verified"] == 0.0
 
 
 def test_summarize():

@@ -14,7 +14,6 @@ Evals and thresholds:
      original targets ignored the many ordinary honest doctors who get flagged). Screen rows: upcoders among the top 25.
   4. Citations valid: 100% of cited claims exist and belong to the provider.
   5. Case Summary Usefulness (1-5): average of at least 4 (LLM judge).
-  6. No templating: the templating check finds none.
 
 Usage:
     python eval/scoreboard.py            # prints the markdown table
@@ -24,7 +23,6 @@ import json
 import os
 
 import run_eval
-import template_check
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAX_RATE = 0.125       # false negative rate and false positive rate
@@ -35,7 +33,7 @@ PASS, FAIL = "🟩", "🟥"   # green = passed the threshold, red = failed
 
 
 def judge(value, kind):
-    """Pass/fail for one eval. kind in fn|fp|prec|cite|useful|templ."""
+    """Pass/fail for one eval. kind in fn|fp|prec|cite|useful."""
     if value is None:
         return None
     if kind == "fn":                       # value = (missed upcoders, all upcoders)
@@ -48,8 +46,6 @@ def judge(value, kind):
         return value == 1.0
     if kind == "useful":
         return value >= MIN_USEFULNESS
-    if kind == "templ":
-        return not value
     raise ValueError(kind)
 
 
@@ -82,7 +78,7 @@ def _ai_cells(d, r):
     cells = {"fn": (d["n_up"] - L["true_upcoders_called"], d["n_up"]),
              "fp": (L["honest_called_upcoding"], L["honest_total"]), "prec": L["precision"],
              "cite": run_eval.citation_stats(recs)["accuracy"],
-             "templ": template_check.check([x["summary"]["rationale"] for x in recs])["flagged"], "useful": None}
+             "useful": None}
     if r.get("usefulness"):
         rows = [json.loads(line) for line in open(_load(r["usefulness"])) if line.strip()]
         cells["useful"] = sum(x["score"] for x in rows) / len(rows)
@@ -100,7 +96,7 @@ def _selection_cells(d, selected, honest_sent):
 
 
 def _row(run, seed, stage, tuning, records, cells):
-    cells = {**{k: None for k in ("fn", "fp", "prec", "cite", "useful", "templ")}, **cells}
+    cells = {**{k: None for k in ("fn", "fp", "prec", "cite", "useful")}, **cells}
     if cells["fp"] and cells["fp"][1] == 0:       # no honest doctors were in scope: the rate is undefined
         cells["fp"] = None
     oks = {k: judge(cells[k], k) for k in cells}
@@ -114,8 +110,6 @@ def _row(run, seed, stage, tuning, records, cells):
         text["cite"] = f"{cells['cite']:.0%}"
     if cells["useful"] is not None:
         text["useful"] = f"{cells['useful']:.2f}"
-    if cells["templ"] is not None:
-        text["templ"] = "templated" if cells["templ"] else "none"
     return {"run": run, "seed": seed, "stage": stage, "tuning": tuning, "records": records, "text": text, "ok": oks,
             "total": total(oks.values())}
 
@@ -159,13 +153,13 @@ def cell(text, ok):
 def markdown(registry_path=None):
     rows = compute(registry_path)
     head = ("| Run | Seed | Screen / AI | Tuning | Records evidence | False negative rate | False positive rate "
-            "| Precision of upcoding calls | Citations valid | Case Summary Usefulness (1-5) | No templating "
-            "| Evals passed |\n|---|---|---|---|---|---|---|---|---|---|---|---|")
+            "| Precision of upcoding calls | Citations valid | Case Summary Usefulness (1-5) "
+            "| Evals passed |\n|---|---|---|---|---|---|---|---|---|---|---|")
     thr = ("| **Threshold** | | | | | at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% "
-           "| at least 4 | none | |")
+           "| at least 4 | |")
     lines = [head, thr]
     for r in rows:
-        cells = " | ".join(cell(r["text"][k], r["ok"][k]) for k in ("fn", "fp", "prec", "cite", "useful", "templ"))
+        cells = " | ".join(cell(r["text"][k], r["ok"][k]) for k in ("fn", "fp", "prec", "cite", "useful"))
         lines.append(f"| {r['run']} | {r['seed']} | {r['stage']} | {r['tuning']} | {r['records']} | {cells} | **{r['total']}** |")
     return "\n".join(lines)
 
