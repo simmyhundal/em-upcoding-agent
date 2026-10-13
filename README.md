@@ -303,6 +303,7 @@ Live from this repository's [milestones](https://github.com/simmyhundal/em-upcod
 - ![M5: Realistic plan inputs (v2 data model)](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/5) A new version of the tool whose inputs look like what a health plan actually holds, in the shapes plans store them, instead of the simplified CSVs used so far.
 - ![M6: Autonomous investigator agent](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/6) Turn the workflow (code fixes the order, one LLM step) into an agent that chooses which tools to use to find upcoders.
 - ![Backlog (v2.1)](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/7) Work deferred past the v2.0 freeze.
+- ![M7: Recovery and downstream actions](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/8) Simulate what happens after a provider is finally flagged (recovery sampling, deficient responses, extrapolated overpayment, notices) so results cover recovery and other downstream uses, not only advising which providers to look at.
 <!-- roadmap:end -->
 
 ### Repo layout
