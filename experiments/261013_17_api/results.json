@@ -1,0 +1,17 @@
+{
+ "run": "261013_17_api",
+ "screen_run": "261013_4_code",
+ "screen_tool": true,
+ "stop_reason": "submitted",
+ "tool_calls": 41,
+ "estimated_usd": 0.2907,
+ "providers_with_findings": 11,
+ "providers_called_upcoding": 2,
+ "upcoders_found": 2,
+ "honest_called_upcoding": 0,
+ "upcoders_total": 8,
+ "records_requests_to_honest": 6,
+ "records_requests_total": 11,
+ "rounds_on_honest": 9,
+ "citation_accuracy": 1.0
+}

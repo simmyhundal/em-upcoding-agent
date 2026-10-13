@@ -454,48 +454,104 @@
    "dataset": "r202",
    "kind": "agent",
    "source": "api",
-   "version": "agent-dev",
+   "version": "v3.0",
    "tuning": "Agent with the screen tool",
    "notes": "investigator agent, reserved seed",
    "records": true,
    "checked": "experiments/261013_8_api/case_summaries_checked.jsonl",
-   "transcript": "experiments/261013_8_api/office_transcript.jsonl"
+   "transcript": "experiments/261013_8_api/office_transcript.jsonl",
+   "usefulness": "experiments/261013_8_api/usefulness.jsonl"
   },
   {
    "run": "261013_9_api",
    "dataset": "r303",
    "kind": "agent",
    "source": "api",
-   "version": "agent-dev",
+   "version": "v3.0",
    "tuning": "Agent with the screen tool",
    "notes": "investigator agent, reserved seed",
    "records": true,
    "checked": "experiments/261013_9_api/case_summaries_checked.jsonl",
-   "transcript": "experiments/261013_9_api/office_transcript.jsonl"
+   "transcript": "experiments/261013_9_api/office_transcript.jsonl",
+   "usefulness": "experiments/261013_9_api/usefulness.jsonl"
   },
   {
    "run": "261013_10_api",
    "dataset": "r202",
    "kind": "agent",
    "source": "api",
-   "version": "agent-dev",
+   "version": "v3.0",
    "tuning": "Agent without the screen tool",
    "notes": "investigator agent, reserved seed",
    "records": true,
    "checked": "experiments/261013_10_api/case_summaries_checked.jsonl",
-   "transcript": "experiments/261013_10_api/office_transcript.jsonl"
+   "transcript": "experiments/261013_10_api/office_transcript.jsonl",
+   "usefulness": "experiments/261013_10_api/usefulness.jsonl"
   },
   {
    "run": "261013_11_api",
    "dataset": "r303",
    "kind": "agent",
    "source": "api",
-   "version": "agent-dev",
+   "version": "v3.0",
    "tuning": "Agent without the screen tool",
    "notes": "investigator agent, reserved seed",
    "records": true,
    "checked": "experiments/261013_11_api/case_summaries_checked.jsonl",
-   "transcript": "experiments/261013_11_api/office_transcript.jsonl"
+   "transcript": "experiments/261013_11_api/office_transcript.jsonl",
+   "usefulness": "experiments/261013_11_api/usefulness.jsonl"
+  },
+  {
+   "run": "261013_16_api",
+   "dataset": "r202",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.0",
+   "tuning": "Agent with the screen tool",
+   "notes": "repeat of 261013_8_api (same seed, same settings) to measure run-to-run variation",
+   "records": true,
+   "checked": "experiments/261013_16_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261013_16_api/office_transcript.jsonl",
+   "usefulness": "experiments/261013_16_api/usefulness.jsonl"
+  },
+  {
+   "run": "261013_17_api",
+   "dataset": "r202",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.0",
+   "tuning": "Agent with the screen tool",
+   "notes": "repeat of 261013_8_api (same seed, same settings) to measure run-to-run variation",
+   "records": true,
+   "checked": "experiments/261013_17_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261013_17_api/office_transcript.jsonl",
+   "usefulness": "experiments/261013_17_api/usefulness.jsonl"
+  },
+  {
+   "run": "261013_18_api",
+   "dataset": "r303",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.0",
+   "tuning": "Agent with the screen tool",
+   "notes": "repeat of 261013_9_api (same seed, same settings) to measure run-to-run variation",
+   "records": true,
+   "checked": "experiments/261013_18_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261013_18_api/office_transcript.jsonl",
+   "usefulness": "experiments/261013_18_api/usefulness.jsonl"
+  },
+  {
+   "run": "261013_19_api",
+   "dataset": "r303",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.0",
+   "tuning": "Agent with the screen tool",
+   "notes": "repeat of 261013_9_api (same seed, same settings) to measure run-to-run variation",
+   "records": true,
+   "checked": "experiments/261013_19_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261013_19_api/office_transcript.jsonl",
+   "usefulness": "experiments/261013_19_api/usefulness.jsonl"
   }
  ],
  "data_descriptions": {
