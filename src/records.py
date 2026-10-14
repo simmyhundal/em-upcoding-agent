@@ -36,6 +36,16 @@ DOC_COLS = ["claim_id", "documented_mdm_level", "documented_minutes", "documente
             "documented_data_level", "documented_risk_level"]
 
 
+def write_docs(path, rows):
+    """Write documentation rows; the data v2.1 note columns are added when rows carry them."""
+    import note_checks
+    cols = DOC_COLS + note_checks.NOTE_DOC_COLS if any("note_id" in r for r in rows) else DOC_COLS
+    with open(path, "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=cols, restval="")
+        w.writeheader()
+        w.writerows(rows)
+
+
 def mdm_level(problems, data, risk):
     """Two of the three elements must reach a level: the second-highest element."""
     return sorted([problems, data, risk])[1]

@@ -40,10 +40,11 @@ Features roughly mirror one another: a change lands in both streams, or is marke
 
 | Feature (issue) | v2.1 workflow | v3.1 agent | Reason if one-sided |
 |---|---|---|---|
-| Richer claim-versus-note checks (#57) | planned | planned | |
+| Richer claim-versus-note checks (#57) | built: note rule, office 2.1 policy (`eval/workflow_policy_v21.py`); not yet evaluated | built: `note_checks` and `request_audit_trail` tools, prompt; not yet evaluated | |
 | Call the honest-notes upcoders we reach (#58) | planned | planned | |
 | Low base rate safeguards (#59) | planned | planned | |
 | Summary quality and judge calibration (#60) | planned | planned | |
+| Second records request (#67) | built (office 2.1; policy sends a targeted second request) | built (office 2.1) | |
 | Hybrid review (#49) | planned | planned (tool exists) | |
 | Screen cutoff choice (#48) | planned: budget-based rule | planned: agent chooses | mirrored by design |
 | Multi-seed paired evaluation (#61) | planned | planned | shared |

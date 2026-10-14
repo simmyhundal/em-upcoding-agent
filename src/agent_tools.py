@@ -40,8 +40,12 @@ def _doc_entry(row):
 
 class Environment:
     def __init__(self, v2_dir, view_dir, seed=1, model_call=None, records_budget=15, screen_enabled=True,
-                 correlation=0.0, roles=None):
-        """model_call(system, user) -> (json_text, usd) is used only inside hybrid_review and draft_summary; None = never call a model."""
+                 correlation=0.0, roles=None, version="3.0"):
+        """model_call(system, user) -> (json_text, usd) is used only inside hybrid_review and draft_summary; None = never call a model.
+        version "3.1" adds the note package (data v2.1): charts carry notes, a second request is allowed (random first, targeted after),
+        and the note_checks and request_audit_trail tools exist. "3.0" is the frozen agent."""
+        self.v31 = version == "3.1"
+        self.note_rows = {}
         self.view_dir, self.model_call, self.records_budget, self.screen_enabled = view_dir, model_call, records_budget, screen_enabled
         self.chronic, self.age, self.conditions, self.claims = cs.load(view_dir)
         self.rates = cs.peer_rates(self.claims, self.chronic)
@@ -61,7 +65,7 @@ class Environment:
                 if self.owner.get(r["claim_id"]) in self.control:
                     self.docs[r["claim_id"]] = _doc_entry(r)
                     self.facts[r["claim_id"]] = int(r["documented_data_level"])
-        self.office = provider_sim.Office(v2_dir, view_dir, seed=seed, correlation=correlation, roles=roles)
+        self.office = provider_sim.Office(v2_dir, view_dir, seed=seed, correlation=correlation, roles=roles, version="2.1" if self.v31 else "2.0")
         self.requested = set()
         self.spent_usd = 0.0
         self.findings = {}
@@ -73,12 +77,14 @@ class Environment:
 
     def _packet(self, pid):
         return cs.build_packet(pid, self.rows[pid], self.chronic, self.age, self.conditions, self.claims, self.rates,
-                               self.docs or None, self._peer_doc(), self.facts)
+                               self.docs or None, self._peer_doc(), self.facts, self.note_rows or None)
 
     def _absorb(self, pid):
         for row in self.office.documentation_rows():
             self.docs[row["claim_id"]] = _doc_entry(row)
             self.facts[row["claim_id"]] = int(row["documented_data_level"])
+            if row.get("note_id"):
+                self.note_rows[row["claim_id"]] = row
 
     def _chart_rule(self, pid):
         rows = self.claims.get(pid, [])
@@ -207,19 +213,42 @@ class Environment:
         st = self.office.state.get(provider_id)
         if not st or not st["requested"]:
             return {"error": "no records request for this provider"}
-        if st["sample_kind"] != "random":
+        ids = self.office.random_claim_ids(provider_id)
+        if not ids:
             return {"error": "the request was targeted; only a random sample supports extrapolation", "valid_for_extrapolation": False}
         rows = self.claims[provider_id]
         by_cpt = {r["claim_id"]: r["cpt"] for r in rows}
         plan = {"provider_id": provider_id, "frame_sizes": dict(Counter(r["cpt"] for r in rows)),
-                "sampled_claims": {c: by_cpt[c] for c in st["requested"]}}
-        reviewed = {c: (CODES[self.docs[c][0]] if c in self.docs else "") for c in st["requested"]}
+                "sampled_claims": {c: by_cpt[c] for c in ids}}
+        reviewed = {c: (CODES[self.docs[c][0]] if c in self.docs else "") for c in ids}
         allowed = {c: v["allowed_amount"] for c, v in json.load(open(ALLOWED))["codes"].items()}
         amounts = {r["claim_id"]: (float(r["allowed_amount"]), float(r["paid_amount"])) for r in rows if r.get("allowed_amount")}
         res = pe.estimate(plan, reviewed, allowed, 0.90, claim_amounts=amounts)
         return {"valid_for_extrapolation": True, "point_estimate": round(res["point_estimate"]), "ci_low": round(res["ci_low"]),
                 "ci_high": round(res["ci_high"]), "reviewed_claims": res["reviewed_claims"], "sampled_claims": res["sampled_claims"],
                 "caveat": "Draft arithmetic from a simulated review; a real recovery needs human review of the records."}
+
+    def note_checks(self, provider_id):
+        """Claim-versus-note signals on the notes already received (version 3.1): rates and example claims."""
+        if not self.v31:
+            return {"error": "tool not available"}
+        import note_checks as nc
+        rows = [r for c, r in self.note_rows.items() if self.owner.get(c) == provider_id]
+        if not rows:
+            return {"error": "no notes received for this provider"}
+        by_id = {r["claim_id"]: r for r in self.claims[provider_id]}
+        audit = any(r.get("created_ts") for r in rows)
+        sig = nc.signals_from_docs(rows, by_id, with_audit=audit)
+        return {"notes": sig["notes"], "audit_trail_received": audit, "rates": {k: (round(v, 3) if v is not None else None) for k, v in sig.items() if k in nc.SIGNALS},
+                "examples": {k: nc.flagged_claims(rows, by_id, k, 5, audit) for k in ("problems", "late", "unsigned", "data", "bulk_created", "paste_heavy")},
+                "reading": "Rates, not proof: honest practices also copy forward, sign late and miss orders at a baseline rate. Fewer than 8 notes gives no pattern signals."}
+
+    def request_audit_trail(self, provider_id, claim_ids):
+        if not self.v31:
+            return {"error": "tool not available"}
+        out = self.office.request_audit_trail(provider_id, claim_ids)
+        self._absorb(provider_id)
+        return out
 
     def submit_findings(self, findings):
         """findings: [{"provider_id", "leaning", "headline", "interpretation"}]. Stored as drafts; the run ends."""
@@ -271,12 +300,24 @@ class Environment:
              "input_schema": {"type": "object", "properties": pid, "required": ["provider_id"]}},
             {"name": "estimate_overpayment", "description": "Overpayment estimate for a provider from a RANDOM records sample.",
              "input_schema": {"type": "object", "properties": pid, "required": ["provider_id"]}},
+            *self._v31_tools(),
             {"name": "submit_findings", "description": "Submit your final findings and end the run. leaning is one of pattern_consistent_with_upcoding, "
              "pattern_consistent_with_high_acuity_panel, inconclusive. Include every provider you looked at closely; only 'upcoding' ones go to recovery.",
              "input_schema": {"type": "object", "properties": {"findings": {"type": "array", "items": {"type": "object", "properties": {
                  "provider_id": {"type": "string"}, "leaning": {"type": "string"}, "headline": {"type": "string"},
                  "interpretation": {"type": "string"}}, "required": ["provider_id", "leaning"]}}}, "required": ["findings"]}}]
         return tools
+
+    def _v31_tools(self):
+        if not self.v31:
+            return []
+        pid = {"provider_id": {"type": "string"}}
+        return [{"name": "note_checks", "description": "Claim-versus-note signals on the notes already received for a provider: how often the notes address fewer problems "
+                 "than their claimed level implies, show data review the claim cannot back, are unsigned, signed late, and (if an audit trail was received) bulk-created or paste-heavy. "
+                 "Rates, not proof; example claims are listed.", "input_schema": {"type": "object", "properties": pid, "required": ["provider_id"]}},
+                {"name": "request_audit_trail", "description": "Second-tier request for the EHR audit trail of charts already received (created and edited times, paste events). "
+                 "Costs a round and the office may refuse.", "input_schema": {"type": "object", "properties": {**pid, "claim_ids": {"type": "array", "items": {"type": "string"}}},
+                                                                             "required": ["provider_id", "claim_ids"]}}]
 
     def call(self, name, args):
         args = args or {}
@@ -288,6 +329,8 @@ class Environment:
               "follow_up_records": lambda: self.follow_up_records(args["provider_id"], args["addressed_codes"], claim_ids=args.get("claim_ids")),
               "close_records": lambda: self.close_records(args["provider_id"], args.get("reason", "")),
               "hybrid_review": lambda: self.hybrid_review(args["provider_ids"]),
+              "note_checks": lambda: self.note_checks(args["provider_id"]),
+              "request_audit_trail": lambda: self.request_audit_trail(args["provider_id"], args["claim_ids"]),
               "draft_summary": lambda: self.draft_summary(args["provider_id"]),
               "estimate_overpayment": lambda: self.estimate_overpayment(args["provider_id"]),
               "submit_findings": lambda: self.submit_findings(args["findings"])}.get(name)

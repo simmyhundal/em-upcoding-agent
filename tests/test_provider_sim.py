@@ -68,7 +68,7 @@ def test_cooperative_completes_and_evasive_can_end_non_responsive_without_usable
     e = office()
     pid = PIDS[1]
     _force(e, pid, "evasive")
-    e._round = lambda p, st, deadline, addressed: (st.update(round=st["round"] + 1), {"deficiencies": [], "status": "no_response"})[1]
+    e._round = lambda p, st, deadline, addressed, **kw: (st.update(round=st["round"] + 1), {"deficiencies": [], "status": "no_response"})[1]
     e.send_request(pid, SAMPLE)
     assert e.close_request(pid)["end_state"] == "non_responsive" and e.documentation_rows() == []
     packet = {"provider_id": pid, "documentation_review": {"claims_with_documentation": 0, "by_billed_level": []}}
@@ -105,6 +105,62 @@ def test_correlation_knob_changes_upcoder_behaviour_only_when_set():
     corr = [office(1, correlation=1.0, roles=roles)._behavior(p) for p in PIDS]
     assert base == same
     assert sum(b in ("evasive", "sloppy") for b in corr) > sum(b in ("evasive", "sloppy") for b in base)
+
+
+def _v21():
+    d, key = tempfile.mkdtemp(), os.path.join(tempfile.mkdtemp(), "k.json")
+    g.build(d, key, seed=9, n_providers=25, n_upcoders=3, n_hard_neg=2, data_version="2.1")
+    view = os.path.join(d, "view")
+    derive.build_view(d, view)
+    return d, view
+
+
+def test_office_v21_second_request_note_package_signatures_and_audit_trail():
+    d, view = _v21()
+    pids = sorted({r["provider_id"] for r in __import__("csv").DictReader(open(os.path.join(view, "claims.csv")))})
+    old = ps.Office(d, view, seed=1)
+    old.send_request(pids[0], SAMPLE)
+    assert "already open" in old.send_request(pids[0], {"kind": "targeted", "cpt": "99215", "n": 10})["error"]       # frozen behaviour
+    o = ps.Office(d, view, seed=1, version="2.1")
+    pid = pids[1]
+    o._st(pid)["behavior"] = "cooperative"
+    r1 = o.send_request(pid, {"kind": "random", "n": 20})
+    r2 = o.send_request(pid, {"kind": "targeted", "cpt": "99215", "n": 5})
+    assert "error" not in r2 and r2["sample_kinds"] == ["random", "targeted"] and r2["requested_total"] >= r1["requested_total"]
+    kinds = o._st(pid)["kinds"]
+    assert set(o.random_claim_ids(pid)) == {c for c, k in kinds.items() if k == "random"}
+    rows = o.documentation_rows()
+    assert rows and all("note_text" in r and "auth_status" in r and "order_count" in r for r in rows)
+    assert all(r["auth_status"] not in ("unsigned", "illegible") for r in rows)                    # those are held back until fixed
+    assert {c for c in o._st(pid)["usable"]} <= set(kinds)
+    ids = sorted(o._st(pid)["usable"])[:5]
+    a = o.request_audit_trail(pid, ids)
+    assert a["status"] in ("audit_trail_provided", "refused")
+    if a["status"] == "audit_trail_provided":
+        assert all(o._st(pid)["usable"][c]["created_ts"] for c in ids)
+    assert "not available" in old.request_audit_trail(pids[0], ids)["error"]
+
+
+def test_office_v21_unsigned_charts_are_held_back_then_attested_after_a_follow_up():
+    d, view = _v21()
+    notes = __import__("note_checks").load_notes(d)
+    bad = {c for c, p in notes.items() if p["auth"]["status"] in ("unsigned", "illegible")}
+    by = {}
+    for r in __import__("csv").DictReader(open(os.path.join(view, "claims.csv"))):
+        by.setdefault(r["provider_id"], []).append(r["claim_id"])
+    pid = next(p for p, ids in by.items() if len(set(ids) & bad) >= 1)
+    o = ps.Office(d, view, seed=1, version="2.1")
+    o._st(pid)["behavior"] = "cooperative"
+    target = sorted(set(by[pid]) & bad)[:1]
+    r = o.send_request(pid, {"kind": "targeted", "claim_ids": target})
+    if r["status"] not in ("complete", "partial"):
+        return
+    assert target[0] not in o._st(pid)["usable"] and any(x["code"] in ("MISSING_SIGNATURE", "ILLEGIBLE") for x in r["deficiencies"])
+    for _ in range(4):
+        r = o.follow_up(pid, ["MISSING_SIGNATURE", "ILLEGIBLE"]) if "error" not in r else r
+        if target[0] in o._st(pid)["usable"]:
+            assert o._st(pid)["usable"][target[0]]["auth_status"] == "attested"
+            return
 
 
 if __name__ == "__main__":

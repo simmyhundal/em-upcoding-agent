@@ -1,66 +1,62 @@
 # CLAUDE.md: start here
 
-Proof of concept that finds likely **E/M upcoding** (billing office-visit codes 99211-99215 higher than the visit justified) on **synthetic** Medicare-style claims. Read `README.md` first (plain English, with figures), then this file. The user keeps the work organized as GitHub issues grouped in milestones; follow that.
+Proof of concept that finds likely **E/M upcoding** (billing office-visit codes 99211-99215 higher than the visit justified) on **synthetic** Medicare-style claims, for SIU and Payment Integrity teams. The README is written for non-healthcare readers (recruiters at Akita Health among them): keep it plain, honest and current. Read `README.md`, then this file. The user runs the work as GitHub issues grouped in milestones; follow that. When this file and the repo disagree, check the repo and fix this file.
 
-## What the system is (get this framing right)
-Statistics screen, the AI filters and explains, code checks the AI, people decide. It is a **workflow with one LLM step**, not an autonomous agent: code controls the flow, the model gets no tools and is called at most once per flagged provider.
-1. `baseline_zscore.py`, `baseline_riskadj.py`, `flagging.py`: the statistical screen. Flags the top 25 (default) or everyone at or above `--min-suspicion S`.
-2. `case_summary.py` (with `summary_rules.py`): rules decide lopsided cases and write the summary by code; for the rest one model call per provider. The model reads a compact evidence card and returns a headline, an interpretation and an advisory **leaning** (upcoding / high-acuity panel / inconclusive). **The leaning is the second filter**: providers it calls upcoding are the suspected upcoders and the only ones that get recovery packets.
-3. `guardrail.py`: rejects summaries citing claims that do not exist or belong to another provider. It does NOT check that a cited claim supports the sentence citing it.
-4. `evidence_chart.py`, `case_report.py`, `pi_packet.py`, `pi_estimate.py`, `finalize_run.py`: reviewer materials and the Payment Integrity packet. Draft material for humans; never letters, findings or accusations.
-5. `eval/`: scores everything against an answer key (`run_eval.py`, `scoreboard.py`, `judge_usefulness.py`, `numcheck.py`, `threshold_sweep.py`).
+## The product has two designs, built side by side
+- **Workflow (v1 -> v2.x).** Code fixes the order of steps: statistical screen, request records, code-written facts and rule-decided clear cases, a model only where the rules are silent, citation and number checks, people review. Frozen baseline `v2.0`; next build `v2.1`.
+- **Agent (v3.x).** A model chooses its own tools and steps within caps (`src/agent.py`, `src/agent_tools.py`). Frozen baseline `v3.0`; next build `v3.1`. The user wants this line kept iterating (an agent should adapt to new data and situations); do not propose dropping it.
+- Features **mirror** across the streams; a change lands in both or is marked one-sided with a reason (`docs/versioning.md` table, issue #62). Baselines `v1.0`, `v2.0`, `v3.0` are tagged, released and never edited.
+- Honest result so far (reserved seeds 202/303, 16 upcoders): workflow found 6, agent 4, all with no honest doctor accused; the agent asked far fewer honest practices for records; nothing meets the 12.5% false-negative threshold. Biggest losses are cloned-note upcoders (found 0 to 1 of 8) and low base rates (v2.0 AI accused 5 of 20 honest doctors at 0.5% upcoders).
 
-**Known big limitation (state it, never hide it):** the AI is given a records-review sample (`documentation.csv`) before it decides. A real payer has only claims at screening time; records arrive after it requests them from the physician. Without that sample the AI accused 14 of 17 honest doctors; with it, 0 of 17. Results are therefore a ceiling. Version 2 data (`src/generate_v2.py`, `src/derive.py`, `src/records.py`, `docs/v2_schemas.md`) models records requests realistically; the AI has not yet been re-run on it.
+## Pipeline and file map
+`src/`: `generate_synthetic.py` (v1 data), `generate_v2.py` (plan-shaped v2 data; `--data-version 2.1` adds the note package via `notes_v21.py`), `derive.py` (conditions and risk from claims, the detector view), `baseline_zscore.py`, `baseline_riskadj.py`, `flagging.py` (the screen; top 25 or `--min-suspicion S`), `records.py` (records requests, chart reading, rules baselines), `provider_sim.py` (simulated practice; hidden behavior; office versions "2.0" frozen and "2.1"), `note_checks.py` (claim-versus-note signals), `summary_rules.py` (facts, citations, next steps and rule-decided leanings written by code; the compact evidence card), `case_summary.py` (rules first, then one batch model call per ambiguous provider), `llm.py` (Batch API, response cache, usage and cost log), `guardrail.py` (citations exist and belong to the provider; NOT that they support the sentence), `evidence_chart.py`, `case_report.py`, `pi_packet.py`, `pi_estimate.py`, `finalize_run.py`, `agent.py`, `agent_tools.py`.
+`eval/`: `run_eval.py`, `scoreboard.py` (writes `experiments/results.csv`), `judge_usefulness.py` (LLM judge, versions j1 and j2), `judge_rules.py` (deterministic judge v2.1), `numcheck.py`, `compare_judges.py`, `make_v2_runs.py` (code-only runs), `make_v2_ai_runs.py`, `make_v2_office_workflow_runs.py`, `run_agent.py`, `judge_agent_runs.py`, `rejudge_rules_all.py`, `run_office_baseline.py`, `workflow_policy_v21.py`, `note_signal_analysis.py`, `threshold_sweep.py`, `make_v2_sample_sweep.py`.
+`docs/`: `versioning.md` (versions, streams, seeds, parity table), `results_table.md` and `results.md` (column meanings and the full table), `v2_schemas.md`, `data_v2_1.md`, `note_signals.md`, `agent_tools.md`, `provider_sim.md`, `payment_integrity.md`, `sample_size_sweep.md`, `releases/` (release-note drafts), `make_figures.py` (all figures; per-version how-it-works SVGs, progression slide), `update_readme.py`.
+`experiments/`: one folder per run, `runs.json` (registry), `results.csv` (**source of truth for results**; the README renders from it), `README.md` index. `tests/`: plain scripts, no pytest.
 
-## Run, test, regenerate
-```bash
-for t in tests/test_*.py; do python3 $t >/dev/null 2>&1 && echo ok $t || echo FAIL $t; done   # no pytest installed; tests are plain scripts
-python3 eval/scoreboard.py --write     # recompute experiments/results.csv (the source of truth for results) from saved outputs; needs the answer keys
-python3 docs/update_readme.py          # render the README scoreboard from results.csv and refresh the roadmap (test fails if stale)
-python3 docs/make_figures.py           # rebuild README figures from saved outputs
-# gitignored data and answer keys, regenerate from seeds (needed by eval code and some tests):
-python3 src/generate_synthetic.py data/synthetic --seed 42
-python3 src/generate_synthetic.py data/synthetic_s101 --seed 101 --answer-key eval/answer_key/ground_truth_s101.json
-python3 src/finalize_run.py RUN_DIR DATA_DIR FLAGGED_CSV CHECKED_SUMMARIES   # charts/, cases/, pi_packets/ inside a run folder
-```
-Full pipeline for a run: generate data, `flagging.py`, `case_summary.py` (API), `guardrail.py`, `judge_usefulness.py` (API), `run_eval.py`, `finalize_run.py`.
+## Data versions and seeds
+- v1 data (`data/synthetic`, seeds 42 and 101): stored condition count, a records sample handed to the AI up front (unrealistic).
+- v2.0 data: plan tables, conditions derived from claims, charts only by records request; some upcoders **clone** notes (documented levels and time inflated to the bill). Frozen.
+- v2.1 data (built, issue #57): adds a note package (templated note text, signatures, orders and results, a second-tier audit trail), with tunable clone-signal strength. Claims and the records universe are identical to v2.0 for the same seed.
+- Seeds: 42 = development (thresholds tuned here), 101 and 7 = held-out for v2.0, 202 and 303 = used in the M6 evaluation (retired), **404, 505, 606 reserved** (never generate or look until the evaluation, #61). Tune only on development seeds.
+
+## Evaluation (read before reporting any number)
+- Thresholds: false negative rate and false positive rate at most 12.5% (false positive counts honest doctors a step actually faced), precision of upcoding calls at least 80% (proposed), citations 100%, usefulness at least 4. Templating is NOT checked (removed on purpose; code-written text is fine).
+- `results.csv` columns include seed status (development, held-out, reserved), source (api, cc, code), agents, data version and description, upcoder rate (never call the prevalence a "baseline"; "baseline" means a comparison arm), clone level, honest doctors sent records requests, request rounds, dollars overpaid to upcoders and dollars at stake in upcoders called (an upper bound on recovery, not recovered money), judge versions, and evals passed and scored. Different rows have different numbers of applicable evals (3 to 5); `evals_score_of_5` scales them.
+- Judges: j1 = LLM judge on the evidence card (all runs so far); j2 = LLM judge plus the tool outputs the author saw (built, not yet applied; re-judging is #65); j2.1 = fully deterministic defect scorer (free, correlates only about 0.15 with the LLM judge; informational, not a counted eval).
+- Compare arms on the same office and seeds; the v2.0 single-draw records request is NOT a fair baseline for the agent. Report one-doctor gaps as such (8 upcoders per seed).
 
 ## Rules that matter
-- **Answer key is eval-only.** `eval/answer_key/` is gitignored and outside `data/`. Only `eval/` code may read it. Never put roles, "justified" levels or labels in anything an agent or the model sees; tests check this.
-- **Money and keys.** Model calls go through the Batch API by default (half price) with a response cache under each run folder, and token usage plus estimated dollars are written next to the outputs (`usage_writer.jsonl`, `usage_judge.jsonl`). Code writes the numeric facts, cited claims and next steps, and decides obvious leanings by rule (`src/summary_rules.py`); the model sees a compact card and writes only a headline, a leaning and an interpretation for ambiguous cases. Run `python src/case_summary.py ... --estimate` first (token counting is free) and expect roughly $0.15 to $0.30 for a v2 writer run; the older v1 runs cost about $2. Do not start paid runs without the user's OK. The key is in `.env` (gitignored): never print, log, commit or ask for it; do not paste keys into chat.
-- **Be honest in outputs.** Report misses (usefulness is below its 4.0 target), say what is easier by construction (the documentation signal is generated from the same hidden truth that defines an upcoded visit), and say what is simulated. Do not tune a run after seeing it and then call it held out.
-- **Experiments are named `YYMMDD_X_Y`** (date, run number that day, `api` = the real pipeline, `cc` = mimicked with Claude Code agents). Each run folder is self-contained and never overwritten; `experiments/README.md` has the index, `experiments/runs.json` registers runs and `experiments/results.csv` holds their results (`docs/results_table.md`). The held-out run used tag `heldout-freeze-261009`.
-- **Work through issues.** One issue per change, tied to a milestone, closed from the commit message (`Closes #N`). End every commit with `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`. Commit and push only when asked or when the pattern in the conversation clearly calls for it.
-- **Scoreboard thresholds** (README "Eval"): false negative rate and false positive rate at most 12.5% (false positive rate counts honest doctors a step actually faced), precision of "upcoding" calls at least 80% (proposed), citations 100%, usefulness at least 4. Templated or code-written summary text is fine (the templating check was removed on purpose).
+- **Answer key is eval-only** (`eval/answer_key/`, gitignored, outside `data/`). Never put roles, justified levels or clone flags in anything an agent or the model sees; tests enforce it. The agent never reads it.
+- **Money and keys.** Do not start paid runs without the user's explicit OK, and state the estimate first (`case_summary.py --estimate` and token counting are free). Model calls use the Batch API with a response cache in each run folder; usage and estimated cost go in `usage_*.jsonl`. A writer run costs about $0.15 to $0.40, an agent run about $0.30 to $0.40 (capped at $3, 60 tool calls). The key is in `.env` (gitignored): never print, log, commit or ask for it.
+- **Be honest.** Report misses, say what is easier by construction (documents are generated from the truth that defines an upcoded visit), what is simulated, and what only one or two seeds show. Never tune after seeing a run and call it held out.
+- **Work through issues.** One change per issue, in a milestone; close from the commit (`Closes #N` on its own line per issue). End every commit with `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`. Commit and push when the user asks or the pattern clearly calls for it; GitHub releases publish to a public repo, so ask first.
+- **No letters or findings are generated** (no demand letters, no accusations). A templated records-request letter is a filed M7 idea (#69); demand and notice letters need legal review and are out of scope.
+- **Never edit a frozen baseline.** Behavior changes go behind a version flag (`Office(version="2.1")`, `Environment(version="3.1")`, judge versions, data `--data-version`) so v2.0 and v3.0 stay reproducible; verify by regenerating from the response cache and diffing.
 
-## Where things are
-| Path | What |
-|---|---|
-| `src/` | pipeline code (screen, flagging, summaries, guardrail, charts, packets); v2: `generate_v2.py`, `derive.py` (conditions and risk from claims, detector view), `records.py` (records requests, rules baselines) |
-| `eval/` | harness, scoreboard, judge, rubric, number check, sweeps; `answer_key/` is gitignored |
-| `data/baselines/` | small CMS-derived files (specialty mix, allowed amounts); `data/synthetic*/` gitignored |
-| `experiments/` | one folder per run plus `runs.json` and an index README |
-| `reports/` | latest screen and eval outputs (`flagged.csv`, `eval_report.md`), default charts and packets |
-| `docs/` | `synthetic_data.md`, `payment_integrity.md`, `threshold_sweep.md`, figures and the scripts that build them |
-| `tests/` | one script per area |
+## Domain facts used to design the simulation
+E/M level (99212 to 99215) comes from medical decision making (problems, data, risk; two of three must meet a level) or total time on the date of the visit, whichever supports the higher level. Nobody scores a visit at billing; contractors and plans request records later (Medicare ADR: 45 days from the letter, claim denies on day 46; signatures must be handwritten or electronic with date stamp, stamps and late signatures are not accepted, a signature log or attestation can cure a missing or illegible one). A random sample supports extrapolating an overpayment; a targeted one does not. Non-response is not evidence of upcoding but in practice the requested claims are denied or recouped (not yet simulated: #68). Chart fields in the model: see `docs/v2_schemas.md` and `docs/data_v2_1.md`.
+
+## The simulated provider office (`provider_sim.py`)
+Hidden behavior per practice (cooperative, slow, sloppy, evasive; independent of upcoder status unless `correlation` is set). Responses: complete, partial, wrong content, missing signature, wrong dates, illegible, clarification, extension, objection, no response. Caps: 3 rounds and 120 days (office 2.0), 5 rounds (2.1). Office 2.0 allows one request per provider (the agent hit that wall 1 to 6 times per run; #67 fixes it in 2.1 by allowing a second request, random first and targeted after); office 2.1 also attaches the note package, holds back unsigned or illegible notes until a follow-up, can report MISSING_RESULTS, and offers a second-tier audit-trail request that may be refused.
+
+## Commands
+```bash
+for t in tests/test_*.py; do python3 $t >/dev/null 2>&1 && echo ok $t || echo FAIL $t; done
+python3 eval/scoreboard.py --write      # recompute experiments/results.csv (needs the gitignored answer keys and data)
+python3 docs/update_readme.py           # render README table and roadmap, and docs/results.md (tests fail if stale)
+python3 docs/make_figures.py            # figures; python3 docs/make_release_notes.py for release drafts
+python3 src/generate_v2.py data/synthetic_v2 --seed 42 --answer-key eval/answer_key/ground_truth_v2.json [--data-version 2.1]
+python3 eval/make_v2_runs.py --only ID; python3 eval/make_v2_ai_runs.py --only ID   # reproduce runs from seeds (paid for the AI step)
+```
 
 ## Gotchas learned the hard way
-- macOS: `sed -i` needs `sed -i ''`; simplest is to edit files with Python. The shell resets its working directory between calls, so use absolute paths. `python3 -I` ignores user site-packages (numpy is installed there), so do not use `-I` for pipeline scripts.
-- `load_dotenv()` with no path fails in a stdin script; pass `../.env` or an explicit path.
-- The installed `anthropic` SDK (0.105) rejects a `fallbacks=` keyword; `case_summary.py` passes it via `extra_body`. Opus 5.5 accepts no sampling-temperature settings, so identical re-runs need a response cache (Issue 26). Check the `claude-api` skill before changing API calls.
-- No matplotlib: charts and figures are hand-written SVG. To look at one, serve the folder (`python3 -m http.server`) and open it in the browser pane; `qlmanage` thumbnails crop wide images.
-- The `gh` token has no `workflow` scope, so GitHub Actions files cannot be pushed. README freshness is enforced by `tests/test_scoreboard.py` and `docs/update_readme.py` instead.
-- Public CMS pages (ameli, data.cms.gov documents) may block scripted downloads; do not try to bypass bot checks.
-- The CMS file hides rows with 10 or fewer patients (small-cell suppression), so real shares are biased; the generator is calibrated only to the upper tail. Issue 8 is deprioritized on purpose.
+- macOS `sed -i` needs `sed -i ''`; editing with Python is simpler. The shell resets its working directory between calls (use absolute paths). zsh treats a bare `==` as a command in `echo`. `python3 -I` ignores user site-packages (numpy), so do not use `-I` for pipeline scripts.
+- `load_dotenv()` with no path fails in stdin scripts; pass `.env` explicitly. The `anthropic` SDK 0.105 rejects `fallbacks=`; pass it through `extra_body` (and note batches do not allow the server-side fallback; refusals retry synchronously). Opus 5.5 takes no sampling temperature, so reproducibility comes from the cache. Forced tool choice is not allowed. Check the `claude-api` skill before changing API calls.
+- Judge and agent runs that need the charts the agent saw rebuild them by replaying `audit.jsonl` against a fresh office (deterministic); changing office behavior breaks replay unless gated by version.
+- No matplotlib: figures are hand-written SVG; to look at one, serve the folder with `python3 -m http.server` and open it in the browser pane. The `gh` token cannot push workflow files, so README freshness is enforced by tests. Do not bypass bot checks on CMS pages. GitHub auto-close from commit messages can lag a few seconds and needs `Closes #N` per issue.
+- The CMS source hides rows with 10 or fewer patients; synthetic data is calibrated only to the upper tail (issue 8 deprioritized on purpose).
 
-## The agent (Milestone 6)
-`src/agent.py` (loop, caps, audit log), `src/agent_tools.py` (tools; payer-visible data only), `src/provider_sim.py` (simulated provider office), `eval/run_agent.py` (runs and scores one agent run; costs real money, capped at $3 by default; ask first), `docs/agent_tools.md`. The agent may never read `eval/answer_key/`; a test enforces it. The workflow baseline is `v2.0`.
-
-## Versions (read before changing code or data)
-`v1.0` is the held-out freeze of the version-1 workflow (commit 25f5ade); `v2.0` is the version-2 workflow (plan-shaped data, records requests, code-written summary parts, rules plus model); `v3.0` is the agent design on the v2 data model (the workflow stays frozen as the comparison arm). Every scoreboard row carries its code version. After `v2.0` the workflow is frozen: change it only as a `v2.x` patch that re-runs the affected rows, and never tune thresholds on the seeds already used (42, 101, 7). Seeds 202 and 303 were used in the Milestone 6 evaluation and are retired; 404, 505 and 606 are reserved, ungenerated. Details: `docs/versioning.md`.
-
-## Two streams (v2.x workflow, v3.x agent)
-Built in parallel with mirrored features; milestone "v2.1 and v3.1: parallel workflow and agent builds". Rule: a change lands in both streams or is marked one-stream-only with a reason in `docs/versioning.md`. Baselines `v2.0` and `v3.0` are frozen and never edited; evaluate new work on fresh seeds (404, 505, 606 and later) with the decision rules fixed in advance (#61); tune only on development seeds.
-
-## Open work
-Milestone 4 reduces API cost (log usage first: Issue 21). Milestone 5 is built and the AI has been run on v2 data (`eval/make_v2_runs.py` builds the code-only runs, `eval/make_v2_ai_runs.py` the AI runs, about $0.25 each); #36 (AI at low base rates) and #37 (sample-size sweep) stay open. Milestone 6 (agent) is built and evaluated once on reserved seeds 202 and 303 (README, "The agent"); open: usefulness of the agent's summaries, the recovery-phase simulation (#52), screen-tuning prompts (#48), the hybrid variants (#49). Do not re-tune on seeds 202 or 303 now that they have been seen. M6 is frozen at `v3.0`. Issues 18 and 19 improve the claim-support check and calibrate the AI grader against a person. Path A (LLM judges free-text clinical notes) is parked as Milestone 2.
+## Open work (check GitHub for the live list)
+- Milestone **"v2.1 and v3.1: parallel workflow and agent builds"**: #57 cloned notes (generator, checks, office wiring, workflow rule, agent tools built; fresh-seed evaluation not run), #58 call the honest-notes upcoders we reach, #59 low-base-rate safeguards, #60 summary quality, #61 multi-seed paired evaluation with decision rules fixed in advance (the thing that tests v2.1 and v3.1 on seeds 404, 505, 606+), #62 parity tracker, #63 next-step boilerplate contradicts findings, #65 re-judge earlier runs with judge j2, #66 agent must explain providers set aside, #67 second request (built in office 2.1), #48 agent chooses its cutoff, #49 hybrid review.
+- Milestone **M7 recovery and downstream actions**: #52 recovery phase, #68 non-response consequences, #69 draft records-request letter. Backlog (v2.1): #32 schema review by an 837/834/835 expert. Housekeeping milestone is closed. Issues 18 and 19 (claim-support check, judge calibration) and Path A (free-text notes judged by an LLM) remain parked.

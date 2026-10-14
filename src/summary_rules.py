@@ -52,6 +52,22 @@ def low_complexity_share_of_99215(packet):
     return (low / tot) if tot else None
 
 
+INFLATED_PROBLEMS, INFLATED_LATE, INFLATED_AUDIT = 0.35, 0.12, 0.08      # data v2.1 note signals; set on the development seed only
+MIN_NOTES_SIGNALS = 8
+
+
+def inflated_notes(packet):
+    """True when the returned notes look inflated: they address fewer problems than their claimed level implies AND show a second signal
+    (late signatures, or with an audit trail bulk creation or paste-heavy notes). Rates, not proof: honest providers show each at a baseline."""
+    ns = (packet.get("documentation_review") or {}).get("note_signals")
+    if not ns or ns["notes"] < MIN_NOTES_SIGNALS:
+        return False
+    r = ns["rates"]
+    second = (r.get("late") or 0) >= INFLATED_LATE or (ns["audit_trail_received"] and ((r.get("bulk_created") or 0) >= INFLATED_AUDIT
+                                                                                       or (r.get("paste_heavy") or 0) >= INFLATED_AUDIT))
+    return (r.get("problems") or 0) >= INFLATED_PROBLEMS and bool(second)
+
+
 def rule_leaning(packet):
     """Return (leaning or None, reason). None means ambiguous: ask the model."""
     if doc_total(packet) < MIN_DOCS_ANY:
@@ -69,6 +85,8 @@ def rule_leaning(packet):
             return None, "notes claim data reviewed that the claims do not show"
     if u >= UP_RATE and u >= UP_VS_PEER * peer:
         return UPCODING, f"{u:.0%} of {n} documented 99215 claims are below the billed level (peer rate {peer:.0%})"
+    if inflated_notes(packet):
+        return UPCODING, "the notes look inflated: they address fewer problems than their claimed level implies and show late signatures or audit-trail signs"
     if u <= max(LOW_RATE, LOW_VS_PEER * peer):
         exp = packet["expected_share_given_patient_complexity"]
         if exp and packet["share_99215"] <= MAX_EXCESS_FOR_ACUITY * exp:
@@ -87,6 +105,8 @@ def _pooled(packet, d):
     u = k / n
     if u >= POOL_UP_RATE and u >= UP_VS_PEER * peer:
         return UPCODING, f"{u:.0%} of {n} documented 99214 and 99215 claims are below the billed level (peer rate {peer:.0%})"
+    if inflated_notes(packet):
+        return UPCODING, "the notes look inflated: they address fewer problems than their claimed level implies and show late signatures or audit-trail signs"
     return None, "documented 99215 claims are too few and the pooled result is not lopsided"
 
 
@@ -110,6 +130,12 @@ def facts(packet):
                        + (f", against {peer:.0%} for the comparison providers." if peer is not None else "."))
         else:
             out.append("No documented 99215 claims came back.")
+        ns = d.get("note_signals")
+        if ns and ns["notes"] >= MIN_NOTES_SIGNALS:
+            r = ns["rates"]
+            bits = [f"{k.replace('_', ' ')} {r[k]:.0%}" for k in ("problems", "late", "unsigned", "data", "bulk_created", "paste_heavy") if r.get(k) is not None]
+            out.append(f"Note checks on {ns['notes']} returned notes (share showing each sign): " + ", ".join(bits) + "."
+                       + ("" if ns["audit_trail_received"] else " No audit trail was received."))
         if d.get("documented_data_reviewed_moderate_or_higher"):
             out.append(f"{d['of_those_with_no_lab_or_test_line_on_the_claim']} of {d['documented_data_reviewed_moderate_or_higher']} "
                        "notes claiming moderate-or-higher data reviewed had no lab or test line on the claim.")
@@ -261,6 +287,8 @@ def to_card(packet):
             "examples_99215_supported": _table(["claim_id", "billed", "mdm", "minutes"],
                                                [[e["claim_id"], e["billed_cpt"], e["documented_mdm_level"], e["documented_minutes"]]
                                                 for e in d["examples_99215_documentation_supports"]])}
+        if d.get("note_signals"):
+            card["documentation"]["note_signals"] = d["note_signals"]
         if "documented_data_reviewed_moderate_or_higher" in d:
             card["documentation"]["data_reviewed_moderate_plus"] = d["documented_data_reviewed_moderate_or_higher"]
             card["documentation"]["of_those_no_lab_on_claim"] = d["of_those_with_no_lab_or_test_line_on_the_claim"]

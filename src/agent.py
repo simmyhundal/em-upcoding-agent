@@ -41,6 +41,16 @@ When you are done, call submit_findings once with every provider you examined cl
 pattern_consistent_with_upcoding only when the evidence supports it. Be economical with tool calls."""
 
 
+SYSTEM_31 = SYSTEM + """
+
+Version 3.1 additions. Returned charts now include the note itself. After a random request you may send a second, targeted request to the same
+practice if the random sample could not show what you need (for example too few 99215 visits); take the random sample first. You have two more
+tools: note_checks (how the received notes compare with the claims: problems addressed against diagnoses, data review against orders and the
+claim's lab lines, signatures, late signing) and request_audit_trail (a second-tier request for the EHR audit trail; it costs a round and may be
+refused). Honest practices also copy forward, sign late and miss orders, so treat these as rates, not proof. For every provider on your candidate
+list that you set aside or never examined, say why in your findings."""
+
+
 def _cost(usage, price=(4.00, 20.00)):
     inp = getattr(usage, "input_tokens", 0) or 0
     out = getattr(usage, "output_tokens", 0) or 0
@@ -49,7 +59,7 @@ def _cost(usage, price=(4.00, 20.00)):
     return (inp * price[0] + out * price[1] + cr * PRICE_CACHE_READ + cw * PRICE_CACHE_WRITE) / 1e6
 
 
-def run_agent(env, task, client=None, model=MODEL, max_tool_calls=MAX_TOOL_CALLS, max_turns=MAX_TURNS, max_usd=MAX_USD,
+def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=MAX_TOOL_CALLS, max_turns=MAX_TURNS, max_usd=MAX_USD,
               out_dir=None, effort="medium", price_scale=1.0, log=print):
     """price_scale multiplies the Opus 5.5 list prices (use 0.025 for Haiku 5.5) so the dollar cap means dollars for the model used."""
     """Run the loop. Returns a dict with the stop reason, counts, dollars and the audit log."""
@@ -67,7 +77,7 @@ def run_agent(env, task, client=None, model=MODEL, max_tool_calls=MAX_TOOL_CALLS
             reason = "dollar cap"
             break
         turn += 1
-        resp = client.messages.create(model=model, max_tokens=8000, system=SYSTEM, tools=tools, messages=messages,
+        resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
                                       output_config={"effort": effort}, extra_body={"cache_control": {"type": "ephemeral"}})
         usd += _cost(resp.usage) * price_scale
         messages.append({"role": "assistant", "content": resp.content})

@@ -111,6 +111,18 @@ def load_docs(data_dir):
     return docs
 
 
+def load_note_rows(data_dir):
+    """claim_id -> full returned-chart row, when documentation.csv carries the data v2.1 note columns (else {})."""
+    path = os.path.join(data_dir, "documentation.csv")
+    out = {}
+    if os.path.exists(path):
+        with open(path) as f:
+            for r in csv.DictReader(f):
+                if r.get("note_id"):
+                    out[r["claim_id"]] = r
+    return out
+
+
 def load_doc_facts(data_dir):
     """claim_id -> documented data-reviewed level (0-4), when the documentation file carries it (v2 records requests)."""
     path = os.path.join(data_dir, "documentation.csv")
@@ -184,7 +196,7 @@ def doc_peer_rates(claims, docs, only=None):
     return {c: (bad[c] / tot[c] if tot[c] else None) for c in tot}
 
 
-def doc_section(rows, docs, rng, peer_doc, facts=None):
+def doc_section(rows, docs, rng, peer_doc, facts=None, note_rows=None):
     got = [r for r in rows if r["claim_id"] in docs]
     table = []
     for cpt in ["99213", "99214", "99215"]:
@@ -206,13 +218,23 @@ def doc_section(rows, docs, rng, peer_doc, facts=None):
         high = [r for r in got if facts.get(r["claim_id"], 0) >= 3]
         extra = {"documented_data_reviewed_moderate_or_higher": len(high),
                  "of_those_with_no_lab_or_test_line_on_the_claim": sum(r.get("has_test_line") == "0" for r in high)}
+    if note_rows:
+        import note_checks
+        by_id = {r["claim_id"]: r for r in rows}
+        mine = [note_rows[r["claim_id"]] for r in got if r["claim_id"] in note_rows]
+        audit = any(x.get("created_ts") for x in mine)
+        sig = note_checks.signals_from_docs(mine, by_id, with_audit=audit)
+        extra["note_signals"] = {"notes": sig["notes"], "audit_trail_received": audit,
+                                 "rates": {k: (round(v, 3) if v is not None else None) for k, v in sig.items() if k in note_checks.SIGNALS},
+                                 "examples": {k: note_checks.flagged_claims(mine, by_id, k, 3, audit) for k in ("problems", "late", "unsigned", "data", "bulk_created", "paste_heavy")
+                                              if sig.get(k)}}
     return {"claims_with_documentation": len(got), "share_of_claims_documented": round(len(got) / len(rows), 3),
             **extra, "by_billed_level": table,
             "examples_documentation_below_billed_level": [card(r) for r in sample_claims(rng, unsup, DOC_UNSUPPORTED_SAMPLE, lambda r: r["cpt"])],
             "examples_99215_documentation_supports": [card(r) for r in sample_claims(rng, sup, DOC_SUPPORTED_SAMPLE, lambda r: 0)]}
 
 
-def build_packet(pid, flag_row, chronic, age, conditions, claims, peer_rate, docs=None, peer_doc=None, facts=None):
+def build_packet(pid, flag_row, chronic, age, conditions, claims, peer_rate, docs=None, peer_doc=None, facts=None, note_rows=None):
     rows = claims[pid]
     mix = Counter(r["cpt"] for r in rows)
     by_bucket = defaultdict(lambda: [0, 0])
@@ -254,7 +276,7 @@ def build_packet(pid, flag_row, chronic, age, conditions, claims, peer_rate, doc
         "99215_claims_on_low_complexity_patients_0_or_1_conditions": low,
         "99215_claims_on_high_complexity_patients_4_plus_conditions": high,
         "comparison_claims_other_than_99215_random_sample": comparison,
-        **({"documentation_review": doc_section(rows, docs, rng, peer_doc or {}, facts)} if docs else {}),
+        **({"documentation_review": doc_section(rows, docs, rng, peer_doc or {}, facts, note_rows)} if docs else {}),
     }
 
 
@@ -287,6 +309,7 @@ def run(data_dir, flagged_csv, out_path, limit=None, dry_run=False, llm=None, ba
     docs = load_docs(data_dir)
     peer_doc = doc_peer_rates(claims, docs, control_providers(data_dir)) if docs else None
     facts = load_doc_facts(data_dir)
+    note_rows = load_note_rows(data_dir)
     with open(flagged_csv) as f:
         flagged = [r for r in csv.DictReader(f) if r["flagged"] == "True"]
     if limit:
@@ -294,7 +317,7 @@ def run(data_dir, flagged_csv, out_path, limit=None, dry_run=False, llm=None, ba
     packets, plan = {}, []
     for fr in flagged:
         pid = fr["provider_id"]
-        packets[pid] = build_packet(pid, fr, chronic, age, conditions, claims, rates, docs, peer_doc, facts)
+        packets[pid] = build_packet(pid, fr, chronic, age, conditions, claims, rates, docs, peer_doc, facts, note_rows)
         lean, reason = sr.rule_leaning(packets[pid])
         plan.append((pid, lean, reason, lean is None or llm_all))
     if dry_run:

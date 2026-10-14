@@ -27,7 +27,9 @@ from collections import defaultdict
 import records
 
 MAX_ROUNDS = 3
+MAX_ROUNDS_21 = 5            # office version 2.1: the first request, a second one, and follow-ups
 MAX_DAYS = 120
+AUDIT_REFUSE = {"cooperative": 0.10, "slow": 0.20, "sloppy": 0.30, "evasive": 0.70}   # chance the office refuses an audit-trail request
 DEFAULT_DEADLINE = 30
 BEHAVIOR_MIX = {"cooperative": 0.55, "slow": 0.15, "sloppy": 0.20, "evasive": 0.10}
 GUILTY_MIX = {"evasive": 0.5, "sloppy": 0.3, "slow": 0.1, "cooperative": 0.1}   # used when correlation > 0
@@ -67,6 +69,8 @@ DEFICIENCY_TEXT = {
     "EXTENSION": "The office asked for more time.",
     "OBJECTION": "The office objects to the scope of the request.",
     "NO_RESPONSE": "No response by the deadline.",
+    "MISSING_RESULTS": "An order is listed but its result was not included.",
+    "AUDIT_TRAIL_REFUSED": "The office declined to provide the EHR audit trail.",
 }
 STATUS_TO_CODE = {"wrong_content": "WRONG_CONTENT", "missing_signature": "MISSING_SIGNATURE", "wrong_dates": "WRONG_DATES",
                   "illegible": "ILLEGIBLE", "clarification_requested": "SCOPE_UNCLEAR", "extension": "EXTENSION",
@@ -80,9 +84,16 @@ def _rows(path):
 
 
 class Office:
-    def __init__(self, v2_dir, view_dir, seed=1, correlation=0.0, roles=None):
-        """roles: optional {provider_id: role}, used ONLY to draw hidden behavior when correlation > 0 (evaluation use)."""
+    def __init__(self, v2_dir, view_dir, seed=1, correlation=0.0, roles=None, version="2.0"):
+        """roles: optional {provider_id: role}, used ONLY to draw hidden behavior when correlation > 0 (evaluation use).
+        version "2.1": returned charts carry the note package (docs/data_v2_1.md), a second request per provider is allowed
+        (random first, targeted after), and an audit trail can be requested as a second-tier action. "2.0" is the frozen behaviour."""
         self.seed = seed
+        self.v21 = version == "2.1"
+        self.max_rounds = MAX_ROUNDS_21 if self.v21 else MAX_ROUNDS
+        if self.v21:
+            import note_checks
+            self.packages = note_checks.load_notes(v2_dir)
         self.universe = {r["claim_id"]: r for r in _rows(os.path.join(v2_dir, "records", "records_universe.csv"))}
         self.claims = defaultdict(list)
         for r in _rows(os.path.join(view_dir, "claims.csv")):
@@ -102,30 +113,43 @@ class Office:
     def _st(self, pid):
         if pid not in self.state:
             self.state[pid] = {"behavior": self._behavior(pid), "round": 0, "day": 0, "requested": [], "sample_kind": None,
-                               "usable": {}, "pending": defaultdict(list), "closed": None, "late": None}
+                               "usable": {}, "pending": defaultdict(list), "closed": None, "late": None, "kinds": {}, "requests": []}
         return self.state[pid]
 
     # ---- plan-side actions ----------------------------------------------
     def send_request(self, pid, sample, deadline=DEFAULT_DEADLINE):
-        """sample: {"kind": "random", "n": N} | {"kind": "targeted", "cpt": "99215", "n": N} | {"kind": "targeted", "claim_ids": [...]}"""
+        """sample: {"kind": "random", "n": N} | {"kind": "targeted", "cpt": "99215", "n": N} | {"kind": "targeted", "claim_ids": [...]}.
+        Version 2.1 allows a further request after the first (new charts only; random first, targeted after), within the same caps."""
         st = self._st(pid)
-        if st["round"] > 0:
+        if st["round"] > 0 and not self.v21:
             return self._err(pid, "a request is already open; use follow_up or close_request")
+        if st["round"] > 0 and (st["round"] >= self.max_rounds or st["day"] >= MAX_DAYS):
+            return self._err(pid, "round or day cap reached; no further request")
         rows = sorted(self.claims.get(pid, []), key=lambda r: r["claim_id"])
         if not rows:
             return self._err(pid, "unknown provider or no claims")
-        rng = random.Random(f"{self.seed}:sample:{pid}")
+        rng = random.Random(f"{self.seed}:sample:{pid}" + (f":{st['round']}" if st["round"] else ""))
+        taken = set(st["requested"])
         kind = sample.get("kind", "random")
         if "claim_ids" in sample:
-            ids = [c for c in sample["claim_ids"] if any(r["claim_id"] == c for r in rows)][:200]
+            ids = [c for c in sample["claim_ids"] if any(r["claim_id"] == c for r in rows) and c not in taken][:200]
             kind = "targeted"
         else:
-            pool = [r["claim_id"] for r in rows if sample.get("cpt") in (None, r["cpt"])]
+            pool = [r["claim_id"] for r in rows if sample.get("cpt") in (None, r["cpt"]) and r["claim_id"] not in taken]
             if sample.get("cpt"):
                 kind = "targeted"
             ids = rng.sample(pool, min(int(sample.get("n", 30)), len(pool)))
-        st["requested"], st["sample_kind"] = ids, kind
-        return self._round(pid, st, deadline, addressed=None)
+        if not ids:
+            return self._err(pid, "no new claims match this request")
+        if st["round"] > 0:
+            st["closed"] = None
+            st["late"] = None
+        st["requested"] = st["requested"] + ids
+        st["sample_kind"] = st["sample_kind"] or kind
+        st["requests"].append({"kind": kind, "ids": ids, "round": st["round"] + 1})
+        for c in ids:
+            st["kinds"][c] = kind
+        return self._round(pid, st, deadline, addressed=None, new_ids=ids)
 
     def follow_up(self, pid, addressed_codes, deadline=DEFAULT_DEADLINE, claim_ids=None):
         """Tell the office what was wrong. claim_ids narrows the scope (helps with objections and clarifications)."""
@@ -134,7 +158,7 @@ class Office:
             return self._err(pid, "no open request")
         if st["closed"]:
             return self._err(pid, "request is closed")
-        if st["round"] >= MAX_ROUNDS or st["day"] >= MAX_DAYS:
+        if st["round"] >= self.max_rounds or st["day"] >= MAX_DAYS:
             return self._err(pid, "round or day cap reached; close the request")
         if claim_ids:
             st["requested"] = [c for c in st["requested"] if c in set(claim_ids)] or st["requested"]
@@ -146,7 +170,7 @@ class Office:
         end = "non_responsive" if n_use == 0 else ("complete" if n_use >= 0.9 * max(n_req, 1) else "partial")
         st["closed"] = end
         out = {"provider_id": pid, "end_state": end, "usable_charts": n_use, "requested": n_req, "rounds": st["round"],
-               "days": st["day"], "sample_kind": st["sample_kind"], "reason": reason,
+               "days": st["day"], "sample_kind": st["sample_kind"], "sample_kinds": [q["kind"] for q in st["requests"]], "reason": reason,
                "note": "No response is not evidence of upcoding; it only means this provider cannot be judged from charts."}
         self.transcript.append({"action": "close_request", **out})
         return out
@@ -158,11 +182,12 @@ class Office:
     def _draw(self, rng, table):
         return rng.choices(list(table), weights=list(table.values()))[0]
 
-    def _round(self, pid, st, deadline, addressed):
+    def _round(self, pid, st, deadline, addressed, new_ids=None):
         rng = random.Random(f"{self.seed}:round:{pid}:{st['round']}")
         beh = st["behavior"]
         first = st["round"] == 0
         st["round"] += 1
+        pending_before = {c for v in st["pending"].values() for c in v}
         lo, hi = DAYS[beh]
         delay = rng.randint(lo, hi)
         released = []
@@ -185,12 +210,22 @@ class Office:
             st["late"], status = status, "no_response"
         st["day"] += min(delay, deadline) if status == "no_response" else delay
         missing_ids, unusable_ids, deficiencies = [], [], []
-        remaining = [c for c in st["requested"] if c not in st["usable"]]
+        remaining = [c for c in st["requested"] if c not in st["usable"] and c not in pending_before]
         if status in ("complete", "partial"):
             got = remaining if status == "complete" else rng.sample(remaining, max(1, int(len(remaining) * rng.uniform(0.4, 0.7))))
             for c in got:
-                st["usable"][c] = records.read_chart(self.universe[c], rng)
-            missing_ids = [c for c in remaining if c not in st["usable"]]
+                row = self._chart(c, rng)
+                bad = self._signature_problem(c)
+                if bad:                                       # unsigned or illegible: held back until a follow-up fixes it
+                    st["pending"][bad].append(c)
+                    unusable_ids.append(c)
+                else:
+                    st["usable"][c] = row
+            for code in ("MISSING_SIGNATURE", "ILLEGIBLE"):
+                held = [c for c in st["pending"].get(code, []) if c in unusable_ids]
+                if held:
+                    deficiencies.append({"code": code, "text": DEFICIENCY_TEXT[code], "claim_ids": held})
+            missing_ids = [c for c in remaining if c not in st["usable"] and c not in unusable_ids]
             if missing_ids:
                 deficiencies.append({"code": "MISSING_VISITS", "text": DEFICIENCY_TEXT["MISSING_VISITS"], "claim_ids": missing_ids})
         elif status in ("missing_signature", "wrong_dates", "illegible"):
@@ -202,15 +237,77 @@ class Office:
             code = STATUS_TO_CODE[status]
             deficiencies.append({"code": code, "text": DEFICIENCY_TEXT[code], "claim_ids": remaining if code != "EXTENSION" else []})
         for c in released:                                        # fixed by the office this round
-            st["usable"][c] = records.read_chart(self.universe[c], rng)
+            st["usable"][c] = self._chart(c, rng, attested=True)
+        if self.v21:
+            gaps = [c for c, row in st["usable"].items() if int(row.get("order_count") or 0) > int(row.get("results_present") or 0)]
+            if addressed and "MISSING_RESULTS" in addressed:
+                for c in list(gaps):
+                    if rng.random() < 0.7:
+                        st["usable"][c]["results_present"] = st["usable"][c]["order_count"]
+                        gaps.remove(c)
+            if gaps:
+                deficiencies.append({"code": "MISSING_RESULTS", "text": DEFICIENCY_TEXT["MISSING_RESULTS"], "claim_ids": sorted(gaps)})
         text = TEXT.get(status, "")
         if status == "extension":
             text += f" We expect to respond within {rng.randint(20, 45)} days."
         resp = {"provider_id": pid, "round": st["round"], "status": status, "text": text, "deficiencies": deficiencies,
                 "usable_claim_ids": sorted(st["usable"]), "usable_total": len(st["usable"]), "requested_total": len(st["requested"]),
                 "unusable_claim_ids": sorted(unusable_ids), "days_elapsed_total": st["day"], "sample_kind": st["sample_kind"],
-                "rounds_left": max(MAX_ROUNDS - st["round"], 0), "days_left": max(MAX_DAYS - st["day"], 0)}
-        self.transcript.append({"action": "send_request" if first else "follow_up", "deadline": deadline, **resp})
+                "rounds_left": max(self.max_rounds - st["round"], 0), "days_left": max(MAX_DAYS - st["day"], 0)}
+        if self.v21:
+            resp["sample_kinds"] = [q["kind"] for q in st["requests"]]
+        action = "follow_up" if addressed is not None else "send_request"
+        self.transcript.append({"action": action, "deadline": deadline, **resp})
+        return resp
+
+    def _chart(self, claim_id, rng, attested=False):
+        """One chart reading; with the note package (version 2.1) its note, signature, order and result fields come along."""
+        row = records.read_chart(self.universe[claim_id], rng)
+        if self.v21:
+            pkg = self.packages[claim_id]
+            n, a = pkg["note"], pkg["auth"]
+            results = pkg["results"].values()
+            row.update({"note_id": n["note_id"], "note_text": n["note_text"], "problems_addressed": n["problems_addressed"],
+                        "time_statement": n["time_statement"], "outside_records_reviewed": n["outside_records_reviewed"],
+                        "auth_status": "attested" if attested else a["status"], "service_date": n["service_date"],
+                        "signed_date": a["signed_date"], "order_count": len(pkg["orders"]),
+                        "results_present": sum(int(r["result_present"]) for r in results)})
+        return row
+
+    def _signature_problem(self, claim_id):
+        if not self.v21:
+            return None
+        return {"unsigned": "MISSING_SIGNATURE", "illegible": "ILLEGIBLE"}.get(self.packages[claim_id]["auth"]["status"])
+
+    def request_audit_trail(self, pid, claim_ids, deadline=DEFAULT_DEADLINE):
+        """Second-tier request (version 2.1): the EHR audit trail for charts already received. Costs a round; may be refused."""
+        if not self.v21:
+            return self._err(pid, "audit trail requests are not available in this office version")
+        st = self._st(pid)
+        if st["round"] == 0:
+            return self._err(pid, "no records request for this provider")
+        if st["round"] >= self.max_rounds or st["day"] >= MAX_DAYS:
+            return self._err(pid, "round or day cap reached")
+        ids = [c for c in claim_ids if c in st["usable"]][:60]
+        if not ids:
+            return self._err(pid, "none of those charts has been received")
+        rng = random.Random(f"{self.seed}:audit:{pid}:{st['round']}")
+        st["round"] += 1
+        lo, hi = DAYS[st["behavior"]]
+        st["day"] += rng.randint(lo, hi)
+        refused = rng.random() < AUDIT_REFUSE[st["behavior"]]
+        if not refused:
+            for c in ids:
+                au = self.packages[c]["audit"]
+                st["usable"][c].update({"created_ts": au["created_ts"], "last_edited_ts": au["last_edited_ts"],
+                                        "copy_paste_events": au["copy_paste_events"], "template_id": au["template_id"]})
+        resp = {"provider_id": pid, "round": st["round"], "status": "refused" if refused else "audit_trail_provided",
+                "text": "We do not provide EHR audit logs." if refused else "Enclosed are the audit-trail records.",
+                "deficiencies": [{"code": "AUDIT_TRAIL_REFUSED", "text": DEFICIENCY_TEXT["AUDIT_TRAIL_REFUSED"], "claim_ids": ids}] if refused else [],
+                "usable_claim_ids": sorted(st["usable"]), "usable_total": len(st["usable"]), "requested_total": len(st["requested"]),
+                "unusable_claim_ids": [], "days_elapsed_total": st["day"], "sample_kind": st["sample_kind"],
+                "rounds_left": max(self.max_rounds - st["round"], 0), "days_left": max(MAX_DAYS - st["day"], 0)}
+        self.transcript.append({"action": "audit_trail", "deadline": deadline, **resp})
         return resp
 
     # ---- outputs ---------------------------------------------------------
@@ -218,9 +315,20 @@ class Office:
         """Usable chart readings in the documentation.csv shape, for providers whose sample kind is in `kinds`."""
         out = []
         for pid, st in self.state.items():
-            if st["sample_kind"] in kinds:
+            if self.v21:
+                out += [row for c, row in st["usable"].items() if st["kinds"].get(c) in kinds]
+            elif st["sample_kind"] in kinds:
                 out += list(st["usable"].values())
         return out
+
+    def random_claim_ids(self, pid):
+        """Claim ids requested as a random sample (the only ones that support extrapolation)."""
+        st = self.state.get(pid)
+        if not st:
+            return []
+        if self.v21:
+            return [c for c in st["requested"] if st["kinds"].get(c) == "random"]
+        return list(st["requested"]) if st["sample_kind"] == "random" else []
 
     def end_states(self):
         return {pid: ("closed:" + st["closed"] if st["closed"] else "open") for pid, st in self.state.items()}

@@ -93,3 +93,41 @@ def provider_signals(items, with_audit=False):
     else:
         out["bulk_created"] = out["paste_heavy"] = None
     return out
+
+
+NOTE_DOC_COLS = ["note_id", "note_text", "problems_addressed", "time_statement", "outside_records_reviewed", "auth_status", "service_date",
+                 "signed_date", "order_count", "results_present", "created_ts", "last_edited_ts", "copy_paste_events", "template_id"]
+
+
+def pkg_from_doc_row(row, claim):
+    """Rebuild a note package from one returned documentation row (data v2.1) and its claim row."""
+    pkg = {"note": {"note_id": row["note_id"], "problems_addressed": row["problems_addressed"], "problems_level": row["documented_problems_level"],
+                    "data_level": row["documented_data_level"], "outside_records_reviewed": row["outside_records_reviewed"] or "0",
+                    "service_date": row["service_date"], "documented_minutes": row["documented_minutes"], "note_text": row["note_text"],
+                    "member_id": claim["patient_id"]},
+           "auth": {"status": row["auth_status"], "signed_date": row["signed_date"]},
+           "orders": [{}] * int(row["order_count"] or 0)}
+    if row.get("created_ts"):
+        pkg["audit"] = {"created_ts": row["created_ts"], "last_edited_ts": row["last_edited_ts"], "copy_paste_events": row["copy_paste_events"]}
+    return pkg
+
+
+def signals_from_docs(rows, claims_by_id, with_audit=False):
+    """Provider-level signal rates from returned documentation rows (those carrying note columns). rows: one provider's rows."""
+    items = [(pkg_from_doc_row(r, claims_by_id[r["claim_id"]]), claims_by_id[r["claim_id"]]) for r in rows
+             if r.get("note_id") and r["claim_id"] in claims_by_id]
+    sig = provider_signals(items, with_audit=with_audit and any("audit" in p for p, _ in items))
+    sig["notes"] = len(items)
+    return sig
+
+
+def flagged_claims(rows, claims_by_id, signal, limit=5, with_audit=False):
+    """Claim ids of returned notes that show `signal` (problems, data, unsigned, late, bulk_created, paste_heavy)."""
+    out = []
+    for r in rows:
+        if not r.get("note_id") or r["claim_id"] not in claims_by_id:
+            continue
+        pkg = pkg_from_doc_row(r, claims_by_id[r["claim_id"]])
+        if visit_flags(pkg, claims_by_id[r["claim_id"]], with_audit).get(signal):
+            out.append(r["claim_id"])
+    return out[:limit]
