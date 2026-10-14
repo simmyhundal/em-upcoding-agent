@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" width="1000" height="560" font-family="Helvetica, Arial, sans-serif">
-<rect width="1000" height="560" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 606" width="1000" height="606" font-family="Helvetica, Arial, sans-serif">
+<rect width="1000" height="606" fill="#ffffff"/>
 <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#6b7280"/></marker></defs>
 <rect x="30" y="30" width="290" height="96" rx="10" fill="#f9fafb" stroke="#2563eb" stroke-width="2.5"/>
 <text x="46" y="58" font-size="14.5" font-weight="bold" fill="#1f2937">Screen</text>
@@ -61,4 +61,14 @@
 <rect x="680" y="490" width="290" height="56" rx="10" fill="none" stroke="#7c3aed" stroke-width="2" stroke-dasharray="6 4"/>
 <text x="696" y="513" font-size="13" font-weight="bold" fill="#1f2937">People review the drafts</text>
 <text x="696" y="533" font-size="12" fill="#6b7280">nothing is sent or decided automatically</text>
+<text x="30" y="586" font-size="12.5" font-weight="bold" fill="#1f2937">Key</text>
+<rect x="66" y="574" width="14" height="14" rx="3" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+<text x="86" y="586" font-size="12.5" fill="#6b7280">statistics (the screen)</text>
+<rect x="256" y="574" width="14" height="14" rx="3" fill="none" stroke="#15803d" stroke-width="2.5"/>
+<text x="276" y="586" font-size="12.5" fill="#6b7280">plain code and checks</text>
+<rect x="446" y="574" width="14" height="14" rx="3" fill="none" stroke="#c2410c" stroke-width="2.5"/>
+<text x="466" y="586" font-size="12.5" fill="#6b7280">the agent (a model)</text>
+<rect x="636" y="574" width="14" height="14" rx="3" fill="none" stroke="#7c3aed" stroke-width="2.5"/>
+<text x="656" y="586" font-size="12.5" fill="#6b7280">people</text>
+<text x="970" y="586" text-anchor="end" font-size="12.5" fill="#6b7280">dashed boxes: what surrounds the agent</text>
 </svg>

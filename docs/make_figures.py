@@ -120,7 +120,7 @@ AGENT_ACTIONS = [
 
 def agent_actions():
     """The agent and the actions it chooses from (the README's main figure)."""
-    W, H = 1000, 560
+    W, H = 1000, 606
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>', f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
          f'<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="{MUTED}"/></marker></defs>']
     bw, bh = 290, 96
@@ -152,6 +152,14 @@ def agent_actions():
         s.append(f'<rect x="{x}" y="490" width="{bw}" height="56" rx="10" fill="none" stroke="{col}" stroke-width="2" stroke-dasharray="6 4"/>')
         s.append(f'<text x="{x + 16}" y="513" font-size="13" font-weight="bold" fill="{INK}">{escape(t)}</text>')
         s.append(f'<text x="{x + 16}" y="533" font-size="12" fill="{MUTED}">{escape(sub)}</text>')
+    key = [(BLUE, "statistics (the screen)"), (GREEN, "plain code and checks"), (ORANGE, "the agent (a model)"), (PEOPLE, "people")]
+    kx = 30
+    s.append(f'<text x="{kx}" y="586" font-size="12.5" font-weight="bold" fill="{INK}">Key</text>')
+    for col, label in key:
+        kx += [60, 190, 190, 190][key.index((col, label))]
+        s.append(f'<rect x="{kx - 24}" y="574" width="14" height="14" rx="3" fill="none" stroke="{col}" stroke-width="2.5"/>')
+        s.append(f'<text x="{kx - 4}" y="586" font-size="12.5" fill="{MUTED}">{label}</text>')
+    s.append(f'<text x="{W - 30}" y="586" text-anchor="end" font-size="12.5" fill="{MUTED}">dashed boxes: what surrounds the agent</text>')
     s.append("</svg>")
     write("agent.svg", "\n".join(s))
 

@@ -16,14 +16,14 @@ v1.x and v2.x are fixed workflows: code picks the steps and a model writes only 
 
 ## Results
 <!-- scoreboard:start -->
-| Arm | Upcoders found | Honest practices accused | Honest practices asked for charts | Request rounds | Summary usefulness (1-5, LLM judge) |
+| Arm | Upcoders found | Honest practices accused | Honest practices asked for charts | Requests and follow-ups sent to practices | Summary usefulness (1-5, LLM judge) |
 |---|---|---|---|---|---|
 | Workflow v2.x, screen at suspicion 5 | 6 of 16 | 0 | 17 | 41 | 3.4 |
 | Workflow v2.x, screen at top 25 | 6 of 16 | 0 | 35 | 71 | 3.5 |
 | Agent v3.x, with the screen tool | 4 of 16 | 0 | 9 | 26 | 2.9 |
 | Agent v3.x, without the screen tool | 4 of 16 | 0 | 12 | 28 | 2.3 |
 
-Two reserved test seeds, 8 planted upcoders each (more in [the full results](docs/results.md)).
+Two reserved test seeds, 8 planted upcoders each. "Requests and follow-ups sent" counts every chart request and every follow-up message to a practice, a measure of the burden on practices (an honest practice asked for charts is a cost with no upside). More in [the full results](docs/results.md).
 <!-- scoreboard:end -->
 
 - No arm meets the 12.5% miss-rate threshold. The agent reaches fewer upcoders than the workflow but asks far fewer honest practices for charts.

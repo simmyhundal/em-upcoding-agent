@@ -387,11 +387,12 @@ def _arm(rows, ids, stage):
 def headline_table(path=CSV_PATH):
     """The README's short results table: the four arms on the two reserved seeds, summed, rendered from the results file."""
     rows = read_csv(path)
-    out = ["| Arm | Upcoders found | Honest practices accused | Honest practices asked for charts | Request rounds | Summary usefulness (1-5, LLM judge) |", "|---|---|---|---|---|---|"]
+    out = ["| Arm | Upcoders found | Honest practices accused | Honest practices asked for charts | Requests and follow-ups sent to practices | Summary usefulness (1-5, LLM judge) |", "|---|---|---|---|---|---|"]
     for name, ids, stage in ARMS:
         a = _arm(rows, ids, stage)
         out.append(f"| {name} | {a['found']} of {a['of']} | {a['accused']} | {a['asked']} | {a['rounds']} | {a['use']:.1f} |")
-    out += ["", "Two reserved test seeds, 8 planted upcoders each (more in [the full results](docs/results.md))."]
+    out += ["", "Two reserved test seeds, 8 planted upcoders each. \"Requests and follow-ups sent\" counts every chart request and every follow-up message to a practice, "
+            "a measure of the burden on practices (an honest practice asked for charts is a cost with no upside). More in [the full results](docs/results.md)."]
     return "\n".join(out)
 
 
