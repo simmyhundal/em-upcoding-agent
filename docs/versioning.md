@@ -45,6 +45,10 @@ Features roughly mirror one another: a change lands in both streams, or is marke
 | Low base rate safeguards (#59) | planned | planned | |
 | Summary quality and judge calibration (#60) | planned | planned | |
 | Second records request (#67) | built (office 2.1; policy sends a targeted second request) | built (office 2.1) | |
+| Conditional next steps and the pre-submission lint (#63) | built (`case_summary.py --v21`: conditional steps, model-written summaries that fail a hard check are repaired by code) | built (`submit_findings` lints and refuses; steps conditional) | |
+| Dispositions for screened candidates (#66) | partial: rule reason strings only; no disposition table yet | built (`set_aside`, refused without it) | agent-only for now; workflow mirror still to build |
+| Estimate reliability gate (v3.1) | n/a (the workflow does not quote estimates) | built (`reliable`, `stratum_reviewed`; the lint refuses quoting an unreliable estimate) | agent-only by design |
+| Screen table magnitude columns and `priority` ordering (#48) | planned: `priority` as the workflow's ordering | built (ratio, excess claims, low-complexity share, excess dollars; `method="priority"`) | mirrored by ordering |
 | Hybrid review (#49) | planned | planned (tool exists) | |
 | Screen cutoff choice (#48) | planned: budget-based rule | planned: agent chooses | mirrored by design |
 | Multi-seed paired evaluation (#61) | planned | planned | shared |

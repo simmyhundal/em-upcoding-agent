@@ -22,6 +22,7 @@ import guardrail
 import pi_estimate as pe
 import provider_sim
 import records
+import summary_lint
 import summary_rules as sr
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -30,6 +31,8 @@ CODES = records.CODES
 CHART_RULE_RATE, CHART_RULE_MIN = 0.15, 8
 SCREEN_ROWS_SHOWN = 30
 CUTOFFS = [3, 4, 5, 6, 8, 10]
+CANDIDATE_RATIO = 3.0        # version 3.1: a screened provider billing 99215 at this many times its expected share must be examined or explained
+MIN_STRATUM_REVIEWED = 8     # version 3.1: an overpayment estimate needs this many reviewed charts in its main stratum to be called reliable
 
 
 def _doc_entry(row):
@@ -46,6 +49,7 @@ class Environment:
         and the note_checks and request_audit_trail tools exist. "3.0" is the frozen agent."""
         self.v31 = version == "3.1"
         self.note_rows = {}
+        self.screen_candidates, self.set_aside, self.tool_calls = set(), {}, []
         self.view_dir, self.model_call, self.records_budget, self.screen_enabled = view_dir, model_call, records_budget, screen_enabled
         self.chronic, self.age, self.conditions, self.claims = cs.load(view_dir)
         self.rates = cs.peer_rates(self.claims, self.chronic)
@@ -65,6 +69,7 @@ class Environment:
                 if self.owner.get(r["claim_id"]) in self.control:
                     self.docs[r["claim_id"]] = _doc_entry(r)
                     self.facts[r["claim_id"]] = int(r["documented_data_level"])
+        self.stats = self._provider_stats() if self.v31 else {}
         self.office = provider_sim.Office(v2_dir, view_dir, seed=seed, correlation=correlation, roles=roles, version="2.1" if self.v31 else "2.0")
         self.requested = set()
         self.spent_usd = 0.0
@@ -72,6 +77,30 @@ class Environment:
         self.summaries = {}
 
     # ---- helpers ---------------------------------------------------------
+    def _provider_stats(self):
+        """Magnitude columns for the screen table (version 3.1): ratio to expected, excess 99215 claims, low-complexity share and dollars."""
+        fees = {c: v["allowed_amount"] for c, v in json.load(open(ALLOWED))["codes"].items()}
+        out = {}
+        for pid, r in self.rows.items():
+            n, share, exp = int(r["n_claims"]), float(r["share_99215"]), float(r["expected_share"])
+            c215 = [c for c in self.claims[pid] if c["cpt"] == "99215"]
+            low = sum(self.chronic.get(c["patient_id"], 0) <= 1 for c in c215) / len(c215) if c215 else 0.0
+            excess = (share - exp) * n
+            out[pid] = {"ratio": round(share / exp, 2) if exp else 0.0, "excess": round(excess, 1), "low": round(low, 2),
+                        "usd": round(max(excess, 0) * (fees["99215"] - fees["99214"]) * 0.8)}
+        order_r = sorted(out, key=lambda p: -out[p]["ratio"])
+        order_e = sorted(out, key=lambda p: -out[p]["excess"])
+        rk_r, rk_e = {p: i for i, p in enumerate(order_r)}, {p: i for i, p in enumerate(order_e)}
+        for p in out:                                   # claims-only priority: rank average of ratio and excess claims (docs/priority_score.md)
+            out[p]["priority"] = -(rk_r[p] + rk_e[p]) / 2
+        return out
+
+    def budget_status(self):
+        left = self.records_budget - len(self.requested)
+        todo = sorted(p for p in self.screen_candidates if p not in self.requested and p not in self.findings)
+        return (f"Records budget: {len(self.requested)} of {self.records_budget} providers asked ({left} left). "
+                f"Screened candidates at 3 or more times expected not yet examined: {len(todo)}" + (f" (e.g. {', '.join(todo[:4])})." if todo else "."))
+
     def _peer_doc(self):
         return cs.doc_peer_rates(self.claims, self.docs, self.control) if self.docs else None
 
@@ -100,12 +129,17 @@ class Environment:
     def screen_providers(self, method="riskadj", top_n=None, min_score=None, max_flagged=None, min_claims=0):
         """Rank providers by a statistical score and choose a cutoff. method: zscore | riskadj | combined."""
         key = {"zscore": ("z", True), "riskadj": ("z_adj", True), "combined": ("mean_rank", False)}.get(method)
+        if self.v31 and method == "priority":
+            key = ("priority", True)
         if not key:
-            return {"error": "method must be zscore, riskadj or combined"}
+            return {"error": "method must be zscore, riskadj or combined" + (" or priority" if self.v31 else "")}
         field, desc = key
         elig = [r for r in self.rows.values() if int(r["n_claims"]) >= min_claims]
-        elig.sort(key=lambda r: (-float(r[field]) if desc else float(r[field]), r["provider_id"]))
-        if min_score is not None and method != "combined":
+        if field == "priority":
+            elig.sort(key=lambda r: (-self.stats[r["provider_id"]]["priority"], r["provider_id"]))
+        else:
+            elig.sort(key=lambda r: (-float(r[field]) if desc else float(r[field]), r["provider_id"]))
+        if min_score is not None and method not in ("combined", "priority"):
             sel = [r for r in elig if float(r[field]) >= min_score]
         else:
             sel = elig[: int(top_n or 25)]
@@ -113,10 +147,16 @@ class Environment:
             sel = sel[: int(max_flagged)]
         zs = sorted(float(r["z_adj"]) for r in self.rows.values())
         q = lambda p: round(zs[min(int(p * len(zs)), len(zs) - 1)], 2)
+        cols = ["provider", "claims", "share_99215", "expected_share", "z", "z_adj", "rank_combined"]
+        extra = lambda r: []
+        if self.v31:
+            cols += ["ratio_to_expected", "excess_99215", "low_complexity_share", "excess_usd"]
+            extra = lambda r: [self.stats[r["provider_id"]][k] for k in ("ratio", "excess", "low", "usd")]
+            self.screen_candidates |= {r["provider_id"] for r in sel if self.stats[r["provider_id"]]["ratio"] >= CANDIDATE_RATIO}
         return {"method": method, "selected": len(sel),
-                "table": {"cols": ["provider", "claims", "share_99215", "expected_share", "z", "z_adj", "rank_combined"],
+                "table": {"cols": cols,
                           "rows": [[r["provider_id"], int(r["n_claims"]), float(r["share_99215"]), float(r["expected_share"]),
-                                    float(r["z"]), float(r["z_adj"]), r["rank"]] for r in sel[:SCREEN_ROWS_SHOWN]]},
+                                    float(r["z"]), float(r["z_adj"]), r["rank"]] + extra(r) for r in sel[:SCREEN_ROWS_SHOWN]]},
                 "shown": min(len(sel), SCREEN_ROWS_SHOWN),
                 "z_adj_distribution": {"providers": len(zs), "p50": q(0.5), "p90": q(0.9), "p95": q(0.95), "p99": q(0.99), "max": zs[-1]},
                 "providers_at_or_above_z_adj": {str(c): sum(z >= c for z in zs) for c in CUTOFFS}}
@@ -195,7 +235,11 @@ class Environment:
                 lean, source = None, "undecided"
             if lean and pid not in self.summaries:
                 self.summaries[pid] = sr.assemble(packet, lean)
-            out.append({"provider": pid, "leaning": lean, "source": source, "reason": reason, "chart_rule": chart})
+            item = {"provider": pid, "leaning": lean, "source": source, "reason": reason, "chart_rule": chart}
+            ns = (packet.get("documentation_review") or {}).get("note_signals")
+            if ns:
+                item["note_signals"] = {"notes": ns["notes"], "rates": ns["rates"], "looks_inflated": sr.inflated_notes(packet)}
+            out.append(item)
         return {"results": out}
 
     def draft_summary(self, provider_id):
@@ -224,9 +268,19 @@ class Environment:
         allowed = {c: v["allowed_amount"] for c, v in json.load(open(ALLOWED))["codes"].items()}
         amounts = {r["claim_id"]: (float(r["allowed_amount"]), float(r["paid_amount"])) for r in rows if r.get("allowed_amount")}
         res = pe.estimate(plan, reviewed, allowed, 0.90, claim_amounts=amounts)
-        return {"valid_for_extrapolation": True, "point_estimate": round(res["point_estimate"]), "ci_low": round(res["ci_low"]),
-                "ci_high": round(res["ci_high"]), "reviewed_claims": res["reviewed_claims"], "sampled_claims": res["sampled_claims"],
-                "caveat": "Draft arithmetic from a simulated review; a real recovery needs human review of the records."}
+        out = {"valid_for_extrapolation": True, "point_estimate": round(res["point_estimate"]), "ci_low": round(res["ci_low"]),
+               "ci_high": round(res["ci_high"]), "reviewed_claims": res["reviewed_claims"], "sampled_claims": res["sampled_claims"],
+               "caveat": "Draft arithmetic from a simulated review; a real recovery needs human review of the records."}
+        if self.v31:
+            strata = {c: d for c, d in res["strata"].items() if d.get("n_reviewed")}
+            main = max(strata, key=lambda c: strata[c]["N"] * strata[c].get("mean_overpayment", 0), default=None)
+            n_main = strata[main]["n_reviewed"] if main else 0
+            out["stratum_reviewed"] = {c: d["n_reviewed"] for c, d in strata.items()}
+            out["reliable"] = bool(main is None or n_main >= MIN_STRATUM_REVIEWED)
+            if not out["reliable"]:
+                out.update({"ci_low": None, "ci_high": None,
+                            "note": f"Not reliable: only {n_main} reviewed charts in the {main} stratum (needs {MIN_STRATUM_REVIEWED}). Do not quote the dollar figure or an interval."})
+        return out
 
     def note_checks(self, provider_id):
         """Claim-versus-note signals on the notes already received (version 3.1): rates and example claims."""
@@ -250,16 +304,36 @@ class Environment:
         self._absorb(provider_id)
         return out
 
-    def submit_findings(self, findings):
-        """findings: [{"provider_id", "leaning", "headline", "interpretation"}]. Stored as drafts; the run ends."""
+    def submit_findings(self, findings, set_aside=None):
+        """findings: [{"provider_id", "leaning", "headline", "interpretation"}]. Stored as drafts; the run ends.
+        Version 3.1 also needs a reason for every screened candidate it leaves out (set_aside) and refuses summaries that fail the lint."""
         bad = [f.get("provider_id") for f in findings if f.get("provider_id") not in self.rows or f.get("leaning") not in
                (sr.UPCODING, sr.HIGH_ACUITY, sr.INCONCLUSIVE)]
         if bad:
             return {"error": f"invalid provider or leaning for: {bad}"}
+        version = "2.1" if self.v31 else "2.0"
+        built, problems = {}, {}
         for f in findings:
             packet = self._packet(f["provider_id"])
-            self.findings[f["provider_id"]] = sr.assemble(packet, f["leaning"], f.get("headline"), f.get("interpretation"))
+            built[f["provider_id"]] = sr.assemble(packet, f["leaning"], f.get("headline"), f.get("interpretation"), version=version)
+            if self.v31:
+                lint = summary_lint.lint(built[f["provider_id"]], packet, summary_lint.evidence_from(self.office.transcript, self._audit_log(), f["provider_id"]))
+                if lint["hard"]:
+                    problems[f["provider_id"]] = lint["hard"]
+        if self.v31:
+            aside = {a["provider_id"]: a.get("reason", "") for a in (set_aside or []) if a.get("provider_id") in self.rows}
+            missing = sorted(c for c in self.screen_candidates if c not in built and not aside.get(c))
+            if missing:
+                return {"error": "every screened provider billing 99215 at 3 or more times its expected share needs a finding or a reason it was set aside",
+                        "missing": missing[:20], "how": "add them to findings, or to set_aside with a reason"}
+            if problems:
+                return {"error": "some findings fail the checks; fix the wording or the leaning and submit again", "problems": problems}
+            self.set_aside = aside
+        self.findings.update(built)
         return {"accepted": len(findings), "status": "drafts for human review; nothing is sent or decided automatically"}
+
+    def _audit_log(self):
+        return [{"tool": t, "args": a, "result": r} for t, a, r in self.tool_calls]
 
     # ---- schemas and dispatch -------------------------------------------
     def tool_schemas(self):
@@ -274,7 +348,7 @@ class Environment:
                           "Rank every provider by a statistical score and pick a cutoff. method zscore|riskadj|combined; select top_n or min_score "
                           "(riskadj/zscore); optional max_flagged and min_claims. Returns a ranked table, the score distribution and how many "
                           "providers sit at or above several cutoffs. Free and deterministic; call it as often as you like.",
-                          "input_schema": {"type": "object", "properties": {"method": {"type": "string", "enum": ["zscore", "riskadj", "combined"]},
+                          "input_schema": {"type": "object", "properties": {"method": {"type": "string", "enum": ["zscore", "riskadj", "combined"] + (["priority"] if self.v31 else [])},
                                            "top_n": {"type": "integer"}, "min_score": {"type": "number"}, "max_flagged": {"type": "integer"},
                                            "min_claims": {"type": "integer"}}}})
         else:
@@ -305,7 +379,10 @@ class Environment:
              "pattern_consistent_with_high_acuity_panel, inconclusive. Include every provider you looked at closely; only 'upcoding' ones go to recovery.",
              "input_schema": {"type": "object", "properties": {"findings": {"type": "array", "items": {"type": "object", "properties": {
                  "provider_id": {"type": "string"}, "leaning": {"type": "string"}, "headline": {"type": "string"},
-                 "interpretation": {"type": "string"}}, "required": ["provider_id", "leaning"]}}}, "required": ["findings"]}}]
+                 "interpretation": {"type": "string"}}, "required": ["provider_id", "leaning"]}},
+                 **({"set_aside": {"type": "array", "description": "screened providers you are leaving out, each with the reason", "items": {"type": "object", "properties": {
+                     "provider_id": {"type": "string"}, "reason": {"type": "string"}}, "required": ["provider_id", "reason"]}}} if self.v31 else {})},
+              "required": ["findings"]}}]
         return tools
 
     def _v31_tools(self):
@@ -333,10 +410,13 @@ class Environment:
               "request_audit_trail": lambda: self.request_audit_trail(args["provider_id"], args["claim_ids"]),
               "draft_summary": lambda: self.draft_summary(args["provider_id"]),
               "estimate_overpayment": lambda: self.estimate_overpayment(args["provider_id"]),
-              "submit_findings": lambda: self.submit_findings(args["findings"])}.get(name)
+              "submit_findings": lambda: self.submit_findings(args["findings"], args.get("set_aside"))}.get(name)
         if fn is None:
             return {"error": f"unknown tool {name}"}
         try:
-            return fn()
+            out = fn()
         except (KeyError, TypeError, ValueError) as e:
             return {"error": f"bad arguments: {e}"}
+        if name in ("estimate_overpayment", "hybrid_review", "draft_summary", "note_checks"):
+            self.tool_calls.append((name, dict(args), json.dumps(out)))
+        return out

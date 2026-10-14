@@ -1,4 +1,4 @@
-"""Judge v2.2 (was v2.1): a completely deterministic usefulness scorer (no model, free, identical every time).
+"""Judge v2.3 (v2.2 plus a fix: "too thin" about the 99215 charts is a contradiction only when 10 or more were documented; the check lives in src/summary_lint.py): a completely deterministic usefulness scorer (no model, free, identical every time).
 v2.2 adds three checks taken from the LLM judge's most frequent complaints (generic next steps, headline not matching the body, understated
 signal) and keeps the rest of v2.1 unchanged.
 
@@ -54,7 +54,7 @@ import judge_usefulness as ju  # noqa: E402
 import numcheck  # noqa: E402
 import summary_rules as sr  # noqa: E402
 
-VERSION = "j2.2"
+VERSION = "j2.3"
 FORBIDDEN = re.compile(r"\b(fraud\w*|guilty|criminal\w*|proves?|proven)\b", re.I)
 HEDGE = re.compile(r"consistent with|may |might|could|suggest|appears?|pattern|not a finding|needs? (a )?(coder|human|review)", re.I)
 
@@ -63,43 +63,7 @@ def _norm(sentence):
     return re.sub(r"\s+", " ", re.sub(r"[\d,.]+%?", "#", sentence.lower())).strip()
 
 
-def _doc_counts(packet):
-    d = packet.get("documentation_review") or {}
-    return d.get("claims_with_documentation", 0), d
-
-
-def leaning_supported(leaning, packet):
-    docs_n, d = _doc_counts(packet)
-    ratio = packet["share_99215"] / packet["expected_share_given_patient_complexity"] if packet["expected_share_given_patient_complexity"] else 0
-    if leaning == sr.INCONCLUSIVE:
-        return True
-    if leaning == sr.UPCODING:
-        rows = [r for r in d.get("by_billed_level", []) if r["billed_cpt"] in ("99214", "99215")]
-        n = sum(r["documented_claims"] for r in rows)
-        k = sum(r["documentation_does_not_support_billed_level"] for r in rows)
-        return sr.rule_leaning(packet)[0] == sr.UPCODING or (n >= 6 and k / n >= 0.25)
-    if leaning == sr.HIGH_ACUITY:
-        if docs_n < 5:
-            return ratio <= 2.5
-        return ratio <= 3.0
-    return True
-
-
-def contradictions(summary, packet):
-    docs_n, _ = _doc_counts(packet)
-    text = " ".join([summary["headline"], summary["rationale"]]).lower()
-    steps = " ".join(summary["next_steps"]).lower()
-    both = text + " " + steps
-    out = []
-    if "documentation returned supports the level billed" in both and docs_n < 5:
-        out.append("says returned documentation supports the level billed, but fewer than 5 documented claims exist")
-    if docs_n >= 25 and re.search(r"too thin|re-screen|once the records arrive", both):
-        out.append("says records are thin or to wait for records, but many records came back")
-    if re.search(r"not prioriti[sz]ed for records|no records requested", text) and re.search(r"request records|request (the )?(full )?records", steps):
-        out.append("says no records were prioritized or requested, but the next steps request records")
-    if "no action is recommended" in text and re.search(r"request", steps):
-        out.append("says no action is recommended, but the next steps request records")
-    return out
+from summary_lint import _doc_counts, contradictions, leaning_supported, unreliable_estimate_quoted  # noqa: E402,F401
 
 
 def score_summary(record, packet, evidence=""):
@@ -118,6 +82,9 @@ def score_summary(record, packet, evidence=""):
     if sm["leaning"] == sr.INCONCLUSIVE and sr.rule_leaning(packet)[0] == sr.UPCODING:
         ded["overcautious"] = 1.0
         prob.append("inconclusive although the evidence rule says upcoding")
+    if unreliable_estimate_quoted(sm, evidence):
+        ded["unreliable_estimate"] = 1.0
+        prob.append("quotes an overpayment estimate the estimate tool marked unreliable")
     c = contradictions(sm, packet)
     if c:
         ded["contradictions"] = min(1.0 * len(c), 2.0)

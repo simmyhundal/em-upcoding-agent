@@ -235,7 +235,36 @@ def _rule_headline(packet, leaning):
     return f"{pid}: documentation supports the level billed"
 
 
-def assemble(packet, leaning, headline=None, interpretation=None):
+def next_steps_21(packet, leaning, ids):
+    """Next steps that depend on what records exist and name the claims and counts (issue 63). Version 2.1 and later."""
+    d = packet.get("documentation_review")
+    n = doc_total(packet)
+    shown = ", ".join(ids[:3]) if ids else "the sampled claims"
+    ns = (d or {}).get("note_signals") or {}
+    if leaning == UPCODING:
+        steps = [f"Request the full charts for {shown} and have a certified coder re-score each against the current E/M rules (medical decision making or total time).",
+                 "If the re-scoring confirms the pattern, review the random sample in the recovery packet's sampling plan before any overpayment estimate; do not extrapolate from a targeted sample."]
+        r = ns.get("rates") or {}
+        if ns.get("notes", 0) >= MIN_NOTES_SIGNALS:
+            steps.append(f"Look at the notes themselves: {r.get('problems', 0):.0%} address fewer problems than their level implies and {r.get('late', 0):.0%} were signed late; request the audit trail for {shown}.")
+        return steps
+    if leaning == HIGH_ACUITY:
+        if n >= 5:
+            row = _row_99215(packet)
+            u = f" ({row['documentation_does_not_support_billed_level']} of {row['documented_claims']} documented 99215 claims below the billed level)" if row else ""
+            return [f"Do not pursue recovery on this evidence: {n} charts came back and they support the level billed{u}.",
+                    "Revisit if the 99215 share keeps rising against peers or a larger sample shows unsupported claims."]
+        return [f"The case for a sicker panel is thin ({n} charts came back): request charts for {shown} before ruling out upcoding."]
+    if d is None or n == 0:
+        return [f"No usable charts yet: request a random sample of 30 charts, then a targeted sample of 99215s for {shown}.",
+                "If the practice does not respond, record that non-response is not evidence of upcoding and decide whether the claims signal alone warrants more."]
+    if n < 5:
+        return [f"Only {n} charts came back: request a larger or targeted sample (for example {shown}) and follow up on any deficiency the practice reported."]
+    return [f"{n} charts came back but do not settle it: request a targeted sample of 99215 charts, starting with {shown}.",
+            "Re-check after the targeted charts arrive; do not call upcoding or a sicker panel on this evidence alone."]
+
+
+def assemble(packet, leaning, headline=None, interpretation=None, version="2.0"):
     """Build the final summary dict (the five schema keys). headline and interpretation come from the model for ambiguous
     cases, else from code."""
     ids = pick_citations(packet, leaning)
@@ -243,8 +272,9 @@ def assemble(packet, leaning, headline=None, interpretation=None):
     parts.append(interpretation.strip() if interpretation else CLOSING[leaning])
     if ids:
         parts.append("Examples: " + " ".join(evidence_lines(packet, ids)))
+    steps = next_steps_21(packet, leaning, ids) if version == "2.1" else NEXT_STEPS[leaning]
     return {"headline": headline or _rule_headline(packet, leaning), "leaning": leaning,
-            "rationale": " ".join(parts), "cited_claim_ids": ids, "next_steps": NEXT_STEPS[leaning]}
+            "rationale": " ".join(parts), "cited_claim_ids": ids, "next_steps": steps}
 
 
 # ---- compact card -------------------------------------------------------------------------------------------------

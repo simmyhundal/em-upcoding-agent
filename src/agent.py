@@ -110,6 +110,8 @@ def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=M
             if u.name == "submit_findings" and "error" not in out:
                 done = True
         note = []
+        if getattr(env, "v31", False) and env.screen_candidates:
+            note.append({"type": "text", "text": env.budget_status()})
         if calls >= 0.8 * max_tool_calls or usd >= 0.8 * max_usd:
             note.append({"type": "text", "text": f"Budget notice: {calls}/{max_tool_calls} tool calls and ${usd:.2f}/${max_usd:.2f} used. "
                                                  "Wrap up and call submit_findings."})
@@ -130,5 +132,7 @@ def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=M
         json.dump(summary, open(os.path.join(out_dir, "agent_run.json"), "w"), indent=1)
         open(os.path.join(out_dir, "agent_notes.txt"), "w").write("\n\n".join(texts))
         env.office.write_transcript(os.path.join(out_dir, "office_transcript.jsonl"))
+        if getattr(env, "v31", False):
+            json.dump(env.set_aside, open(os.path.join(out_dir, "set_aside.json"), "w"), indent=1)
     summary["audit"] = audit
     return summary

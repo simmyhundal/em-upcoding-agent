@@ -21,6 +21,7 @@ import random
 from collections import Counter, defaultdict
 
 import llm as llm_mod
+import summary_lint
 import summary_rules as sr
 from records import level_from_minutes
 
@@ -303,7 +304,9 @@ def peer_rates(claims, chronic):
 
 
 def run(data_dir, flagged_csv, out_path, limit=None, dry_run=False, llm=None, batch=False, llm_all=False,
-        cache_dir=None, usage_path=None, estimate=False, assume_output_tokens=1000, log=print):
+        cache_dir=None, usage_path=None, estimate=False, assume_output_tokens=1000, log=print, version="2.0", lint=False):
+    """version "2.1": next steps depend on the records state and name claims and counts (issue 63). lint=True: a model-written summary that fails a
+    hard check (unsupported figure or leaning, contradiction, accusatory wording) is replaced by the code-written one (summary_lint.repair)."""
     chronic, age, conditions, claims = load(data_dir)
     rates = peer_rates(claims, chronic)
     docs = load_docs(data_dir)
@@ -342,11 +345,16 @@ def run(data_dir, flagged_csv, out_path, limit=None, dry_run=False, llm=None, ba
     for pid, lean, reason, call in plan:
         if call:
             m = json.loads(got[pid][0])
-            summary = sr.assemble(packets[pid], m["leaning"], m["headline"], m["interpretation"])
-            out.append({"provider_id": pid, "model": MODEL, "summary": summary, "citations_checked": False,
-                        "source": "llm", "rule_leaning": lean, "rule_reason": reason})
+            summary = sr.assemble(packets[pid], m["leaning"], m["headline"], m["interpretation"], version=version)
+            rec = {"provider_id": pid, "model": MODEL, "summary": summary, "citations_checked": False,
+                   "source": "llm", "rule_leaning": lean, "rule_reason": reason}
+            if lint:
+                found = summary_lint.lint(summary, packets[pid])
+                if found["hard"]:
+                    rec.update({"summary": summary_lint.repair(summary, packets[pid]), "lint_repaired": True, "lint_problems": found["hard"], "source": "llm+repair"})
+            out.append(rec)
         else:
-            out.append({"provider_id": pid, "model": "rules", "summary": sr.assemble(packets[pid], lean),
+            out.append({"provider_id": pid, "model": "rules", "summary": sr.assemble(packets[pid], lean, version=version),
                         "citations_checked": False, "source": "rules", "rule_leaning": lean, "rule_reason": reason})
     _write(out_path, out)
     if usage_path and got:
@@ -377,13 +385,15 @@ if __name__ == "__main__":
     ap.add_argument("--estimate", action="store_true", help="count tokens (free) and print the estimated cost; no billed call")
     ap.add_argument("--llm-all", action="store_true", help="call the model for every provider, even where a rule decides")
     ap.add_argument("--sync", action="store_true", help="one request at a time instead of the Batch API")
+    ap.add_argument("--v21", action="store_true", help="version 2.1 summaries: conditional next steps and the lint-and-repair check")
     ap.add_argument("--cache-dir", help="response cache folder (default: llm_cache next to the output)")
     ap.add_argument("--usage-jsonl", help="where to write token usage and estimated cost (default: next to the output)")
     a = ap.parse_args()
     base = os.path.dirname(os.path.abspath(a.out_jsonl))
     res = run(a.data_dir, a.flagged_csv, a.out_jsonl, a.limit, a.dry_run, batch=not a.sync, llm_all=a.llm_all,
               cache_dir=a.cache_dir or os.path.join(base, "llm_cache"),
-              usage_path=a.usage_jsonl or os.path.join(base, "usage_writer.jsonl"), estimate=a.estimate)
+              usage_path=a.usage_jsonl or os.path.join(base, "usage_writer.jsonl"), estimate=a.estimate,
+              version="2.1" if a.v21 else "2.0", lint=a.v21)
     if not a.estimate:
         calls = sum(1 for r in res if r.get("source") == "llm" or r.get("will_call_llm"))
         print(f"{len(res)} {'packets' if a.dry_run else 'summaries'} ({calls} via the model) -> {a.out_jsonl}")

@@ -24,6 +24,7 @@ sys.path.insert(0, os.path.join(HERE, "..", "src"))
 import case_summary as cs  # noqa: E402
 import llm as llm_mod  # noqa: E402
 import numcheck  # noqa: E402
+import summary_lint  # noqa: E402
 import summary_rules as sr  # noqa: E402
 
 JUDGE_MODEL = os.environ.get("JUDGE_MODEL", "claude-sonnet-5-5")
@@ -51,29 +52,14 @@ from an estimate, is grounded if it matches those outputs even though it is not 
 
 def tool_evidence(run_dir, pid):
     """Text of what the author's tools returned for this provider (office responses, estimates, hybrid review); '' if not logged."""
-    lines = []
+    events, audit = [], []
     tr = os.path.join(run_dir or "", "office_transcript.jsonl")
     if run_dir and os.path.exists(tr):
-        for line in open(tr):
-            e = json.loads(line)
-            if e.get("provider_id") != pid:
-                continue
-            if e.get("action") == "close_request":
-                lines.append(f"Request closed ({e.get('end_state')}): {e.get('usable_charts')} usable charts of {e.get('requested')}; reason: {e.get('reason', '')}")
-            elif "status" in e:
-                codes = ", ".join(d["code"] for d in e.get("deficiencies", [])) or "none"
-                lines.append(f"Round {e['round']} ({e['action']}): response '{e['status']}' {e.get('text', '')} Deficiencies: {codes}. "
-                             f"Usable charts {e['usable_total']} of {e['requested_total']}; sample kind {e['sample_kind']}; days elapsed {e['days_elapsed_total']}.")
+        events = [json.loads(line) for line in open(tr)]
     au = os.path.join(run_dir or "", "audit.jsonl")
     if run_dir and os.path.exists(au):
-        for line in open(au):
-            a = json.loads(line)
-            if a["tool"] not in ("estimate_overpayment", "hybrid_review", "draft_summary"):
-                continue
-            args = a["args"]
-            if args.get("provider_id") == pid or pid in args.get("provider_ids", []):
-                lines.append(f"{a['tool']} output: {a['result']}" if args.get("provider_id") == pid else f"{a['tool']} output (several providers): {a['result']}")
-    return "\n".join(lines)
+        audit = [json.loads(line) for line in open(au)]
+    return summary_lint.evidence_from(events, audit, pid)
 
 
 def rubric_text():
