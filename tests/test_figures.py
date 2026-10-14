@@ -22,12 +22,10 @@ def test_progression_slide_shows_the_numbers_in_the_results_file():
             assert n in text, (v, n)
 
 
-def test_every_version_has_a_figure_with_eight_steps_and_the_latest_is_the_readme_figure():
+def test_every_version_has_a_figure_with_eight_steps():
     for v in mf.VERSIONS:
         svg = open(os.path.join(ROOT, "docs", "images", f"how_it_works_{v}.svg")).read()
         assert len(re.findall(r'font-size="14.5" font-weight="bold"', svg)) == 8 and v in svg
-    assert open(os.path.join(ROOT, "docs", "images", "pipeline.svg")).read() == \
-        open(os.path.join(ROOT, "docs", "images", f"how_it_works_{mf.LATEST}.svg")).read()
 
 
 if __name__ == "__main__":

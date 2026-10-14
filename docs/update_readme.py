@@ -1,10 +1,9 @@
 """Refresh the generated parts of the README so they cannot go stale.
 
-  * the scoreboard table (between <!-- scoreboard:start --> and <!-- scoreboard:end -->), rendered from experiments/results.csv (the source of truth, written
-    from the saved outputs listed in experiments/runs.json by `python eval/scoreboard.py --write`);
-  * the roadmap (between <!-- roadmap:start --> and <!-- roadmap:end -->), built from this repository's GitHub milestones.
-    Each milestone is a live progress badge, so title and open/closed counts update on their own; running this script
-    also picks up milestones created later.
+  * the README's TL;DR sentence and headline table (between the tldr and scoreboard markers), rendered from experiments/results.csv (the source of truth,
+    written from the saved outputs listed in experiments/runs.json by `python eval/scoreboard.py --write`);
+  * docs/results.md (every run) and docs/roadmap.md (built from this repository's GitHub milestones as live progress badges; running this script
+    also picks up milestones created later).
 
 GitHub cannot run code when a README is viewed, so the scoreboard and the milestone list refresh when this script runs
 (`python docs/update_readme.py`). tests/test_scoreboard.py fails if the committed scoreboard no longer matches the data.
@@ -53,18 +52,27 @@ RESULTS_DOC = os.path.join(ROOT, "docs", "results.md")
 
 
 def results_doc():
-    return ("# Results (full table)\n\nRendered from `experiments/results.csv` by `python docs/update_readme.py`; the README shows a compact view. "
-            "Columns are explained in [results_table.md](results_table.md).\n\n" + scoreboard.markdown_from_csv() + "\n")
+    return ("# Results\n\n[Back to the README](../README.md)\n\nRendered from `experiments/results.csv` by `python docs/update_readme.py`. "
+            "Columns are explained in [results_table.md](results_table.md).\n\n## Every run, key numbers\n\n" + scoreboard.markdown_compact().replace("(docs/results.md)", "(results.md)").replace("(docs/results_table.md)", "(results_table.md)")
+            + "\n\n## Every run, all columns\n\n" + scoreboard.markdown_from_csv() + "\n")
 
 
 def build(text, with_roadmap=True):
-    text = replace_block(text, "scoreboard", scoreboard.markdown())
-    if with_roadmap:
-        try:
-            text = replace_block(text, "roadmap", roadmap_markdown())
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            print("note: could not read milestones with gh; roadmap left as is", file=sys.stderr)
+    text = replace_block(text, "tldr", scoreboard.headline_sentence())
+    text = replace_block(text, "scoreboard", scoreboard.headline_table())
     return text
+
+
+ROADMAP_DOC = os.path.join(ROOT, "docs", "roadmap.md")
+
+
+def roadmap_doc():
+    old = open(ROADMAP_DOC).read() if os.path.exists(ROADMAP_DOC) else "# Roadmap\n\n[Back to the README](../README.md)\n\n<!-- roadmap:start -->\n<!-- roadmap:end -->\n"
+    try:
+        return replace_block(old, "roadmap", roadmap_markdown())
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("note: could not read milestones with gh; roadmap left as is", file=sys.stderr)
+        return old
 
 
 if __name__ == "__main__":
@@ -76,6 +84,11 @@ if __name__ == "__main__":
     if results_doc() != doc_old:
         open(RESULTS_DOC, "w").write(results_doc())
         print("docs/results.md updated")
+    rm_old = open(ROADMAP_DOC).read() if os.path.exists(ROADMAP_DOC) else ""
+    rm_new = roadmap_doc()
+    if rm_new != rm_old and "--check" not in sys.argv:
+        open(ROADMAP_DOC, "w").write(rm_new)
+        print("docs/roadmap.md updated")
     if new != old:
         open(README, "w").write(new)
         print("README updated")

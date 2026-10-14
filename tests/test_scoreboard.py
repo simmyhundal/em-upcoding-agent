@@ -24,11 +24,12 @@ def test_total_ignores_unscored_evals():
     assert sb.total([None, None]) == "0 / 0"
 
 
-def test_readme_table_is_rendered_from_the_results_file():
+def test_readme_table_and_tldr_are_rendered_from_the_results_file():
     text = open(os.path.join(ROOT, "README.md")).read()
-    start = text.index("<!-- scoreboard:start -->") + len("<!-- scoreboard:start -->")
-    end = text.index("<!-- scoreboard:end -->")
-    assert text[start:end].strip() == sb.markdown_compact().strip(), "README table is stale: run python docs/update_readme.py"
+    for name, expected in (("scoreboard", sb.headline_table()), ("tldr", sb.headline_sentence())):
+        start = text.index(f"<!-- {name}:start -->") + len(f"<!-- {name}:start -->")
+        end = text.index(f"<!-- {name}:end -->")
+        assert text[start:end].strip() == expected.strip(), f"README {name} block is stale: run python docs/update_readme.py"
 
 
 def test_full_results_doc_is_rendered_from_the_results_file():

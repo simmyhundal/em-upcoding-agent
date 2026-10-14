@@ -370,6 +370,40 @@ def markdown_compact(path=CSV_PATH):
     return "\n".join(lines)
 
 
+ARMS = [("Workflow v2.x, screen at suspicion 5", ["261013_12_api", "261013_13_api"], "AI"),
+        ("Workflow v2.x, screen at top 25", ["261013_14_api", "261013_15_api"], "AI"),
+        ("Agent v3.x, with the screen tool", ["261013_8_api", "261013_9_api"], "Agent"),
+        ("Agent v3.x, without the screen tool", ["261013_10_api", "261013_11_api"], "Agent")]
+
+
+def _arm(rows, ids, stage):
+    rs = [r for r in rows if r["run_id"] in ids and r["stage"] == stage]
+    found = sum(int(r["fn_total"]) - int(r["fn_missed"]) for r in rs)
+    return {"found": found, "of": sum(int(r["fn_total"]) for r in rs), "accused": sum(int(r["fp_count"] or 0) for r in rs),
+            "asked": sum(int(r["honest_requested"] or 0) for r in rs), "rounds": sum(int(r["request_rounds_total"] or 0) for r in rs),
+            "use": sum(float(r["usefulness"]) for r in rs if r["usefulness"]) / max(sum(1 for r in rs if r["usefulness"]), 1)}
+
+
+def headline_table(path=CSV_PATH):
+    """The README's short results table: the four arms on the two reserved seeds, summed, rendered from the results file."""
+    rows = read_csv(path)
+    out = ["| Arm | Upcoders found | Honest practices accused | Honest practices asked for charts | Request rounds | Summary usefulness (1-5, LLM judge) |", "|---|---|---|---|---|---|"]
+    for name, ids, stage in ARMS:
+        a = _arm(rows, ids, stage)
+        out.append(f"| {name} | {a['found']} of {a['of']} | {a['accused']} | {a['asked']} | {a['rounds']} | {a['use']:.1f} |")
+    out += ["", "Two reserved test seeds, 8 planted upcoders each (more in [the full results](docs/results.md))."]
+    return "\n".join(out)
+
+
+def headline_sentence(path=CSV_PATH):
+    rows = read_csv(path)
+    w, ag = _arm(rows, ARMS[0][1], "AI"), _arm(rows, ARMS[2][1], "Agent")
+    accused = ("neither accused an honest practice" if w["accused"] == 0 and ag["accused"] == 0
+               else f"honest practices accused: {w['accused']} by the workflow, {ag['accused']} by the agent")
+    return (f"On two reserved test seeds ({w['of']} planted upcoders), the fixed workflow found {w['found']} and the agent {ag['found']}; {accused}, and "
+            f"the agent asked {ag['asked']} honest practices for charts to the workflow's {w['asked']}.")
+
+
 def markdown(registry_path=None):
     return markdown_compact(CSV_PATH)
 

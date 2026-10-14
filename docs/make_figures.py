@@ -105,8 +105,55 @@ def how_it_works(version):
     s.append("</svg>")
     svg = "\n".join(s)
     write(f"how_it_works_{version}.svg", svg)
-    if version == LATEST:
-        write("pipeline.svg", svg)          # the README shows the latest version's figure
+
+
+AGENT_ACTIONS = [
+    ("Screen", "Rank providers by z-score, risk-adjusted score or priority, with any cutoff, as often as it likes.", BLUE),
+    ("Look closer", "Evidence card and peer comparison for one provider: billing mix, complexity, sample claims.", GREEN),
+    ("Request charts", "Ask a practice for a random sample first, then a targeted one if needed.", GREEN),
+    ("Follow up", "Answer deficiencies (unsigned, missing results), or ask for the EHR audit trail.", GREEN),
+    ("Check notes", "Notes against claims: problems addressed, orders and results, signatures, copy-forward.", GREEN),
+    ("Estimate", "Extrapolate an overpayment from a random sample, flagged when the sample is too thin.", GREEN),
+    ("Review", "Chart rule and summary rules first, a model only where they are silent.", GREEN),
+    ("Submit findings", "A finding or a stated reason for every candidate; unsupported claims are refused.", ORANGE)]
+
+
+def agent_actions():
+    """The agent and the actions it chooses from (the README's main figure)."""
+    W, H = 1000, 560
+    s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>', f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
+         f'<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="{MUTED}"/></marker></defs>']
+    bw, bh = 290, 96
+    pos = [(30, 30), (355, 30), (680, 30), (30, 200), (680, 200), (30, 370), (355, 370), (680, 370)]
+    cx, cy, cw, ch = 355, 190, 290, 116
+    centers = []
+    for (n, body, col), (x, y) in zip(AGENT_ACTIONS, pos):
+        s.append(f'<rect x="{x}" y="{y}" width="{bw}" height="{bh}" rx="10" fill="#f9fafb" stroke="{col}" stroke-width="2.5"/>')
+        s.append(f'<text x="{x + 16}" y="{y + 28}" font-size="14.5" font-weight="bold" fill="{INK}">{escape(n)}</text>')
+        for j, line in enumerate(textwrap.wrap(body, 40)[:3]):
+            s.append(f'<text x="{x + 16}" y="{y + 52 + j * 17}" font-size="12.5" fill="{MUTED}">{escape(line)}</text>')
+        centers.append((x + bw / 2, y + bh / 2, x, y))
+    s.append(f'<rect x="{cx}" y="{cy}" width="{cw}" height="{ch}" rx="14" fill="#fff7ed" stroke="{ORANGE}" stroke-width="3"/>')
+    s.append(f'<text x="{cx + cw / 2}" y="{cy + 38}" text-anchor="middle" font-size="19" font-weight="bold" fill="{INK}">The agent</text>')
+    for j, line in enumerate(["Claude Opus 5.5 picks the next action", "within caps: tool calls, dollars, charts requested"]):
+        s.append(f'<text x="{cx + cw / 2}" y="{cy + 64 + j * 18}" text-anchor="middle" font-size="12.5" fill="{MUTED}">{line}</text>')
+    s.append(f'<text x="{cx + cw / 2}" y="{cy + 106}" text-anchor="middle" font-size="12" fill="{MUTED}">never sees the answer key</text>')
+    for (mx, my, x, y) in centers:                       # a line from the agent to each action, ending at the nearest box edge
+        tx = cx + cw / 2
+        ty = cy + ch / 2
+        if abs(mx - tx) < 5:
+            x1, y1, x2, y2 = tx, (cy if my < ty else cy + ch), mx, (y + bh if my < ty else y)
+        else:
+            x1, y1, x2, y2 = (cx if mx < tx else cx + cw), ty, (x + bw if mx < tx else x), my
+        s.append(f'<path d="M{x1} {y1} L{x2} {y2}" stroke="{MUTED}" stroke-width="1.5" marker-end="url(#a)" fill="none"/>')
+    chips = [("Simulated practices answer", "complete, partial, late, unsigned or silent", GREEN, 30), ("Checks before anything is accepted", "citations, numbers, contradictions, leaning", GREEN, 355),
+             ("People review the drafts", "nothing is sent or decided automatically", PEOPLE, 680)]
+    for t, sub, col, x in chips:
+        s.append(f'<rect x="{x}" y="490" width="{bw}" height="56" rx="10" fill="none" stroke="{col}" stroke-width="2" stroke-dasharray="6 4"/>')
+        s.append(f'<text x="{x + 16}" y="513" font-size="13" font-weight="bold" fill="{INK}">{escape(t)}</text>')
+        s.append(f'<text x="{x + 16}" y="533" font-size="12" fill="{MUTED}">{escape(sub)}</text>')
+    s.append("</svg>")
+    write("agent.svg", "\n".join(s))
 
 
 def pipeline():
@@ -151,25 +198,25 @@ def progression_cells(rows=None):
 
 def progression():
     """One slide: how it works over time, as a table with icons and headline eval results."""
-    ev = progression_cells()
-    cols = [("data", "Data"), ("screen", "Screen"), ("records", "Records"), ("write", "Who writes it"), ("decide", "Who decides"),
-            ("eval", "Headline eval")]
-    rows = [("v1.0", "Version 1", ["Provider, patient and claim tables. A records sample is handed to the AI.", "Top 25 by statistics. Fixed.",
-                                  "Given, not requested.", "The AI writes it all: facts, citations, next steps.", "Code, in a fixed order."]),
-            ("v2.0", "Version 2: workflow", ["Plan-shaped tables; conditions derived from claims.", "Suspicion 5 or higher (or top 25).",
-                                            "Requested: 30 charts, one follow-up; some late or missing.", "Code writes facts and clear cases; a model the rest.",
-                                            "Code, with a fixed policy."]),
-            ("v3.0", "Version 3: agent", ["Same as version 2.", "A tool the agent runs with any cutoff.", "The agent chooses whom to ask and whether to follow up.",
-                                         "The agent submits findings; code adds facts and checks.", "The agent, within caps."])]
-    W, H = 1180, 500
-    x0, cw, rh, y0 = 150, 170, 118, 92
+    ev = {k.replace(".0", ".x"): v for k, v in progression_cells().items()}
+    cols = [("data", "Claims"), ("screen", "Screen"), ("records", "Charts"), ("write", "Who writes it"), ("decide", "Who decides"),
+            ("eval", "Headline results")]
+    rows = [("v1.x", "Fixed workflow", ["Provider, patient and claim tables with a stored condition count.", "Top 25 by statistics. Fixed.",
+                                      "A sample handed to the AI up front.", "The AI writes it all: facts, citations, next steps.", "Code, in a fixed order."]),
+            ("v2.x", "Fixed workflow", ["Plan-shaped claims; conditions derived from them.", "Suspicion 5 or higher (or top 25).",
+                                      "Requested: 30 per flagged doctor, one follow-up; some late or missing.", "Code writes facts and clear cases; a model the rest.",
+                                      "Code, with a fixed policy."]),
+            ("v3.x", "Agent", ["Same as v2.x.", "A tool the agent runs with any cutoff.", "The agent chooses whom to ask, what sample, and whether to follow up.",
+                              "The agent submits findings; code adds facts and checks.", "The agent, within caps."])]
+    W, H = 1180, 410
+    x0, cw, rh, y0 = 150, 170, 118, 56
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="1000" height="{round(H * 1000 / W)}" {FONT}>',
          f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
-         f'<text x="30" y="38" font-size="19" font-weight="bold" fill="{INK}">How it works, version by version</text>']
+         ]
     for i, (icon, label) in enumerate(cols):
         x = x0 + i * cw
-        s.append(_icon(icon, x, 50, BLUE))
-        s.append(f'<text x="{x + 34}" y="68" font-size="12.5" font-weight="bold" fill="{INK}">{escape(label)}</text>')
+        s.append(_icon(icon, x, 14, BLUE))
+        s.append(f'<text x="{x + 34}" y="32" font-size="12.5" font-weight="bold" fill="{INK}">{escape(label)}</text>')
     for r, (v, name, cells) in enumerate(rows):
         y = y0 + r * rh
         s.append(f'<rect x="20" y="{y}" width="{W - 40}" height="{rh - 8}" rx="10" fill="#f9fafb" stroke="{LINE}"/>')
@@ -181,7 +228,6 @@ def progression():
             width = 24 if i < 5 else 27
             for j, line in enumerate(textwrap.wrap(text, width)[:6]):
                 s.append(f'<text x="{x}" y="{y + 24 + j * 16}" font-size="12" fill="{INK if i == 5 else MUTED}">{escape(line)}</text>')
-    s.append(f'<text x="30" y="{H - 20}" font-size="12" fill="{MUTED}">Numbers come from experiments/results.csv and are not comparable across versions: different data and inputs. See the Eval table.</text>')
     s.append("</svg>")
     write("progression.svg", "\n".join(s))
 
@@ -362,6 +408,7 @@ def funnel():
 if __name__ == "__main__":
     os.makedirs(os.path.join(ROOT, "docs", "images"), exist_ok=True)
     pipeline()
+    agent_actions()
     progression()
     em_levels()
     funnel()
