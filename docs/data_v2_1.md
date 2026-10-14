@@ -51,7 +51,7 @@ Which providers clone, which visits are cloned, and the visit each cloned note w
 ## Office responses
 New deficiency codes for the provider-office simulator: `MISSING_ORDERS`, `MISSING_RESULTS`, `LATE_SIGNATURE`, `AUDIT_TRAIL_REFUSED`. Existing ones (`MISSING_SIGNATURE`, `WRONG_DATES`, `ILLEGIBLE`, ...) stay.
 
-## Open choices (for the user)
-1. Free-text note (templated) versus structured fields only. Recommended: include the text so similarity checks are real.
-2. Audit trail as a second-tier request. Recommended: yes.
-3. Keep phantom visits out of 2.1. Recommended: yes.
+## Decisions (made with the user)
+1. **Templated note text is included** (structured fields stay the truth), so similarity checks are real.
+2. **The audit trail is a second-tier request**: a follow-up that costs a round and can be refused or slow.
+3. **Phantom visits stay out of 2.1.** The note package supports them for a later version.

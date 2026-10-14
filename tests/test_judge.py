@@ -72,6 +72,34 @@ def test_unverified_numbers_are_reported_to_the_judge_and_in_the_output():
     assert ju.summarize(out)["summaries_with_all_numbers_verified"] == 0.0
 
 
+def test_judge_v2_adds_tool_outputs_and_v1_prompt_is_unchanged():
+    run_dir = tempfile.mkdtemp()
+    pid = ROWS[0]["provider_id"]
+    with open(os.path.join(run_dir, "office_transcript.jsonl"), "w") as f:
+        f.write(json.dumps({"action": "send_request", "provider_id": pid, "round": 1, "status": "extension", "text": "We need more time.",
+                            "deficiencies": [{"code": "EXTENSION"}], "usable_total": 0, "requested_total": 30, "sample_kind": "random",
+                            "days_elapsed_total": 41}) + "\n")
+    with open(os.path.join(run_dir, "audit.jsonl"), "w") as f:
+        f.write(json.dumps({"tool": "estimate_overpayment", "args": {"provider_id": pid}, "result": '{"point_estimate": 98765}'}) + "\n")
+    ev = ju.tool_evidence(run_dir, pid)
+    assert "extension" in ev and "98765" in ev and "days elapsed 41" in ev
+    path = os.path.join(D, "checked_v2.jsonl")
+    with open(path, "w") as f:
+        f.write(json.dumps({"provider_id": pid, "citation_check": {"passed": True, "n_cited": 1, "n_valid": 1, "reason": ""},
+                            "summary": {"headline": "h", "leaning": "inconclusive", "rationale": "The estimate is 98765 dollars.",
+                                        "cited_claim_ids": ["C0000001"], "next_steps": []}}) + "\n")
+    seen = {}
+
+    def fake(system, user):
+        seen["system"], seen["user"] = system, user
+        return json.dumps({"score": 3, "justification": "ok", "problems": []})
+    out = ju.run(D, FLAGGED, path, os.path.join(D, "o_v2.jsonl"), llm=fake, run_dir=run_dir, version="j2")
+    assert "TOOL OUTPUTS THE AUTHOR SAW" in seen["user"] and "98765" in seen["user"] and "output of tools" in seen["system"]
+    assert out[0]["judge_version"] == "j2" and out[0]["unverified_numbers"] == []          # the estimate's number is matched through the tool output
+    ju.run(D, FLAGGED, path, os.path.join(D, "o_v1.jsonl"), llm=fake, run_dir=run_dir, version="j1")
+    assert "TOOL OUTPUTS" not in seen["user"] and seen["system"] == ju.SYSTEM               # j1 is exactly the original prompt
+
+
 def test_summarize():
     s = ju.summarize([{"score": 5}, {"score": 3}, {"score": 4}])
     assert s["mean"] == 4.0 and s["distribution"][3] == 1 and s["n"] == 3

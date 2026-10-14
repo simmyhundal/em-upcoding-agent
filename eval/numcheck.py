@@ -53,8 +53,9 @@ def _collect(obj, acc):
             _collect(v, acc)
 
 
-def allowed_numbers(packet):
+def allowed_numbers(packet, extra_text=""):
     acc = set()
+    _collect(extra_text, acc)
     _collect(packet, acc)
     _collect(sr.to_card(packet), acc)
     _collect(sr.facts(packet), acc)
@@ -66,9 +67,10 @@ def _matches(v, d, allowed):
     return any(abs(a - v) <= tol or abs(a * 100 - v) <= tol or abs(a - v * 100) <= tol * 100 for a in allowed)
 
 
-def verify(summary, packet):
+def verify(summary, packet, extra_text=""):
+    """extra_text: tool outputs the author saw (judge v2); numbers in them count as matched."""
     text = " ".join([summary["headline"], summary["rationale"], *summary["next_steps"]])
-    allowed = allowed_numbers(packet)
+    allowed = allowed_numbers(packet, extra_text)
     nums = numbers_in(text)
     bad = sorted({lit for v, d, lit in nums if not _matches(v, d, allowed)})
     return {"numbers": len(nums), "unverified": bad}

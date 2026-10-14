@@ -69,7 +69,7 @@ def main(run_id, code_run):
     out = os.path.join(ROOT, "experiments", run_id)
     rows = ju.run(view, os.path.join(ROOT, "experiments", code_run, "flagged.csv"), os.path.join(out, "case_summaries_checked.jsonl"),
                   os.path.join(out, "usefulness.jsonl"), batch=True, cache_dir=os.path.join(out, "llm_cache_judge"),
-                  usage_path=os.path.join(out, "usage_judge.jsonl"))
+                  usage_path=os.path.join(out, "usage_judge.jsonl"), run_dir=out)
     print(run_id, ju.summarize(rows))
 
 

@@ -18,6 +18,7 @@ Rebuild the file from the saved run outputs and the answer keys (gitignored) wit
 | `upcoder_rate` | The share of providers that are real upcoders (prevalence), with counts. "Baseline" is reserved for a comparison arm. |
 | `upcoder_clone_level` | The share of upcoders whose notes are cloned to match the bill (`n/a` on version 1, which had no cloning). |
 | `fn_*`, `fp_*`, `precision*`, `citations_*`, `usefulness*` | The raw numbers behind each eval and a `pass`/`fail` against its threshold (blank = not scored). |
+| `judge_version` | Which usefulness judge scored the row: `j1` = evidence card only (all runs so far), `j2` = card plus the tool outputs the author saw. Blank when no usefulness was scored. |
 | `evals_score_of_5` | Evals passed scaled to a five-point score: 5 x passed / applicable (3 of 4 becomes 3.75). Usefulness itself is always scored 1 to 5, so it needs no conversion. |
 | `evals_passed`, `evals_applicable` | Evals passed and the denominator, how many evals applied to the row (the README shows them as "Evals passed" and "Evals scored"). Screen rows have 3; AI rows have 4, or 5 when the usefulness judge ran. Earlier tables had one more eval (templating, since removed), so old scores like 5/5 are now 4/4. |
 | `honest_requested` | Honest doctors who received a records request (the burden on honest practices). Blank where the stage sent none (the screen) or where requests were not simulated (version 1). |
