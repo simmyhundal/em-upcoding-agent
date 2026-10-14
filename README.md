@@ -219,78 +219,78 @@ Each run has a **Screen** row (the statistical screen's flagged doctors count as
 |---|---|---|---|---|---|---|---|---|---|---|
 | screen_v1_s42 | v1.0 | development | Screen | Z-score of risk-adjusted coding >= 5 | 🟩 8 of 8 | 🟩 3 of 208 | 🟥 73% | – | – | 3.3 of 5 (2 of 3) |
 | 261008_2_cc | v1.0 | development | Screen | Top 25 upcoding outliers | 🟩 8 of 8 | 🟩 17 of 208 | 🟥 32% | – | – | 3.3 of 5 (2 of 3) |
-| 261008_2_cc | v1.0 | development | AI | AI calls upcoding (screen: top 25 upcoding outliers) | 🟩 7 of 8 | 🟥 10 of 17 | 🟥 41% | – | 2.96 | 2.5 of 5 (2 of 4) |
+| 261008_2_cc | v1.0 | development | AI | AI calls upcoding (screen: top 25 upcoding outliers) | 🟩 7 of 8 | 🟥 10 of 17 | 🟥 41% | – | 1.84 (j2.2) | 2.5 of 5 (2 of 4) |
 | 261008_3_cc | v1.0 | development | Screen | Top 25 upcoding outliers | 🟩 8 of 8 | 🟩 17 of 208 | 🟥 32% | – | – | 3.3 of 5 (2 of 3) |
-| 261008_3_cc | v1.0 | development | AI | AI calls upcoding (screen: top 25 upcoding outliers) | 🟩 8 of 8 | 🟥 14 of 17 | 🟥 36% | – | 2.84 | 2.5 of 5 (2 of 4) |
+| 261008_3_cc | v1.0 | development | AI | AI calls upcoding (screen: top 25 upcoding outliers) | 🟩 8 of 8 | 🟥 14 of 17 | 🟥 36% | – | 2.84 (j2.2) | 2.5 of 5 (2 of 4) |
 | 261008_4_cc | v1.0 | development | Screen | Top 25 upcoding outliers | 🟩 8 of 8 | 🟩 17 of 208 | 🟥 32% | – | – | 3.3 of 5 (2 of 3) |
-| 261008_4_cc | v1.0 | development | AI | AI calls upcoding (screen: top 25 upcoding outliers) | 🟩 8 of 8 | 🟩 0 of 17 | 🟩 100% | – | 4.16 | 5.0 of 5 (4 of 4) |
+| 261008_4_cc | v1.0 | development | AI | AI calls upcoding (screen: top 25 upcoding outliers) | 🟩 8 of 8 | 🟩 0 of 17 | 🟩 100% | – | 3.96 (j2.2) | 5.0 of 5 (4 of 4) |
 | 261009_1_api | v1.0 | development | Screen | Top 25 upcoding outliers | 🟩 8 of 8 | 🟩 17 of 208 | 🟥 32% | – | – | 3.3 of 5 (2 of 3) |
-| 261009_1_api | v1.0 | development | AI | AI calls upcoding (screen: top 25 upcoding outliers) | 🟩 8 of 8 | 🟩 0 of 17 | 🟩 100% | 🟥 3.44 (j1) | 4.00 | 4.0 of 5 (4 of 5) |
+| 261009_1_api | v1.0 | development | AI | AI calls upcoding (screen: top 25 upcoding outliers) | 🟩 8 of 8 | 🟩 0 of 17 | 🟩 100% | 🟥 3.44 (j1) | 3.76 (j2.2) | 4.0 of 5 (4 of 5) |
 | screen_v1_s101 | v1.0 | held-out | Screen | Z-score of risk-adjusted coding >= 5 | 🟩 8 of 8 | 🟩 1 of 208 | 🟩 89% | – | – | 5.0 of 5 (3 of 3) |
 | 261009_2_api | v1.0 | held-out | Screen | Top 25 upcoding outliers | 🟩 8 of 8 | 🟩 17 of 208 | 🟥 32% | – | – | 3.3 of 5 (2 of 3) |
-| 261009_2_api | v1.0 | held-out | AI | AI calls upcoding (screen: top 25 upcoding outliers) | 🟩 8 of 8 | 🟩 0 of 17 | 🟩 100% | 🟥 3.24 (j1) | 3.96 | 4.0 of 5 (4 of 5) |
+| 261009_2_api | v1.0 | held-out | AI | AI calls upcoding (screen: top 25 upcoding outliers) | 🟩 8 of 8 | 🟩 0 of 17 | 🟩 100% | 🟥 3.24 (j1) | 3.72 (j2.2) | 4.0 of 5 (4 of 5) |
 | 261012_8_api | v2.0 | development | Screen | Z-score of risk-adjusted coding >= 5 | 🟥 6 of 8 | 🟩 7 of 208 | 🟥 46% | – | – | 1.7 of 5 (1 of 3) |
 | 261012_8_api | v2.0 | development | Rules | Documented level below billed in over 15% of returned charts | 🟥 2 of 8 | 🟩 0 of 7 | 🟩 100% | – | – | 3.3 of 5 (2 of 3) |
 | 261012_8_api | v2.0 | development | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | 🟥 3 of 8 | 🟥 1 of 7 | 🟥 75% | – | – | 0.0 of 5 (0 of 3) |
-| 261012_8_api | v2.0 | development | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 2 of 8 | 🟩 0 of 7 | 🟩 100% | 🟥 3.54 (j1) | 5.00 | 3.0 of 5 (3 of 5) |
+| 261012_8_api | v2.0 | development | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 2 of 8 | 🟩 0 of 7 | 🟩 100% | 🟥 3.54 (j1) | 4.00 (j2.2) | 3.0 of 5 (3 of 5) |
 | 261012_8_api | v2.0 | development | Hybrid | Chart rule first, then summary rules and model | 🟥 2 of 8 | 🟩 0 of 7 | 🟩 100% | – | – | 3.3 of 5 (2 of 3) |
 | 261012_9_api | v2.0 | held-out | Screen | Z-score of risk-adjusted coding >= 5 | 🟥 4 of 8 | 🟩 5 of 208 | 🟥 44% | – | – | 1.7 of 5 (1 of 3) |
 | 261012_9_api | v2.0 | held-out | Rules | Documented level below billed in over 15% of returned charts | 🟥 1 of 8 | 🟩 0 of 5 | 🟩 100% | – | – | 3.3 of 5 (2 of 3) |
 | 261012_9_api | v2.0 | held-out | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | 🟥 2 of 8 | 🟩 0 of 5 | 🟩 100% | – | – | 3.3 of 5 (2 of 3) |
-| 261012_9_api | v2.0 | held-out | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 2 of 8 | 🟥 1 of 5 | 🟥 67% | 🟥 3.44 (j1) | 4.67 | 1.0 of 5 (1 of 5) |
+| 261012_9_api | v2.0 | held-out | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 2 of 8 | 🟥 1 of 5 | 🟥 67% | 🟥 3.44 (j1) | 3.67 (j2.2) | 1.0 of 5 (1 of 5) |
 | 261012_9_api | v2.0 | held-out | Hybrid | Chart rule first, then summary rules and model | 🟥 2 of 8 | 🟥 1 of 5 | 🟥 67% | – | – | 0.0 of 5 (0 of 3) |
 | 261012_12_api | v2.0 | held-out | Screen | Z-score of risk-adjusted coding >= 5 | 🟥 2 of 3 | 🟩 20 of 597 | 🟥 9% | – | – | 1.7 of 5 (1 of 3) |
 | 261012_12_api | v2.0 | held-out | Rules | Documented level below billed in over 15% of returned charts | 🟥 0 of 3 | 🟩 0 of 20 | – | – | – | 2.5 of 5 (1 of 2) |
 | 261012_12_api | v2.0 | held-out | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | 🟥 0 of 3 | 🟥 3 of 20 | 🟥 0% | – | – | 0.0 of 5 (0 of 3) |
-| 261012_12_api | v2.0 | held-out | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 0 of 3 | 🟥 5 of 20 | 🟥 0% | 🟥 3.45 (j1) | 4.59 | 1.0 of 5 (1 of 5) |
+| 261012_12_api | v2.0 | held-out | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 0 of 3 | 🟥 5 of 20 | 🟥 0% | 🟥 3.45 (j1) | 3.45 (j2.2) | 1.0 of 5 (1 of 5) |
 | 261012_12_api | v2.0 | held-out | Hybrid | Chart rule first, then summary rules and model | 🟥 0 of 3 | 🟥 5 of 20 | 🟥 0% | – | – | 0.0 of 5 (0 of 3) |
 | 261012_13_api | v2.0 | held-out | Screen | Z-score of risk-adjusted coding >= 5 | 🟥 3 of 6 | 🟩 17 of 594 | 🟥 15% | – | – | 1.7 of 5 (1 of 3) |
 | 261012_13_api | v2.0 | held-out | Rules | Documented level below billed in over 15% of returned charts | 🟥 0 of 6 | 🟩 0 of 17 | – | – | – | 2.5 of 5 (1 of 2) |
 | 261012_13_api | v2.0 | held-out | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | 🟥 3 of 6 | 🟩 1 of 17 | 🟥 75% | – | – | 1.7 of 5 (1 of 3) |
-| 261012_13_api | v2.0 | held-out | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 2 of 6 | 🟥 3 of 17 | 🟥 40% | 🟥 3.25 (j1) | 4.55 | 1.0 of 5 (1 of 5) |
+| 261012_13_api | v2.0 | held-out | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 2 of 6 | 🟥 3 of 17 | 🟥 40% | 🟥 3.25 (j1) | 3.45 (j2.2) | 1.0 of 5 (1 of 5) |
 | 261012_13_api | v2.0 | held-out | Hybrid | Chart rule first, then summary rules and model | 🟥 2 of 6 | 🟥 3 of 17 | 🟥 40% | – | – | 0.0 of 5 (0 of 3) |
 | 261012_14_api | v2.0 | held-out | Screen | Z-score of risk-adjusted coding >= 5 | 🟥 10 of 12 | 🟩 13 of 588 | 🟥 43% | – | – | 1.7 of 5 (1 of 3) |
 | 261012_14_api | v2.0 | held-out | Rules | Documented level below billed in over 15% of returned charts | 🟥 3 of 12 | 🟩 0 of 13 | 🟩 100% | – | – | 3.3 of 5 (2 of 3) |
 | 261012_14_api | v2.0 | held-out | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | 🟥 4 of 12 | 🟩 1 of 13 | 🟩 80% | – | – | 3.3 of 5 (2 of 3) |
-| 261012_14_api | v2.0 | held-out | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 4 of 12 | 🟩 1 of 13 | 🟩 80% | 🟥 3.57 (j1) | 4.83 | 3.0 of 5 (3 of 5) |
+| 261012_14_api | v2.0 | held-out | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 4 of 12 | 🟩 1 of 13 | 🟩 80% | 🟥 3.57 (j1) | 3.83 (j2.2) | 3.0 of 5 (3 of 5) |
 | 261012_14_api | v2.0 | held-out | Hybrid | Chart rule first, then summary rules and model | 🟥 5 of 12 | 🟩 1 of 13 | 🟩 83% | – | – | 3.3 of 5 (2 of 3) |
 | 261012_10_api | v2.0 | development | Screen | Z-score of risk-adjusted coding >= 5 | 🟥 6 of 8 | 🟩 7 of 208 | 🟥 46% | – | – | 1.7 of 5 (1 of 3) |
 | 261012_10_api | v2.0 | development | Rules | Documented level below billed in over 15% of returned charts | 🟥 6 of 8 | 🟩 0 of 7 | 🟩 100% | – | – | 3.3 of 5 (2 of 3) |
 | 261012_10_api | v2.0 | development | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | 🟥 0 of 8 | 🟥 2 of 7 | 🟥 0% | – | – | 0.0 of 5 (0 of 3) |
-| 261012_10_api | v2.0 | development | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 4 of 8 | 🟩 0 of 7 | 🟩 100% | 🟥 3.54 (j1) | 5.00 | 3.0 of 5 (3 of 5) |
+| 261012_10_api | v2.0 | development | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 4 of 8 | 🟩 0 of 7 | 🟩 100% | 🟥 3.54 (j1) | 4.00 (j2.2) | 3.0 of 5 (3 of 5) |
 | 261012_10_api | v2.0 | development | Hybrid | Chart rule first, then summary rules and model | 🟥 6 of 8 | 🟩 0 of 7 | 🟩 100% | – | – | 3.3 of 5 (2 of 3) |
 | 261012_11_api | v2.0 | development | Screen | Z-score of risk-adjusted coding >= 5 | 🟥 4 of 8 | 🟩 5 of 208 | 🟥 44% | – | – | 1.7 of 5 (1 of 3) |
 | 261012_11_api | v2.0 | development | Rules | Documented level below billed in over 15% of returned charts | 🟥 0 of 8 | 🟩 0 of 5 | – | – | – | 2.5 of 5 (1 of 2) |
 | 261012_11_api | v2.0 | development | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | 🟥 1 of 8 | 🟥 1 of 5 | 🟥 50% | – | – | 0.0 of 5 (0 of 3) |
-| 261012_11_api | v2.0 | development | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 3 of 8 | 🟥 1 of 5 | 🟥 75% | 🟥 3.67 (j1) | 4.33 | 1.0 of 5 (1 of 5) |
+| 261012_11_api | v2.0 | development | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 3 of 8 | 🟥 1 of 5 | 🟥 75% | 🟥 3.67 (j1) | 3.33 (j2.2) | 1.0 of 5 (1 of 5) |
 | 261012_11_api | v2.0 | development | Hybrid | Chart rule first, then summary rules and model | 🟥 3 of 8 | 🟥 1 of 5 | 🟥 75% | – | – | 0.0 of 5 (0 of 3) |
-| 261013_3_api | agent-dev | development | Agent | Agent chose: combined rank, top 25; records for 10 providers | 🟥 3 of 8 | 🟩 0 of 4 | 🟩 100% | – | 4.18 | 3.8 of 5 (3 of 4) |
+| 261013_3_api | agent-dev | development | Agent | Agent chose: combined rank, top 25; records for 10 providers | 🟥 3 of 8 | 🟩 0 of 4 | 🟩 100% | – | 3.18 (j2.2) | 3.8 of 5 (3 of 4) |
 | 261013_6_api | v2.0 | reserved | Screen | Z-score of risk-adjusted coding >= 5 | 🟥 6 of 8 | 🟩 6 of 208 | 🟥 50% | – | – | 1.7 of 5 (1 of 3) |
 | 261013_6_api | v2.0 | reserved | Rules | Documented level below billed in over 15% of returned charts | 🟥 2 of 8 | 🟩 0 of 6 | 🟩 100% | – | – | 3.3 of 5 (2 of 3) |
 | 261013_6_api | v2.0 | reserved | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | 🟥 2 of 8 | 🟩 0 of 6 | 🟩 100% | – | – | 3.3 of 5 (2 of 3) |
-| 261013_6_api | v2.0 | reserved | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 1 of 8 | 🟩 0 of 6 | 🟩 100% | 🟥 3.08 (j1) | 4.92 | 3.0 of 5 (3 of 5) |
+| 261013_6_api | v2.0 | reserved | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 1 of 8 | 🟩 0 of 6 | 🟩 100% | 🟥 3.08 (j1) | 3.83 (j2.2) | 3.0 of 5 (3 of 5) |
 | 261013_6_api | v2.0 | reserved | Hybrid | Chart rule first, then summary rules and model | 🟥 3 of 8 | 🟩 0 of 6 | 🟩 100% | – | – | 3.3 of 5 (2 of 3) |
 | 261013_7_api | v2.0 | reserved | Screen | Z-score of risk-adjusted coding >= 5 | 🟩 7 of 8 | 🟩 11 of 208 | 🟥 39% | – | – | 3.3 of 5 (2 of 3) |
 | 261013_7_api | v2.0 | reserved | Rules | Documented level below billed in over 15% of returned charts | 🟥 3 of 8 | 🟩 1 of 11 | 🟥 75% | – | – | 1.7 of 5 (1 of 3) |
 | 261013_7_api | v2.0 | reserved | Rules | Note claims moderate+ data but claim has no lab or test line, over 12% of returned charts | 🟥 3 of 8 | 🟥 2 of 11 | 🟥 60% | – | – | 0.0 of 5 (0 of 3) |
-| 261013_7_api | v2.0 | reserved | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 2 of 8 | 🟥 3 of 11 | 🟥 40% | 🟥 3.44 (j1) | 4.72 | 1.0 of 5 (1 of 5) |
+| 261013_7_api | v2.0 | reserved | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 2 of 8 | 🟥 3 of 11 | 🟥 40% | 🟥 3.44 (j1) | 3.61 (j2.2) | 1.0 of 5 (1 of 5) |
 | 261013_7_api | v2.0 | reserved | Hybrid | Chart rule first, then summary rules and model | 🟥 3 of 8 | 🟥 4 of 11 | 🟥 43% | – | – | 0.0 of 5 (0 of 3) |
 | 261013_12_api | v2.0 | reserved | Screen | Z-score of risk-adjusted coding >= 5 | 🟥 6 of 8 | 🟩 6 of 208 | 🟥 50% | – | – | 1.7 of 5 (1 of 3) |
-| 261013_12_api | v2.0 | reserved | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 2 of 8 | 🟩 0 of 6 | 🟩 100% | 🟥 3.50 (j1) | 4.50 | 3.0 of 5 (3 of 5) |
+| 261013_12_api | v2.0 | reserved | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 2 of 8 | 🟩 0 of 6 | 🟩 100% | 🟥 3.50 (j1) | 3.25 (j2.2) | 3.0 of 5 (3 of 5) |
 | 261013_13_api | v2.0 | reserved | Screen | Z-score of risk-adjusted coding >= 5 | 🟩 7 of 8 | 🟩 11 of 208 | 🟥 39% | – | – | 3.3 of 5 (2 of 3) |
-| 261013_13_api | v2.0 | reserved | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 4 of 8 | 🟩 0 of 11 | 🟩 100% | 🟥 3.39 (j1) | 3.89 | 3.0 of 5 (3 of 5) |
+| 261013_13_api | v2.0 | reserved | AI | AI calls upcoding (screen: z-score of risk-adjusted coding >= 5) | 🟥 4 of 8 | 🟩 0 of 11 | 🟩 100% | 🟥 3.39 (j1) | 2.72 (j2.2) | 3.0 of 5 (3 of 5) |
 | 261013_14_api | v2.0 | reserved | Screen | Top 25 upcoding outliers | 🟩 7 of 8 | 🟩 18 of 208 | 🟥 28% | – | – | 3.3 of 5 (2 of 3) |
-| 261013_14_api | v2.0 | reserved | AI | AI calls upcoding (screen: top 25 upcoding outliers) | 🟥 3 of 8 | 🟩 0 of 18 | 🟩 100% | 🟥 3.36 (j1) | 4.32 | 3.0 of 5 (3 of 5) |
+| 261013_14_api | v2.0 | reserved | AI | AI calls upcoding (screen: top 25 upcoding outliers) | 🟥 3 of 8 | 🟩 0 of 18 | 🟩 100% | 🟥 3.36 (j1) | 3.08 (j2.2) | 3.0 of 5 (3 of 5) |
 | 261013_15_api | v2.0 | reserved | Screen | Top 25 upcoding outliers | 🟩 8 of 8 | 🟩 17 of 208 | 🟥 32% | – | – | 3.3 of 5 (2 of 3) |
-| 261013_15_api | v2.0 | reserved | AI | AI calls upcoding (screen: top 25 upcoding outliers) | 🟥 3 of 8 | 🟩 0 of 17 | 🟩 100% | 🟥 3.56 (j1) | 4.16 | 3.0 of 5 (3 of 5) |
-| 261013_8_api | v3.0 | reserved | Agent | Agent with the screen tool | 🟥 2 of 8 | 🟩 0 of 7 | 🟩 100% | 🟥 2.83 (j1) | 4.08 | 3.0 of 5 (3 of 5) |
-| 261013_9_api | v3.0 | reserved | Agent | Agent with the screen tool | 🟥 2 of 8 | 🟩 0 of 6 | 🟩 100% | 🟥 2.92 (j1) | 4.15 | 3.0 of 5 (3 of 5) |
-| 261013_10_api | v3.0 | reserved | Agent | Agent without the screen tool | 🟥 2 of 8 | 🟩 0 of 10 | 🟩 100% | 🟥 2.29 (j1) | 4.14 | 3.0 of 5 (3 of 5) |
-| 261013_11_api | v3.0 | reserved | Agent | Agent without the screen tool | 🟥 2 of 8 | 🟩 0 of 12 | 🟩 100% | 🟥 2.33 (j1) | 4.06 | 3.0 of 5 (3 of 5) |
-| 261013_16_api | v3.0 | reserved | Agent | Agent with the screen tool | 🟥 2 of 8 | 🟩 0 of 7 | 🟩 100% | 🟥 2.91 (j1) | 4.36 | 3.0 of 5 (3 of 5) |
-| 261013_17_api | v3.0 | reserved | Agent | Agent with the screen tool | 🟥 2 of 8 | 🟩 0 of 6 | 🟩 100% | 🟥 3.00 (j1) | 4.36 | 3.0 of 5 (3 of 5) |
-| 261013_18_api | v3.0 | reserved | Agent | Agent with the screen tool | 🟥 2 of 8 | 🟩 0 of 6 | 🟩 100% | 🟥 2.83 (j1) | 3.83 | 3.0 of 5 (3 of 5) |
-| 261013_19_api | v3.0 | reserved | Agent | Agent with the screen tool | 🟥 2 of 8 | 🟩 0 of 7 | 🟩 100% | 🟥 2.57 (j1) | 3.93 | 3.0 of 5 (3 of 5) |
+| 261013_15_api | v2.0 | reserved | AI | AI calls upcoding (screen: top 25 upcoding outliers) | 🟥 3 of 8 | 🟩 0 of 17 | 🟩 100% | 🟥 3.56 (j1) | 3.08 (j2.2) | 3.0 of 5 (3 of 5) |
+| 261013_8_api | v3.0 | reserved | Agent | Agent with the screen tool | 🟥 2 of 8 | 🟩 0 of 7 | 🟩 100% | 🟥 2.83 (j1) | 2.83 (j2.2) | 3.0 of 5 (3 of 5) |
+| 261013_9_api | v3.0 | reserved | Agent | Agent with the screen tool | 🟥 2 of 8 | 🟩 0 of 6 | 🟩 100% | 🟥 2.92 (j1) | 3.15 (j2.2) | 3.0 of 5 (3 of 5) |
+| 261013_10_api | v3.0 | reserved | Agent | Agent without the screen tool | 🟥 2 of 8 | 🟩 0 of 10 | 🟩 100% | 🟥 2.29 (j1) | 2.93 (j2.2) | 3.0 of 5 (3 of 5) |
+| 261013_11_api | v3.0 | reserved | Agent | Agent without the screen tool | 🟥 2 of 8 | 🟩 0 of 12 | 🟩 100% | 🟥 2.33 (j1) | 2.72 (j2.2) | 3.0 of 5 (3 of 5) |
+| 261013_16_api | v3.0 | reserved | Agent | Agent with the screen tool | 🟥 2 of 8 | 🟩 0 of 7 | 🟩 100% | 🟥 2.91 (j1) | 3.18 (j2.2) | 3.0 of 5 (3 of 5) |
+| 261013_17_api | v3.0 | reserved | Agent | Agent with the screen tool | 🟥 2 of 8 | 🟩 0 of 6 | 🟩 100% | 🟥 3.00 (j1) | 3.18 (j2.2) | 3.0 of 5 (3 of 5) |
+| 261013_18_api | v3.0 | reserved | Agent | Agent with the screen tool | 🟥 2 of 8 | 🟩 0 of 6 | 🟩 100% | 🟥 2.83 (j1) | 2.58 (j2.2) | 3.0 of 5 (3 of 5) |
+| 261013_19_api | v3.0 | reserved | Agent | Agent with the screen tool | 🟥 2 of 8 | 🟩 0 of 7 | 🟩 100% | 🟥 2.57 (j1) | 2.57 (j2.2) | 3.0 of 5 (3 of 5) |
 
 Green means the threshold was met, red that it was missed. Thresholds: at most 12.5% of upcoders missed, at most 12.5% of honest doctors accused, precision at least 80% (proposed), usefulness at least 4. The full table (data version, upcoder rate, clone level, agents, request rounds, dollars) is in [docs/results.md](docs/results.md); the source of truth is `experiments/results.csv` ([columns](docs/results_table.md)).
 <!-- scoreboard:end -->

@@ -18,10 +18,23 @@ def good(pk, leaning):
     return sr.assemble(pk, leaning)
 
 
-def test_code_written_summary_scores_five_and_is_deterministic():
+def test_code_written_summary_is_deterministic_and_boilerplate_next_steps_are_flagged_generic():
     pk = packet(bad=6)
     a, b = jr.score_summary(rec(good(pk, sr.UPCODING)), pk), jr.score_summary(rec(good(pk, sr.UPCODING)), pk)
-    assert a == b and a["score"] == 5 and not a["problems"]
+    assert a == b and a["score"] == 4 and a["problems"] == ["no next step is specific (none names a claim, a count or a figure)"]
+    s = good(pk, sr.UPCODING)
+    s["next_steps"] = ["Request the full charts for C0000010 and C0000012 and have a coder re-score them."]
+    assert jr.score_summary(rec(s), pk)["score"] == 5
+
+
+def test_headline_figures_missing_from_the_body_and_understated_signals_lose_points():
+    pk = packet(bad=1, share=0.3, exp=0.05)                      # 6 times expected
+    s = good(pk, sr.INCONCLUSIVE)
+    s["next_steps"] = ["Request charts for C0000010 and C0000012."]
+    s["headline"] = "Only a modest elevation: 77.7% of visits"
+    s["rationale"] = s["rationale"] + " The elevation is mild."
+    r = jr.score_summary(rec(s), pk)
+    assert any("understates" in p for p in r["problems"]) and any("headline figures" in p for p in r["problems"])
 
 
 def test_guardrail_failure_scores_one():
@@ -44,7 +57,7 @@ def test_invented_numbers_and_accusatory_words_lose_points():
     s = good(pk, sr.UPCODING)
     s["rationale"] += " This proves fraud of 4321 dollars."
     r = jr.score_summary(rec(s), pk)
-    assert any("accusatory" in p for p in r["problems"]) and r["unverified_numbers"] == ["4321"] and r["score"] == 4
+    assert any("accusatory" in p for p in r["problems"]) and r["unverified_numbers"] == ["4321"] and r["score"] == 3
 
 
 def test_no_request_but_next_step_requests_records_is_flagged():

@@ -1,4 +1,6 @@
-"""Judge v2.1: a completely deterministic usefulness scorer (no model, free, identical every time).
+"""Judge v2.2 (was v2.1): a completely deterministic usefulness scorer (no model, free, identical every time).
+v2.2 adds three checks taken from the LLM judge's most frequent complaints (generic next steps, headline not matching the body, understated
+signal) and keeps the rest of v2.1 unchanged.
 
 It scores a case summary 1 to 5 by counting auditable defects against the evidence the author had, instead of asking a model for a
 holistic opinion. Start at 5 and subtract; the table is the whole definition, so a reviewer can see exactly why a summary lost points.
@@ -19,6 +21,9 @@ LLM judge; compare them (eval/compare_judges.py) rather than assuming they are t
 | No next steps | 1.0 |
 | Records thin or missing (fewer than 5 documented claims) and the text never says so | 0.5 |
 | A repeated sentence (the same sentence twice, ignoring numbers) | 0.5 |
+| No next step is specific (none names a claim, a count or a figure) | 1.0 |
+| Each number in the headline that the rationale never states | 0.5 each, at most 1.0 |
+| Words that understate the signal (modest, mild, slight, weak signal, near peers) while the billed 99215 share is 3 or more times expected and the leaning is not upcoding | 1.0 |
 
 Score = max(1, min(5, floor(5 - total + 0.5))).
 
@@ -49,7 +54,7 @@ import judge_usefulness as ju  # noqa: E402
 import numcheck  # noqa: E402
 import summary_rules as sr  # noqa: E402
 
-VERSION = "j2.1"
+VERSION = "j2.2"
 FORBIDDEN = re.compile(r"\b(fraud\w*|guilty|criminal\w*|proves?|proven)\b", re.I)
 HEDGE = re.compile(r"consistent with|may |might|could|suggest|appears?|pattern|not a finding|needs? (a )?(coder|human|review)", re.I)
 
@@ -138,6 +143,21 @@ def score_summary(record, packet, evidence=""):
     if len(sents) != len(set(sents)):
         ded["repeated"] = 0.5
         prob.append("a sentence is repeated")
+    steps = " ".join(sm["next_steps"])
+    if sm["next_steps"] and not (re.search(r"\bC\d{7}\b", steps) or numcheck.numbers_in(steps)):
+        ded["generic_next_steps"] = 1.0
+        prob.append("no next step is specific (none names a claim, a count or a figure)")
+    head_nums = [lit for _, _, lit in numcheck.numbers_in(sm["headline"])]
+    body = sm["rationale"].replace(",", "")
+    missing = [x for x in head_nums if x.replace(",", "") not in body]
+    if missing:
+        ded["headline_not_in_body"] = min(0.5 * len(missing), 1.0)
+        prob.append(f"headline figures the rationale never states: {', '.join(missing)}")
+    exp = packet["expected_share_given_patient_complexity"]
+    ratio = packet["share_99215"] / exp if exp else 0
+    if sm["leaning"] != sr.UPCODING and ratio >= 3 and re.search(r"\b(modest|mild|mildly|slight|weak signal|near peers?)\b", sm["headline"] + " " + sm["rationale"], re.I):
+        ded["understates"] = 1.0
+        prob.append(f"understates the signal (billed 99215 share is {ratio:.1f} times expected)")
     total = sum(ded.values())
     return {"score": int(max(1, min(5, math.floor(5 - total + 0.5)))), "problems": prob, "deductions": ded, "unverified_numbers": chk["unverified"]}
 
