@@ -30,3 +30,20 @@ Seeds 202 and 303 were reserved and have now been used and seen (the Milestone 6
 - `summary_rules._rule_headline` crashed or mis-worded when the pooled 99214/99215 rule decided; it now states the pooled counts. Four stored headlines (runs 261012_9_api and 261012_10_api) kept their older wording; no leaning, citation or score changed (regenerated from the response cache and compared).
 - `summary_rules.pick_citations` always cites something from the packet's own samples, so a rule-decided summary can no longer be rejected for citing nothing.
 - `records.read_chart` was split out of `request_records` so the provider simulator reads charts the same way (outputs verified identical).
+
+## Two parallel streams from here
+The product now develops on two lines at once, so we can keep learning from both designs:
+- **v2.x: the workflow.** Code fixes the order of steps; the model only writes where rules are silent. Baseline `v2.0` (frozen).
+- **v3.x: the agent.** A model chooses its tools and steps within caps. Baseline `v3.0` (frozen).
+
+Features roughly mirror one another: a change lands in both streams, or is marked one-stream-only below with a reason. Shared pieces (the data generator, the provider office, the number check, the results table, the judge) change once and are re-run for both. Each stream's next release is `v2.1` and `v3.1`; the baselines are never edited. New results are compared with the frozen baselines on fresh seeds, using the decision rules fixed in advance in the multi-seed evaluation issue (#61). The reason for keeping the agent in development whatever the comparison shows: an agent should adapt to whatever data and situation it meets, which a fixed workflow cannot, and that has not yet been tested at low base rates or on new kinds of evidence.
+
+| Feature (issue) | v2.1 workflow | v3.1 agent | Reason if one-sided |
+|---|---|---|---|
+| Richer claim-versus-note checks (#57) | planned | planned | |
+| Call the honest-notes upcoders we reach (#58) | planned | planned | |
+| Low base rate safeguards (#59) | planned | planned | |
+| Summary quality and judge calibration (#60) | planned | planned | |
+| Hybrid review (#49) | planned | planned (tool exists) | |
+| Screen cutoff choice (#48) | planned: budget-based rule | planned: agent chooses | mirrored by design |
+| Multi-seed paired evaluation (#61) | planned | planned | shared |

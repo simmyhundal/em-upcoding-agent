@@ -309,7 +309,7 @@ Live from this repository's [milestones](https://github.com/simmyhundal/em-upcod
 - ![Backlog (v2.1)](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/7) Work deferred past the v2.0 freeze.
 - ![M7: Recovery and downstream actions](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/8) Simulate what happens after a provider is finally flagged (recovery sampling, deficient responses, extrapolated overpayment, notices) so results cover recovery and other downstream uses, not only advising which providers to look at.
 - ![Housekeeping: docs, visuals and releases](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/9) Keep the README, visuals and GitHub releases current and consistent with each tagged version.
-- ![Next version (v4 candidates)](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/10) Work carried forward from v3.0: better screen reach, claims-versus-note checks for cloned notes, the hybrid review and agent-tuned screening.
+- ![v2.1 and v3.1: parallel workflow and agent builds](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/10) Two streams built side by side: v2.1 improves the fixed workflow, v3.1 improves the agent.
 <!-- roadmap:end -->
 
 ### Repo layout
