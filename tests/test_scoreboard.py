@@ -28,7 +28,13 @@ def test_readme_table_is_rendered_from_the_results_file():
     text = open(os.path.join(ROOT, "README.md")).read()
     start = text.index("<!-- scoreboard:start -->") + len("<!-- scoreboard:start -->")
     end = text.index("<!-- scoreboard:end -->")
-    assert text[start:end].strip() == sb.markdown_from_csv().strip(), "README table is stale: run python docs/update_readme.py"
+    assert text[start:end].strip() == sb.markdown_compact().strip(), "README table is stale: run python docs/update_readme.py"
+
+
+def test_full_results_doc_is_rendered_from_the_results_file():
+    sys.path.insert(0, os.path.join(ROOT, "docs"))
+    import update_readme as ur
+    assert open(ur.RESULTS_DOC).read() == ur.results_doc(), "docs/results.md is stale: run python docs/update_readme.py"
 
 
 def test_results_file_matches_the_saved_outputs():

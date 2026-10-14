@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 500" width="1000" height="424" font-family="Helvetica, Arial, sans-serif">
+<rect width="1180" height="500" fill="#ffffff"/>
+<text x="30" y="38" font-size="19" font-weight="bold" fill="#1f2937">How it works, version by version</text>
+<g transform="translate(150,50)"><rect x="3" y="2" width="16" height="21" rx="2" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 8h8M7 12h8M7 16h5" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="184" y="68" font-size="12.5" font-weight="bold" fill="#1f2937">Data</text>
+<g transform="translate(320,50)"><path d="M2 3h22l-8 9v9l-6-3v-6z" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="354" y="68" font-size="12.5" font-weight="bold" fill="#1f2937">Screen</text>
+<g transform="translate(490,50)"><path d="M2 7h8l2 3h12v12H2z" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="524" y="68" font-size="12.5" font-weight="bold" fill="#1f2937">Records</text>
+<g transform="translate(660,50)"><path d="M4 22l1-6L18 3l5 5L10 21z" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 6l5 5" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="694" y="68" font-size="12.5" font-weight="bold" fill="#1f2937">Who writes it</text>
+<g transform="translate(830,50)"><circle cx="13" cy="13" r="10" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 9l-2 6-6 2 2-6z" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="864" y="68" font-size="12.5" font-weight="bold" fill="#1f2937">Who decides</text>
+<g transform="translate(1000,50)"><path d="M3 22V10M10 22V4M17 22V14M24 22H2" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="1034" y="68" font-size="12.5" font-weight="bold" fill="#1f2937">Headline eval</text>
+<rect x="20" y="92" width="1140" height="110" rx="10" fill="#f9fafb" stroke="#d1d5db"/>
+<text x="34" y="122" font-size="18" font-weight="bold" fill="#1f2937">v1.0</text>
+<text x="34" y="144" font-size="12.5" fill="#6b7280">Version 1</text>
+<text x="150" y="116" font-size="12" fill="#6b7280">Provider, patient and</text>
+<text x="150" y="132" font-size="12" fill="#6b7280">claim tables. A records</text>
+<text x="150" y="148" font-size="12" fill="#6b7280">sample is handed to the</text>
+<text x="150" y="164" font-size="12" fill="#6b7280">AI.</text>
+<text x="320" y="116" font-size="12" fill="#6b7280">Top 25 by statistics.</text>
+<text x="320" y="132" font-size="12" fill="#6b7280">Fixed.</text>
+<text x="490" y="116" font-size="12" fill="#6b7280">Given, not requested.</text>
+<text x="660" y="116" font-size="12" fill="#6b7280">The AI writes it all:</text>
+<text x="660" y="132" font-size="12" fill="#6b7280">facts, citations, next</text>
+<text x="660" y="148" font-size="12" fill="#6b7280">steps.</text>
+<text x="830" y="116" font-size="12" fill="#6b7280">Code, in a fixed order.</text>
+<text x="1000" y="116" font-size="12" fill="#1f2937">Held-out run: 8 of 8</text>
+<text x="1000" y="132" font-size="12" fill="#1f2937">upcoders called, 0 of 17</text>
+<text x="1000" y="148" font-size="12" fill="#1f2937">honest doctors accused</text>
+<text x="1000" y="164" font-size="12" fill="#1f2937">(charts were handed over,</text>
+<text x="1000" y="180" font-size="12" fill="#1f2937">so optimistic).</text>
+<rect x="20" y="210" width="1140" height="110" rx="10" fill="#f9fafb" stroke="#d1d5db"/>
+<text x="34" y="240" font-size="18" font-weight="bold" fill="#1f2937">v2.0</text>
+<text x="34" y="262" font-size="12.5" fill="#6b7280">Version 2:</text>
+<text x="34" y="278" font-size="12.5" fill="#6b7280">workflow</text>
+<text x="150" y="234" font-size="12" fill="#6b7280">Plan-shaped tables;</text>
+<text x="150" y="250" font-size="12" fill="#6b7280">conditions derived from</text>
+<text x="150" y="266" font-size="12" fill="#6b7280">claims.</text>
+<text x="320" y="234" font-size="12" fill="#6b7280">Suspicion 5 or higher</text>
+<text x="320" y="250" font-size="12" fill="#6b7280">(or top 25).</text>
+<text x="490" y="234" font-size="12" fill="#6b7280">Requested: 30 charts,</text>
+<text x="490" y="250" font-size="12" fill="#6b7280">one follow-up; some late</text>
+<text x="490" y="266" font-size="12" fill="#6b7280">or missing.</text>
+<text x="660" y="234" font-size="12" fill="#6b7280">Code writes facts and</text>
+<text x="660" y="250" font-size="12" fill="#6b7280">clear cases; a model the</text>
+<text x="660" y="266" font-size="12" fill="#6b7280">rest.</text>
+<text x="830" y="234" font-size="12" fill="#6b7280">Code, with a fixed</text>
+<text x="830" y="250" font-size="12" fill="#6b7280">policy.</text>
+<text x="1000" y="234" font-size="12" fill="#1f2937">Two reserved seeds: 6 of 16</text>
+<text x="1000" y="250" font-size="12" fill="#1f2937">upcoders found, 0 honest</text>
+<text x="1000" y="266" font-size="12" fill="#1f2937">accused; 17 honest</text>
+<text x="1000" y="282" font-size="12" fill="#1f2937">practices asked for charts.</text>
+<rect x="20" y="328" width="1140" height="110" rx="10" fill="#f9fafb" stroke="#d1d5db"/>
+<text x="34" y="358" font-size="18" font-weight="bold" fill="#1f2937">v3.0</text>
+<text x="34" y="380" font-size="12.5" fill="#6b7280">Version 3:</text>
+<text x="34" y="396" font-size="12.5" fill="#6b7280">agent</text>
+<text x="150" y="352" font-size="12" fill="#6b7280">Same as version 2.</text>
+<text x="320" y="352" font-size="12" fill="#6b7280">A tool the agent runs</text>
+<text x="320" y="368" font-size="12" fill="#6b7280">with any cutoff.</text>
+<text x="490" y="352" font-size="12" fill="#6b7280">The agent chooses whom</text>
+<text x="490" y="368" font-size="12" fill="#6b7280">to ask and whether to</text>
+<text x="490" y="384" font-size="12" fill="#6b7280">follow up.</text>
+<text x="660" y="352" font-size="12" fill="#6b7280">The agent submits</text>
+<text x="660" y="368" font-size="12" fill="#6b7280">findings; code adds</text>
+<text x="660" y="384" font-size="12" fill="#6b7280">facts and checks.</text>
+<text x="830" y="352" font-size="12" fill="#6b7280">The agent, within caps.</text>
+<text x="1000" y="352" font-size="12" fill="#1f2937">Same two seeds: 4 of 16</text>
+<text x="1000" y="368" font-size="12" fill="#1f2937">upcoders found, 0 honest</text>
+<text x="1000" y="384" font-size="12" fill="#1f2937">accused; 9 honest practices</text>
+<text x="1000" y="400" font-size="12" fill="#1f2937">asked for charts.</text>
+<text x="30" y="480" font-size="12" fill="#6b7280">Numbers come from experiments/results.csv and are not comparable across versions: different data and inputs. See the Eval table.</text>
+</svg>

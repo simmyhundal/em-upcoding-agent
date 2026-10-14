@@ -334,8 +334,31 @@ def markdown_from_csv(path=CSV_PATH):
     return "\n".join(lines)
 
 
+SQ = {"pass": PASS, "fail": FAIL, "": ""}
+
+
+def markdown_compact(path=CSV_PATH):
+    """A short headline view for the README: one row per run and stage with the key numbers. The full table is docs/results.md."""
+    rows = read_csv(path)
+    head = ("| Run | Version | Seed status | Stage | Tuning | Upcoders found | Honest doctors accused | Precision | Usefulness (1-5) | Evals passed |\n"
+            "|---|---|---|---|---|---|---|---|---|---|")
+    lines = [head]
+    for r in rows:
+        found = f"{SQ[r['fn_pass']]} {int(r['fn_total']) - int(r['fn_missed'])} of {r['fn_total']}"
+        acc = f"{SQ[r['fp_pass']]} {r['fp_count']} of {r['fp_total']}" if r["fp_total"] else "–"
+        prec = f"{SQ[r['precision_pass']]} {float(r['precision']):.0%}" if r["precision_pass"] else "–"
+        use = f"{SQ[r['usefulness_pass']]} {float(r['usefulness']):.2f}" if r["usefulness_pass"] else "–"
+        lines.append(f"| {r['run_id']} | {r['code_version']} | {r['seed_status']} | {r['stage']} | {r['tuning']} | {found} | {acc} | {prec} | {use} "
+                     f"| {r['evals_passed']} of {r['evals_applicable']} |")
+    lines += ["", "Green means the threshold was met, red that it was missed. Thresholds: at most 12.5% of upcoders missed, at most 12.5% of honest "
+              "doctors accused, precision at least 80% (proposed), usefulness at least 4. The full table (data version, upcoder rate, clone level, "
+              "agents, request rounds, dollars) is in [docs/results.md](docs/results.md); the source of truth is `experiments/results.csv` "
+              "([columns](docs/results_table.md))."]
+    return "\n".join(lines)
+
+
 def markdown(registry_path=None):
-    return markdown_from_csv(CSV_PATH)
+    return markdown_compact(CSV_PATH)
 
 
 if __name__ == "__main__":

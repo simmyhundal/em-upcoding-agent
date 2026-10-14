@@ -49,6 +49,14 @@ def roadmap_markdown():
     return "\n".join(lines)
 
 
+RESULTS_DOC = os.path.join(ROOT, "docs", "results.md")
+
+
+def results_doc():
+    return ("# Results (full table)\n\nRendered from `experiments/results.csv` by `python docs/update_readme.py`; the README shows a compact view. "
+            "Columns are explained in [results_table.md](results_table.md).\n\n" + scoreboard.markdown_from_csv() + "\n")
+
+
 def build(text, with_roadmap=True):
     text = replace_block(text, "scoreboard", scoreboard.markdown())
     if with_roadmap:
@@ -62,8 +70,12 @@ def build(text, with_roadmap=True):
 if __name__ == "__main__":
     old = open(README).read()
     new = build(old)
+    doc_old = open(RESULTS_DOC).read() if os.path.exists(RESULTS_DOC) else ""
     if "--check" in sys.argv:
-        sys.exit(0 if new == old else 1)
+        sys.exit(0 if new == old and results_doc() == doc_old else 1)
+    if results_doc() != doc_old:
+        open(RESULTS_DOC, "w").write(results_doc())
+        print("docs/results.md updated")
     if new != old:
         open(README, "w").write(new)
         print("README updated")

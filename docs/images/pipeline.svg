@@ -1,68 +1,66 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" width="1000" height="470" font-family="Helvetica, Arial, sans-serif">
 <rect width="1000" height="470" fill="#ffffff"/>
-<text x="30" y="40" font-size="19" font-weight="bold" fill="#1f2937">Statistics screens upcoders then AI suggests and explains. Humans review generated cases.</text>
+<text x="30" y="40" font-size="19" font-weight="bold" fill="#1f2937">An agent chooses the next step. Code limits and checks it. Humans review the findings.</text>
+<text x="970" y="452" text-anchor="end" font-size="12.5" fill="#6b7280">v3.0</text>
 <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#6b7280"/></marker></defs>
 <rect x="30" y="74" width="225" height="150" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
 <circle cx="54" cy="100" r="14" fill="#15803d"/>
 <text x="54" y="105" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">1</text>
-<text x="76" y="105" font-size="14.5" font-weight="bold" fill="#1f2937">Billing data</text>
-<text x="46" y="136" font-size="12.5" fill="#6b7280">Claims data. Here: synthetic</text>
-<text x="46" y="154" font-size="12.5" fill="#6b7280">claims shaped like public</text>
-<text x="46" y="172" font-size="12.5" fill="#6b7280">Medicare numbers.</text>
+<text x="76" y="105" font-size="14.5" font-weight="bold" fill="#1f2937">Claims data</text>
+<text x="46" y="136" font-size="12.5" fill="#6b7280">Plan-shaped synthetic data:</text>
+<text x="46" y="154" font-size="12.5" fill="#6b7280">members, claim lines, denials.</text>
+<text x="46" y="172" font-size="12.5" fill="#6b7280">Conditions are derived from</text>
+<text x="46" y="190" font-size="12.5" fill="#6b7280">the claims.</text>
 <rect x="275" y="74" width="225" height="150" rx="10" fill="#f9fafb" stroke="#2563eb" stroke-width="2.5"/>
 <circle cx="299" cy="100" r="14" fill="#2563eb"/>
 <text x="299" y="105" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">2</text>
-<text x="321" y="105" font-size="14.5" font-weight="bold" fill="#1f2937">Statistical screen</text>
-<text x="291" y="136" font-size="12.5" fill="#6b7280">Flags doctors who bill the top</text>
-<text x="291" y="154" font-size="12.5" fill="#6b7280">visit code unusually often for</text>
-<text x="291" y="172" font-size="12.5" fill="#6b7280">their patients. The most</text>
-<text x="291" y="190" font-size="12.5" fill="#6b7280">unusual go on.</text>
+<text x="321" y="105" font-size="14.5" font-weight="bold" fill="#1f2937">Screen tool</text>
+<text x="291" y="136" font-size="12.5" fill="#6b7280">A statistical screen the agent</text>
+<text x="291" y="154" font-size="12.5" fill="#6b7280">can run with any cutoff, as</text>
+<text x="291" y="172" font-size="12.5" fill="#6b7280">often as it likes.</text>
 <rect x="520" y="74" width="225" height="150" rx="10" fill="#f9fafb" stroke="#c2410c" stroke-width="2.5"/>
 <circle cx="544" cy="100" r="14" fill="#c2410c"/>
 <text x="544" y="105" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">3</text>
-<text x="566" y="105" font-size="14.5" font-weight="bold" fill="#1f2937">AI review</text>
-<text x="536" y="136" font-size="12.5" fill="#6b7280">Reads each flagged doctor's</text>
-<text x="536" y="154" font-size="12.5" fill="#6b7280">evidence and writes a short</text>
-<text x="536" y="172" font-size="12.5" fill="#6b7280">explanation citing the exact</text>
-<text x="536" y="190" font-size="12.5" fill="#6b7280">visits.</text>
-<rect x="765" y="74" width="225" height="150" rx="10" fill="#f9fafb" stroke="#c2410c" stroke-width="2.5"/>
-<circle cx="789" cy="100" r="14" fill="#c2410c"/>
+<text x="566" y="105" font-size="14.5" font-weight="bold" fill="#1f2937">Agent decides</text>
+<text x="536" y="136" font-size="12.5" fill="#6b7280">A model picks the next step</text>
+<text x="536" y="154" font-size="12.5" fill="#6b7280">within caps: look closer,</text>
+<text x="536" y="172" font-size="12.5" fill="#6b7280">compare peers, ask for charts,</text>
+<text x="536" y="190" font-size="12.5" fill="#6b7280">follow up, stop.</text>
+<rect x="765" y="74" width="225" height="150" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
+<circle cx="789" cy="100" r="14" fill="#15803d"/>
 <text x="789" y="105" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">4</text>
-<text x="811" y="105" font-size="14.5" font-weight="bold" fill="#1f2937">AI filter</text>
-<text x="781" y="136" font-size="12.5" fill="#6b7280">In the same call, suggests:</text>
-<text x="781" y="154" font-size="12.5" fill="#6b7280">looks like upcoding, sicker</text>
-<text x="781" y="172" font-size="12.5" fill="#6b7280">patients, or unclear. Only</text>
-<text x="781" y="190" font-size="12.5" fill="#6b7280">'upcoding' moves on.</text>
+<text x="811" y="105" font-size="14.5" font-weight="bold" fill="#1f2937">Provider office</text>
+<text x="781" y="136" font-size="12.5" fill="#6b7280">Simulated practices answer:</text>
+<text x="781" y="154" font-size="12.5" fill="#6b7280">complete, partial, late,</text>
+<text x="781" y="172" font-size="12.5" fill="#6b7280">unusable or not at all.</text>
 <rect x="30" y="268" width="225" height="150" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
 <circle cx="54" cy="294" r="14" fill="#15803d"/>
 <text x="54" y="299" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">5</text>
-<text x="76" y="299" font-size="14.5" font-weight="bold" fill="#1f2937">Citation check</text>
-<text x="46" y="330" font-size="12.5" fill="#6b7280">Code rejects any summary that</text>
-<text x="46" y="348" font-size="12.5" fill="#6b7280">cites a visit that does not</text>
-<text x="46" y="366" font-size="12.5" fill="#6b7280">exist or belongs to someone</text>
-<text x="46" y="384" font-size="12.5" fill="#6b7280">else.</text>
-<rect x="275" y="268" width="225" height="150" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
-<circle cx="299" cy="294" r="14" fill="#15803d"/>
+<text x="76" y="299" font-size="14.5" font-weight="bold" fill="#1f2937">Evidence checks</text>
+<text x="46" y="330" font-size="12.5" fill="#6b7280">Chart rule, claim facts and</text>
+<text x="46" y="348" font-size="12.5" fill="#6b7280">summary rules, available to</text>
+<text x="46" y="366" font-size="12.5" fill="#6b7280">the agent as tools.</text>
+<rect x="275" y="268" width="225" height="150" rx="10" fill="#f9fafb" stroke="#c2410c" stroke-width="2.5"/>
+<circle cx="299" cy="294" r="14" fill="#c2410c"/>
 <text x="299" y="299" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">6</text>
-<text x="321" y="299" font-size="14.5" font-weight="bold" fill="#1f2937">Case pages</text>
-<text x="291" y="330" font-size="12.5" fill="#6b7280">One page per flagged doctor:</text>
-<text x="291" y="348" font-size="12.5" fill="#6b7280">the summary, its cited visits</text>
-<text x="291" y="366" font-size="12.5" fill="#6b7280">and a chart against peers.</text>
+<text x="321" y="299" font-size="14.5" font-weight="bold" fill="#1f2937">AI findings</text>
+<text x="291" y="330" font-size="12.5" fill="#6b7280">The agent submits a leaning</text>
+<text x="291" y="348" font-size="12.5" fill="#6b7280">for each doctor it examined,</text>
+<text x="291" y="366" font-size="12.5" fill="#6b7280">with a short interpretation.</text>
 <rect x="520" y="268" width="225" height="150" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
 <circle cx="544" cy="294" r="14" fill="#15803d"/>
 <text x="544" y="299" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">7</text>
-<text x="566" y="299" font-size="14.5" font-weight="bold" fill="#1f2937">Recovery packets</text>
-<text x="536" y="330" font-size="12.5" fill="#6b7280">For suspected upcoders only:</text>
-<text x="536" y="348" font-size="12.5" fill="#6b7280">records to request, a sample</text>
-<text x="536" y="366" font-size="12.5" fill="#6b7280">plan, an overpayment estimate.</text>
+<text x="566" y="299" font-size="14.5" font-weight="bold" fill="#1f2937">Checks</text>
+<text x="536" y="330" font-size="12.5" fill="#6b7280">A citation check and a number</text>
+<text x="536" y="348" font-size="12.5" fill="#6b7280">check run on the findings;</text>
+<text x="536" y="366" font-size="12.5" fill="#6b7280">every tool call is logged.</text>
 <rect x="765" y="268" width="225" height="150" rx="10" fill="#f9fafb" stroke="#7c3aed" stroke-width="2.5"/>
 <circle cx="789" cy="294" r="14" fill="#7c3aed"/>
 <text x="789" y="299" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">8</text>
 <text x="811" y="299" font-size="14.5" font-weight="bold" fill="#1f2937">People review</text>
-<text x="781" y="330" font-size="12.5" fill="#6b7280">SIU reviewers read the cases.</text>
-<text x="781" y="348" font-size="12.5" fill="#6b7280">Payment integrity requests</text>
-<text x="781" y="366" font-size="12.5" fill="#6b7280">records and decides what</text>
-<text x="781" y="384" font-size="12.5" fill="#6b7280">happens next.</text>
+<text x="781" y="330" font-size="12.5" fill="#6b7280">Findings are drafts. People</text>
+<text x="781" y="348" font-size="12.5" fill="#6b7280">decide; nothing is sent</text>
+<text x="781" y="366" font-size="12.5" fill="#6b7280">automatically.</text>
 <path d="M257 149.0 L271 149.0" stroke="#6b7280" stroke-width="2" marker-end="url(#a)"/>
 <path d="M502 149.0 L516 149.0" stroke="#6b7280" stroke-width="2" marker-end="url(#a)"/>
 <path d="M747 149.0 L761 149.0" stroke="#6b7280" stroke-width="2" marker-end="url(#a)"/>

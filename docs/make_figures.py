@@ -33,31 +33,58 @@ def write(name, svg):
         f.write(svg)
 
 
-def pipeline():
-    """Eight steps, colored by who does the work: statistics, AI, plain code and checks, people."""
-    PEOPLE = "#7c3aed"
-    steps = [("1", "Billing data", "Claims data. Here: synthetic claims shaped like public Medicare numbers.", GREEN),
-             ("2", "Statistical screen", "Flags doctors who bill the top visit code unusually often for their patients. The most unusual go on.", BLUE),
-             ("3", "AI review", "Reads each flagged doctor's evidence and writes a short explanation citing the exact visits.", ORANGE),
-             ("4", "AI filter", "In the same call, suggests: looks like upcoding, sicker patients, or unclear. Only 'upcoding' moves on.", ORANGE),
-             ("5", "Citation check", "Code rejects any summary that cites a visit that does not exist or belongs to someone else.", GREEN),
-             ("6", "Case pages", "One page per flagged doctor: the summary, its cited visits and a chart against peers.", GREEN),
-             ("7", "Recovery packets", "For suspected upcoders only: records to request, a sample plan, an overpayment estimate.", GREEN),
-             ("8", "People review", "SIU reviewers read the cases. Payment integrity requests records and decides what happens next.", PEOPLE)]
+PEOPLE = "#7c3aed"
+LATEST = "v3.0"
+VERSIONS = {
+    "v1.0": ("Statistics screens upcoders then AI suggests and explains. Humans review generated cases.", [
+        ("Billing data", "Claims data. Here: synthetic claims shaped like public Medicare numbers.", GREEN),
+        ("Statistical screen", "Flags doctors who bill the top visit code unusually often for their patients. The most unusual go on.", BLUE),
+        ("AI review", "Reads each flagged doctor's evidence and writes a short explanation citing the exact visits.", ORANGE),
+        ("AI filter", "In the same call, suggests: looks like upcoding, sicker patients, or unclear. Only 'upcoding' moves on.", ORANGE),
+        ("Citation check", "Code rejects any summary that cites a visit that does not exist or belongs to someone else.", GREEN),
+        ("Case pages", "One page per flagged doctor: the summary, its cited visits and a chart against peers.", GREEN),
+        ("Recovery packets", "For suspected upcoders only: records to request, a sample plan, an overpayment estimate.", GREEN),
+        ("People review", "SIU reviewers read the cases. Payment integrity requests records and decides what happens next.", PEOPLE)]),
+    "v2.0": ("Statistics screen, code asks for charts and settles the clear cases, AI handles the rest. Humans review.", [
+        ("Claims data", "Plan-shaped synthetic data: members, claim lines, denials. Conditions are derived from the claims.", GREEN),
+        ("Statistical screen", "Flags doctors who bill the top code more than their patients explain: suspicion 5 or higher.", BLUE),
+        ("Records request", "Asks each flagged doctor's office for charts. Some come late, incomplete or not at all.", GREEN),
+        ("Chart rules", "Code checks whether the charts support the level billed and decides the clear-cut cases.", GREEN),
+        ("AI interpretation", "Where the rules are silent, a model reads a compact evidence card and gives an advisory leaning.", ORANGE),
+        ("Checks", "A citation check and a number check reject anything unsupported by the evidence.", GREEN),
+        ("Case pages and packets", "Draft case pages and recovery packets for the doctors called upcoding.", GREEN),
+        ("People review", "SIU reviewers read the drafts and decide. Nothing is sent automatically.", PEOPLE)]),
+    "v3.0": ("An agent chooses the next step. Code limits and checks it. Humans review the findings.", [
+        ("Claims data", "Plan-shaped synthetic data: members, claim lines, denials. Conditions are derived from the claims.", GREEN),
+        ("Screen tool", "A statistical screen the agent can run with any cutoff, as often as it likes.", BLUE),
+        ("Agent decides", "A model picks the next step within caps: look closer, compare peers, ask for charts, follow up, stop.", ORANGE),
+        ("Provider office", "Simulated practices answer: complete, partial, late, unusable or not at all.", GREEN),
+        ("Evidence checks", "Chart rule, claim facts and summary rules, available to the agent as tools.", GREEN),
+        ("AI findings", "The agent submits a leaning for each doctor it examined, with a short interpretation.", ORANGE),
+        ("Checks", "A citation check and a number check run on the findings; every tool call is logged.", GREEN),
+        ("People review", "Findings are drafts. People decide; nothing is sent automatically.", PEOPLE)]),
+}
+
+
+def how_it_works(version):
+    """Eight steps, colored by who does the work: statistics, AI, plain code and checks, people. One figure per version."""
+    title, raw = VERSIONS[version]
+    steps = [(str(i + 1), t, body, col) for i, (t, body, col) in enumerate(raw)]
     W, H = 1000, 470
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>',
          f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
-         f'<text x="30" y="40" font-size="19" font-weight="bold" fill="{INK}">Statistics screens upcoders then AI suggests and explains. Humans review generated cases.</text>']
+         f'<text x="30" y="40" font-size="19" font-weight="bold" fill="{INK}">{escape(title)}</text>',
+         f'<text x="{W - 30}" y="{H - 18}" text-anchor="end" font-size="12.5" fill="{MUTED}">{version}</text>']
     bw, bh, gap, x0 = 225, 150, 20, 30
     rows_y = (74, 268)
     pos = [(x0 + (i % 4) * (bw + gap), rows_y[i // 4]) for i in range(8)]
     s.append(f'<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">'
              f'<path d="M0 0 L10 5 L0 10 z" fill="{MUTED}"/></marker></defs>')
-    for (n, title, body, col), (x, y) in zip(steps, pos):
+    for (n, t, body, col), (x, y) in zip(steps, pos):
         s.append(f'<rect x="{x}" y="{y}" width="{bw}" height="{bh}" rx="10" fill="#f9fafb" stroke="{col}" stroke-width="2.5"/>')
         s.append(f'<circle cx="{x + 24}" cy="{y + 26}" r="14" fill="{col}"/>')
         s.append(f'<text x="{x + 24}" y="{y + 31}" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">{n}</text>')
-        s.append(f'<text x="{x + 46}" y="{y + 31}" font-size="14.5" font-weight="bold" fill="{INK}">{escape(title)}</text>')
+        s.append(f'<text x="{x + 46}" y="{y + 31}" font-size="14.5" font-weight="bold" fill="{INK}">{escape(t)}</text>')
         for j, line in enumerate(textwrap.wrap(body, 30)[:6]):
             s.append(f'<text x="{x + 16}" y="{y + 62 + j * 18}" font-size="12.5" fill="{MUTED}">{escape(line)}</text>')
     for r in (0, 1):
@@ -76,7 +103,87 @@ def pipeline():
         s.append(f'<rect x="{lx}" y="{ly - 11}" width="14" height="14" rx="3" fill="none" stroke="{col}" stroke-width="2.5"/>')
         s.append(f'<text x="{lx + 20}" y="{ly + 1}" font-size="12.5" fill="{MUTED}">{label}</text>')
     s.append("</svg>")
-    write("pipeline.svg", "\n".join(s))
+    svg = "\n".join(s)
+    write(f"how_it_works_{version}.svg", svg)
+    if version == LATEST:
+        write("pipeline.svg", svg)          # the README shows the latest version's figure
+
+
+def pipeline():
+    for v in VERSIONS:
+        how_it_works(v)
+
+
+def _icon(name, x, y, col):
+    """Small 26px icons drawn from basic shapes."""
+    c = f'fill="none" stroke="{col}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
+    g = {"data": f'<rect x="3" y="2" width="16" height="21" rx="2" {c}/><path d="M7 8h8M7 12h8M7 16h5" {c}/>',
+         "screen": f'<path d="M2 3h22l-8 9v9l-6-3v-6z" {c}/>',
+         "records": f'<path d="M2 7h8l2 3h12v12H2z" {c}/>',
+         "write": f'<path d="M4 22l1-6L18 3l5 5L10 21z" {c}/><path d="M15 6l5 5" {c}/>',
+         "decide": f'<circle cx="13" cy="13" r="10" {c}/><path d="M17 9l-2 6-6 2 2-6z" {c}/>',
+         "eval": f'<path d="M3 22V10M10 22V4M17 22V14M24 22H2" {c}/>'}[name]
+    return f'<g transform="translate({x},{y})">{g}</g>'
+
+
+def progression_cells(rows=None):
+    """Headline numbers per version, read from experiments/results.csv (the source of truth)."""
+    import csv
+    rows = rows or list(csv.DictReader(open(os.path.join(ROOT, "experiments", "results.csv"))))
+
+    def pick(ids, stage):
+        return [r for r in rows if r["run_id"] in ids and r["stage"] == stage]
+
+    def tot(rs):
+        found = sum(int(r["fn_total"]) - int(r["fn_missed"]) for r in rs)
+        up = sum(int(r["fn_total"]) for r in rs)
+        fp = sum(int(r["fp_count"]) for r in rs)
+        return found, up, fp, sum(int(r["fp_total"]) for r in rs)
+    v1 = tot(pick({"261009_2_api"}, "AI"))
+    v2 = tot(pick({"261013_12_api", "261013_13_api"}, "AI"))
+    v3 = tot(pick({"261013_8_api", "261013_9_api"}, "Agent"))
+    v3_h = sum(int(r["honest_requested"]) for r in pick({"261013_8_api", "261013_9_api"}, "Agent"))
+    v2_h = sum(int(r["honest_requested"]) for r in pick({"261013_12_api", "261013_13_api"}, "AI"))
+    return {"v1.0": f"Held-out run: {v1[0]} of {v1[1]} upcoders called, {v1[2]} of {v1[3]} honest doctors accused (charts were handed over, so optimistic).",
+            "v2.0": f"Two reserved seeds: {v2[0]} of {v2[1]} upcoders found, {v2[2]} honest accused; {v2_h} honest practices asked for charts.",
+            "v3.0": f"Same two seeds: {v3[0]} of {v3[1]} upcoders found, {v3[2]} honest accused; {v3_h} honest practices asked for charts."}
+
+
+def progression():
+    """One slide: how it works over time, as a table with icons and headline eval results."""
+    ev = progression_cells()
+    cols = [("data", "Data"), ("screen", "Screen"), ("records", "Records"), ("write", "Who writes it"), ("decide", "Who decides"),
+            ("eval", "Headline eval")]
+    rows = [("v1.0", "Version 1", ["Provider, patient and claim tables. A records sample is handed to the AI.", "Top 25 by statistics. Fixed.",
+                                  "Given, not requested.", "The AI writes it all: facts, citations, next steps.", "Code, in a fixed order."]),
+            ("v2.0", "Version 2: workflow", ["Plan-shaped tables; conditions derived from claims.", "Suspicion 5 or higher (or top 25).",
+                                            "Requested: 30 charts, one follow-up; some late or missing.", "Code writes facts and clear cases; a model the rest.",
+                                            "Code, with a fixed policy."]),
+            ("v3.0", "Version 3: agent", ["Same as version 2.", "A tool the agent runs with any cutoff.", "The agent chooses whom to ask and whether to follow up.",
+                                         "The agent submits findings; code adds facts and checks.", "The agent, within caps."])]
+    W, H = 1180, 500
+    x0, cw, rh, y0 = 150, 170, 118, 92
+    s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="1000" height="{round(H * 1000 / W)}" {FONT}>',
+         f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
+         f'<text x="30" y="38" font-size="19" font-weight="bold" fill="{INK}">How it works, version by version</text>']
+    for i, (icon, label) in enumerate(cols):
+        x = x0 + i * cw
+        s.append(_icon(icon, x, 50, BLUE))
+        s.append(f'<text x="{x + 34}" y="68" font-size="12.5" font-weight="bold" fill="{INK}">{escape(label)}</text>')
+    for r, (v, name, cells) in enumerate(rows):
+        y = y0 + r * rh
+        s.append(f'<rect x="20" y="{y}" width="{W - 40}" height="{rh - 8}" rx="10" fill="#f9fafb" stroke="{LINE}"/>')
+        s.append(f'<text x="34" y="{y + 30}" font-size="18" font-weight="bold" fill="{INK}">{v}</text>')
+        for j, line in enumerate(textwrap.wrap(name, 14)):
+            s.append(f'<text x="34" y="{y + 52 + j * 16}" font-size="12.5" fill="{MUTED}">{escape(line)}</text>')
+        for i, text in enumerate(cells + [ev[v]]):
+            x = x0 + i * cw
+            width = 24 if i < 5 else 27
+            for j, line in enumerate(textwrap.wrap(text, width)[:6]):
+                s.append(f'<text x="{x}" y="{y + 24 + j * 16}" font-size="12" fill="{INK if i == 5 else MUTED}">{escape(line)}</text>')
+    s.append(f'<text x="30" y="{H - 20}" font-size="12" fill="{MUTED}">Numbers come from experiments/results.csv and are not comparable across versions: different data and inputs. See the Eval table.</text>')
+    s.append("</svg>")
+    write("progression.svg", "\n".join(s))
 
 
 def em_levels():
@@ -255,6 +362,7 @@ def funnel():
 if __name__ == "__main__":
     os.makedirs(os.path.join(ROOT, "docs", "images"), exist_ok=True)
     pipeline()
+    progression()
     em_levels()
     funnel()
     print("results:", results())
