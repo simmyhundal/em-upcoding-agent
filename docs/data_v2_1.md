@@ -5,7 +5,7 @@
 ## Why a note, and why more than three numbers
 In v2.0 the "chart" for a visit is three MDM element levels and a minutes figure. A real response to a records request is a **note package**: the visit note, who signed it and when, the orders and results the note refers to, and any outside records. The reviewer's first job is to confirm that the claim's facts are real and consistent with the note (the right patient, provider and date; the problems and tests the claim shows). Only then do they score the level. Cloned or inflated notes are caught by comparing the note with the claim and with other notes, not by the level alone. So v2.1 includes an EHR note as text, so there is something to confirm the claim against, plus structured fields so the truth stays checkable.
 
-What a plan gets back has to follow what a Medicare-style request asks for (see the process write-up in the conversation notes and the contractor guidance cited in the README): the note for the date of service, orders and results, and a signature log or attestation where a signature is missing. The EHR audit trail is **not** part of a standard request; it is a second, specific request, so it costs an extra round.
+What a plan gets back has to follow what a Medicare-style request asks for (Medicare contractor ADR guidance: the note for the date of service, orders and results, signature log or attestation): the note for the date of service, orders and results, and a signature log or attestation where a signature is missing. The EHR audit trail is **not** part of a standard request; it is a second, specific request, so it costs an extra round.
 
 ## Tables (the hidden "records universe"; the plan only sees what a request returns)
 ### `records/visit_notes.csv` (one row per visit)
