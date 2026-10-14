@@ -24,6 +24,7 @@ from datetime import date, timedelta
 import numpy as np
 
 import generate_synthetic as g1
+import notes_v21
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_KEY = os.path.join(ROOT, "eval", "answer_key", "ground_truth_v2.json")
@@ -55,8 +56,10 @@ def _write_csv(path, rows, cols):
 
 
 def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcoder_rate=8 / 216, hard_neg_rate=8 / 216,
-          clone_share=0.5, n_upcoders=None, n_hard_neg=None):
-    """Write plan tables and the records universe to out_dir; the answer key goes outside it."""
+          clone_share=0.5, n_upcoders=None, n_hard_neg=None, data_version="2.0", clone_signal_strength=0.7):
+    """Write plan tables and the records universe to out_dir; the answer key goes outside it.
+    data_version "2.1" also writes the note package (docs/data_v2_1.md); claims and the universe stay identical to 2.0 for the same seed."""
+    ng = notes_v21.NoteGen(seed, clone_signal_strength) if data_version == "2.1" else None
     if os.path.commonpath([os.path.abspath(out_dir), os.path.abspath(answer_key_path)]) == os.path.abspath(out_dir):
         raise ValueError("answer_key_path must be outside out_dir so agents reading the data cannot see it")
     os.makedirs(os.path.dirname(os.path.abspath(answer_key_path)), exist_ok=True)
@@ -158,6 +161,7 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
             odd = int(rrng.integers(0, 3))
             els[odd] = int(np.clip(L + int(rrng.choice([-2, -1, 1, 2])), 0, 4))
             data_true = els[1]
+            els_true = list(els)
             lab = rrng.random() < (LAB_IF_DATA_HIGH if data_true >= 3 else LAB_IF_DATA_LOW)
             time_rec = rrng.random() < TIME_PRESENT
             tlevel = int(np.clip(L + int(rrng.choice([-1, 0, 1], p=[0.15, 0.7, 0.15])), 0, 4))
@@ -178,12 +182,16 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
             line_rows = [{"claim_id": claim_id, "line_no": 1, "cpt": CODES[B], "modifiers": mods, "units": 1,
                           "place_of_service": "11", "dx_pointer": "1", "billed_amount": round(em_allowed * 2.5, 2),
                           "allowed_amount": em_allowed, "paid_amount": round(em_allowed * 0.8, 2)}]
+            lab_code = None
             if lab:
                 code, price = LAB_CODES[int(mrng.integers(len(LAB_CODES)))]
+                lab_code = code
                 line_rows.append({"claim_id": claim_id, "line_no": 2, "cpt": code, "modifiers": "", "units": 1,
                                   "place_of_service": "11", "dx_pointer": "1", "billed_amount": round(price * 2.5, 2),
                                   "allowed_amount": price, "paid_amount": round(price * 0.8, 2)})
             lines.extend(line_rows)
+            if ng is not None:
+                ng.add_visit(claim_id, None, m, P, L, B, els, els_true, minutes, tlevel, lab_code, date_, dx)
             total_paid = sum(r["paid_amount"] for r in line_rows)
             u = mrng.random()
             if u < DENIAL_SHARE:
@@ -235,10 +243,18 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
                [{"specialty": "Family Practice", "peer_group": "GA Family Practice office-based"}], ["specialty", "peer_group"])
     _write_csv(os.path.join(out_dir, "records", "records_universe.csv"), universe,
                ["claim_id", "problems_level", "data_level", "risk_level", "documented_minutes"])
+    if ng is not None:
+        for name, rows, cols in (("visit_notes", ng.notes, notes_v21.NOTE_COLS), ("note_authentication", ng.auth, notes_v21.AUTH_COLS),
+                                 ("note_orders", ng.orders, notes_v21.ORDER_COLS), ("note_results", ng.results, notes_v21.RESULT_COLS),
+                                 ("audit_trail", ng.audit, notes_v21.AUDIT_COLS)):
+            _write_csv(os.path.join(out_dir, "records", f"{name}.csv"), rows, cols)
     with open(answer_key_path, "w") as f:
-        json.dump({"seed": seed, "clone_share": clone_share,
+        json.dump({"seed": seed, "clone_share": clone_share, "data_version": data_version,
+                   **({"clone_signal_strength": clone_signal_strength, "cloned_visits": ng.cloned} if ng is not None else {}),
                    "providers": {P["npi"]: {"role": P["role"], "upgrade_fraction": round(P["up"], 3),
-                                            "clones_notes": P["clones"]} for P in provs},
+                                            "clones_notes": P["clones"],
+                                            **({"uses_template": bool(ng.prov.get(P["npi"], {}).get("template"))} if ng is not None else {})}
+                                   for P in provs},
                    "justified_cpt_by_claim": truth}, f)
     return prov_rows
 
@@ -252,6 +268,9 @@ if __name__ == "__main__":
     ap.add_argument("--hard-neg-rate", type=float, default=8 / 216)
     ap.add_argument("--clone-share", type=float, default=0.5, help="share of upcoders whose documentation is cloned to match billing")
     ap.add_argument("--answer-key", default=DEFAULT_KEY)
+    ap.add_argument("--data-version", default="2.0", choices=["2.0", "2.1"], help="2.1 also writes the note package")
+    ap.add_argument("--clone-signal-strength", type=float, default=0.7, help="data 2.1: chance each clone signal appears on a cloned visit")
     a = ap.parse_args()
-    out = build(a.out_dir, a.answer_key, a.seed, a.providers, a.upcoder_rate, a.hard_neg_rate, a.clone_share)
+    out = build(a.out_dir, a.answer_key, a.seed, a.providers, a.upcoder_rate, a.hard_neg_rate, a.clone_share,
+                data_version=a.data_version, clone_signal_strength=a.clone_signal_strength)
     print(f"wrote {len(out)} providers to {a.out_dir}; answer key at {a.answer_key}")

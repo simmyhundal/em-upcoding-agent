@@ -1,6 +1,6 @@
 # Data v2.1 (draft): the note package a records request returns
 
-**Status: draft schema for issue 57. Nothing here is built.** Data v2.0 (`docs/v2_schemas.md`) stays frozen; v2.1 is a separate generator version with fresh seeds, so old and new results are never mixed.
+**Status: generator and checks built (issue 57); not yet wired into the workflow or the agent.** Data v2.0 (`docs/v2_schemas.md`) stays frozen; v2.1 is a separate generator version with fresh seeds, so old and new results are never mixed.
 
 ## Why a note, and why more than three numbers
 In v2.0 the "chart" for a visit is three MDM element levels and a minutes figure. A real response to a records request is a **note package**: the visit note, who signed it and when, the orders and results the note refers to, and any outside records. The reviewer's first job is to confirm that the claim's facts are real and consistent with the note (the right patient, provider and date; the problems and tests the claim shows). Only then do they score the level. Cloned or inflated notes are caught by comparing the note with the claim and with other notes, not by the level alone. So v2.1 includes an EHR note as text, so there is something to confirm the claim against, plus structured fields so the truth stays checkable.
@@ -55,3 +55,9 @@ New deficiency codes for the provider-office simulator: `MISSING_ORDERS`, `MISSI
 1. **Templated note text is included** (structured fields stay the truth), so similarity checks are real.
 2. **The audit trail is a second-tier request**: a follow-up that costs a round and can be refused or slow.
 3. **Phantom visits stay out of 2.1.** The note package supports them for a later version.
+
+## Built so far (issue 57)
+- `src/generate_v2.py --data-version 2.1` (and `src/notes_v21.py`) writes the note package; claims and the records universe are byte-identical to data v2.0 for the same seed and settings. `--clone-signal-strength` sets how often each clone signal appears. The answer key records which visits were cloned and which honest providers use fixed templates.
+- `src/note_checks.py`: claim-versus-note checks per visit and per provider (problems, data reviewed, signatures, late signatures, repeated time statements, near-duplicate notes, and with the audit trail bulk creation and paste-heavy notes).
+- `eval/note_signal_analysis.py` -> [note_signals.md](note_signals.md): how well each signal separates cloners on the development seed (free, no model).
+- Not yet done: the provider office returning note packages and the new deficiency codes, the workflow rules and agent tool using the checks, and the evaluation on fresh seeds.
