@@ -1,0 +1,9 @@
+{"provider_id": "1000000043", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000133", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000031", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000123", "score": 4, "justification": "leaning upcoding is not supported by the evidence", "problems": ["leaning upcoding is not supported by the evidence"], "deductions": {"leaning": 1.5}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000193", "score": 3, "justification": "leaning upcoding is not supported by the evidence; a sentence is repeated", "problems": ["leaning upcoding is not supported by the evidence", "a sentence is repeated"], "deductions": {"leaning": 1.5, "repeated": 0.5}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000149", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000054", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000195", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000115", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}

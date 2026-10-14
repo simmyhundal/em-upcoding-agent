@@ -1,0 +1,12 @@
+{"provider_id": "1000000151", "score": 4, "justification": "leaning upcoding is not supported by the evidence", "problems": ["leaning upcoding is not supported by the evidence"], "deductions": {"leaning": 1.5}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000201", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000085", "score": 5, "justification": "a sentence is repeated", "problems": ["a sentence is repeated"], "deductions": {"repeated": 0.5}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000067", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000018", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000093", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000012", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000074", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000131", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000092", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000078", "score": 5, "justification": "a sentence is repeated", "problems": ["a sentence is repeated"], "deductions": {"repeated": 0.5}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000143", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}

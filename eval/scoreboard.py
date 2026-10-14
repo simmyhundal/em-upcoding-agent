@@ -88,6 +88,9 @@ def _ai_cells(d, r):
         rows = [json.loads(line) for line in open(_load(r["usefulness"])) if line.strip()]
         cells["useful"] = sum(x["score"] for x in rows) / len(rows)
         cells["_judge"] = r.get("judge_version", "j1")      # j1: evidence card only; j2: plus the tool outputs the author saw
+    if r.get("usefulness_rules"):          # judge v2.1: deterministic, informational (not counted among the evals)
+        rr = [json.loads(line) for line in open(_load(r["usefulness_rules"])) if line.strip()]
+        cells["_rules"] = sum(x["score"] for x in rr) / len(rr)
     return cells
 
 
@@ -104,7 +107,7 @@ def _selection_cells(d, selected, honest_sent):
 COLUMNS = ["run_id", "stage", "tuning", "records_evidence", "code_version", "seed", "seed_status", "source", "agents", "data_version",
            "data_description", "upcoder_rate", "upcoder_clone_level",
            "fn_missed", "fn_total", "fn_rate", "fn_pass", "fp_count", "fp_total", "fp_rate", "fp_pass",
-           "precision", "precision_pass", "citations_valid", "citations_pass", "usefulness", "usefulness_pass", "judge_version",
+           "precision", "precision_pass", "citations_valid", "citations_pass", "usefulness", "usefulness_pass", "judge_version", "usefulness_rules",
            "evals_passed", "evals_applicable", "evals_score_of_5",
            "honest_requested", "request_rounds_total", "request_rounds_honest", "request_rounds_called",
            "overpaid_usd", "reached_usd", "reached_share", "notes"]
@@ -174,6 +177,7 @@ def _row(meta, stage, tuning, records, cells, d=None, sent=None, transcript=None
     cells = dict(cells)
     called = cells.pop("called", None)
     judge_version = cells.pop("_judge", "")
+    rules_score = cells.pop("_rules", None)
     cells = {**{k: None for k in ("fn", "fp", "prec", "cite", "useful")}, **cells}
     if cells["fp"] and cells["fp"][1] == 0:       # no honest doctors were in scope: the rate is undefined
         cells["fp"] = None
@@ -196,6 +200,7 @@ def _row(meta, stage, tuning, records, cells, d=None, sent=None, transcript=None
             "citations_valid": f(cells["cite"]), "citations_pass": VERDICT[oks["cite"]],
             "usefulness": f(cells["useful"], 2), "usefulness_pass": VERDICT[oks["useful"]],
             "judge_version": judge_version if cells["useful"] is not None else "",
+            "usefulness_rules": "" if rules_score is None else round(rules_score, 2),
             "evals_passed": sum(app), "evals_applicable": len(app),
             "evals_score_of_5": round(5 * sum(app) / len(app), 2) if app else "", **extra}
 
@@ -317,21 +322,21 @@ def markdown_from_csv(path=CSV_PATH):
     rows = read_csv(path)
     head = ("| Run | Seed | Seed status | Source | Agents | Code version | Data version | Upcoders in data | Upcoder clone level "
             "| Screen / AI | Tuning | Records evidence | False negative rate | False positive rate | Precision of upcoding calls "
-            "| Citations valid | Case Summary Usefulness (1-5) | Judge version | Evals passed | Evals scored | Evals passed (of 5) | Honest doctors sent records requests "
-            "| Request rounds (honest / total) | Dollars overpaid to upcoders | Dollars at stake in upcoders called |\n" + "|---" * 25 + "|")
-    thr = "| **Threshold** |" + " |" * 11 + " at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% | at least 4 | | | | | | | | |"
+            "| Citations valid | Case Summary Usefulness (1-5) | Judge version | Defect-free score (rule judge v2.1) | Evals passed | Evals scored | Evals passed (of 5) | Honest doctors sent records requests "
+            "| Request rounds (honest / total) | Dollars overpaid to upcoders | Dollars at stake in upcoders called |\n" + "|---" * 26 + "|")
+    thr = "| **Threshold** |" + " |" * 11 + " at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% | at least 4 | | | | | | | | | |"
     lines = [head, thr]
     for r in rows:
         lines.append(f"| {r['run_id']} | {r['seed']} | {r['seed_status']} | {r['source']} | {r['agents'] or '–'} | {r['code_version']} "
                      f"| {r['data_version']} | {r['upcoder_rate']} | {r['upcoder_clone_level']} | {r['stage']} | {r['tuning']} "
                      f"| {r['records_evidence']} | " + " | ".join(_cell(r, k) for k in ("fn", "fp", "prec", "cite", "useful"))
-                     + f" | {r['judge_version'] or '–'} | **{r['evals_passed']}** | {r['evals_applicable']} | {float(r['evals_score_of_5']):.1f} | {_blank(r['honest_requested'])} | {_rounds_cell(r)} | {_usd(r['overpaid_usd'])} | {_reached_cell(r)} |")
+                     + f" | {r['judge_version'] or '–'} | {r['usefulness_rules'] or '–'} | **{r['evals_passed']}** | {r['evals_applicable']} | {float(r['evals_score_of_5']):.1f} | {_blank(r['honest_requested'])} | {_rounds_cell(r)} | {_usd(r['overpaid_usd'])} | {_reached_cell(r)} |")
     descs = {}
     for r in rows:
         descs.setdefault(r["data_version"], r["data_description"])
     lines += ["", "Columns: **Seed status**: development = the seed used to build and tune the workflow, held-out = generated or scored after "
               "those settings were frozen, reserved = held back and never looked at until the Milestone 6 evaluation. **Source**: api = the project's own pipeline calling the API, cc = mimicked with Claude Code "
-              "agents, code = no model. **Judge version**: j1 = the usefulness judge saw the evidence card only, j2 = it also saw the tool outputs the author saw; scores from different versions are not strictly comparable (see the re-judging issue). **Evals passed (of 5)**: passes scaled to a common five-point score (5 x passed / scored) so rows with different numbers of applicable evals read on one scale; it is still not a like-for-like comparison, because different evals apply. **Evals scored**: how many of the evals applied to that row (a screen row has 3; an AI row has 4, or 5 when the usefulness judge ran), so compare passes only between rows with the same count; the templating check was removed, which lowered AI rows' count by one. **Agents**: separate model calls or chat agents that wrote summaries (code-written ones do not count). "
+              "agents, code = no model. **Defect-free score (rule judge v2.1)**: a deterministic 1-to-5 score that subtracts points for auditable defects (unmatched numbers, an unsupported leaning, text that contradicts the facts, thin disclosure); it is informational, is not counted in the evals, and correlates only weakly with the LLM judge (see eval/compare_judges.py). **Judge version**: j1 = the usefulness judge saw the evidence card only, j2 = it also saw the tool outputs the author saw; scores from different versions are not strictly comparable (see the re-judging issue). **Evals passed (of 5)**: passes scaled to a common five-point score (5 x passed / scored) so rows with different numbers of applicable evals read on one scale; it is still not a like-for-like comparison, because different evals apply. **Evals scored**: how many of the evals applied to that row (a screen row has 3; an AI row has 4, or 5 when the usefulness judge ran), so compare passes only between rows with the same count; the templating check was removed, which lowered AI rows' count by one. **Agents**: separate model calls or chat agents that wrote summaries (code-written ones do not count). "
               "**Upcoders in data**: the share of providers that are real upcoders (the prevalence; \"baseline\" is used only for a comparison arm). **Honest doctors sent records requests** and **Request rounds**: the burden on practices (a round is the first request or one follow-up). **Dollars overpaid to upcoders**: what upcoders were paid above what the justified levels would have paid (answer key). **Dollars at stake in upcoders called**: the same dollars for only the upcoders that stage called, an upper bound on what recovery could reach. **Upcoder clone level**: the share of upcoders whose notes "
               "are cloned to match the bill. Source of truth: `experiments/results.csv`.", ""]
     lines += [f"- **{k}**: {v}" for k, v in sorted(descs.items())]
@@ -344,15 +349,16 @@ SQ = {"pass": PASS, "fail": FAIL, "": ""}
 def markdown_compact(path=CSV_PATH):
     """A short headline view for the README: one row per run and stage with the key numbers. The full table is docs/results.md."""
     rows = read_csv(path)
-    head = ("| Run | Version | Seed status | Stage | Tuning | Upcoders found | Honest doctors accused | Precision | Usefulness (1-5, judge) | Evals passed, scaled to 5 (raw) |\n"
-            "|---|---|---|---|---|---|---|---|---|---|")
+    head = ("| Run | Version | Seed status | Stage | Tuning | Upcoders found | Honest doctors accused | Precision | Usefulness (1-5, LLM judge) | Defect-free score (1-5, rule judge) | Evals passed, scaled to 5 (raw) |\n"
+            "|---|---|---|---|---|---|---|---|---|---|---|")
     lines = [head]
     for r in rows:
         found = f"{SQ[r['fn_pass']]} {int(r['fn_total']) - int(r['fn_missed'])} of {r['fn_total']}"
         acc = f"{SQ[r['fp_pass']]} {r['fp_count']} of {r['fp_total']}" if r["fp_total"] else "–"
         prec = f"{SQ[r['precision_pass']]} {float(r['precision']):.0%}" if r["precision_pass"] else "–"
         use = f"{SQ[r['usefulness_pass']]} {float(r['usefulness']):.2f} ({r['judge_version']})" if r["usefulness_pass"] else "–"
-        lines.append(f"| {r['run_id']} | {r['code_version']} | {r['seed_status']} | {r['stage']} | {r['tuning']} | {found} | {acc} | {prec} | {use} "
+        rule = f"{float(r['usefulness_rules']):.2f}" if r["usefulness_rules"] else "–"
+        lines.append(f"| {r['run_id']} | {r['code_version']} | {r['seed_status']} | {r['stage']} | {r['tuning']} | {found} | {acc} | {prec} | {use} | {rule} "
                      f"| {float(r['evals_score_of_5']):.1f} of 5 ({r['evals_passed']} of {r['evals_applicable']}) |")
     lines += ["", "Green means the threshold was met, red that it was missed. Thresholds: at most 12.5% of upcoders missed, at most 12.5% of honest "
               "doctors accused, precision at least 80% (proposed), usefulness at least 4. The full table (data version, upcoder rate, clone level, "

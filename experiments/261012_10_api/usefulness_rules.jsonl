@@ -1,0 +1,13 @@
+{"provider_id": "1000000127", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000095", "score": 5, "justification": "a sentence is repeated", "problems": ["a sentence is repeated"], "deductions": {"repeated": 0.5}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000098", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000132", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000064", "score": 5, "justification": "a sentence is repeated", "problems": ["a sentence is repeated"], "deductions": {"repeated": 0.5}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000041", "score": 5, "justification": "a sentence is repeated", "problems": ["a sentence is repeated"], "deductions": {"repeated": 0.5}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000215", "score": 5, "justification": "numbers not matched to the evidence: 40", "problems": ["numbers not matched to the evidence: 40"], "deductions": {"numbers": 0.5}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": ["40"]}
+{"provider_id": "1000000063", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000151", "score": 5, "justification": "a sentence is repeated", "problems": ["a sentence is repeated"], "deductions": {"repeated": 0.5}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000116", "score": 5, "justification": "a sentence is repeated", "problems": ["a sentence is repeated"], "deductions": {"repeated": 0.5}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000088", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000122", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}
+{"provider_id": "1000000002", "score": 5, "justification": "a sentence is repeated", "problems": ["a sentence is repeated"], "deductions": {"repeated": 0.5}, "judge": "rules", "judge_version": "j2.1", "unverified_numbers": []}

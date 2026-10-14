@@ -44,7 +44,8 @@ def replay(run_id, code_run):
     return data, base, office
 
 
-def main(run_id, code_run):
+def build_view(run_id, code_run):
+    """Replay the agent's records requests and write the run's view folder (claims, patients, providers, the charts it obtained)."""
     data, base, office = replay(run_id, code_run)
     view = os.path.join(data, f"view_{run_id}")
     os.makedirs(view, exist_ok=True)
@@ -66,6 +67,11 @@ def main(run_id, code_run):
         w.writerow(["provider_id", "kind", "requested", "received", "late", "no_response"])
         for p in sorted(control):
             w.writerow([p, "control", 0, 0, 0, 0])
+    return view
+
+
+def main(run_id, code_run):
+    view = build_view(run_id, code_run)
     out = os.path.join(ROOT, "experiments", run_id)
     rows = ju.run(view, os.path.join(ROOT, "experiments", code_run, "flagged.csv"), os.path.join(out, "case_summaries_checked.jsonl"),
                   os.path.join(out, "usefulness.jsonl"), batch=True, cache_dir=os.path.join(out, "llm_cache_judge"),
