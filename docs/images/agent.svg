@@ -34,14 +34,14 @@
 <text x="371" y="398" font-size="14.5" font-weight="bold" fill="#1f2937">Review</text>
 <text x="371" y="422" font-size="12.5" fill="#6b7280">Chart rule and summary rules first, a</text>
 <text x="371" y="439" font-size="12.5" fill="#6b7280">model only where they are silent.</text>
-<rect x="680" y="370" width="290" height="96" rx="10" fill="#f9fafb" stroke="#c2410c" stroke-width="2.5"/>
+<rect x="680" y="370" width="290" height="96" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
 <text x="696" y="398" font-size="14.5" font-weight="bold" fill="#1f2937">Submit findings</text>
 <text x="696" y="422" font-size="12.5" fill="#6b7280">A finding or a stated reason for every</text>
 <text x="696" y="439" font-size="12.5" fill="#6b7280">candidate; unsupported claims are</text>
 <text x="696" y="456" font-size="12.5" fill="#6b7280">refused.</text>
 <rect x="355" y="190" width="290" height="116" rx="14" fill="#fff7ed" stroke="#c2410c" stroke-width="3"/>
 <text x="500.0" y="228" text-anchor="middle" font-size="19" font-weight="bold" fill="#1f2937">The agent</text>
-<text x="500.0" y="254" text-anchor="middle" font-size="12.5" fill="#6b7280">Claude Opus 5.5 picks the next action</text>
+<text x="500.0" y="254" text-anchor="middle" font-size="12.5" fill="#6b7280">A model picks the next action</text>
 <text x="500.0" y="272" text-anchor="middle" font-size="12.5" fill="#6b7280">within caps: tool calls, dollars, charts requested</text>
 <text x="500.0" y="296" text-anchor="middle" font-size="12" fill="#6b7280">never sees the answer key</text>
 <path d="M355 248.0 L320 78.0" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)" fill="none"/>

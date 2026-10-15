@@ -115,7 +115,7 @@ AGENT_ACTIONS = [
     ("Check notes", "Notes against claims: problems addressed, orders and results, signatures, copy-forward.", GREEN),
     ("Estimate", "Extrapolate an overpayment from a random sample, flagged when the sample is too thin.", GREEN),
     ("Review", "Chart rule and summary rules first, a model only where they are silent.", GREEN),
-    ("Submit findings", "A finding or a stated reason for every candidate; unsupported claims are refused.", ORANGE)]
+    ("Submit findings", "A finding or a stated reason for every candidate; unsupported claims are refused.", GREEN)]
 
 
 def agent_actions():
@@ -135,7 +135,7 @@ def agent_actions():
         centers.append((x + bw / 2, y + bh / 2, x, y))
     s.append(f'<rect x="{cx}" y="{cy}" width="{cw}" height="{ch}" rx="14" fill="#fff7ed" stroke="{ORANGE}" stroke-width="3"/>')
     s.append(f'<text x="{cx + cw / 2}" y="{cy + 38}" text-anchor="middle" font-size="19" font-weight="bold" fill="{INK}">The agent</text>')
-    for j, line in enumerate(["Claude Opus 5.5 picks the next action", "within caps: tool calls, dollars, charts requested"]):
+    for j, line in enumerate(["A model picks the next action", "within caps: tool calls, dollars, charts requested"]):
         s.append(f'<text x="{cx + cw / 2}" y="{cy + 64 + j * 18}" text-anchor="middle" font-size="12.5" fill="{MUTED}">{line}</text>')
     s.append(f'<text x="{cx + cw / 2}" y="{cy + 106}" text-anchor="middle" font-size="12" fill="{MUTED}">never sees the answer key</text>')
     for (mx, my, x, y) in centers:                       # a line from the agent to each action, ending at the nearest box edge
