@@ -8,6 +8,17 @@
 
 A major version marks a change in what the product is (v1 to v2: the data model; v2 to v3: who decides the next step), not a claim that it performs better; on the reserved seeds the agent found fewer upcoders than the workflow.
 
+## Data, workflow and agent share the minor version
+Three things carry version numbers: the **data** (generator, schemas and the simulated office), the **workflow** and the **agent**. The major number says what each one is (data 1: the version-1 tables; data 2: plan-shaped tables; workflow 2.x; agent 3.x). The **minor number is shared**: release Y pairs data 2.Y with workflow 2.Y and agent 3.Y, and they are evaluated together on the same fresh seeds. A release that changes only one of them still runs the others on the new data under the same number.
+
+| Release | Data | Workflow | Agent | Status |
+|---|---|---|---|---|
+| 0 | 2.0 (`docs/v2_schemas.md`, office 2.0) | `v2.0` | `v3.0` | frozen and evaluated |
+| 1 | 2.1 (adds the note package, `docs/data_v2_1.md`; office 2.1) | `v2.1` | `v3.1` | built; not yet evaluated (#61) |
+| 2 | 2.2 | `v2.2` | `v3.2` | planned |
+
+Data 1 pairs only with workflow `v1.0`. In `experiments/results.csv`, runs so far record the data version as `v1` or `v2` (meaning data 2.0); runs on data 2.1 and later should record the full number.
+
 ## What "frozen" means
 - Code under `src/` and `eval/` that produces the v2 results does not change except through a `v2.x` patch: a commit that says what changed and re-runs the affected scoreboard rows.
 - Thresholds (screen cutoff 5, rule cutoffs in `src/summary_rules.py` and `src/records.py`) are not re-tuned on seeds 42, 101 or 7. They were set by looking at seed 42 and have been seen on all three since.
