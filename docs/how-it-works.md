@@ -5,7 +5,7 @@
 The agent design in eight steps, and how each version differs.
 
 ## The eight steps
-![An agent chooses the next step. Code limits and checks it. Humans review the findings. Eight steps: claims data, screen tool, agent decides, provider office, evidence checks, AI findings, checks, people review.](images/how_it_works_v3.0.svg)
+![The agent and the actions it chooses from: screen, look closer, request charts, follow up, check notes, estimate, review, submit findings; simulated practices answer, checks gate the findings, people review the drafts](images/agent.svg)
 
 1. **Claims data.** A fake (synthetic) population of 216 family doctors in Georgia and about 120,000 office visits, shaped like what a health plan holds: members, claim lines, denials, replacements and voids, with conditions derived from the claims. Eight doctors are planted upcoders (half of them clone their notes so the charts match the bill), eight are honest but treat unusually sick patients, and the rest are typical. Because the answer is known, the tools can be graded.
 2. **Screen tool.** Statistics rank doctors by how often they bill the top visit code compared with what their patients' conditions explain. The agent can run this screen with any cutoff, as often as it likes. It is a wide net: it catches the upcoders but also many honest doctors.
