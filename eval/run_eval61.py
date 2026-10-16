@@ -14,6 +14,7 @@ Usage:
     python eval/run_eval61.py eval [--only-datasets e404 ...] [--arms W2.0 W2.1 A3.0 A3.1]
 """
 import argparse
+import glob
 import json
 import os
 import sys
@@ -28,6 +29,7 @@ import make_v2_runs as mk  # noqa: E402
 import run_agent  # noqa: E402
 
 DATE = "261015"
+CAP_USD = 40.0          # spending cap for the issue-61 runs, posted on the issue
 ARMS = ["W2.0", "W2.1", "A3.0", "A3.1"]
 # key, seed, providers, upcoders, hard negatives, clone share, note, seed status
 SMOKE = [("x1_s42", 42, 216, 8, 8, 0.5, "smoke run: development seed 42, 3.7% upcoders, half clone notes", "development")]
@@ -48,6 +50,21 @@ def run_ids(key, smoke):
     for k, arm in enumerate(ARMS):
         ids[arm] = f"{DATE}_{base + 1 + k}_api"
     return ids
+
+
+def spent():
+    """Estimated spend so far on the evaluation runs (the smoke runs are excluded)."""
+    usd = 0.0
+    smoke = set(run_ids(SMOKE[0][0], True).values())
+    for d in glob.glob(os.path.join(ROOT, "experiments", f"{DATE}_*_api")):
+        if os.path.basename(d) in smoke:
+            continue
+        for f in glob.glob(os.path.join(d, "usage_*.jsonl")):
+            usd += sum(json.loads(x).get("estimated_usd", 0) for x in open(f) if x.strip())
+        p = os.path.join(d, "agent_run.json")
+        if os.path.exists(p):
+            usd += json.load(open(p)).get("estimated_usd", 0)
+    return usd
 
 
 def done(rid, name):
@@ -90,7 +107,7 @@ def register(reg, spec, ids, arms):
                                 "usefulness_rules": f"experiments/{rid}/usefulness_rules.jsonl"})
 
 
-def run_dataset(spec, arms, smoke):
+def run_dataset(spec, arms, smoke, do_register=True):
     key, seed, n, n_up, n_hn, clone, note, status = spec
     ids = run_ids(key, smoke)
     code = ids["code"]
@@ -103,6 +120,8 @@ def run_dataset(spec, arms, smoke):
         if done(rid, "usefulness_rules.jsonl"):
             print("skip", arm, rid, flush=True)
             continue
+        if not smoke and spent() >= CAP_USD:
+            raise SystemExit(f"spending cap ${CAP_USD:.0f} reached (${spent():.2f}); stopping as posted on issue 61")
         print("start", arm, rid, flush=True)
         if arm.startswith("W"):
             ver = arm[1:]
@@ -117,9 +136,15 @@ def run_dataset(spec, arms, smoke):
                 jar.main(rid, code, ver)
             rules_judge(rid, os.path.join(data, f"view_{rid}"), os.path.join(ROOT, "experiments", code, "flagged.csv"))
         print("done", arm, rid, flush=True)
+    if do_register:
+        register_all([spec], arms, smoke)
+
+
+def register_all(specs, arms, smoke):
     path = os.path.join(ROOT, "experiments", "runs.json")
     reg = json.load(open(path))
-    register(reg, spec, ids, arms)
+    for spec in specs:
+        register(reg, spec, run_ids(spec[0], smoke), arms)
     json.dump(reg, open(path, "w"), indent=1)
 
 
@@ -127,13 +152,17 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
     load_dotenv(os.path.join(ROOT, ".env"))
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=["smoke", "eval"])
+    ap.add_argument("mode", choices=["smoke", "eval", "register"])
+    ap.add_argument("--no-register", action="store_true", help="for parallel workers; run the register mode afterwards")
     ap.add_argument("--only-datasets", nargs="*")
     ap.add_argument("--arms", nargs="*", default=None)
     a = ap.parse_args()
     smoke = a.mode == "smoke"
-    specs = SMOKE if smoke else EVAL
+    specs = [x for x in (SMOKE if smoke else EVAL) if not a.only_datasets or x[0] in a.only_datasets]
     arms = a.arms or (["W2.1", "A3.1"] if smoke else ARMS)
-    for spec in specs:
-        if not a.only_datasets or spec[0] in a.only_datasets:
-            run_dataset(spec, arms, smoke)
+    if a.mode == "register":
+        register_all(specs, arms, False)
+        print("registered", len(specs), "datasets; spent so far", f"${spent():.2f}")
+    else:
+        for spec in specs:
+            run_dataset(spec, arms, smoke, not a.no_register)
