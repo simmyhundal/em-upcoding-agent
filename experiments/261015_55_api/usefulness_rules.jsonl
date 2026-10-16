@@ -1,0 +1,13 @@
+{"provider_id": "1000000114", "score": 5, "justification": "a sentence is repeated", "problems": ["a sentence is repeated"], "deductions": {"repeated": 0.5}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000198", "score": 4, "justification": "leaning upcoding is not supported by the evidence", "problems": ["leaning upcoding is not supported by the evidence"], "deductions": {"leaning": 1.5}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000188", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000110", "score": 4, "justification": "understates the signal (billed 99215 share is 5.1 times expected)", "problems": ["understates the signal (billed 99215 share is 5.1 times expected)"], "deductions": {"understates": 1.0}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000093", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000021", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000133", "score": 5, "justification": "a sentence is repeated", "problems": ["a sentence is repeated"], "deductions": {"repeated": 0.5}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000027", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000033", "score": 5, "justification": "a sentence is repeated", "problems": ["a sentence is repeated"], "deductions": {"repeated": 0.5}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000156", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000072", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000213", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000002", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}

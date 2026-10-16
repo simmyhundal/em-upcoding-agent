@@ -1,0 +1,12 @@
+{"provider_id": "1000000102", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000053", "score": 5, "justification": "a sentence is repeated", "problems": ["a sentence is repeated"], "deductions": {"repeated": 0.5}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000180", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000040", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000052", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000183", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000204", "score": 5, "justification": "headline figures the rationale never states: 17", "problems": ["headline figures the rationale never states: 17"], "deductions": {"headline_not_in_body": 0.5}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000034", "score": 5, "justification": "headline figures the rationale never states: 27", "problems": ["headline figures the rationale never states: 27"], "deductions": {"headline_not_in_body": 0.5}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000146", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000086", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000103", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}
+{"provider_id": "1000000037", "score": 5, "justification": "no defects found", "problems": [], "deductions": {}, "judge": "rules", "judge_version": "j2.3", "unverified_numbers": []}

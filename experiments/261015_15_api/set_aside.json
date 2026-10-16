@@ -1,0 +1,20 @@
+{
+ "1000000008": "Weaker risk-adjusted score and small volume; below the records cutoff we used.",
+ "1000000181": "Moderate score and very few low-complexity visits, which suggests a sicker panel; not requested.",
+ "1000000066": "Below the cutoff, low volume.",
+ "1000000032": "Below the records cutoff; monitor.",
+ "1000000036": "Below the cutoff; small excess.",
+ "1000000200": "Below the cutoff; small excess.",
+ "1000000210": "Weak signal, low volume.",
+ "1000000062": "Below the cutoff.",
+ "1000000027": "Below the cutoff; monitor.",
+ "1000000042": "Below the cutoff, modest ratio.",
+ "1000000184": "Below the cutoff, modest ratio.",
+ "1000000132": "Modest ratio spread over high volume; not requested because of the records and call budget. Recommended for the next cycle.",
+ "1000000212": "Modest ratio, high volume; next cycle.",
+ "1000000150": "Weak score and very few low-complexity visits; likely acuity.",
+ "1000000034": "Little excess over expected.",
+ "1000000152": "Little excess over expected.",
+ "1000000015": "Little excess over expected.",
+ "1000000136": "Weak signal, low volume."
+}

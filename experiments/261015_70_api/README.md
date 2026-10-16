@@ -1,0 +1,26 @@
+# 261015_70_api
+
+The investigator agent v3.1 (`src/agent.py`, model claude-opus-5-5) on the v2 data of `261015_66_code`, with the statistical screen tool. Caps: $3.00, 60 tool calls, records for at most 15 providers. Office behavior is independent of upcoder status (correlation 0.0). Findings are drafts for human review.
+
+```
+{
+ "run": "261015_70_api",
+ "version": "3.1",
+ "screen_run": "261015_66_code",
+ "screen_tool": true,
+ "stop_reason": "submitted",
+ "tool_calls": 53,
+ "estimated_usd": 0.4769,
+ "providers_with_findings": 14,
+ "providers_called_upcoding": 5,
+ "upcoders_found": 5,
+ "honest_called_upcoding": 0,
+ "upcoders_total": 12,
+ "records_requests_to_honest": 6,
+ "records_requests_total": 14,
+ "rounds_on_honest": 11,
+ "citation_accuracy": 1.0
+}
+```
+
+Files: `audit.jsonl` (every tool call), `office_transcript.jsonl`, `agent_notes.txt`, `case_summaries*.jsonl`. Answer key: `eval/answer_key/ground_truth_v2_261015_66_code.json` (gitignored). Frozen workflow baseline: `v2.0`.

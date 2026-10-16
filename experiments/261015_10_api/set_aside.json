@@ -1,0 +1,14 @@
+{
+ "1000000178": "Large z_adj (6.1) mainly because of volume. Raw 99215 share is only 6.2%, z 0.26. Lower priority than the providers examined; records budget saved.",
+ "1000000201": "z_adj 3.95, ratio 3.99 on a small excess (34 visits). Ranked below the providers examined; not examined because of the call and records budget.",
+ "1000000171": "z_adj 3.83, small book (231 claims, about 32 excess visits). Not examined because of the budget.",
+ "1000000103": "z_adj 3.78, about 36 excess visits. Not examined because of the budget.",
+ "1000000108": "z_adj 2.76, below the cutoff of 3; 123 claims.",
+ "1000000040": "z_adj 2.87, below the cutoff; only 6% low-complexity patients, which suggests a sicker panel.",
+ "1000000047": "z_adj 2.10, below the cutoff; small book.",
+ "1000000102": "z_adj 1.91, below the cutoff; small book.",
+ "1000000127": "z_adj 2.63, below the cutoff.",
+ "1000000161": "z_adj 2.48, below the cutoff.",
+ "1000000154": "z_adj 4.45 but ratio 2.8. Not examined because of the budget; next in line.",
+ "1000000100": "z_adj 4.38, ratio 2.9; only 2% low-complexity patients, which suggests a sicker panel. Not examined."
+}

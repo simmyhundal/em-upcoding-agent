@@ -1,0 +1,13 @@
+{
+ "1000000067": "0% 99215 on healthy patients, concentrated in patients with 4+ conditions; 5% low-complexity patients. Fits a sicker panel.",
+ "1000000079": "z_adj 4.1; share rises with complexity; small elevation on healthy patients. Lower priority.",
+ "1000000214": "Healthy-patient 99215 share (1.7%) at peer level; excess in complex patients.",
+ "1000000193": "Healthy-patient share at peer level; clear complexity gradient.",
+ "1000000008": "z_adj 2.4, about $900 excess, no consistent pattern.",
+ "1000000149": "98 claims, z_adj 2.0, about $400 excess.",
+ "1000000153": "Elevated on healthy patients, but only 115 claims, z_adj 2.5 and about $480 excess; did not justify the burden of a request.",
+ "1000000143": "z_adj 3.4, 10% low-complexity patients; likely a sicker panel.",
+ "1000000185": "Ratio 2.4x, 12% low-complexity patients.",
+ "1000000006": "Ratio 2.1x; not prioritized.",
+ "1000000012": "Ratio 1.8x, z_adj 1.7."
+}

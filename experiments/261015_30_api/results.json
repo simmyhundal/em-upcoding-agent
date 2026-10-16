@@ -1,0 +1,18 @@
+{
+ "run": "261015_30_api",
+ "version": "3.1",
+ "screen_run": "261015_26_code",
+ "screen_tool": true,
+ "stop_reason": "submitted",
+ "tool_calls": 51,
+ "estimated_usd": 0.4546,
+ "providers_with_findings": 15,
+ "providers_called_upcoding": 5,
+ "upcoders_found": 5,
+ "honest_called_upcoding": 0,
+ "upcoders_total": 8,
+ "records_requests_to_honest": 7,
+ "records_requests_total": 15,
+ "rounds_on_honest": 10,
+ "citation_accuracy": 1.0
+}

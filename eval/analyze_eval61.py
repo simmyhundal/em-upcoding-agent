@@ -123,6 +123,24 @@ def main():
         agent_main = lo > 0 and extra <= 1 and p is not None and p >= 0.8
         lines += ["", f"**Decision (rule fixed in advance):** {'the agent (v3.1) becomes the main line' if agent_main else 'the workflow (v2.1) stays the main line'}; "
                   "the agent stays in development either way."]
+    lines += ["", "## Upcoders found by kind of notes (ten seeds, 40 of each)", "",
+              "Half the planted upcoders clone their notes so the charts match the bill; the data 2.1 note package plants signals of that "
+              "(generated, so easier than real notes).", "", "| Arm | Cloned-notes upcoders found | Honest-notes upcoders found |", "|---|---|---|"]
+    reg = json.load(open(os.path.join(ROOT, "experiments", "runs.json")))
+    for a in ARMS:
+        cf = ca = hf = ha = 0
+        for k in complete:
+            rid = res[(k, a)]["run"]
+            key = json.load(open(os.path.join(ROOT, reg["datasets"][k]["truth"])))["providers"]
+            called = {x["provider_id"] for x in map(json.loads, open(os.path.join(ROOT, "experiments", rid, "case_summaries_checked.jsonl")))
+                      if x["summary"]["leaning"] == "pattern_consistent_with_upcoding"}
+            for p, v in key.items():
+                if v["role"] == "upcoder":
+                    if v.get("clones_notes"):
+                        ca, cf = ca + 1, cf + (p in called)
+                    else:
+                        ha, hf = ha + 1, hf + (p in called)
+        lines.append(f"| {a} | {cf} of {ca} | {hf} of {ha} |")
     if low_keys:
         lines += ["", "## Low base rates (one seed each, descriptive only)", "",
                   "| Dataset | Arm | Upcoders found | Honest doctors accused | Precision | Cost |", "|---|---|---|---|---|---|"]

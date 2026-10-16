@@ -370,10 +370,13 @@ def markdown_compact(path=CSV_PATH):
     return "\n".join(lines)
 
 
-ARMS = [("Workflow v2.x, screen at suspicion 5", ["261013_12_api", "261013_13_api"], "AI"),
-        ("Workflow v2.x, screen at top 25", ["261013_14_api", "261013_15_api"], "AI"),
-        ("Agent v3.x, with the screen tool", ["261013_8_api", "261013_9_api"], "Agent"),
-        ("Agent v3.x, without the screen tool", ["261013_10_api", "261013_11_api"], "Agent")]
+# The README's headline: the issue-61 evaluation, ten fresh seeds at 3.7% upcoders (run ids from eval/run_eval61.py: dataset k has code run
+# 261015_{1+5k}_code and arms W2.0, W2.1, A3.0, A3.1 at +1..+4).
+_E61 = [1 + 5 * k for k in range(1, 11)]
+ARMS = [("Workflow v2.0 (frozen)", [f"261015_{b + 1}_api" for b in _E61], "AI"),
+        ("Workflow v2.1", [f"261015_{b + 2}_api" for b in _E61], "AI"),
+        ("Agent v3.0 (frozen)", [f"261015_{b + 3}_api" for b in _E61], "Agent"),
+        ("Agent v3.1", [f"261015_{b + 4}_api" for b in _E61], "Agent")]
 
 
 def _arm(rows, ids, stage):
@@ -385,24 +388,25 @@ def _arm(rows, ids, stage):
 
 
 def headline_table(path=CSV_PATH):
-    """The README's short results table: the four arms on the two reserved seeds, summed, rendered from the results file."""
+    """The README's short results table: the four arms of the issue-61 evaluation on ten fresh seeds, summed, rendered from the results file."""
     rows = read_csv(path)
     out = ["| Arm | Upcoders found | Honest practices accused | Honest practices asked for charts | Requests and follow-ups sent to practices | Summary usefulness (1-5, LLM judge) |", "|---|---|---|---|---|---|"]
     for name, ids, stage in ARMS:
         a = _arm(rows, ids, stage)
         out.append(f"| {name} | {a['found']} of {a['of']} | {a['accused']} | {a['asked']} | {a['rounds']} | {a['use']:.1f} |")
-    out += ["", "Two reserved test seeds, 8 planted upcoders each. \"Requests and follow-ups sent\" counts every chart request and every follow-up message to a practice, "
-            "a measure of the burden on practices (an honest practice asked for charts is a cost with no upside). More in [the full results](docs/results.md)."]
+    out += ["", "Ten fresh test seeds, 8 planted upcoders each, all four arms on the same data. \"Requests and follow-ups sent\" counts every chart request and "
+            "follow-up message to a practice, a measure of the burden on practices. Paired comparisons and the decision rules: [the evaluation](docs/eval61.md); "
+            "every run: [the full results](docs/results.md)."]
     return "\n".join(out)
 
 
 def headline_sentence(path=CSV_PATH):
     rows = read_csv(path)
-    w, ag = _arm(rows, ARMS[0][1], "AI"), _arm(rows, ARMS[2][1], "Agent")
+    w0, w, a0, ag = (_arm(rows, ARMS[i][1], ARMS[i][2]) for i in range(4))
     accused = ("neither accused an honest practice" if w["accused"] == 0 and ag["accused"] == 0
                else f"honest practices accused: {w['accused']} by the workflow, {ag['accused']} by the agent")
-    return (f"On two reserved test seeds ({w['of']} planted upcoders), the fixed workflow found {w['found']} and the agent {ag['found']}; {accused}, and "
-            f"the agent asked {ag['asked']} honest practices for charts to the workflow's {w['asked']}.")
+    return (f"On ten fresh test seeds ({w['of']} planted upcoders), workflow v2.1 found {w['found']} and agent v3.1 {ag['found']} (up from "
+            f"{w0['found']} and {a0['found']} for v2.0 and v3.0); {accused}.")
 
 
 def markdown(registry_path=None):

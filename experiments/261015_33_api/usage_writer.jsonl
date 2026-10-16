@@ -1,0 +1,6 @@
+{"id": "1000000120", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 4222, "output_tokens": 1059, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01903}
+{"id": "1000000205", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 4231, "output_tokens": 886, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01732}
+{"id": "1000000014", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 4233, "output_tokens": 849, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01696}
+{"id": "1000000146", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3968, "output_tokens": 803, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01597}
+{"id": "1000000001", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 4177, "output_tokens": 761, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01596}
+{"id": "1000000127", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 4054, "output_tokens": 673, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01484}

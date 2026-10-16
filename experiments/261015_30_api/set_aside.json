@@ -1,0 +1,12 @@
+{
+ "1000000054": "z_adj 4.39, 3.0 times expected, mostly complex panel (12% low complexity); records budget spent on higher-scoring providers",
+ "1000000168": "z_adj 4.08 on 121 claims; ranked below the 15 providers asked for records",
+ "1000000124": "z_adj 4.82 but only 2.8 times expected; records budget exhausted",
+ "1000000072": "1.9 times expected, sick panel (6% low complexity); weak signal",
+ "1000000029": "z_adj 2.59, small volume (97 claims); below cutoff",
+ "1000000185": "z_adj 2.73, 2.2 times expected, almost entirely complex panel (1% low complexity)",
+ "1000000161": "z_adj 2.84, 15 excess 99215; below cutoff",
+ "1000000122": "z_adj 2.11, 2.45 times expected, complex panel; below cutoff",
+ "1000000141": "z_adj 1.66, no low-complexity patients; below cutoff",
+ "1000000116": "z_adj 1.49, only 59 claims; below cutoff"
+}

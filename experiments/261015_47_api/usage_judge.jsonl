@@ -1,0 +1,10 @@
+{"id": "1000000049", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 4038, "output_tokens": 540, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00674}
+{"id": "1000000120", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 3960, "output_tokens": 606, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00699}
+{"id": "1000000143", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 4356, "output_tokens": 669, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.0077}
+{"id": "1000000170", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 4233, "output_tokens": 568, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00707}
+{"id": "1000000129", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 4730, "output_tokens": 698, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00822}
+{"id": "1000000043", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 3877, "output_tokens": 496, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00636}
+{"id": "1000000001", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 4569, "output_tokens": 539, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00726}
+{"id": "1000000076", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 3531, "output_tokens": 504, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00605}
+{"id": "1000000213", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 4806, "output_tokens": 664, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00813}
+{"id": "1000000215", "model": "claude-sonnet-5-5", "via": "batch", "input_tokens": 4702, "output_tokens": 611, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.00776}

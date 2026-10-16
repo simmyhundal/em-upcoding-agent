@@ -1,0 +1,11 @@
+{"id": "1000000198", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 4051, "output_tokens": 781, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01591}
+{"id": "1000000188", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3996, "output_tokens": 469, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01268}
+{"id": "1000000021", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 4034, "output_tokens": 493, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.013}
+{"id": "1000000033", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3888, "output_tokens": 454, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01232}
+{"id": "1000000027", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3990, "output_tokens": 752, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.0155}
+{"id": "1000000213", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 4069, "output_tokens": 863, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01677}
+{"id": "1000000072", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3571, "output_tokens": 1001, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01715}
+{"id": "1000000002", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3403, "output_tokens": 911, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01592}
+{"id": "1000000133", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 4038, "output_tokens": 439, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01247}
+{"id": "1000000110", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3479, "output_tokens": 837, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01533}
+{"id": "1000000009", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3843, "output_tokens": 433, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01202}

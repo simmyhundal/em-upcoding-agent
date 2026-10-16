@@ -1,0 +1,11 @@
+{
+ "1000000076": "Lower priority (risk-adjusted 3.8, 4.5x expected); records budget used up on higher-ranked providers",
+ "1000000081": "Lower priority (risk-adjusted 2.1, 155 claims); budget used up",
+ "1000000139": "Lower priority (risk-adjusted 3.1, 184 claims); budget used up",
+ "1000000146": "Lower priority (risk-adjusted 3.7, 194 claims); budget used up; candidate for next cycle",
+ "1000000172": "Small volume (110 claims), risk-adjusted 2.8; budget used up",
+ "1000000210": "Risk-adjusted 2.2, 14% low-complexity panel; plausibly acuity; budget used up",
+ "1000000214": "Risk-adjusted 2.2, 128 claims, 15% low-complexity panel; budget used up",
+ "1000000120": "Ratio only 2.6x expected, risk-adjusted 2.8; below priority cutoff",
+ "1000000121": "Ratio only 2.6x expected, 99215 share 8%; below priority cutoff"
+}

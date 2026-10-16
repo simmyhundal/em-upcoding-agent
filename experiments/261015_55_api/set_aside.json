@@ -1,0 +1,19 @@
+{
+ "1000000009": "Peer-compared: 99215 rate about 10% for patients with 0-1 conditions (peers 3-4%), with a small excess. Below my cutoff for a records request; worth monitoring.",
+ "1000000108": "Peer-compared: modest excess on low-complexity patients. Below the cutoff.",
+ "1000000005": "Peer-compared: modest excess, mostly in patients with 2-3 conditions. Below the cutoff.",
+ "1000000011": "Not examined: lower risk-adjusted score and small excess; lower priority than those charted.",
+ "1000000107": "Not examined: small volume and small excess.",
+ "1000000200": "Not examined: small volume and small excess.",
+ "1000000202": "Not examined: small volume and small excess.",
+ "1000000087": "Not examined: lower risk-adjusted score and small excess.",
+ "1000000140": "Not examined: lower risk-adjusted score and small excess.",
+ "1000000209": "Not examined: small volume and low risk-adjusted score.",
+ "1000000151": "Not examined: lower risk-adjusted score and small excess.",
+ "1000000201": "Not examined: ratio to expected below 3x.",
+ "1000000020": "Not examined: ratio to expected below 3x.",
+ "1000000045": "Not examined: ratio below 3x; mostly a complex panel.",
+ "1000000068": "Not examined: ratio below 3x; mostly a complex panel.",
+ "1000000177": "Not examined: ratio below 3x; mostly a complex panel.",
+ "1000000051": "Not examined: ratio below 3x."
+}

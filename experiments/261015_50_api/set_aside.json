@@ -1,0 +1,15 @@
+{
+ "1000000065": "Below the cutoff (risk-adjusted z 2.26, top-5% threshold about 4.8); small volume and a mostly complex panel.",
+ "1000000027": "Below the cutoff (risk-adjusted z 2.25); only 2.2 times expected, and only 5% of the panel is low complexity.",
+ "1000000079": "Below the cutoff (risk-adjusted z 3.27); excess about $867. Records budget kept for stronger signals.",
+ "1000000182": "Below the cutoff (risk-adjusted z 2.62); small volume (122 claims), excess about $495.",
+ "1000000097": "Below the cutoff (risk-adjusted z 2.29); excess about $754.",
+ "1000000147": "Below the cutoff (risk-adjusted z 3.65); 2.8 times expected and a mostly complex panel.",
+ "1000000077": "Below the cutoff (risk-adjusted z 3.14).",
+ "1000000121": "Below the cutoff (risk-adjusted z 2.02); small volume.",
+ "1000000210": "Below the cutoff (risk-adjusted z 3.29); excess about $1,051. A candidate for the next cycle.",
+ "1000000142": "Below the cutoff (risk-adjusted z 2.85); excess about $727.",
+ "1000000188": "Below the cutoff (risk-adjusted z 1.84); very small volume (77 claims).",
+ "1000000149": "Below the cutoff (risk-adjusted z 3.17); only 1.85 times expected with a complex panel.",
+ "1000000125": "Below the cutoff (risk-adjusted z 1.47); 2.5 times expected and a highly complex panel."
+}

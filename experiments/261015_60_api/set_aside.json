@@ -1,0 +1,17 @@
+{
+ "1000000226": "Records budget used up. Mostly complex panel (9% low-complexity), z_adj 5.6, small claim count; plausibly high acuity.",
+ "1000000061": "Budget used up; z_adj 5.6 on only 186 claims and a small dollar excess.",
+ "1000000376": "Budget used up; z_adj 5.1, lower priority.",
+ "1000000167": "Budget used up; z_adj 3.8, mostly complex panel.",
+ "1000000214": "Budget used up; z_adj 5.0, mostly complex panel (11% low-complexity).",
+ "1000000563": "Budget used up; z_adj 5.4, lower priority.",
+ "1000000472": "Budget used up; z_adj 4.3, small volume.",
+ "1000000282": "Budget used up; z_adj 2.7, sick panel (3% low-complexity).",
+ "1000000040": "Budget used up; z_adj 4.3.",
+ "1000000119": "Budget used up; z_adj 3.3.",
+ "1000000087": "Budget used up; z_adj 4.2; next candidate if budget allows (45% low-complexity).",
+ "1000000252": "Budget used up; z_adj 6.3; next candidate if budget allows.",
+ "1000000479": "Budget used up; z_adj 3.2, complex panel.",
+ "1000000373": "Budget used up; z_adj 5.6; candidate for a later cycle.",
+ "1000000272": "Budget used up; z_adj 2.4, small volume, complex panel."
+}

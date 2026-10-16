@@ -1,0 +1,15 @@
+{
+ "1000000177": "Risk-adjusted score 4.54, below the cutoff of 5 (about the 95th percentile); only 106 claims; low-complexity share 0.12",
+ "1000000065": "Only 57 claims; 4% low-complexity share points to a sicker panel",
+ "1000000023": "Risk-adjusted score 4.35, below the cutoff",
+ "1000000197": "Risk-adjusted score 4.19, below the cutoff",
+ "1000000194": "Risk-adjusted score 4.00, below the cutoff",
+ "1000000130": "Risk-adjusted score 4.47, below the cutoff",
+ "1000000008": "Risk-adjusted score 3.94, below the cutoff",
+ "1000000002": "Risk-adjusted score 3.50, below the cutoff",
+ "1000000170": "Risk-adjusted score 3.09, below the cutoff",
+ "1000000096": "Under 2x expected; 8% low-complexity share",
+ "1000000058": "118 claims; 5% low-complexity share; risk-adjusted score 2.06",
+ "1000000187": "1.86x expected with 0% low-complexity share; consistent with a sicker panel",
+ "1000000215": "1.63x expected with 0% low-complexity share; consistent with a sicker panel"
+}

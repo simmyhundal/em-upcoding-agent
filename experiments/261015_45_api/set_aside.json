@@ -1,0 +1,16 @@
+{
+ "1000000051": "Peer comparison suggests a sick panel: most 99215s are for patients with 5+ conditions, with almost none at low complexity. The risk-adjusted score of 3.8 is modest. No records were requested.",
+ "1000000142": "Sick panel: 2% of visits are for low-complexity patients and 99215s are concentrated in higher-complexity patients. The risk-adjusted score of 4.0 is modest. Not requested, to save the records budget.",
+ "1000000149": "Risk-adjusted score 4.2 with a mostly complex panel. Lower priority than the healthy-panel outliers. Not examined because of the records budget.",
+ "1000000031": "Risk-adjusted score 4.5 and 2.6 times expected, with a mostly complex panel. Lower priority. Not examined.",
+ "1000000035": "Risk-adjusted score 4.5. Ranked below the providers examined, and the records budget and tool calls ran out. Not examined; a candidate for the next cycle.",
+ "1000000115": "Risk-adjusted score 4.8, but only 2.8 times expected. Lower priority. Not examined; a candidate for the next cycle.",
+ "1000000048": "Risk-adjusted score 2.7, below the cutoff. Small volume.",
+ "1000000010": "Risk-adjusted score 3.1 and only 144 claims. Below the cutoff.",
+ "1000000100": "58 claims and a risk-adjusted score of 1.5. Too small.",
+ "1000000198": "87 claims and a risk-adjusted score of 2.1. Below the cutoff.",
+ "1000000094": "Risk-adjusted score 2.1 with a complex panel. Below the cutoff.",
+ "1000000207": "Risk-adjusted score 2.5. Below the cutoff.",
+ "1000000055": "Risk-adjusted score 2.2. Below the cutoff.",
+ "1000000186": "68 claims and a risk-adjusted score of 1.4. Below the cutoff."
+}

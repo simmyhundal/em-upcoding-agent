@@ -4,7 +4,24 @@
 
 Every run, with all columns, is in [results.md](results.md); the source of truth is `experiments/results.csv` ([columns](results_table.md)). The version 1 results are archived in [archive-version-1.md](archive-version-1.md).
 
-## Agent versus workflow
+## Multi-seed evaluation of v2.1 and v3.1 (issue 61)
+All four arms (workflow v2.0 and v2.1, agent v3.0 and v3.1) on **ten fresh seeds** (404 to 1313, 80 planted upcoders) plus one fresh seed at 0.5%, 1% and 2% upcoders, with the protocol and decision rules [posted on the issue](https://github.com/simmyhundal/em-upcoding-agent/issues/61) before any run. Full tables: [eval61.md](eval61.md).
+
+| Arm | Upcoders found (of 80) | Honest doctors accused | Cloned-notes upcoders found (of 40) | Requests and follow-ups to honest practices |
+|---|---|---|---|---|
+| Workflow v2.0 (frozen) | 19 | 3 | 3 | 80 |
+| Workflow v2.1 | 32 | 0 | 10 | 203 |
+| Agent v3.0 (frozen) | 18 | 0 | 1 | 68 |
+| Agent v3.1 | 27 | 0 | 8 | 101 |
+
+- **Both upgrades helped** (paired per seed, 95% bootstrap interval): workflow v2.1 over v2.0 by +1.3 upcoders per seed (+0.6 to +2.0) with 3 fewer false accusations; agent v3.1 over v3.0 by +0.9 (+0.1 to +1.8).
+- **Workflow and agent are not reliably different:** v3.1 minus v2.1 is -0.5 per seed (-1.2 to +0.2). By the rule fixed in advance, the workflow stays the main line; the agent stays in development. The Milestone 6 gap (v3.0 behind v2.0) did not replicate on ten seeds (-0.1, -0.7 to +0.5).
+- **The note checks are where the gain came from:** cloned-notes upcoders found rose from 3 to 10 (workflow) and 1 to 8 (agent). The clone signals are planted by the data 2.1 generator, so real notes would be harder.
+- **The cost is burden:** workflow v2.1's second requests and audit-trail requests more than double the follow-ups sent to honest practices (203 against 80); agent v3.1 sends half as many as workflow v2.1.
+- **Low base rates** (one seed each, descriptive): v2.1 and v3.1 accused one honest doctor between them across the three rates (workflow v2.1 at 1%), against five for v2.0.
+- Still no arm meets the 12.5% miss-rate threshold. Evaluation spend: about $19 (plus about $0.30 for one crashed run, issue 85).
+
+## Agent versus workflow: the first comparison on two seeds
 The frozen workflow (`v2.0`) fixes the order of steps in code. Milestone 6 built the other design to compare against it: an **agent** that gets tools and decides what to do: which screen to run and where to put the cutoff, which providers to look at, whether to ask a provider's office for charts, what to do about an incomplete response, and when to stop. Code only supplies tools and enforces limits (tool calls, dollars, records requests) and logs every call. Tools, limits and what the agent can see: [docs/agent_tools.md](agent_tools.md); the simulated provider office it negotiates with: [docs/provider_sim.md](provider_sim.md).
 
 **Head-to-head on two reserved seeds (202 and 303; never looked at before this test), 8 upcoders each, same simulated office for every arm.** Totals over the two seeds (16 upcoders, 416 honest doctors):

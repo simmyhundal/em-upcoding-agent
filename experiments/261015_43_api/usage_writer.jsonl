@@ -1,0 +1,4 @@
+{"id": "1000000087", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 4263, "output_tokens": 683, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01536}
+{"id": "1000000160", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3753, "output_tokens": 797, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01548}
+{"id": "1000000129", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 3659, "output_tokens": 777, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01509}
+{"id": "1000000133", "model": "claude-opus-5-5", "via": "batch", "input_tokens": 4265, "output_tokens": 781, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0, "estimated_usd": 0.01634}

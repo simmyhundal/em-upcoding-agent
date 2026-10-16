@@ -107,6 +107,123 @@
    "view": "data/synthetic_v2_261015_1_code/view",
    "data_version": "v2.1",
    "seed_status": "development"
+  },
+  "e404": {
+   "label": "seed 404",
+   "seed": 404,
+   "flagged": "experiments/261015_6_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261015_6_code.json",
+   "view": "data/synthetic_v2_261015_6_code/view",
+   "data_version": "v2.1",
+   "seed_status": "reserved"
+  },
+  "e505": {
+   "label": "seed 505",
+   "seed": 505,
+   "flagged": "experiments/261015_11_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261015_11_code.json",
+   "view": "data/synthetic_v2_261015_11_code/view",
+   "data_version": "v2.1",
+   "seed_status": "reserved"
+  },
+  "e606": {
+   "label": "seed 606",
+   "seed": 606,
+   "flagged": "experiments/261015_16_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261015_16_code.json",
+   "view": "data/synthetic_v2_261015_16_code/view",
+   "data_version": "v2.1",
+   "seed_status": "reserved"
+  },
+  "e707": {
+   "label": "seed 707",
+   "seed": 707,
+   "flagged": "experiments/261015_21_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261015_21_code.json",
+   "view": "data/synthetic_v2_261015_21_code/view",
+   "data_version": "v2.1",
+   "seed_status": "reserved"
+  },
+  "e808": {
+   "label": "seed 808",
+   "seed": 808,
+   "flagged": "experiments/261015_26_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261015_26_code.json",
+   "view": "data/synthetic_v2_261015_26_code/view",
+   "data_version": "v2.1",
+   "seed_status": "reserved"
+  },
+  "e909": {
+   "label": "seed 909",
+   "seed": 909,
+   "flagged": "experiments/261015_31_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261015_31_code.json",
+   "view": "data/synthetic_v2_261015_31_code/view",
+   "data_version": "v2.1",
+   "seed_status": "reserved"
+  },
+  "e1010": {
+   "label": "seed 1010",
+   "seed": 1010,
+   "flagged": "experiments/261015_36_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261015_36_code.json",
+   "view": "data/synthetic_v2_261015_36_code/view",
+   "data_version": "v2.1",
+   "seed_status": "reserved"
+  },
+  "e1111": {
+   "label": "seed 1111",
+   "seed": 1111,
+   "flagged": "experiments/261015_41_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261015_41_code.json",
+   "view": "data/synthetic_v2_261015_41_code/view",
+   "data_version": "v2.1",
+   "seed_status": "reserved"
+  },
+  "e1212": {
+   "label": "seed 1212",
+   "seed": 1212,
+   "flagged": "experiments/261015_46_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261015_46_code.json",
+   "view": "data/synthetic_v2_261015_46_code/view",
+   "data_version": "v2.1",
+   "seed_status": "reserved"
+  },
+  "e1313": {
+   "label": "seed 1313",
+   "seed": 1313,
+   "flagged": "experiments/261015_51_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261015_51_code.json",
+   "view": "data/synthetic_v2_261015_51_code/view",
+   "data_version": "v2.1",
+   "seed_status": "reserved"
+  },
+  "e1414_r05": {
+   "label": "seed 1414",
+   "seed": 1414,
+   "flagged": "experiments/261015_56_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261015_56_code.json",
+   "view": "data/synthetic_v2_261015_56_code/view",
+   "data_version": "v2.1",
+   "seed_status": "reserved"
+  },
+  "e1414_r1": {
+   "label": "seed 1414",
+   "seed": 1414,
+   "flagged": "experiments/261015_61_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261015_61_code.json",
+   "view": "data/synthetic_v2_261015_61_code/view",
+   "data_version": "v2.1",
+   "seed_status": "reserved"
+  },
+  "e1414_r2": {
+   "label": "seed 1414",
+   "seed": 1414,
+   "flagged": "experiments/261015_66_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261015_66_code.json",
+   "view": "data/synthetic_v2_261015_66_code/view",
+   "data_version": "v2.1",
+   "seed_status": "reserved"
   }
  },
  "runs": [
@@ -618,6 +735,786 @@
    "transcript": "experiments/261015_5_api/office_transcript.jsonl",
    "usefulness": "experiments/261015_5_api/usefulness.jsonl",
    "usefulness_rules": "experiments/261015_5_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_7_api",
+   "dataset": "e404",
+   "kind": "v2",
+   "version": "v2.0",
+   "source": "api",
+   "notes": "issue 61: workflow 2.0 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_7_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_7_api/usefulness.jsonl",
+    "transcript": "experiments/261015_7_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_7_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_7_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_8_api",
+   "dataset": "e404",
+   "kind": "v2",
+   "version": "v2.1",
+   "source": "api",
+   "notes": "issue 61: workflow 2.1 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_8_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_8_api/usefulness.jsonl",
+    "transcript": "experiments/261015_8_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_8_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_8_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_9_api",
+   "dataset": "e404",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.0",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.0",
+   "records": true,
+   "checked": "experiments/261015_9_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_9_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_9_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_9_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_10_api",
+   "dataset": "e404",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.1",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.1",
+   "records": true,
+   "checked": "experiments/261015_10_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_10_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_10_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_10_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_12_api",
+   "dataset": "e505",
+   "kind": "v2",
+   "version": "v2.0",
+   "source": "api",
+   "notes": "issue 61: workflow 2.0 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_12_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_12_api/usefulness.jsonl",
+    "transcript": "experiments/261015_12_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_12_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_12_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_13_api",
+   "dataset": "e505",
+   "kind": "v2",
+   "version": "v2.1",
+   "source": "api",
+   "notes": "issue 61: workflow 2.1 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_13_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_13_api/usefulness.jsonl",
+    "transcript": "experiments/261015_13_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_13_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_13_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_14_api",
+   "dataset": "e505",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.0",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.0",
+   "records": true,
+   "checked": "experiments/261015_14_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_14_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_14_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_14_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_15_api",
+   "dataset": "e505",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.1",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.1",
+   "records": true,
+   "checked": "experiments/261015_15_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_15_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_15_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_15_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_17_api",
+   "dataset": "e606",
+   "kind": "v2",
+   "version": "v2.0",
+   "source": "api",
+   "notes": "issue 61: workflow 2.0 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_17_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_17_api/usefulness.jsonl",
+    "transcript": "experiments/261015_17_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_17_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_17_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_18_api",
+   "dataset": "e606",
+   "kind": "v2",
+   "version": "v2.1",
+   "source": "api",
+   "notes": "issue 61: workflow 2.1 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_18_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_18_api/usefulness.jsonl",
+    "transcript": "experiments/261015_18_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_18_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_18_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_19_api",
+   "dataset": "e606",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.0",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.0",
+   "records": true,
+   "checked": "experiments/261015_19_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_19_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_19_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_19_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_20_api",
+   "dataset": "e606",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.1",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.1",
+   "records": true,
+   "checked": "experiments/261015_20_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_20_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_20_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_20_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_22_api",
+   "dataset": "e707",
+   "kind": "v2",
+   "version": "v2.0",
+   "source": "api",
+   "notes": "issue 61: workflow 2.0 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_22_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_22_api/usefulness.jsonl",
+    "transcript": "experiments/261015_22_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_22_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_22_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_23_api",
+   "dataset": "e707",
+   "kind": "v2",
+   "version": "v2.1",
+   "source": "api",
+   "notes": "issue 61: workflow 2.1 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_23_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_23_api/usefulness.jsonl",
+    "transcript": "experiments/261015_23_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_23_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_23_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_24_api",
+   "dataset": "e707",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.0",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.0",
+   "records": true,
+   "checked": "experiments/261015_24_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_24_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_24_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_24_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_25_api",
+   "dataset": "e707",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.1",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.1",
+   "records": true,
+   "checked": "experiments/261015_25_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_25_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_25_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_25_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_27_api",
+   "dataset": "e808",
+   "kind": "v2",
+   "version": "v2.0",
+   "source": "api",
+   "notes": "issue 61: workflow 2.0 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_27_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_27_api/usefulness.jsonl",
+    "transcript": "experiments/261015_27_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_27_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_27_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_28_api",
+   "dataset": "e808",
+   "kind": "v2",
+   "version": "v2.1",
+   "source": "api",
+   "notes": "issue 61: workflow 2.1 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_28_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_28_api/usefulness.jsonl",
+    "transcript": "experiments/261015_28_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_28_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_28_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_29_api",
+   "dataset": "e808",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.0",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.0",
+   "records": true,
+   "checked": "experiments/261015_29_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_29_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_29_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_29_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_30_api",
+   "dataset": "e808",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.1",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.1",
+   "records": true,
+   "checked": "experiments/261015_30_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_30_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_30_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_30_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_32_api",
+   "dataset": "e909",
+   "kind": "v2",
+   "version": "v2.0",
+   "source": "api",
+   "notes": "issue 61: workflow 2.0 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_32_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_32_api/usefulness.jsonl",
+    "transcript": "experiments/261015_32_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_32_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_32_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_33_api",
+   "dataset": "e909",
+   "kind": "v2",
+   "version": "v2.1",
+   "source": "api",
+   "notes": "issue 61: workflow 2.1 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_33_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_33_api/usefulness.jsonl",
+    "transcript": "experiments/261015_33_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_33_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_33_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_34_api",
+   "dataset": "e909",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.0",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.0",
+   "records": true,
+   "checked": "experiments/261015_34_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_34_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_34_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_34_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_35_api",
+   "dataset": "e909",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.1",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.1",
+   "records": true,
+   "checked": "experiments/261015_35_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_35_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_35_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_35_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_37_api",
+   "dataset": "e1010",
+   "kind": "v2",
+   "version": "v2.0",
+   "source": "api",
+   "notes": "issue 61: workflow 2.0 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_37_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_37_api/usefulness.jsonl",
+    "transcript": "experiments/261015_37_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_37_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_37_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_38_api",
+   "dataset": "e1010",
+   "kind": "v2",
+   "version": "v2.1",
+   "source": "api",
+   "notes": "issue 61: workflow 2.1 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_38_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_38_api/usefulness.jsonl",
+    "transcript": "experiments/261015_38_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_38_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_38_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_39_api",
+   "dataset": "e1010",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.0",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.0",
+   "records": true,
+   "checked": "experiments/261015_39_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_39_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_39_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_39_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_40_api",
+   "dataset": "e1010",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.1",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.1",
+   "records": true,
+   "checked": "experiments/261015_40_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_40_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_40_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_40_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_42_api",
+   "dataset": "e1111",
+   "kind": "v2",
+   "version": "v2.0",
+   "source": "api",
+   "notes": "issue 61: workflow 2.0 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_42_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_42_api/usefulness.jsonl",
+    "transcript": "experiments/261015_42_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_42_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_42_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_43_api",
+   "dataset": "e1111",
+   "kind": "v2",
+   "version": "v2.1",
+   "source": "api",
+   "notes": "issue 61: workflow 2.1 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_43_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_43_api/usefulness.jsonl",
+    "transcript": "experiments/261015_43_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_43_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_43_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_44_api",
+   "dataset": "e1111",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.0",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.0",
+   "records": true,
+   "checked": "experiments/261015_44_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_44_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_44_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_44_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_45_api",
+   "dataset": "e1111",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.1",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.1",
+   "records": true,
+   "checked": "experiments/261015_45_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_45_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_45_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_45_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_47_api",
+   "dataset": "e1212",
+   "kind": "v2",
+   "version": "v2.0",
+   "source": "api",
+   "notes": "issue 61: workflow 2.0 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_47_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_47_api/usefulness.jsonl",
+    "transcript": "experiments/261015_47_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_47_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_47_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_48_api",
+   "dataset": "e1212",
+   "kind": "v2",
+   "version": "v2.1",
+   "source": "api",
+   "notes": "issue 61: workflow 2.1 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_48_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_48_api/usefulness.jsonl",
+    "transcript": "experiments/261015_48_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_48_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_48_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_49_api",
+   "dataset": "e1212",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.0",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.0",
+   "records": true,
+   "checked": "experiments/261015_49_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_49_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_49_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_49_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_50_api",
+   "dataset": "e1212",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.1",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.1",
+   "records": true,
+   "checked": "experiments/261015_50_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_50_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_50_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_50_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_52_api",
+   "dataset": "e1313",
+   "kind": "v2",
+   "version": "v2.0",
+   "source": "api",
+   "notes": "issue 61: workflow 2.0 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_52_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_52_api/usefulness.jsonl",
+    "transcript": "experiments/261015_52_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_52_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_52_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_53_api",
+   "dataset": "e1313",
+   "kind": "v2",
+   "version": "v2.1",
+   "source": "api",
+   "notes": "issue 61: workflow 2.1 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_53_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_53_api/usefulness.jsonl",
+    "transcript": "experiments/261015_53_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_53_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_53_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_54_api",
+   "dataset": "e1313",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.0",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.0",
+   "records": true,
+   "checked": "experiments/261015_54_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_54_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_54_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_54_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_55_api",
+   "dataset": "e1313",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.1",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.1",
+   "records": true,
+   "checked": "experiments/261015_55_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_55_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_55_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_55_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_57_api",
+   "dataset": "e1414_r05",
+   "kind": "v2",
+   "version": "v2.0",
+   "source": "api",
+   "notes": "issue 61: workflow 2.0 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_57_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_57_api/usefulness.jsonl",
+    "transcript": "experiments/261015_57_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_57_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_57_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_58_api",
+   "dataset": "e1414_r05",
+   "kind": "v2",
+   "version": "v2.1",
+   "source": "api",
+   "notes": "issue 61: workflow 2.1 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_58_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_58_api/usefulness.jsonl",
+    "transcript": "experiments/261015_58_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_58_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_58_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_59_api",
+   "dataset": "e1414_r05",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.0",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.0",
+   "records": true,
+   "checked": "experiments/261015_59_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_59_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_59_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_59_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_60_api",
+   "dataset": "e1414_r05",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.1",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.1",
+   "records": true,
+   "checked": "experiments/261015_60_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_60_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_60_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_60_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_62_api",
+   "dataset": "e1414_r1",
+   "kind": "v2",
+   "version": "v2.0",
+   "source": "api",
+   "notes": "issue 61: workflow 2.0 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_62_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_62_api/usefulness.jsonl",
+    "transcript": "experiments/261015_62_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_62_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_62_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_63_api",
+   "dataset": "e1414_r1",
+   "kind": "v2",
+   "version": "v2.1",
+   "source": "api",
+   "notes": "issue 61: workflow 2.1 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_63_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_63_api/usefulness.jsonl",
+    "transcript": "experiments/261015_63_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_63_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_63_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_64_api",
+   "dataset": "e1414_r1",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.0",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.0",
+   "records": true,
+   "checked": "experiments/261015_64_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_64_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_64_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_64_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_65_api",
+   "dataset": "e1414_r1",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.1",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.1",
+   "records": true,
+   "checked": "experiments/261015_65_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_65_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_65_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_65_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_67_api",
+   "dataset": "e1414_r2",
+   "kind": "v2",
+   "version": "v2.0",
+   "source": "api",
+   "notes": "issue 61: workflow 2.0 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_67_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_67_api/usefulness.jsonl",
+    "transcript": "experiments/261015_67_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_67_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_67_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_68_api",
+   "dataset": "e1414_r2",
+   "kind": "v2",
+   "version": "v2.1",
+   "source": "api",
+   "notes": "issue 61: workflow 2.1 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_68_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_68_api/usefulness.jsonl",
+    "transcript": "experiments/261015_68_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_68_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_68_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_69_api",
+   "dataset": "e1414_r2",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.0",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.0",
+   "records": true,
+   "checked": "experiments/261015_69_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_69_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_69_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_69_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_70_api",
+   "dataset": "e1414_r2",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.1",
+   "tuning": "Agent with the screen tool",
+   "notes": "issue 61: investigator agent 3.1",
+   "records": true,
+   "checked": "experiments/261015_70_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_70_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_70_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_70_api/usefulness_rules.jsonl"
   }
  ],
  "data_descriptions": {

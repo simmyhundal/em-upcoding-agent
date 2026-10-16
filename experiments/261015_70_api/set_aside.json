@@ -1,0 +1,18 @@
+{
+ "1000000056": "Claims only: 99215 sits in the 5+ condition patients, with near-peer shares at 0-1 conditions and 2% low complexity. Consistent with a sicker panel; no records requested.",
+ "1000000108": "Claims only: no 99215 on 0-condition patients, with the excess in 3+ condition patients and 5% low complexity. Looks like panel acuity; no records requested.",
+ "1000000142": "z_adj 2.7 and 0% low-complexity patients; likely high acuity. Not examined.",
+ "1000000533": "Only 116 claims and $975 excess; lower priority. Not examined.",
+ "1000000194": "z_adj 5.2, modest excess; not reached within the records budget.",
+ "1000000334": "z_adj 5.3; not reached within the records budget.",
+ "1000000353": "z_adj 5.4; not reached within the records budget.",
+ "1000000561": "Large volume but only 2.75x ratio; not reached.",
+ "1000000511": "z_adj 5.1, 56% low complexity; a candidate for the next cycle.",
+ "1000000293": "z_adj 4.9; not reached.",
+ "1000000145": "z_adj 3.9, small excess; not reached.",
+ "1000000080": "z_adj 4.7; not reached.",
+ "1000000450": "2.3x ratio, 7% low complexity; likely acuity-driven. Not examined.",
+ "1000000578": "z_adj 3.0, small excess; not examined.",
+ "1000000062": "z_adj 4.8; not reached.",
+ "1000000319": "z_adj 6.3, 60% low complexity; a strong candidate for the next cycle (one records slot remains), not reached within the call budget."
+}
