@@ -38,9 +38,10 @@ def sh(*args):
         raise SystemExit(f"failed: {' '.join(args[:2])}")
 
 
-def run(rid, src, note, view_name="view", flagged_name="flagged_threshold.csv"):
+def run(rid, src, note, view_name="view", flagged_name="flagged_threshold.csv", v21=False):
     """view_name: a folder under the data dir holding documentation.csv and records_requests.csv from a different records request
-    (the sample-size sweep); the screen always comes from the code-only run `src`."""
+    (the sample-size sweep); the screen always comes from the code-only run `src`. v21: version 2.1 summaries (conditional next steps,
+    lint and repair)."""
     out = os.path.join(ROOT, "experiments", rid)
     os.makedirs(out, exist_ok=True)
     s = os.path.join(ROOT, "experiments", src)
@@ -52,13 +53,13 @@ def run(rid, src, note, view_name="view", flagged_name="flagged_threshold.csv"):
     flagged = os.path.join(out, flagged_name)
     summaries, checked = os.path.join(out, "case_summaries.jsonl"), os.path.join(out, "case_summaries_checked.jsonl")
     sh("src/case_summary.py", view, flagged, summaries, "--cache-dir", os.path.join(out, "llm_cache"),
-       "--usage-jsonl", os.path.join(out, "usage_writer.jsonl"))
+       "--usage-jsonl", os.path.join(out, "usage_writer.jsonl"), *(["--v21"] if v21 else []))
     sh("src/guardrail.py", view, summaries, checked)
     sh("eval/judge_usefulness.py", view, flagged, checked, os.path.join(out, "usefulness.jsonl"),
        "--cache-dir", os.path.join(out, "llm_cache_judge"), "--usage-jsonl", os.path.join(out, "usage_judge.jsonl"))
     sh("src/finalize_run.py", out, view, flagged, checked)
     open(os.path.join(out, "README.md"), "w").write(
-        f"# {rid}\n\nv2 data, the full pipeline with the AI step. {note}.\n\n"
+        f"# {rid}\n\nv2 data, the full pipeline with the AI step{' (workflow v2.1 summaries)' if v21 else ''}. {note}.\n\n"
         f"- Screen from `experiments/{src}/` (`flagged_threshold.csv`); records request in `documentation.csv` and `records_requests.csv`.\n"
         "- Summaries: obvious cases decided and written by rules (`src/summary_rules.py`), the rest by Claude Opus 5.5 through the Batch API "
         "(headline, leaning and interpretation only). Each record says which (`source`) and what the rule said (`rule_leaning`).\n"

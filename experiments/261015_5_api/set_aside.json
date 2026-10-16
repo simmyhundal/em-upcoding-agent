@@ -1,0 +1,21 @@
+{
+ "1000000016": "99215 share for zero-condition patients matches peers (2.3% vs 2.1%); the excess is in sicker patients. Looks like acuity; records not requested.",
+ "1000000169": "Mostly 99214; the 99215 share is only modestly above peers in each complexity group. Lower priority.",
+ "1000000175": "Modestly elevated in each complexity group. Lower priority.",
+ "1000000201": "z_adj 4.2, modest elevation on healthy patients. Candidate for the next cycle.",
+ "1000000002": "z_adj 3.2, small volume, normal share at zero conditions.",
+ "1000000151": "z_adj 3.2, small volume, low dollar exposure.",
+ "1000000081": "z_adj 3.1, small volume, low dollar exposure.",
+ "1000000203": "Low volume (144 claims). Not examined.",
+ "1000000024": "z_adj 3.8. Not examined because of tool-call limits; candidate for the next cycle.",
+ "1000000117": "Low volume (171 claims). Not examined.",
+ "1000000005": "Sick panel, only 2x expected. Not examined.",
+ "1000000099": "Sick panel, z_adj 2.3. Not examined.",
+ "1000000141": "z_adj 3.8. Not examined because of tool-call limits; candidate for the next cycle.",
+ "1000000166": "z_adj 2.9. Not examined.",
+ "1000000120": "z_adj 2.7. Not examined.",
+ "1000000014": "Sick panel, only 1.5x expected.",
+ "1000000036": "Only 1.9x expected.",
+ "1000000073": "Only 2.5x expected.",
+ "1000000056": "Only 2.4x expected, with a 99215 share of 8.2%."
+}

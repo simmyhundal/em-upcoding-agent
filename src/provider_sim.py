@@ -212,7 +212,8 @@ class Office:
         missing_ids, unusable_ids, deficiencies = [], [], []
         remaining = [c for c in st["requested"] if c not in st["usable"] and c not in pending_before]
         if status in ("complete", "partial"):
-            got = remaining if status == "complete" else rng.sample(remaining, max(1, int(len(remaining) * rng.uniform(0.4, 0.7))))
+            # nothing left to send (every requested chart is usable or held back for a signature): an empty reply, not a crash (issue 84)
+            got = remaining if status == "complete" or not remaining else rng.sample(remaining, max(1, int(len(remaining) * rng.uniform(0.4, 0.7))))
             for c in got:
                 row = self._chart(c, rng)
                 bad = self._signature_problem(c)

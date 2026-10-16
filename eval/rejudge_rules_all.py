@@ -24,7 +24,7 @@ def run_view(r, ds):
     rid = r["run"]
     code = os.path.basename(os.path.dirname(ds["flagged"])) if r["kind"] in ("v2", "agent") else None
     if r["kind"] == "agent":
-        return jar.build_view(rid, code)
+        return jar.build_view(rid, code, "3.1" if r.get("version") == "v3.1" else "3.0")
     if r["kind"] == "v2":
         v = os.path.join(ROOT, ds["view"].rsplit("/view", 1)[0], f"view_{rid}")
         return v if os.path.isdir(v) else os.path.join(ROOT, ds["view"])

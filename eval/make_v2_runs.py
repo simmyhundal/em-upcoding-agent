@@ -43,13 +43,14 @@ RUNS = [
 ]
 
 
-def run(spec):
+def run(spec, data_version="2.0"):
+    """data_version "2.1" also writes the note package; claims and the records universe are identical to 2.0 for the same seed."""
     rid, seed, n, n_up, n_hn, clone, note = spec
     data = os.path.join(ROOT, "data", f"synthetic_v2_{rid}")
     key = os.path.join(ROOT, "eval", "answer_key", f"ground_truth_v2_{rid}.json")
     out = os.path.join(ROOT, "experiments", rid)
     os.makedirs(out, exist_ok=True)
-    generate_v2.build(data, key, seed=seed, n_providers=n, n_upcoders=n_up, n_hard_neg=n_hn, clone_share=clone)
+    generate_v2.build(data, key, seed=seed, n_providers=n, n_upcoders=n_up, n_hard_neg=n_hn, clone_share=clone, data_version=data_version)
     view = os.path.join(data, "view")
     derive.build_view(data, view)
     py = sys.executable
@@ -72,7 +73,7 @@ def run(spec):
     got = sum(r["received"] for r in st if r["kind"] == "flagged")
     req = sum(r["requested"] for r in st if r["kind"] == "flagged")
     open(os.path.join(out, "README.md"), "w").write(
-        f"# {rid}\n\nv2 data, code only (no AI step). {note}.\n\n"
+        f"# {rid}\n\nv2 data ({data_version}), code only (no AI step). {note}.\n\n"
         f"- Screen: `flagged.csv` (top 25 by combined rank) and `flagged_threshold.csv` (suspicion at or above {MIN_SUSPICION}, at most "
         f"{MAX_FLAGGED}); {flagged_n} providers flagged by the threshold.\n"
         f"- Records request for those providers plus a 30-provider control sample: {got} of {req} requested charts for the flagged "

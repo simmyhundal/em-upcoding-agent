@@ -163,6 +163,24 @@ def test_office_v21_unsigned_charts_are_held_back_then_attested_after_a_follow_u
             return
 
 
+def test_office_v21_follow_up_with_nothing_left_to_send_does_not_crash():
+    """Issue 84: when every requested chart is already usable or held back, a 'partial' reply drew a sample from an empty list."""
+    d, view = _v21()
+    pids = sorted({r["provider_id"] for r in __import__("csv").DictReader(open(os.path.join(view, "claims.csv")))})
+    for seed in range(1, 6):
+        o = ps.Office(d, view, seed=seed, version="2.1")
+        for pid in pids:
+            r = o.send_request(pid, {"kind": "random", "n": 10})
+            if "error" in r:
+                continue
+            st = o._st(pid)
+            for c in st["requested"]:
+                st["usable"].setdefault(c, {"claim_id": c})          # everything already arrived
+            for _ in range(2):
+                r = o.follow_up(pid, ["MISSING_VISITS"])
+                assert "error" in r or "status" in r
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

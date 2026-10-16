@@ -22,6 +22,7 @@ import make_v2_ai_runs as ai  # noqa: E402
 import provider_sim  # noqa: E402
 import records  # noqa: E402
 import run_office_baseline as rob  # noqa: E402
+import workflow_policy_v21 as wp  # noqa: E402
 
 RUNS = [("261013_12_api", "261013_4_code", "threshold", "reserved seed 202; screen suspicion >= 5; fixed office policy"),
         ("261013_13_api", "261013_5_code", "threshold", "reserved seed 303; screen suspicion >= 5; fixed office policy"),
@@ -29,7 +30,8 @@ RUNS = [("261013_12_api", "261013_4_code", "threshold", "reserved seed 202; scre
         ("261013_15_api", "261013_5_code", "top25", "reserved seed 303; screen top 25; fixed office policy")]
 
 
-def build_view(rid, src, screen):
+def build_view(rid, src, screen, version="2.0"):
+    """version "2.1": office 2.1 and the fixed v2.1 policy (eval/workflow_policy_v21.py) on data 2.1; the notes go into documentation.csv."""
     data = os.path.join(ROOT, "data", f"synthetic_v2_{src}")
     base = os.path.join(data, "view")
     view = os.path.join(data, f"view_{rid}")
@@ -40,18 +42,22 @@ def build_view(rid, src, screen):
             os.symlink(os.path.join(base, name), dst)
     flagged_file = os.path.join(ROOT, "experiments", src, "flagged_threshold.csv" if screen == "threshold" else "flagged.csv")
     flagged = [r["provider_id"] for r in csv.DictReader(open(flagged_file)) if r["flagged"] == "True"]
-    office = provider_sim.Office(data, base, seed=1)
-    rob.run_policy(office, flagged)
+    if version == "2.1":
+        office = provider_sim.Office(data, base, seed=1, version="2.1")
+        by_provider = {}
+        for r in csv.DictReader(open(os.path.join(base, "claims.csv"))):
+            by_provider.setdefault(r["provider_id"], []).append(r)
+        wp.run_policy_v21(office, flagged, by_provider)
+    else:
+        office = provider_sim.Office(data, base, seed=1)
+        rob.run_policy(office, flagged)
     # control sample = earlier reviews of providers outside the flagged list
     req = list(csv.DictReader(open(os.path.join(base, "records_requests.csv"))))
     control = {r["provider_id"] for r in req if r["kind"] == "control"} - set(flagged)
     owner = {r["claim_id"]: r["provider_id"] for r in csv.DictReader(open(os.path.join(base, "claims.csv")))}
     docs = [r for r in csv.DictReader(open(os.path.join(base, "documentation.csv"))) if owner.get(r["claim_id"]) in control]
     docs += office.documentation_rows()
-    with open(os.path.join(view, "documentation.csv"), "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=records.DOC_COLS)
-        w.writeheader()
-        w.writerows(docs)
+    records.write_docs(os.path.join(view, "documentation.csv"), docs)
     with open(os.path.join(view, "records_requests.csv"), "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["provider_id", "kind", "requested", "received", "late", "no_response"])
@@ -63,10 +69,10 @@ def build_view(rid, src, screen):
     return view, office, flagged_file
 
 
-def run(rid, src, screen, note):
-    view, office, flagged_file = build_view(rid, src, screen)
+def run(rid, src, screen, note, version="2.0"):
+    view, office, flagged_file = build_view(rid, src, screen, version)
     name = os.path.basename(view)
-    ai.run(rid, src, note, view_name=name, flagged_name=os.path.basename(flagged_file))
+    ai.run(rid, src, note, view_name=name, flagged_name=os.path.basename(flagged_file), v21=version == "2.1")
     office.write_transcript(os.path.join(ROOT, "experiments", rid, "office_transcript.jsonl"))
 
 

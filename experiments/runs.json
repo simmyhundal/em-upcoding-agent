@@ -98,6 +98,15 @@
    "view": "data/synthetic_v2_261013_5_code/view",
    "data_version": "v2",
    "seed_status": "reserved"
+  },
+  "x1_s42": {
+   "label": "seed 42",
+   "seed": 42,
+   "flagged": "experiments/261015_1_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261015_1_code.json",
+   "view": "data/synthetic_v2_261015_1_code/view",
+   "data_version": "v2.1",
+   "seed_status": "development"
   }
  },
  "runs": [
@@ -579,11 +588,42 @@
    "transcript": "experiments/261013_19_api/office_transcript.jsonl",
    "usefulness": "experiments/261013_19_api/usefulness.jsonl",
    "usefulness_rules": "experiments/261013_19_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "261015_3_api",
+   "dataset": "x1_s42",
+   "kind": "v2",
+   "version": "v2.1",
+   "source": "api",
+   "notes": "smoke run, not counted: workflow 2.1 with the provider office, screen suspicion >= 5",
+   "ai": {
+    "checked": "experiments/261015_3_api/case_summaries_checked.jsonl",
+    "usefulness": "experiments/261015_3_api/usefulness.jsonl",
+    "transcript": "experiments/261015_3_api/office_transcript.jsonl",
+    "usefulness_rules": "experiments/261015_3_api/usefulness_rules.jsonl"
+   },
+   "sent": "experiments/261015_3_api/flagged_threshold.csv",
+   "min_suspicion": 5
+  },
+  {
+   "run": "261015_5_api",
+   "dataset": "x1_s42",
+   "kind": "agent",
+   "source": "api",
+   "version": "v3.1",
+   "tuning": "Agent with the screen tool",
+   "notes": "smoke run, not counted: investigator agent 3.1",
+   "records": true,
+   "checked": "experiments/261015_5_api/case_summaries_checked.jsonl",
+   "transcript": "experiments/261015_5_api/office_transcript.jsonl",
+   "usefulness": "experiments/261015_5_api/usefulness.jsonl",
+   "usefulness_rules": "experiments/261015_5_api/usefulness_rules.jsonl"
   }
  ],
  "data_descriptions": {
   "v1": "Version 1 synthetic data: provider, patient and claim tables with a stored chronic-condition count, plus a records-review sample (documentation.csv, about 30% of claims) handed to the AI up front.",
-  "v2": "Version 2 synthetic data: plan-shaped tables (members, providers, claim headers and lines, remittance with denials, replacements and voids); conditions derived from claims; charts only by records request (limited, late or missing responses, coder disagreement); separate MDM elements and minutes; some upcoders clone their notes."
+  "v2": "Version 2 synthetic data: plan-shaped tables (members, providers, claim headers and lines, remittance with denials, replacements and voids); conditions derived from claims; charts only by records request (limited, late or missing responses, coder disagreement); separate MDM elements and minutes; some upcoders clone their notes.",
+  "v2.1": "Version 2.1 synthetic data: the version 2 plan-shaped tables (claims and records universe identical to 2.0 for the same seed) plus the note package a records request returns (note text, signatures, orders and results, an EHR audit trail)."
  },
  "seed_status_meaning": "development = the seed used to build and tune the workflow (screen cutoff, rule thresholds); held-out = generated or scored after those settings were frozen."
 }

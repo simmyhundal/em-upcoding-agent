@@ -5,7 +5,7 @@ The judge must see the charts the agent itself obtained. The office is determini
 view folder for the run, then calls eval/judge_usefulness.py (Batch API, cached). Costs real money (about $0.05 a run).
 
 Usage:
-    python eval/judge_agent_runs.py RUN_ID CODE_RUN
+    python eval/judge_agent_runs.py RUN_ID CODE_RUN [3.0|3.1]
 """
 import csv
 import json
@@ -20,11 +20,12 @@ import provider_sim  # noqa: E402
 import records  # noqa: E402
 
 
-def replay(run_id, code_run):
+def replay(run_id, code_run, version="3.0"):
+    """version "3.1": the agent ran against office 2.1 (second requests, audit-trail requests, the note package)."""
     data = os.path.join(ROOT, "data", f"synthetic_v2_{code_run}")
     base = os.path.join(data, "view")
     out = os.path.join(ROOT, "experiments", run_id)
-    office = provider_sim.Office(data, base, seed=1)
+    office = provider_sim.Office(data, base, seed=1, version="2.1" if version == "3.1" else "2.0")
     for line in open(os.path.join(out, "audit.jsonl")):
         a = json.loads(line)
         args = a["args"]
@@ -34,6 +35,8 @@ def replay(run_id, code_run):
             office.follow_up(args["provider_id"], args["addressed_codes"], claim_ids=args.get("claim_ids"))
         elif a["tool"] == "close_records":
             office.close_request(args["provider_id"], args.get("reason", ""))
+        elif a["tool"] == "request_audit_trail":
+            office.request_audit_trail(args["provider_id"], args.get("claim_ids", []))
     logged = {}
     for line in open(os.path.join(out, "office_transcript.jsonl")):
         e = json.loads(line)
@@ -44,9 +47,9 @@ def replay(run_id, code_run):
     return data, base, office
 
 
-def build_view(run_id, code_run):
+def build_view(run_id, code_run, version="3.0"):
     """Replay the agent's records requests and write the run's view folder (claims, patients, providers, the charts it obtained)."""
-    data, base, office = replay(run_id, code_run)
+    data, base, office = replay(run_id, code_run, version)
     view = os.path.join(data, f"view_{run_id}")
     os.makedirs(view, exist_ok=True)
     for name in ("claims.csv", "patients.csv", "providers.csv"):
@@ -58,10 +61,7 @@ def build_view(run_id, code_run):
     owner = {r["claim_id"]: r["provider_id"] for r in csv.DictReader(open(os.path.join(base, "claims.csv")))}
     docs = [r for r in csv.DictReader(open(os.path.join(base, "documentation.csv"))) if owner.get(r["claim_id"]) in control]
     docs += office.documentation_rows()
-    with open(os.path.join(view, "documentation.csv"), "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=records.DOC_COLS)
-        w.writeheader()
-        w.writerows(docs)
+    records.write_docs(os.path.join(view, "documentation.csv"), docs)
     with open(os.path.join(view, "records_requests.csv"), "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["provider_id", "kind", "requested", "received", "late", "no_response"])
@@ -70,8 +70,8 @@ def build_view(run_id, code_run):
     return view
 
 
-def main(run_id, code_run):
-    view = build_view(run_id, code_run)
+def main(run_id, code_run, version="3.0"):
+    view = build_view(run_id, code_run, version)
     out = os.path.join(ROOT, "experiments", run_id)
     rows = ju.run(view, os.path.join(ROOT, "experiments", code_run, "flagged.csv"), os.path.join(out, "case_summaries_checked.jsonl"),
                   os.path.join(out, "usefulness.jsonl"), batch=True, cache_dir=os.path.join(out, "llm_cache_judge"),
@@ -85,4 +85,4 @@ if __name__ == "__main__":
         load_dotenv()
     except ImportError:
         pass
-    main(sys.argv[1], sys.argv[2])
+    main(sys.argv[1], sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else "3.0")

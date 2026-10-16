@@ -59,7 +59,7 @@ def test_results_rows_have_the_metadata_columns():
     assert set(sb.COLUMNS) == set(rows[0])
     for r in rows:
         assert " " not in r["run_id"] and r["seed_status"] in ("development", "held-out", "reserved") and r["source"] in ("api", "cc", "code")
-        assert r["data_version"] in ("v1", "v2") and r["data_description"] and r["upcoder_rate"] and r["upcoder_clone_level"]
+        assert r["data_version"] in ("v1", "v2", "v2.1") and r["data_description"] and r["upcoder_rate"] and r["upcoder_clone_level"]
         if r["stage"] == "AI":
             assert r["agents"] != ""
 
