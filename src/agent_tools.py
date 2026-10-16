@@ -415,7 +415,7 @@ class Environment:
             return {"error": f"unknown tool {name}"}
         try:
             out = fn()
-        except (KeyError, TypeError, ValueError) as e:
+        except (KeyError, TypeError, ValueError, AttributeError) as e:      # malformed arguments go back to the model (issue 85)
             return {"error": f"bad arguments: {e}"}
         if name in ("estimate_overpayment", "hybrid_review", "draft_summary", "note_checks"):
             self.tool_calls.append((name, dict(args), json.dumps(out)))

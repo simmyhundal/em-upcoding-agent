@@ -149,6 +149,8 @@ def test_submit_rejects_bad_input_and_tool_errors_do_not_crash():
     assert "error" in e.submit_findings([{"provider_id": PIDS[0], "leaning": "guilty"}])
     assert "error" in e.call("provider_profile", {})
     assert "error" in e.call("no_such_tool", {})
+    # issue 85: findings as a list of strings (seen in a live run) used to raise AttributeError and end the run
+    assert "bad arguments" in e.call("submit_findings", {"findings": ["P1 looks like upcoding"]})["error"]
 
 
 if __name__ == "__main__":

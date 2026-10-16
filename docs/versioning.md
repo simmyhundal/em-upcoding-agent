@@ -41,6 +41,10 @@ Seeds 202 and 303 were reserved and have now been used and seen (the Milestone 6
 - `summary_rules.pick_citations` always cites something from the packet's own samples, so a rule-decided summary can no longer be rejected for citing nothing.
 - `records.read_chart` was split out of `request_records` so the provider simulator reads charts the same way (outputs verified identical).
 
+## Patches since v3.0 (no results changed)
+- `agent_tools.Environment.call` returns `bad arguments` for an `AttributeError` too (issue 85). A live run (`261015_64_api`) crashed when the model passed `submit_findings` a list of strings; the old code could only crash on that path, so no recorded run changes.
+- Office 2.1 no longer draws a sample from an empty list when a follow-up has nothing left to send (issue 84). Office 2.0 never reached that branch with an empty list, so frozen results are unchanged.
+
 ## Two parallel streams from here
 The product now develops on two lines at once, so we can keep learning from both designs:
 - **v2.x: the workflow.** Code fixes the order of steps; the model only writes where rules are silent. Baseline `v2.0` (frozen).
