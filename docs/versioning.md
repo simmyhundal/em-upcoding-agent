@@ -67,6 +67,7 @@ Release 2 (in development, branch `release2-overnight`). Data 2.2 is behind `--d
 | Data-quality pre-flight (#81) | built: `flagging.py --preflight` ([data_quality.md](data_quality.md)); the case-summary step does not consume the column yet | built: `data_quality` and `flag_data_issue` tools, hold in `submit_findings`; offline tests only | |
 | Fewer model calls in the writer (#91) | built: rules 2.2 (`case_summary.py --v22`, `summary_rules.rule_leaning_22`) decide inconclusive the ambiguous cases where the v2.1 model always said inconclusive; 115 to 11 model calls on the release 1 runs, no leaning changed ([workflow_cost.md](workflow_cost.md)) | n/a: the agent writes its own findings (its cost is #92) | the agent has no rule-then-model writer |
 | No LLM usefulness judge in the evaluation (#91, #93) | built: the 2.2 workflow path skips `judge_usefulness.py`; the rule judge runs | #92 | |
+| Agent cost (#92) | n/a: the workflow has no agent loop (its cost is #91) | built: $1 cap for 3.2 (`run_agent.EVAL_MAX_USD_32`), no LLM judge (`judge_agent_runs.main(..., "3.2")` rebuilds the view only, replaying office 2.1), usage per turn (`turn_usage.jsonl`), `run_agent.py --model` and `--effort`; measured in [agent_cost.md](agent_cost.md) | agent loop only |
 
 Release 1 (frozen). Items still planned carry over to `v2.2` and `v3.2`.
 

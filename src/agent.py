@@ -82,6 +82,7 @@ def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=M
     tools = env.tool_schemas()
     messages = [{"role": "user", "content": task}]
     audit, usd, calls, turn, reason, nudged, texts = [], 0.0, 0, 0, "", False, []
+    turn_usage = []              # version 3.2: token usage per turn (issue 92), so cache reads and output can be checked on every run
     while True:
         if turn >= max_turns:
             reason = "turn cap"
@@ -93,6 +94,9 @@ def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=M
         resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_32 if getattr(env, 'v32', False) else SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
                                       output_config={"effort": effort}, extra_body={"cache_control": {"type": "ephemeral"}})
         usd += _cost(resp.usage) * price_scale
+        if getattr(env, "v32", False):
+            turn_usage.append({"turn": turn, **{k: getattr(resp.usage, k, 0) or 0 for k in ("input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens")},
+                               "usd_so_far": round(usd, 4)})
         messages.append({"role": "assistant", "content": resp.content})
         texts += [b.text for b in resp.content if b.type == "text" and b.text.strip()]
         if resp.stop_reason == "refusal":
@@ -150,5 +154,7 @@ def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=M
         if getattr(env, "v32", False):
             json.dump(env.dq, open(os.path.join(out_dir, "data_quality.json"), "w"), indent=1)
             json.dump(env.data_issues, open(os.path.join(out_dir, "data_issues.json"), "w"), indent=1)
+            with open(os.path.join(out_dir, "turn_usage.jsonl"), "w") as f:
+                f.writelines(json.dumps(t) + "\n" for t in turn_usage)
     summary["audit"] = audit
     return summary
