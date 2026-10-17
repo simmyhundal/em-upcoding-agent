@@ -2,7 +2,7 @@
 
 [Back to the README](../README.md)
 
-The agent design, what each of its actions does, and how the versions differ. **Status:** `v3.0` is the frozen agent that was evaluated. `v3.1`, shown in the figure, adds the actions marked *v3.1* below and runs on data 2.1; it is built and tested but not yet evaluated on fresh seeds (#61).
+The agent design, what each of its actions does, and how the versions differ. **Status:** `v3.0` and `v3.1` are frozen and evaluated. `v3.1`, shown in the figure, adds the actions marked *v3.1* below and runs on data 2.1; on ten fresh seeds it found 27 of 80 upcoders against 18 for `v3.0`, and was not reliably different from workflow `v2.1` (32 of 80; [eval61.md](eval61.md)).
 
 ## The agent and its actions
 ![The agent and the actions it chooses from: screen, look closer, request charts, follow up, check notes, estimate, review, submit findings; simulated practices answer, checks gate the findings, people review the drafts](images/agent.svg)
