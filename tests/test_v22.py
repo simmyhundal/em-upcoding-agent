@@ -125,6 +125,26 @@ def test_org_billing_with_blank_rendering_cannot_be_attributed():
     assert 0 < stats["unattributed"] <= 5
 
 
+def test_dx_cap_truncates_only_the_delivered_extract_and_moves_nothing_else():
+    a, ka = build("2.2", seed=8)
+    b, kb = build("2.2", seed=8, dx_cap=2, dx_cap_months=(1, 2, 3, 4, 5, 6))
+    ha, hb = _rows(os.path.join(a, "claims_header.csv")), _rows(os.path.join(b, "claims_header.csv"))
+    assert len(ha) == len(hb)
+    cut = 0
+    for x, y in zip(ha, hb):
+        dxa = [x[f"dx{k}"] for k in range(1, 7) if x[f"dx{k}"]]
+        dxb = [y[f"dx{k}"] for k in range(1, 7) if y[f"dx{k}"]]
+        if int(x["service_date"][5:7]) <= 6:
+            assert dxb == dxa[:2]
+        else:
+            assert dxb == dxa                                                    # months outside the cap are untouched
+        cut += (dxb != dxa) and x["claim_frequency"] == "1"          # replacements and voids copy their original's list
+    assert cut > 0 and kb["defects"]["dx_truncation"]["claims_shortened"] == cut
+    assert filecmp.cmp(os.path.join(a, "claim_lines.csv"), os.path.join(b, "claim_lines.csv"), shallow=False)
+    assert filecmp.cmp(os.path.join(a, "records", "visit_notes.csv"), os.path.join(b, "records", "visit_notes.csv"), shallow=False)
+    assert ka["justified_cpt_by_claim"] == kb["justified_cpt_by_claim"] and "defects" in kb and not ka["defects"]
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

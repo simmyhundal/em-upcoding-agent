@@ -59,7 +59,8 @@ def _write_csv(path, rows, cols):
 # plausibility and for keeping honest noise below the upcoder margin (docs/data_v2_2.md). Frozen data versions never read these.
 V22_DEFAULTS = {"honest_miscode_rate": 0.08, "honest_up_share": 0.5, "honest_miscode_spread": 0.4, "honest_miscode_max": 0.12,
                 "upcoder_fraction": g1.UPCODER_FRACTION, "subtle_upcoder_share": 0.25, "subtle_upcoder_fraction": (0.08, 0.12),
-                "upcoder_margin": 0.06, "group_billing": True, "rendering_omitted_share": 0.3}
+                "upcoder_margin": 0.06, "group_billing": True, "rendering_omitted_share": 0.3,
+                "dx_cap": 0, "dx_cap_months": tuple(range(1, 13))}
 
 
 def _beta_rate(nrng, mean, cv, cap):
@@ -167,6 +168,7 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
     # ---- phase 2: visits
     headers, lines, remit, universe, truth = [], [], [], [], {}
     cid = 0
+    dx_cut = 0                                   # data 2.2: claims whose delivered diagnosis list was shortened by --dx-cap
     n_prov = len(provs)
     for pi, P in enumerate(provs):
         vol = P["volume"]
@@ -226,10 +228,12 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
 
             # claim header and lines (original claim)
             em_allowed = allowed[CODES[B]]
+            dx_out = dx[:cfg["dx_cap"]] if (v22_on and cfg["dx_cap"] and date_.month in cfg["dx_cap_months"]) else dx   # the extract keeps fewer
+            dx_cut += len(dx_out) < len(dx)
             headers.append({"claim_id": claim_id, "member_id": m["member_id"], "billing_npi": P["billing"],
                             "rendering_npi": "" if omit[v] else P["npi"], "claim_frequency": 1, "original_claim_id": "",
                             "service_date": date_.isoformat(),
-                            **{f"dx{k + 1}": (dx[k] if k < len(dx) else "") for k in range(6)}})
+                            **{f"dx{k + 1}": (dx_out[k] if k < len(dx_out) else "") for k in range(6)}})
             mods = "25" if (lab and mrng.random() < 0.05) else ""
             line_rows = [{"claim_id": claim_id, "line_no": 1, "cpt": CODES[B], "modifiers": mods, "units": 1,
                           "place_of_service": "11", "dx_pointer": "1", "billed_amount": round(em_allowed * 2.5, 2),
@@ -310,6 +314,8 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
             # role by the stated definition: upcoding rate above the honest baseline by at least the margin (issue 74)
             P["role"] = "upcoder" if P["up_rate"] - baseline >= cfg["upcoder_margin"] else ("hard_negative" if P["planted"] == "hard_negative" else "normal")
         v22_key = {"honest_baseline_upcode_rate": round(baseline, 4), "upcoder_margin": cfg["upcoder_margin"],
+                   "defects": {**({"dx_truncation": {"cap": cfg["dx_cap"], "months": list(cfg["dx_cap_months"]), "claims_shortened": dx_cut}}
+                                  if cfg["dx_cap"] else {})},
                    "noise": {k: cfg[k] for k in ("honest_miscode_rate", "honest_up_share", "honest_miscode_spread", "honest_miscode_max",
                                                  "subtle_upcoder_share")}}
     with open(answer_key_path, "w") as f:
@@ -346,6 +352,8 @@ if __name__ == "__main__":
     g.add_argument("--subtle-upcoder-share", type=float, help="share of upcoders drawn from the subtle range instead")
     g.add_argument("--subtle-upcoder-fraction", type=float, nargs=2, metavar=("LO", "HI"), help="the subtle range")
     g.add_argument("--upcoder-margin", type=float, help="an upcoder's upcoding rate exceeds the honest baseline by at least this")
+    g.add_argument("--dx-cap", type=int, help="keep only the first N diagnosis positions in the delivered extract (the claim had more); 0 = off")
+    g.add_argument("--dx-cap-months", type=int, nargs="+", help="service months (1 to 12) the cap applies to; default all")
     g.add_argument("--group-billing", action=argparse.BooleanOptionalAction, default=None,
                    help="groups of 2 or more clinicians bill under an organizational NPI (the clinician stays the rendering provider)")
     g.add_argument("--rendering-omitted-share", type=float, help="share of single-clinician claims with the rendering NPI left blank (it equals billing)")

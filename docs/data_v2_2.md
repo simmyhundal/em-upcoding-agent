@@ -87,6 +87,40 @@ fell back to billing, and `billing_entity` (clinician to the NPI that receives a
 - What this does not do: the claims are not otherwise harder to read. It tests that the pipeline attributes visits correctly when the rendering field is
   absent or the biller is an organization, and it is the plumbing the data-quality check (issue 81) reports on ("share of claims missing a rendering NPI").
 
+## Diagnosis-code truncation in the plan's extract (issue 77)
+
+`claims_header` carries `dx1` to `dx6` (an 837P allows 12) and nothing tested what happens when a plan's warehouse or extract keeps fewer. Truncation lowers
+derived condition counts, so sick panels look healthier and honest high-acuity doctors look like upcoders.
+
+| Option | Default | Meaning |
+|---|---|---|
+| `--dx-cap N` | 0 (off) | keep only the first N diagnosis positions in the delivered `claims_header` (the claim, and the visit note, had more) |
+| `--dx-cap-months M ...` | all | service months the cap applies to (a re-extract of some months only) |
+
+The answer key records the defect under `defects.dx_truncation` (cap, months, number of claims shortened) so a data-quality check can be graded
+(issue 81). Truncation uses no random numbers: nothing else in the data moves.
+
+**Measured on the development seed 42** (`python eval/dx_cap_effect.py --write`; free; one draw per row):
+
+<!-- dxcap:start -->
+| Diagnosis positions kept | Claims shortened | Mean derived conditions per patient | High-acuity doctors: 99215 share / expected | Doctors with suspicion >= 5 | `riskadj` top 25: upcoders / high-acuity / ordinary | `riskadj` AUPRC | `eb_ratio` top 25: upcoders / high-acuity / ordinary | `eb_ratio` AUPRC |
+|---|---|---|---|---|---|---|---|---|
+| 6 (no cap) | 0 | 1.54 | 1.17 | 10 | 7 / 1 / 17 | 0.457 | 6 / 1 / 18 | 0.754 |
+| 4 | 9,118 | 1.49 | 1.21 | 8 | 6 / 2 / 17 | 0.456 | 6 / 1 / 18 | 0.779 |
+| 3 | 19,294 | 1.38 | 1.35 | 8 | 6 / 2 / 17 | 0.458 | 6 / 2 / 17 | 0.738 |
+| 2 | 38,696 | 1.16 | 1.57 | 10 | 5 / 4 / 16 | 0.413 | 6 / 2 / 17 | 0.583 |
+<!-- dxcap:end -->
+
+Reading it: a cap of 4 or 3 changes little (the mean derived count falls from 1.54 to 1.49 and 1.38, one more high-acuity doctor enters the top 25); a cap of
+2 is clear: the mean count falls to 1.16, the high-acuity doctors' 99215 share rises from 1.17 to 1.57 times what the model expects, four of them reach the
+top 25 (one before), and `riskadj` loses two upcoders from its top 25. `eb_ratio` is affected less in the top 25 but its AUPRC falls from 0.75 to 0.58.
+One dataset, 8 high-acuity doctors and 7 upcoders, so single doctors move these counts; the direction (sicker panels look healthier, honest
+high-acuity doctors look worse) is what the generator guarantees and the table confirms. Only the first `N` positions survive, and the generator puts
+chronic conditions first, so a low cap removes chronic conditions before acute ones; a plan that orders diagnoses differently would truncate differently.
+
+**Response when truncation is suspected** (built with the data-quality check, issue 81): findings that rely on risk adjustment are held or marked
+low-confidence, and a person asks the plan for a full-fidelity re-extract from its original claim records. The agent does not request data itself.
+
 ## Not yet built
 
-Items 77, 79 and 80 of the milestone are listed here when built.
+Items 79 and 80 of the milestone are listed here when built.
