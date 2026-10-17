@@ -14,6 +14,8 @@ Status: **proposal, nothing run.** No paid run starts, and no seed above 1414 is
 
 Not exercised live: `ai.run(preflight=True)` and the v3.2 prompt have only offline tests; the first paid run is their first real use, so the first dataset should be a single-seed smoke run.
 
+**Judge decision (Simmy):** the evaluation uses the deterministic rule judge only (`eval/judge_rules.py`); the LLM usefulness judge is not run. That removes about $0.11 per arm (roughly a quarter of the cost). Improving that judge, and testing a deterministic summary writer, is tracked in [#93](https://github.com/simmyhundal/em-upcoding-agent/issues/93).
+
 ## Arms (per dataset, same data and seed)
 | Arm | What | Approx. cost per dataset (from #61) |
 |---|---|---|
