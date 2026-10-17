@@ -65,6 +65,28 @@ doctors now show visits billed above the supported level.
 
 ![Expected level versus billed level on data 2.2](images/expected_billed_2_2.svg)
 
+## Billing provider is the group; rendering NPI omitted when it equals billing (issue 75)
+
+Real professional claims are usually billed by the group (an organizational NPI) with the treating clinician as rendering provider, and the rendering
+field is often left blank when it equals billing. Before, `billing_npi` equalled `rendering_npi` on every claim and `group_tin` was never used.
+
+| Option | Default | Meaning |
+|---|---|---|
+| `--group-billing` / `--no-group-billing` | on | clinicians sharing a `group_tin` with at least one other clinician bill under an organizational NPI (starts with 2); single-clinician groups bill under their own NPI |
+| `--rendering-omitted-share` | 0.3 | share of single-clinician claims (billing equals rendering) with the rendering NPI left blank; its own random stream, so changing it moves no billed level |
+
+`src/derive.py` (the detector view) attributes each visit to the **clinician who saw the patient**: the rendering NPI, or the billing NPI when rendering is
+blank and billing is an individual. A blank rendering NPI under an organizational billing NPI cannot be attributed; that visit is dropped and counted.
+When any visit used the fallback, was group billed, or was unattributed, the view gets `attribution.json` with the counts, the share of visits that
+fell back to billing, and `billing_entity` (clinician to the NPI that receives actions). Views of earlier data get no such file and are byte-identical.
+
+- **Scoring is never done at the group level.** The screen, the metrics and every finding are per clinician. Seed 42: 187 of 216 clinicians bill under an
+  organizational NPI that is not their own; 3.3% of visits (3,899) fell back to billing; 0 were unattributed.
+- **Actions go to the billing entity.** `derive.billing_entity(view_dir)` gives the NPI a records request or recovery would be addressed to. The simulated
+  provider office (`provider_sim.py`) still behaves per clinician; modelling a group office that answers for several clinicians is not built.
+- What this does not do: the claims are not otherwise harder to read. It tests that the pipeline attributes visits correctly when the rendering field is
+  absent or the biller is an organization, and it is the plumbing the data-quality check (issue 81) reports on ("share of claims missing a rendering NPI").
+
 ## Not yet built
 
-Items 75, 77, 79 and 80 of the milestone are listed here when built.
+Items 77, 79 and 80 of the milestone are listed here when built.

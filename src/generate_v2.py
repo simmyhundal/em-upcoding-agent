@@ -59,7 +59,7 @@ def _write_csv(path, rows, cols):
 # plausibility and for keeping honest noise below the upcoder margin (docs/data_v2_2.md). Frozen data versions never read these.
 V22_DEFAULTS = {"honest_miscode_rate": 0.08, "honest_up_share": 0.5, "honest_miscode_spread": 0.4, "honest_miscode_max": 0.12,
                 "upcoder_fraction": g1.UPCODER_FRACTION, "subtle_upcoder_share": 0.25, "subtle_upcoder_fraction": (0.08, 0.12),
-                "upcoder_margin": 0.06}
+                "upcoder_margin": 0.06, "group_billing": True, "rendering_omitted_share": 0.3}
 
 
 def _beta_rate(nrng, mean, cv, cap):
@@ -85,6 +85,7 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
         raise ValueError(f"unknown or data-2.2-only options: {sorted(v22)}")
     cfg = {**V22_DEFAULTS, **v22}
     nrng = np.random.default_rng([seed, 19])      # data 2.2 only: honest coding noise and subtle-upcoder choice; its own stream
+    orng = np.random.default_rng([seed, 23])      # data 2.2 only: which claims leave the rendering NPI blank; its own stream, so toggling it moves nothing else
     ng = notes_v21.NoteGen(seed, clone_signal_strength) if data_version in ("2.1", "2.2") else None
     if os.path.commonpath([os.path.abspath(out_dir), os.path.abspath(answer_key_path)]) == os.path.abspath(out_dir):
         raise ValueError("answer_key_path must be outside out_dir so agents reading the data cannot see it")
@@ -138,6 +139,18 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
             provs[-1]["member_ids"].append(base + j)
         clone_flags[npi] = i in cloners
 
+    # data 2.2: a group billing for several clinicians bills under an organizational NPI (starts with 2); the clinician stays the rendering provider
+    org_npi = {}
+    if v22_on and cfg["group_billing"]:
+        size = {}
+        for P in provs:
+            size[P["tin"]] = size.get(P["tin"], 0) + 1
+        for P in provs:
+            if size[P["tin"]] >= 2:
+                org_npi.setdefault(P["tin"], f"2{len(org_npi) + 1:09d}")
+    for P in provs:
+        P["billing"] = org_npi.get(P["tin"], P["npi"])
+
     weekdays = [date(2024, 1, 1) + timedelta(days=k) for k in range(366)
                 if (date(2024, 1, 1) + timedelta(days=k)).weekday() < 5 and (date(2024, 1, 1) + timedelta(days=k)).year == 2024]
     W = len(weekdays)
@@ -180,6 +193,9 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
             goes_up = nrng.random(vol) < cfg["honest_up_share"]
             billed = np.where(slip & goes_up & (just < 4), just + 1, np.where(slip & ~goes_up & (just > 0), just - 1, billed))
         P["n_up_visits"], P["n_down_visits"] = int((billed > just).sum()), int((billed < just).sum())
+        # data 2.2: a clinician billing under their own NPI often leaves the rendering field blank (it equals billing)
+        omit = (orng.random(vol) < cfg["rendering_omitted_share"]) if (v22_on and cfg["rendering_omitted_share"] > 0 and P["billing"] == P["npi"]) \
+            else np.zeros(vol, dtype=bool)
         for v in range(vol):
             m = members[mem_idx[v]]
             cid += 1
@@ -210,8 +226,8 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
 
             # claim header and lines (original claim)
             em_allowed = allowed[CODES[B]]
-            headers.append({"claim_id": claim_id, "member_id": m["member_id"], "billing_npi": P["npi"],
-                            "rendering_npi": P["npi"], "claim_frequency": 1, "original_claim_id": "",
+            headers.append({"claim_id": claim_id, "member_id": m["member_id"], "billing_npi": P["billing"],
+                            "rendering_npi": "" if omit[v] else P["npi"], "claim_frequency": 1, "original_claim_id": "",
                             "service_date": date_.isoformat(),
                             **{f"dx{k + 1}": (dx[k] if k < len(dx) else "") for k in range(6)}})
             mods = "25" if (lab and mrng.random() < 0.05) else ""
@@ -300,6 +316,7 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
         json.dump({"seed": seed, "clone_share": clone_share, "data_version": data_version, **v22_key,
                    **({"clone_signal_strength": clone_signal_strength, "cloned_visits": ng.cloned} if ng is not None else {}),
                    "providers": {P["npi"]: {"role": P["role"], "upgrade_fraction": round(P["up"], 3),
+                                            **({"billing_npi": P["billing"], "group_tin": P["tin"]} if v22_on else {}),
                                             "clones_notes": P["clones"],
                                             **({"planted": P["planted"], "subtle": P["subtle"], "honest_miscode_rate": round(P["miscode"], 4),
                                                 "upcode_rate": round(P["up_rate"], 4), "downcode_rate": round(P["down_rate"], 4)} if v22_on else {}),
@@ -329,6 +346,9 @@ if __name__ == "__main__":
     g.add_argument("--subtle-upcoder-share", type=float, help="share of upcoders drawn from the subtle range instead")
     g.add_argument("--subtle-upcoder-fraction", type=float, nargs=2, metavar=("LO", "HI"), help="the subtle range")
     g.add_argument("--upcoder-margin", type=float, help="an upcoder's upcoding rate exceeds the honest baseline by at least this")
+    g.add_argument("--group-billing", action=argparse.BooleanOptionalAction, default=None,
+                   help="groups of 2 or more clinicians bill under an organizational NPI (the clinician stays the rendering provider)")
+    g.add_argument("--rendering-omitted-share", type=float, help="share of single-clinician claims with the rendering NPI left blank (it equals billing)")
     a = ap.parse_args()
     opts = {k: (tuple(v) if isinstance(v, list) else v) for k, v in vars(a).items()
             if k in V22_DEFAULTS and v is not None}
