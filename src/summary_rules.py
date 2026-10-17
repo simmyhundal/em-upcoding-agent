@@ -95,6 +95,24 @@ def rule_leaning(packet):
     return None, "documentation result sits between the rule's cutoffs"
 
 
+# Rules 2.2 (workflow v2.2, issue 91): in the release 1 runs the model, asked about these ambiguous cases, answered inconclusive every
+# time (workflow v2.1: 104 of 104; docs/workflow_cost.md). Rules 2.2 decide them inconclusive without a model call. The model is still
+# asked when notes claim data review the claims do not show, the one case where it leaned upcoding (correctly). rule_leaning itself is
+# frozen (workflow v2.0 and v2.1, agent v3.0 and v3.1, the lint and the rule judge all call it); only rule_leaning_22 changes.
+RULES_22_INCONCLUSIVE = ("documentation supports billing but the 99215 share is far above the expected share",
+                         "documented 99215 claims are too few and the pooled result is not lopsided",
+                         "documentation result sits between the rule's cutoffs",
+                         "too few documented 99214 and 99215 claims to lean either way")
+
+
+def rule_leaning_22(packet):
+    """rule_leaning, with the ambiguous cases in RULES_22_INCONCLUSIVE decided inconclusive by rule."""
+    lean, reason = rule_leaning(packet)
+    if lean is None and reason in RULES_22_INCONCLUSIVE:
+        return INCONCLUSIVE, reason + "; rules 2.2 leave it inconclusive without a model call"
+    return lean, reason
+
+
 def _pooled(packet, d):
     rows = [r for r in d["by_billed_level"] if r["billed_cpt"] in ("99214", "99215")]
     n = sum(r["documented_claims"] for r in rows)

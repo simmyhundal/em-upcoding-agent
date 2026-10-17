@@ -97,14 +97,15 @@ def main():
         f, up, acc = sum(r["found"] for r in rs), sum(r["upcoders"] for r in rs), sum(r["accused"] for r in rs)
         hr, rh = sum(r["honest_requested"] for r in rs), sum(r["rounds_honest"] for r in rs)
         prec = f / (f + acc) if f + acc else None
-        mean = lambda key: sum(float(r[key]) for r in rs if r[key] not in ("", None)) / max(1, sum(r[key] not in ("", None) for r in rs))
+        vals = lambda key: [float(r[key]) for r in rs if r[key] not in ("", None)]
+        mean = lambda key: f"{sum(vals(key)) / len(vals(key)):.2f}" if vals(key) else "–"      # "–": no run had that judge (release 2: no LLM judge)
         tot[a] = {"found": f, "accused": acc, "precision": prec}
         rc = [rec61.recover(r["run"], r["code"]) for r in rs]
         est, total = sum(x["est"] for x in rc), sum(r["overpaid"] for r in rs)
         money = (f"{sum(x['unreliable'] for x in rc)}/{sum(x['estimated'] for x in rc)}", f"${est:,.0f}", f"${total:,.0f}", f"{est / total:.0%}")
         cost_tot = sum(r["cost"] for r in rs)
         lines.append(f"| {a} | {f} of {up} | {f / up:.0%} | {acc} | {'–' if prec is None else f'{prec:.0%}'} | {hr} | {rh} | "
-                     f"{hr / f:.1f} | {mean('usefulness'):.2f} | {mean('usefulness_rules'):.2f} | ${cost_tot:.2f} | ${cost_tot / len(rs):.2f} | "
+                     f"{hr / f:.1f} | {mean('usefulness')} | {mean('usefulness_rules')} | ${cost_tot:.2f} | ${cost_tot / len(rs):.2f} | "
                      f"{money[1]} | {money[2]} | {money[3]} |"
                      if f else f"| {a} | 0 of {up} | 0% | {acc} | – | {hr} | {rh} | – | – | – | ${cost_tot:.2f} | ${cost_tot / len(rs):.2f} | {money[1]} | {money[2]} | {money[3]} |")
         unrel[a] = money[0]

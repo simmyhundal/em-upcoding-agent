@@ -73,7 +73,9 @@ def build_view(rid, src, screen, version="2.0"):
 def run(rid, src, screen, note, version="2.0"):
     view, office, flagged_file = build_view(rid, src, screen, version)
     name = os.path.basename(view)
-    ai.run(rid, src, note, view_name=name, flagged_name=os.path.basename(flagged_file), v21=version in ("2.1", "2.2"), preflight=version == "2.2")
+    # 2.2: rules 2.2 decide more summaries without the model, and no LLM usefulness judge (the rule judge runs after; issues 91 and 93)
+    ai.run(rid, src, note, view_name=name, flagged_name=os.path.basename(flagged_file), v21=version in ("2.1", "2.2"), preflight=version == "2.2",
+           v22=version == "2.2", llm_judge=version != "2.2")
     office.write_transcript(os.path.join(ROOT, "experiments", rid, "office_transcript.jsonl"))
 
 
