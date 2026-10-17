@@ -6,12 +6,14 @@ Arms: **W2.0** frozen workflow (provider office 2.0, screen suspicion >= 5, fixe
 
 ## Per arm, ten seeds at 3.7% upcoders (8 of 216 each)
 
-| Arm | Upcoders found | Honest doctors accused | Precision | Honest practices sent requests | Request rounds on honest | Requests to honest per upcoder found | Usefulness (LLM judge) | Usefulness (rule judge) | Cost |
-|---|---|---|---|---|---|---|---|---|---|
-| W2.0 | 19 of 80 | 3 | 86% | 61 | 80 | 3.2 | 3.42 | 3.31 | $1.96 |
-| W2.1 | 32 of 80 | 0 | 100% | 61 | 203 | 1.9 | 3.13 | 4.70 | $1.94 |
-| A3.0 | 18 of 80 | 0 | 100% | 50 | 68 | 2.8 | 3.03 | 3.04 | $3.70 |
-| A3.1 | 27 of 80 | 0 | 100% | 63 | 101 | 2.3 | 3.30 | 4.80 | $5.29 |
+| Arm | Upcoders found | Recall | Honest doctors accused | Precision | Honest practices sent requests | Request rounds on honest | Requests to honest per upcoder found | Usefulness (LLM judge) | Usefulness (rule judge) | Cost | Cost per run | Estimated recovery from accused providers | Total recoverable from all upcoders | Share recovered |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| W2.0 | 19 of 80 | 24% | 3 | 86% | 61 | 80 | 3.2 | 3.42 | 3.31 | $1.96 | $0.20 | $77,056 | $338,279 | 23% |
+| W2.1 | 32 of 80 | 40% | 0 | 100% | 61 | 203 | 1.9 | 3.13 | 4.70 | $1.94 | $0.19 | $122,017 | $338,279 | 36% |
+| A3.0 | 18 of 80 | 22% | 0 | 100% | 50 | 68 | 2.8 | 3.03 | 3.04 | $3.70 | $0.37 | $85,794 | $338,279 | 25% |
+| A3.1 | 27 of 80 | 34% | 0 | 100% | 63 | 101 | 2.3 | 3.30 | 4.80 | $5.29 | $0.53 | $96,257 | $338,279 | 28% |
+
+**Recall** is upcoders found divided by upcoders planted. **Cost per run** is the arm's total cost divided by its ten runs. **Estimated recovery** is what the extrapolation tool (`src/pi_estimate.py`, the arithmetic behind the agent's `estimate_overpayment`) would estimate if run on every provider the arm accused, using the random charts the office returned for that provider (point estimate, negative estimates count as zero; honest doctors the arm accused are included). **Total recoverable** is what upcoders were paid above the justified levels (answer key), the same for every arm because the data is the same; **Share recovered** divides the two. Read these as upper-bound arithmetic, not recovered money: charts are read by a simulated reviewer with coder noise, a provider with no random charts adds nothing, and estimates from few charts are unreliable (accused providers with fewer than 8 charts in the main stratum, as the agent tool counts: W2.0 9/22, W2.1 9/32, A3.0 7/18, A3.1 7/27). Check against the truth: the estimate is 83% (W2.0), 70% (W2.1), 94% (A3.0), 73% (A3.1) of the dollars actually sitting with the upcoders each arm called, so the extrapolation tends to fall short rather than overshoot. Method and code: `eval/eval61_recovery.py`.
 
 ## Paired comparisons (upcoders found per seed)
 

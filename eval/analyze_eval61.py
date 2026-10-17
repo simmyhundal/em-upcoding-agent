@@ -20,8 +20,12 @@ import glob
 import json
 import os
 import random
+import sys
+
+import eval61_recovery as rec61
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "eval"))
 ARMS = ["W2.0", "W2.1", "A3.0", "A3.1"]
 PAIRS = [("A3.1", "W2.1", "agent v3.1 vs workflow v2.1 (which stream is the main line)"),
          ("W2.1", "W2.0", "workflow upgrade: v2.1 vs v2.0"),
@@ -57,7 +61,7 @@ def load():
             continue
         arm = arm_of(run, row)
         found = int(row["fn_total"]) - int(row["fn_missed"])
-        out[(key, arm)] = {"run": run["run"], "found": found, "upcoders": int(row["fn_total"]),
+        out[(key, arm)] = {"run": run["run"], "code": reg["datasets"][key]["flagged"].split("/")[1], "overpaid": int(row["overpaid_usd"] or 0), "reached": int(row["reached_usd"] or 0), "found": found, "upcoders": int(row["fn_total"]),
                            "accused": int(row["fp_count"] or 0), "precision": row["precision"],
                            "honest_requested": int(row["honest_requested"] or 0), "rounds_honest": int(row["request_rounds_honest"] or 0),
                            "usefulness": row["usefulness"], "usefulness_rules": row["usefulness_rules"], "cost": cost(run["run"])}
@@ -81,10 +85,11 @@ def main():
              "Arms: **W2.0** frozen workflow (provider office 2.0, screen suspicion >= 5, fixed office policy), **W2.1** workflow v2.1, "
              "**A3.0** frozen agent, **A3.1** agent v3.1. Data 2.1 for every seed (the frozen arms read only the 2.0 part, which is identical).", "",
              "## Per arm, ten seeds at 3.7% upcoders (8 of 216 each)", "",
-             "| Arm | Upcoders found | Honest doctors accused | Precision | Honest practices sent requests | Request rounds on honest | "
-             "Requests to honest per upcoder found | Usefulness (LLM judge) | Usefulness (rule judge) | Cost |",
-             "|---|---|---|---|---|---|---|---|---|---|"]
-    tot = {}
+             "| Arm | Upcoders found | Recall | Honest doctors accused | Precision | Honest practices sent requests | Request rounds on honest | "
+             "Requests to honest per upcoder found | Usefulness (LLM judge) | Usefulness (rule judge) | Cost | Cost per run | "
+             "Estimated recovery from accused providers | Total recoverable from all upcoders | Share recovered |",
+             "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    tot, unrel, chk = {}, {}, {}
     for a in ARMS:
         rs = [res[(k, a)] for k in complete]
         if not rs:
@@ -94,10 +99,26 @@ def main():
         prec = f / (f + acc) if f + acc else None
         mean = lambda key: sum(float(r[key]) for r in rs if r[key] not in ("", None)) / max(1, sum(r[key] not in ("", None) for r in rs))
         tot[a] = {"found": f, "accused": acc, "precision": prec}
-        lines.append(f"| {a} | {f} of {up} | {acc} | {'–' if prec is None else f'{prec:.0%}'} | {hr} | {rh} | "
-                     f"{hr / f:.1f} | {mean('usefulness'):.2f} | {mean('usefulness_rules'):.2f} | ${sum(r['cost'] for r in rs):.2f} |"
-                     if f else f"| {a} | 0 of {up} | {acc} | – | {hr} | {rh} | – | – | – | ${sum(r['cost'] for r in rs):.2f} |")
-    lines += ["", "## Paired comparisons (upcoders found per seed)", "",
+        rc = [rec61.recover(r["run"], r["code"]) for r in rs]
+        est, total = sum(x["est"] for x in rc), sum(r["overpaid"] for r in rs)
+        money = (f"{sum(x['unreliable'] for x in rc)}/{sum(x['estimated'] for x in rc)}", f"${est:,.0f}", f"${total:,.0f}", f"{est / total:.0%}")
+        cost_tot = sum(r["cost"] for r in rs)
+        lines.append(f"| {a} | {f} of {up} | {f / up:.0%} | {acc} | {'–' if prec is None else f'{prec:.0%}'} | {hr} | {rh} | "
+                     f"{hr / f:.1f} | {mean('usefulness'):.2f} | {mean('usefulness_rules'):.2f} | ${cost_tot:.2f} | ${cost_tot / len(rs):.2f} | "
+                     f"{money[1]} | {money[2]} | {money[3]} |"
+                     if f else f"| {a} | 0 of {up} | 0% | {acc} | – | {hr} | {rh} | – | – | – | ${cost_tot:.2f} | ${cost_tot / len(rs):.2f} | {money[1]} | {money[2]} | {money[3]} |")
+        unrel[a] = money[0]
+        chk[a] = est / sum(r["reached"] for r in rs) if sum(r["reached"] for r in rs) else None
+    lines += ["", "**Recall** is upcoders found divided by upcoders planted. **Cost per run** is the arm's total cost divided by its ten runs. "
+              "**Estimated recovery** is what the extrapolation tool (`src/pi_estimate.py`, the arithmetic behind the agent's `estimate_overpayment`) would estimate if run on every provider "
+              "the arm accused, using the random charts the office returned for that provider (point estimate, negative estimates count as zero; honest doctors the arm accused are included). "
+              "**Total recoverable** is what upcoders were paid above the justified levels (answer key), the same for every arm because the data is the same; **Share recovered** divides the two. "
+              "Read these as upper-bound arithmetic, not recovered money: charts are read by a simulated reviewer with coder noise, a provider with no random charts adds nothing, and estimates "
+              "from few charts are unreliable (accused providers with fewer than 8 charts in the main stratum, as the agent tool counts: "
+              + ", ".join(f"{a} {unrel[a]}" for a in ARMS if a in unrel) + "). Check against the truth: the estimate is "
+              + ", ".join(f"{chk[a]:.0%} ({a})" for a in ARMS if chk.get(a)) + " of the dollars actually sitting with the upcoders each arm called, so the extrapolation tends to fall short rather than overshoot. "
+              "Method and code: `eval/eval61_recovery.py`.",
+              "", "## Paired comparisons (upcoders found per seed)", "",
               "| Comparison | Mean difference per seed | 95% interval | Verdict | Extra honest doctors accused (total) |", "|---|---|---|---|---|"]
     verdicts = {}
     for a, b, label in PAIRS:
