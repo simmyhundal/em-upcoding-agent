@@ -52,20 +52,19 @@ the baseline by at least the margin**; otherwise `hard_negative` (a planted high
 - Everything that reads `role` (screen, scoreboard, judges) keeps working; the number of upcoders can now differ from the number planted.
 - Cloned notes still apply to every visit a cloning provider bills above the justified level, including honest slips upward. Small, and only for cloners.
 
-### A proposed upcoder definition (not built; awaiting Simmy's decision)
+### A proposed upcoder definition, based on how payers decide (not built; awaiting Simmy's decision)
 
-The definition above labels a provider from its realised rate, so the label depends on sampling luck: in seed 42 one planted upcoder fell under the margin and an honest provider could cross
-it. Proposal for release 2:
+**What payers use.** None of the sources found defines an upcoder by intent. Payers and Medicare contractors work in two steps, and the numbers in the second step are not published:
 
-1. **An upcoder is a provider that deliberately bills a pattern of visits one level above what the chart supports**: a planted upgrade fraction of at least 5% of eligible visits (the obvious range stays
-   15 to 40%, the subtle range becomes 5 to 12%). The label is fixed when the data is generated, so the count of upcoders is the count planted (8 of 216) on every seed.
-2. **Honest providers keep their own slip rate and are never relabeled.** The top decile of honest slip rates is recorded as `gray_zone` (honest and aggressive but defensible), so false accusations of them are
-   reported on their own line, like hard negatives.
-3. **Materiality is reported, not used to relabel.** The key records each upcoder's realised excess upcoded visits and excess paid dollars, and the evaluation reports found upcoders by tier
-   (subtle under 15%, obvious from 15%) and by dollars, so a missed 5% upcoder is not counted the same as a missed 35% one.
+1. **Find outliers against specialty peers.** CMS Comparative Billing Reports compare a provider's code use with state and national peers in the same specialty by percentile ([secondary summary](https://AAO.ORG/eyenet/article/comparative-billing-reports-2)); a Blue Cross plan describes a vendor review of high-level E/M codes (99204, 99205, 99214, 99215, 99244, 99245) to find practitioners billing a higher share than like-specialty peers ([Blue Cross Minnesota](https://bluecrossmn.com/sites/default/files/DAM/2021-11/P11GA_13148857.pdf)); the HHS OIG's list of high-coding physicians used the top 1% of average code level in a specialty and about 95% of services in the two highest levels (secondary summaries of the [2012 report](https://oig.hhs.gov/reports/all/2012/coding-trends-of-medicare-evaluation-and-management-services); I did not retrieve the report's methodology section, so check the exact thresholds).
+2. **Confirm by reviewing a sample of claims against the records.** In Medicare's Targeted Probe and Educate, a contractor reviews 20 to 40 claims per round, up to three rounds, and computes a **claims error rate** (claims in error divided by claims reviewed) and a **payment error rate** (allowed dollars in error divided by allowed dollars); the threshold is set by the contractor and sent in the provider's letter, and a provider still above it after round three can face extrapolation, 100% prepayment review or referral ([CGS Medicare](https://www.cgsmedicare.com/parta/mr/tpe_process.html), [CGS FAQs](https://cgsmedicare.com/parta/mr/tpe_faqs.html)). A non-response counts as an error.
 
-Why: a payer acts on a pattern and its dollars, not on one year's luck; fixed labels make seeds comparable and keep the paired comparison honest. Cost: a planted 5% upcoder can be indistinguishable from an
-honest provider's noise in one year, which is realistic, and the evaluation will show it as a miss rather than hiding it. The margin definition would stay available as `--upcoder-definition margin`.
+**Proposal: use the same two tests on the true values.** A provider is an upcoder when its true overbilling rate, the share of its live claims billed above the level the chart supports, is
+(a) **above the 95th percentile of the honest providers' rates**, so a peer-percentile screen would call it an outlier, **and** (b) **at least a stated margin above the honest mean** (6 points of visits as built), so a claims-error-rate review of a sample would confirm it as material.
+The margin definition already built is test (b) alone; the proposal adds (a), so a lucky honest provider does not cross the line. The numbers 95th percentile and 6 points are our choices: the sources fix the structure, not the thresholds (the OIG used top 1%; TPE thresholds are per contractor and unpublished).
+Consequence, said plainly: a planted subtle upcoder under the line is **not** an upcoder, because a payer following these rules would not act on it either; the evaluation reports it separately as "planted below the payer line" instead of hiding it. The dollar side stays in the key (excess paid dollars per provider) so misses can be weighed.
+
+An earlier version of this proposal (labels fixed by planted intent) is withdrawn: payers cannot see intent, and a label no payer rule could reproduce would make the evaluation less comparable to practice.
 
 ### What honest noise does (development seed 42, free, one draw per row)
 
