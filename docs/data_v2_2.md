@@ -160,6 +160,30 @@ One of the five (1000000056, screen rank 14) is high in the screen for its 99215
 anything. The other four rank 43 to 214. Corrections are about 2% of visits, spread evenly across providers by the generator (no provider-level propensity), so "providers who correct often" here
 are sampling spread, not a modeled behavior. A provider-level correction habit is not built.
 
+## Injected data defects and the plan's control totals (issue 80)
+
+The synthetic data is clean, so any data-quality check would pass trivially. Data 2.2 can inject defects into the **delivered extract** (the plan tables), each
+off by default, with its own random stream so nothing else moves (`src/defects_v22.py`; the diagnosis cap of issue 77 is the fifth defect).
+
+| Option | Default | Defect |
+|---|---|---|
+| `--defect-duplicate-share` | 0 | share of paid claims delivered twice, the copy under a new claim id (the copy also gets a records-universe row and a justified level; it has no note) |
+| `--defect-orphan-share` | 0 | share of replacements and voids whose original claim is missing from the extract |
+| `--defect-unknown-member-share` | 0 | share of claims whose member id does not join to eligibility (`members.csv`) |
+| `--defect-no-rendering-share` | 0 | share of group-billed claims with the rendering NPI blank, so no clinician can be named |
+| `--dx-cap`, `--dx-cap-months` | off | diagnosis truncation ([above](#diagnosis-code-truncation-in-the-plans-extract-issue-77)) |
+| `--control-totals` | on | writes `control_totals.csv`: claims and paid dollars by service month **as the plan says it delivered**, computed from the clean extract before any defect |
+
+With no defect the delivered tables reconcile with the control totals exactly (a test checks it); each defect breaks the reconciliation by exactly the
+injected rows (duplicates add claims and dollars, missing originals remove them). The answer key records every injected defect under `defects` (counts and
+claim ids) so the checks can be graded. `derive.py` drops visits whose member does not join and visits it cannot attribute to a clinician, and counts both in
+`attribution.json`; it does not remove duplicates, because finding them is the data-quality check's job.
+
+A graded example, seed 42, data 2.2 with defects (`experiments/261016_2_code`, data folder gitignored):
+duplicates 1% (1,190 claims), orphans 30% (737 replacements and 378 voids lose their original), unknown members 0.5% (562 claims), no rendering NPI 3% of
+group-billed claims (2,981), diagnosis cap 3 from July (9,677 claims shortened). It is development data for building and grading the check (issue 81).
+Defects are not part of the default release 2 settings; whether the release 2 evaluation uses them is a decision for the evaluation plan.
+
 ## Not yet built
 
-Item 80 of the milestone are listed here when built.
+Not built in this release 2 work so far: incident-to billing (issue 76), claims lag and monthly feeds (issue 78) and the X12 ingestion path (issue 82).

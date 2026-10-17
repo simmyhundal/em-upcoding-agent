@@ -50,8 +50,9 @@ def accepted_visits(v2_dir, stats=None):
     back to billing. A blank rendering NPI with an organizational billing NPI cannot be attributed to a clinician and the visit is dropped.
     `stats`, if given, is filled with counts of the fallbacks (see build_view)."""
     npis = {r["npi"] for r in _rows(os.path.join(v2_dir, "providers.csv"))}
+    members = {r["member_id"] for r in _rows(os.path.join(v2_dir, "members.csv"))}
     stats = stats if stats is not None else {}
-    for k in ("visits", "fallback_to_billing", "unattributed", "group_billed"):
+    for k in ("visits", "fallback_to_billing", "unattributed", "group_billed", "member_not_in_eligibility"):
         stats.setdefault(k, 0)
     header = {r["claim_id"]: r for r in _rows(os.path.join(v2_dir, "claims_header.csv"))}
     status = {r["claim_id"]: r["status"] for r in _rows(os.path.join(v2_dir, "remittance.csv"))}
@@ -68,6 +69,9 @@ def accepted_visits(v2_dir, stats=None):
             continue
         em = [x for x in lines[cid] if x["cpt"] in EM_CODES]
         if not em:
+            continue
+        if h["member_id"] not in members:             # does not join to eligibility: dropped from the detector view and counted
+            stats["member_not_in_eligibility"] += 1
             continue
         who = h["rendering_npi"]
         if not who:
@@ -130,7 +134,7 @@ def build_view(v2_dir, view_dir):
             v = visits[vid]
             w.writerow([vid, v["provider_id"], v["member_id"], v["service_date"], v["cpt"], v["place_of_service"],
                         v["diagnosis_codes"], int(v["has_test_line"]), v["allowed_amount"], v["paid_amount"]])
-    if stats["fallback_to_billing"] or stats["unattributed"] or stats["group_billed"]:
+    if stats["fallback_to_billing"] or stats["unattributed"] or stats["group_billed"] or stats["member_not_in_eligibility"]:
         # only data with group billing or blank rendering NPIs gets this report, so views of earlier data stay byte-identical
         import json
         entity = {}

@@ -31,7 +31,7 @@ def same_files(a, b):
 def test_zero_noise_reproduces_data_2_1_exactly():
     a, ka = build("2.1")
     b, kb = build("2.2", honest_miscode_rate=0.0, subtle_upcoder_share=0.0, group_billing=False, rendering_omitted_share=0.0,
-                  correction_level_change_share=0.0)
+                  correction_level_change_share=0.0, control_totals=False)
     assert same_files(a, b) == []
     assert ka["justified_cpt_by_claim"] == kb["justified_cpt_by_claim"]
     assert {p: v["role"] for p, v in ka["providers"].items()} == {p: v["role"] for p, v in kb["providers"].items()}
@@ -143,7 +143,7 @@ def test_dx_cap_truncates_only_the_delivered_extract_and_moves_nothing_else():
     assert cut > 0 and kb["defects"]["dx_truncation"]["claims_shortened"] == cut
     assert filecmp.cmp(os.path.join(a, "claim_lines.csv"), os.path.join(b, "claim_lines.csv"), shallow=False)
     assert filecmp.cmp(os.path.join(a, "records", "visit_notes.csv"), os.path.join(b, "records", "visit_notes.csv"), shallow=False)
-    assert ka["justified_cpt_by_claim"] == kb["justified_cpt_by_claim"] and "defects" in kb and not ka["defects"]
+    assert ka["justified_cpt_by_claim"] == kb["justified_cpt_by_claim"] and "dx_truncation" in kb["defects"] and "dx_truncation" not in ka["defects"]
 
 
 def test_corrections_change_the_level_and_the_view_keeps_the_live_claim():
@@ -175,6 +175,58 @@ def test_correction_option_moves_no_other_billed_level():
     lb = {r["claim_id"]: r["cpt"] for r in _rows(os.path.join(b, "claim_lines.csv"))}
     changed = {c for c in la if la[c] != lb[c]}
     assert changed and all(hb_["claim_frequency"] == "7" for hb_ in hb if hb_["claim_id"] in changed)
+
+
+def _delivered_totals(out):
+    import defects_v22
+    return defects_v22.control_totals(_rows(os.path.join(out, "claims_header.csv")), _rows(os.path.join(out, "remittance.csv")))
+
+
+def test_control_totals_match_a_clean_extract_exactly():
+    out, key = build("2.2", seed=10)
+    ct = {r["service_month"]: {"claims": int(r["claims"]), "paid_usd": float(r["paid_usd"])} for r in _rows(os.path.join(out, "control_totals.csv"))}
+    assert ct == _delivered_totals(out) and key["defects"]["control_totals"]["months"] == len(ct) and "duplicates" not in key["defects"]
+
+
+def test_injected_defects_are_in_the_data_and_recorded_in_the_key():
+    import derive
+    import json
+    out, key = build("2.2", seed=10, defect_duplicate_share=0.05, defect_orphan_share=0.5, defect_unknown_member_share=0.04,
+                     defect_no_rendering_share=0.2)
+    d = key["defects"]
+    hdr = {h["claim_id"]: h for h in _rows(os.path.join(out, "claims_header.csv"))}
+    members = {m["member_id"] for m in _rows(os.path.join(out, "members.csv"))}
+    assert d["duplicates"]["count"] > 0
+    for dup, orig in d["duplicates"]["pairs"]:
+        a, b = hdr[dup], hdr[orig]
+        assert (a["member_id"], a["service_date"], a["billing_npi"], a["dx1"]) == (b["member_id"], b["service_date"], b["billing_npi"], b["dx1"])
+    assert d["orphans"]["missing_originals"] and all(o not in hdr for o in d["orphans"]["missing_originals"])
+    assert all(hdr[c]["original_claim_id"] in d["orphans"]["missing_originals"] for c in d["orphans"]["replacements"])
+    assert d["unknown_member"]["count"] > 0 and all(hdr[c]["member_id"] not in members for c in d["unknown_member"]["claim_ids"])
+    assert d["no_rendering"]["count"] > 0 and all(hdr[c]["rendering_npi"] == "" and hdr[c]["billing_npi"].startswith("2") for c in d["no_rendering"]["claim_ids"])
+    # the delivered extract no longer matches the plan's control totals, by exactly the injected claims
+    ct = {r["service_month"]: int(r["claims"]) for r in _rows(os.path.join(out, "control_totals.csv"))}
+    delivered = {m: v["claims"] for m, v in _delivered_totals(out).items()}
+    assert sum(delivered.values()) - sum(ct.values()) == d["duplicates"]["count"] - len(d["orphans"]["missing_originals"])
+    assert delivered != ct
+    # the detector view drops what cannot be joined or attributed and says how many
+    view = _view(out)
+    rep = json.load(open(os.path.join(view, "attribution.json")))
+    assert rep["member_not_in_eligibility"] > 0 and rep["unattributed"] > 0
+    assert not {c["claim_id"] for c in _rows(os.path.join(view, "claims.csv"))} & set(d["unknown_member"]["claim_ids"])
+    assert key["justified_cpt_by_claim"].get(d["duplicates"]["pairs"][0][0])                                 # duplicates carry a justified level
+
+
+def test_defects_are_refused_on_frozen_versions_and_leave_other_streams_alone():
+    a, _ = build("2.2", seed=11)
+    b, _ = build("2.2", seed=11, defect_duplicate_share=0.1)
+    ha, hb = _rows(os.path.join(a, "claims_header.csv")), _rows(os.path.join(b, "claims_header.csv"))
+    assert hb[:len(ha)] == ha                                                       # duplicates are appended; nothing before them moves
+    try:
+        build("2.1", defect_duplicate_share=0.1)
+    except ValueError:
+        return
+    raise AssertionError("defects must not be accepted on data 2.1")
 
 
 if __name__ == "__main__":

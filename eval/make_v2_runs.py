@@ -43,14 +43,15 @@ RUNS = [
 ]
 
 
-def run(spec, data_version="2.0"):
-    """data_version "2.1" also writes the note package; claims and the records universe are identical to 2.0 for the same seed."""
+def run(spec, data_version="2.0", **v22):
+    """data_version "2.1" also writes the note package; claims and the records universe are identical to 2.0 for the same seed.
+    data_version "2.2" accepts the data 2.2 options of generate_v2.build (honest noise, group billing, defects, ...) as keyword arguments."""
     rid, seed, n, n_up, n_hn, clone, note = spec
     data = os.path.join(ROOT, "data", f"synthetic_v2_{rid}")
     key = os.path.join(ROOT, "eval", "answer_key", f"ground_truth_v2_{rid}.json")
     out = os.path.join(ROOT, "experiments", rid)
     os.makedirs(out, exist_ok=True)
-    generate_v2.build(data, key, seed=seed, n_providers=n, n_upcoders=n_up, n_hard_neg=n_hn, clone_share=clone, data_version=data_version)
+    generate_v2.build(data, key, seed=seed, n_providers=n, n_upcoders=n_up, n_hard_neg=n_hn, clone_share=clone, data_version=data_version, **v22)
     view = os.path.join(data, "view")
     derive.build_view(data, view)
     py = sys.executable

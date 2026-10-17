@@ -24,6 +24,7 @@ from datetime import date, timedelta
 import numpy as np
 
 import generate_synthetic as g1
+import defects_v22
 import notes_v21
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -61,7 +62,9 @@ V22_DEFAULTS = {"honest_miscode_rate": 0.08, "honest_up_share": 0.5, "honest_mis
                 "upcoder_fraction": g1.UPCODER_FRACTION, "subtle_upcoder_share": 0.25, "subtle_upcoder_fraction": (0.08, 0.12),
                 "upcoder_margin": 0.06, "group_billing": True, "rendering_omitted_share": 0.3,
                 "dx_cap": 0, "dx_cap_months": tuple(range(1, 13)),
-                "correction_level_change_share": 0.25, "correction_up_share": 0.4}
+                "correction_level_change_share": 0.25, "correction_up_share": 0.4,
+                "defect_duplicate_share": 0.0, "defect_orphan_share": 0.0, "defect_unknown_member_share": 0.0, "defect_no_rendering_share": 0.0,
+                "control_totals": True}
 
 
 def _beta_rate(nrng, mean, cv, cap):
@@ -295,6 +298,14 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
         if v22_on:                                    # rates are of the live claims, so a downward correction counts for the provider
             P["n_up_visits"], P["n_down_visits"] = int((final_b > just).sum()), int((final_b < just).sum())
 
+    # ---- data 2.2: control totals of the clean extract, then the delivered-extract defects (issue 80)
+    ctotals, defect_rec = None, {}
+    if v22_on:
+        if cfg["control_totals"]:
+            ctotals = defects_v22.control_totals(headers, remit)
+        if any(cfg[k] for k in defects_v22.DEFECT_OPTIONS):
+            defect_rec, cid = defects_v22.inject(headers, lines, remit, universe, truth, cfg, np.random.default_rng([seed, 31]), cid)
+
     # ---- write
     pcols = ["npi", "taxonomy", "specialty", "state", "zip3", "group_tin", "network_status"]
     prov_rows = [{"npi": P["npi"], "taxonomy": TAXONOMY, "specialty": "Family Practice", "state": "GA",
@@ -320,6 +331,8 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
                [{"specialty": "Family Practice", "peer_group": "GA Family Practice office-based"}], ["specialty", "peer_group"])
     _write_csv(os.path.join(out_dir, "records", "records_universe.csv"), universe,
                ["claim_id", "problems_level", "data_level", "risk_level", "documented_minutes"])
+    if ctotals is not None:
+        defects_v22.write_control_totals(os.path.join(out_dir, "control_totals.csv"), ctotals)
     if ng is not None:
         for name, rows, cols in (("visit_notes", ng.notes, notes_v21.NOTE_COLS), ("note_authentication", ng.auth, notes_v21.AUTH_COLS),
                                  ("note_orders", ng.orders, notes_v21.ORDER_COLS), ("note_results", ng.results, notes_v21.RESULT_COLS),
@@ -336,7 +349,8 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
             P["role"] = "upcoder" if P["up_rate"] - baseline >= cfg["upcoder_margin"] else ("hard_negative" if P["planted"] == "hard_negative" else "normal")
         v22_key = {"honest_baseline_upcode_rate": round(baseline, 4), "upcoder_margin": cfg["upcoder_margin"],
                    "defects": {**({"dx_truncation": {"cap": cfg["dx_cap"], "months": list(cfg["dx_cap_months"]), "claims_shortened": dx_cut}}
-                                  if cfg["dx_cap"] else {})},
+                                  if cfg["dx_cap"] else {}), **defect_rec,
+                               **({"control_totals": {"file": "control_totals.csv", "months": len(ctotals)}} if ctotals is not None else {})},
                    "noise": {k: cfg[k] for k in ("honest_miscode_rate", "honest_up_share", "honest_miscode_spread", "honest_miscode_max",
                                                  "subtle_upcoder_share")}}
     with open(answer_key_path, "w") as f:
@@ -378,6 +392,11 @@ if __name__ == "__main__":
     g.add_argument("--dx-cap-months", type=int, nargs="+", help="service months (1 to 12) the cap applies to; default all")
     g.add_argument("--correction-level-change-share", type=float, help="share of replacement (corrected) claims that change the E/M level by one")
     g.add_argument("--correction-up-share", type=float, help="share of level-changing corrections that go up (the rest go down)")
+    g.add_argument("--defect-duplicate-share", type=float, help="issue 80: share of paid claims delivered twice under a new claim id")
+    g.add_argument("--defect-orphan-share", type=float, help="issue 80: share of replacements and voids whose original is missing from the extract")
+    g.add_argument("--defect-unknown-member-share", type=float, help="issue 80: share of claims whose member id does not join to eligibility")
+    g.add_argument("--defect-no-rendering-share", type=float, help="issue 80: share of group-billed claims with the rendering NPI blank")
+    g.add_argument("--control-totals", action=argparse.BooleanOptionalAction, default=None, help="write control_totals.csv (claims and paid dollars by month)")
     g.add_argument("--group-billing", action=argparse.BooleanOptionalAction, default=None,
                    help="groups of 2 or more clinicians bill under an organizational NPI (the clinician stays the rendering provider)")
     g.add_argument("--rendering-omitted-share", type=float, help="share of single-clinician claims with the rendering NPI left blank (it equals billing)")
