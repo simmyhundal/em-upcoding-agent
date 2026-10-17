@@ -65,6 +65,8 @@ Release 2 (in development, branch `release2-overnight`). Data 2.2 is behind `--d
 | Screen ranking metrics (#83) | built: columns of `results.csv`, [screen_metrics.md](screen_metrics.md) | same (evaluation only) | shared |
 | Screen methods (#88) | `eb_ratio` and `priority` are the release 2 candidates ([screen_methods.md](screen_methods.md)): `flagging.py --method`, v2.2 workflow arms; `riskadj` stays frozen | `screen_providers` with method `eb_ratio` or `priority` in v3.2 | confirmed or rejected on the fresh seeds ([release2_plan.md](release2_plan.md)) |
 | Data-quality pre-flight (#81) | built: `flagging.py --preflight` ([data_quality.md](data_quality.md)); the case-summary step does not consume the column yet | built: `data_quality` and `flag_data_issue` tools, hold in `submit_findings`; offline tests only | |
+| Fewer model calls in the writer (#91) | built: rules 2.2 (`case_summary.py --v22`, `summary_rules.rule_leaning_22`) decide inconclusive the ambiguous cases where the v2.1 model always said inconclusive; 115 to 11 model calls on the release 1 runs, no leaning changed ([workflow_cost.md](workflow_cost.md)) | n/a: the agent writes its own findings (its cost is #92) | the agent has no rule-then-model writer |
+| No LLM usefulness judge in the evaluation (#91, #93) | built: the 2.2 workflow path skips `judge_usefulness.py`; the rule judge runs | #92 | |
 
 Release 1 (frozen). Items still planned carry over to `v2.2` and `v3.2`.
 
