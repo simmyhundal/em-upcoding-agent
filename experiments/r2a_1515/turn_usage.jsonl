@@ -1,11 +1,5 @@
-{"turn": 1, "input_tokens": 4, "output_tokens": 148, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 3967, "usd_so_far": 0.0228}
-{"turn": 2, "input_tokens": 4, "output_tokens": 699, "cache_read_input_tokens": 3967, "cache_creation_input_tokens": 1767, "usd_so_far": 0.0464}
-{"turn": 3, "input_tokens": 4, "output_tokens": 1474, "cache_read_input_tokens": 5734, "cache_creation_input_tokens": 4731, "usd_so_far": 0.1007}
-{"turn": 4, "input_tokens": 4, "output_tokens": 535, "cache_read_input_tokens": 10465, "cache_creation_input_tokens": 5894, "usd_so_far": 0.143}
-{"turn": 5, "input_tokens": 4, "output_tokens": 359, "cache_read_input_tokens": 16359, "cache_creation_input_tokens": 2611, "usd_so_far": 0.1665}
-{"turn": 6, "input_tokens": 4, "output_tokens": 736, "cache_read_input_tokens": 18970, "cache_creation_input_tokens": 2766, "usd_so_far": 0.1989}
-{"turn": 7, "input_tokens": 4, "output_tokens": 288, "cache_read_input_tokens": 21736, "cache_creation_input_tokens": 2529, "usd_so_far": 0.2217}
-{"turn": 8, "input_tokens": 4, "output_tokens": 161, "cache_read_input_tokens": 24265, "cache_creation_input_tokens": 979, "usd_so_far": 0.2346}
-{"turn": 9, "input_tokens": 4, "output_tokens": 518, "cache_read_input_tokens": 25244, "cache_creation_input_tokens": 1645, "usd_so_far": 0.2583}
-{"turn": 10, "input_tokens": 4, "output_tokens": 1778, "cache_read_input_tokens": 26889, "cache_creation_input_tokens": 1076, "usd_so_far": 0.3046}
-{"turn": 11, "input_tokens": 4, "output_tokens": 1661, "cache_read_input_tokens": 27965, "cache_creation_input_tokens": 1979, "usd_so_far": 0.3534}
+{"turn": 1, "input_tokens": 4, "output_tokens": 102, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 3967, "usd_so_far": 0.0219}
+{"turn": 2, "input_tokens": 4, "output_tokens": 927, "cache_read_input_tokens": 3967, "cache_creation_input_tokens": 1721, "usd_so_far": 0.0498}
+{"turn": 3, "input_tokens": 4, "output_tokens": 457, "cache_read_input_tokens": 5688, "cache_creation_input_tokens": 5347, "usd_so_far": 0.0869}
+{"turn": 4, "input_tokens": 4, "output_tokens": 115, "cache_read_input_tokens": 11035, "cache_creation_input_tokens": 3755, "usd_so_far": 0.1102}
+{"turn": 5, "input_tokens": 4, "output_tokens": 1172, "cache_read_input_tokens": 14790, "cache_creation_input_tokens": 696, "usd_so_far": 0.1401}
