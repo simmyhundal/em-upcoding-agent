@@ -55,11 +55,37 @@ def _write_csv(path, rows, cols):
         w.writerows(rows)
 
 
+# Data 2.2 defaults (issue 74). Illustrative, not calibrated to a published coding-error rate; chosen on the development seed 42 for
+# plausibility and for keeping honest noise below the upcoder margin (docs/data_v2_2.md). Frozen data versions never read these.
+V22_DEFAULTS = {"honest_miscode_rate": 0.08, "honest_up_share": 0.5, "honest_miscode_spread": 0.4, "honest_miscode_max": 0.12,
+                "upcoder_fraction": g1.UPCODER_FRACTION, "subtle_upcoder_share": 0.25, "subtle_upcoder_fraction": (0.08, 0.12),
+                "upcoder_margin": 0.06}
+
+
+def _beta_rate(nrng, mean, cv, cap):
+    """One provider's honest miscode rate: Beta with the given mean and coefficient of variation, capped. cv 0 gives the mean."""
+    if mean <= 0:
+        return 0.0
+    if cv <= 0:
+        return min(mean, cap)
+    kappa = mean * (1 - mean) / ((cv * mean) ** 2) - 1
+    kappa = max(kappa, 0.5)
+    return float(min(nrng.beta(mean * kappa, (1 - mean) * kappa), cap))
+
+
 def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcoder_rate=8 / 216, hard_neg_rate=8 / 216,
-          clone_share=0.5, n_upcoders=None, n_hard_neg=None, data_version="2.0", clone_signal_strength=0.7):
+          clone_share=0.5, n_upcoders=None, n_hard_neg=None, data_version="2.0", clone_signal_strength=0.7, **v22):
     """Write plan tables and the records universe to out_dir; the answer key goes outside it.
-    data_version "2.1" also writes the note package (docs/data_v2_1.md); claims and the universe stay identical to 2.0 for the same seed."""
-    ng = notes_v21.NoteGen(seed, clone_signal_strength) if data_version == "2.1" else None
+    data_version "2.1" also writes the note package (docs/data_v2_1.md); claims and the universe stay identical to 2.0 for the same seed.
+    data_version "2.2" is 2.1 plus honest coding noise and an upcoder defined as above the honest baseline (docs/data_v2_2.md); keyword
+    arguments override V22_DEFAULTS. With every noise parameter at zero a 2.2 build reproduces 2.1 claims and records exactly."""
+    v22_on = data_version == "2.2"
+    unknown = set(v22) - set(V22_DEFAULTS)
+    if unknown or (v22 and not v22_on):
+        raise ValueError(f"unknown or data-2.2-only options: {sorted(v22)}")
+    cfg = {**V22_DEFAULTS, **v22}
+    nrng = np.random.default_rng([seed, 19])      # data 2.2 only: honest coding noise and subtle-upcoder choice; its own stream
+    ng = notes_v21.NoteGen(seed, clone_signal_strength) if data_version in ("2.1", "2.2") else None
     if os.path.commonpath([os.path.abspath(out_dir), os.path.abspath(answer_key_path)]) == os.path.abspath(out_dir):
         raise ValueError("answer_key_path must be outside out_dir so agents reading the data cannot see it")
     os.makedirs(os.path.dirname(os.path.abspath(answer_key_path)), exist_ok=True)
@@ -76,6 +102,9 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
     clone_flags = {}
     up_idx = [i for i, r in enumerate(roles) if r == "upcoder"]
     cloners = set(rng.choice(up_idx, size=n_clone, replace=False).tolist()) if n_clone else set()
+    subtle = set()
+    if v22_on and cfg["subtle_upcoder_share"] > 0 and up_idx:
+        subtle = set(nrng.choice(up_idx, size=int(round(cfg["subtle_upcoder_share"] * len(up_idx))), replace=False).tolist())
 
     # ---- phase 1: providers and their member panels
     provs, members = [], []
@@ -86,7 +115,8 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
         if role == "upcoder":
             volume = max(volume, 250)
         mult = g1.HARD_NEG_LAM_MULT if role == "hard_negative" else 1.0
-        up = float(rng.uniform(*g1.UPCODER_FRACTION)) if role == "upcoder" else 0.0
+        frac_range = (cfg["subtle_upcoder_fraction"] if i in subtle else cfg["upcoder_fraction"]) if v22_on else g1.UPCODER_FRACTION
+        up = float(rng.uniform(*frac_range)) if role == "upcoder" else 0.0
         lam = g1.PARAMS["lam_mu"] * mult * np.exp(rng.normal(0, g1.PARAMS["lam_sigma"]))
         n_pat = max(20, int(volume / g1.VISITS_PER_PATIENT))
         chronic = np.minimum(rng.poisson(lam, size=n_pat), 8)
@@ -95,7 +125,8 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
         if not tin_pool or rng.random() < 0.35:
             tin_pool.append(f"{rng.integers(10 ** 8, 10 ** 9)}")
         provs.append({"npi": npi, "role": role, "volume": volume, "up": up, "eta": float(eta), "top_shift": float(top_shift),
-                      "chronic": chronic, "tin": tin_pool[-1], "clones": i in cloners, "member_ids": []})
+                      "chronic": chronic, "tin": tin_pool[-1], "clones": i in cloners, "member_ids": [], "subtle": i in subtle,
+                      "miscode": _beta_rate(nrng, cfg["honest_miscode_rate"], cfg["honest_miscode_spread"], cfg["honest_miscode_max"]) if v22_on else 0.0})
         base = len(members)
         for j, c in enumerate(chronic):
             order = rng.choice(len(g1.CONDITIONS), size=min(int(c), len(g1.CONDITIONS)), replace=False,
@@ -144,6 +175,11 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
         if P["up"] > 0:
             up = (rng.random(vol) < P["up"]) & (just >= 1)
             billed = np.where(up, np.minimum(just + 1, 4), just)
+        if v22_on and P["miscode"] > 0:           # honest coding noise on visits not deliberately upgraded
+            slip = (nrng.random(vol) < P["miscode"]) & (billed == just)
+            goes_up = nrng.random(vol) < cfg["honest_up_share"]
+            billed = np.where(slip & goes_up & (just < 4), just + 1, np.where(slip & ~goes_up & (just > 0), just - 1, billed))
+        P["n_up_visits"], P["n_down_visits"] = int((billed > just).sum()), int((billed < just).sum())
         for v in range(vol):
             m = members[mem_idx[v]]
             cid += 1
@@ -248,11 +284,25 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
                                  ("note_orders", ng.orders, notes_v21.ORDER_COLS), ("note_results", ng.results, notes_v21.RESULT_COLS),
                                  ("audit_trail", ng.audit, notes_v21.AUDIT_COLS)):
             _write_csv(os.path.join(out_dir, "records", f"{name}.csv"), rows, cols)
+    v22_key = {}
+    if v22_on:
+        honest = [P for P in provs if P["role"] != "upcoder"]
+        baseline = sum(P["n_up_visits"] / P["volume"] for P in honest) / len(honest) if honest else 0.0
+        for P in provs:
+            P["up_rate"], P["down_rate"] = P["n_up_visits"] / P["volume"], P["n_down_visits"] / P["volume"]
+            P["planted"] = P["role"]
+            # role by the stated definition: upcoding rate above the honest baseline by at least the margin (issue 74)
+            P["role"] = "upcoder" if P["up_rate"] - baseline >= cfg["upcoder_margin"] else ("hard_negative" if P["planted"] == "hard_negative" else "normal")
+        v22_key = {"honest_baseline_upcode_rate": round(baseline, 4), "upcoder_margin": cfg["upcoder_margin"],
+                   "noise": {k: cfg[k] for k in ("honest_miscode_rate", "honest_up_share", "honest_miscode_spread", "honest_miscode_max",
+                                                 "subtle_upcoder_share")}}
     with open(answer_key_path, "w") as f:
-        json.dump({"seed": seed, "clone_share": clone_share, "data_version": data_version,
+        json.dump({"seed": seed, "clone_share": clone_share, "data_version": data_version, **v22_key,
                    **({"clone_signal_strength": clone_signal_strength, "cloned_visits": ng.cloned} if ng is not None else {}),
                    "providers": {P["npi"]: {"role": P["role"], "upgrade_fraction": round(P["up"], 3),
                                             "clones_notes": P["clones"],
+                                            **({"planted": P["planted"], "subtle": P["subtle"], "honest_miscode_rate": round(P["miscode"], 4),
+                                                "upcode_rate": round(P["up_rate"], 4), "downcode_rate": round(P["down_rate"], 4)} if v22_on else {}),
                                             **({"uses_template": bool(ng.prov.get(P["npi"], {}).get("template"))} if ng is not None else {})}
                                    for P in provs},
                    "justified_cpt_by_claim": truth}, f)
@@ -268,9 +318,20 @@ if __name__ == "__main__":
     ap.add_argument("--hard-neg-rate", type=float, default=8 / 216)
     ap.add_argument("--clone-share", type=float, default=0.5, help="share of upcoders whose documentation is cloned to match billing")
     ap.add_argument("--answer-key", default=DEFAULT_KEY)
-    ap.add_argument("--data-version", default="2.0", choices=["2.0", "2.1"], help="2.1 also writes the note package")
+    ap.add_argument("--data-version", default="2.0", choices=["2.0", "2.1", "2.2"], help="2.1 also writes the note package; 2.2 adds honest coding noise")
     ap.add_argument("--clone-signal-strength", type=float, default=0.7, help="data 2.1: chance each clone signal appears on a cloned visit")
+    g = ap.add_argument_group("data 2.2 (issue 74); defaults in V22_DEFAULTS")
+    g.add_argument("--honest-miscode-rate", type=float, help="mean share of an honest provider's visits billed off the justified level")
+    g.add_argument("--honest-up-share", type=float, help="share of those miscodes that go up (the rest go down)")
+    g.add_argument("--honest-miscode-spread", type=float, help="provider-to-provider coefficient of variation of the miscode rate (Beta)")
+    g.add_argument("--honest-miscode-max", type=float, help="cap on any provider's honest miscode rate")
+    g.add_argument("--upcoder-fraction", type=float, nargs=2, metavar=("LO", "HI"), help="range of visits an upcoder bills one level up")
+    g.add_argument("--subtle-upcoder-share", type=float, help="share of upcoders drawn from the subtle range instead")
+    g.add_argument("--subtle-upcoder-fraction", type=float, nargs=2, metavar=("LO", "HI"), help="the subtle range")
+    g.add_argument("--upcoder-margin", type=float, help="an upcoder's upcoding rate exceeds the honest baseline by at least this")
     a = ap.parse_args()
+    opts = {k: (tuple(v) if isinstance(v, list) else v) for k, v in vars(a).items()
+            if k in V22_DEFAULTS and v is not None}
     out = build(a.out_dir, a.answer_key, a.seed, a.providers, a.upcoder_rate, a.hard_neg_rate, a.clone_share,
-                data_version=a.data_version, clone_signal_strength=a.clone_signal_strength)
+                data_version=a.data_version, clone_signal_strength=a.clone_signal_strength, **opts)
     print(f"wrote {len(out)} providers to {a.out_dir}; answer key at {a.answer_key}")

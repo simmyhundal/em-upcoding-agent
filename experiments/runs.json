@@ -224,6 +224,15 @@
    "view": "data/synthetic_v2_261015_66_code/view",
    "data_version": "v2.1",
    "seed_status": "reserved"
+  },
+  "x2_s42_d22": {
+   "label": "seed 42, data 2.2",
+   "seed": 42,
+   "flagged": "experiments/261016_1_code/flagged.csv",
+   "truth": "eval/answer_key/ground_truth_v2_261016_1_code.json",
+   "view": "data/synthetic_v2_261016_1_code/view",
+   "data_version": "v2.2",
+   "seed_status": "development"
   }
  },
  "runs": [
@@ -1515,12 +1524,21 @@
    "transcript": "experiments/261015_70_api/office_transcript.jsonl",
    "usefulness": "experiments/261015_70_api/usefulness.jsonl",
    "usefulness_rules": "experiments/261015_70_api/usefulness_rules.jsonl"
+  },
+  {
+   "run": "screen_v22_s42",
+   "dataset": "x2_s42_d22",
+   "kind": "screen",
+   "min_suspicion": 5,
+   "notes": "data 2.2 default honest noise, development seed 42 (issue 74); screen only",
+   "source": "code"
   }
  ],
  "data_descriptions": {
   "v1": "Version 1 synthetic data: provider, patient and claim tables with a stored chronic-condition count, plus a records-review sample (documentation.csv, about 30% of claims) handed to the AI up front.",
   "v2": "Version 2 synthetic data: plan-shaped tables (members, providers, claim headers and lines, remittance with denials, replacements and voids); conditions derived from claims; charts only by records request (limited, late or missing responses, coder disagreement); separate MDM elements and minutes; some upcoders clone their notes.",
-  "v2.1": "Version 2.1 synthetic data: the version 2 plan-shaped tables (claims and records universe identical to 2.0 for the same seed) plus the note package a records request returns (note text, signatures, orders and results, an EHR audit trail)."
+  "v2.1": "Version 2.1 synthetic data: the version 2 plan-shaped tables (claims and records universe identical to 2.0 for the same seed) plus the note package a records request returns (note text, signatures, orders and results, an EHR audit trail).",
+  "v2.2": "Version 2.2 synthetic data: data 2.1 plus honest coding noise (every provider bills a share of visits one level off the justified level) and an upcoder defined as billing above the honest baseline by a stated margin (docs/data_v2_2.md)."
  },
  "seed_status_meaning": "development = the seed used to build and tune the workflow (screen cutoff, rule thresholds); held-out = generated or scored after those settings were frozen."
 }

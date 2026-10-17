@@ -17,7 +17,7 @@ Three things carry version numbers: the **data** (generator, schemas and the sim
 |---|---|---|---|---|
 | 0 | 2.0 (`docs/v2_schemas.md`, office 2.0) | `v2.0` | `v3.0` | frozen and evaluated |
 | 1 | 2.1 (adds the note package, `docs/data_v2_1.md`; office 2.1) | `v2.1` | `v3.1` | frozen and evaluated on ten fresh seeds (#61, [eval61.md](eval61.md)); workflow is the main line |
-| 2 | 2.2 (realism and data defects, issues #74 to #80) | `v2.2` | `v3.2` | in development |
+| 2 | 2.2 (realism and data defects, issues #74 to #80; [data_v2_2.md](data_v2_2.md)) | `v2.2` | `v3.2` | in development |
 
 Data 1 pairs only with workflow `v1.0`. In `experiments/results.csv`, runs so far record the data version as `v1` or `v2` (meaning data 2.0); runs on data 2.1 and later should record the full number.
 

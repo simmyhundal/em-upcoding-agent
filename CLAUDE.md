@@ -19,6 +19,7 @@ Proof of concept that finds likely **E/M upcoding** (billing office-visit codes 
 - v2.0 data: plan tables, conditions derived from claims, charts only by records request; some upcoders **clone** notes (documented levels and time inflated to the bill). Frozen.
 - v2.1 data (frozen, issue #57, evaluated in #61): adds a note package (templated note text, signatures, orders and results, a second-tier audit trail), with tunable clone-signal strength. Claims and the records universe are identical to v2.0 for the same seed.
 - v2.2 data (in development, milestone "v2.2 and v3.2", #74 to #80): realism (honest coding noise, group billing, incident-to, diagnosis truncation, claims lag, level-changing corrections) and injected data defects, behind `--data-version 2.2`.
+- v2.2 data (release 2, in development; `docs/data_v2_2.md`): `--data-version 2.2` adds honest coding noise and defines an upcoder as billing above the honest baseline by a margin (#74); with its options at zero it reproduces 2.1 exactly (`tests/test_v22.py`). Answer-key `role` follows that definition; `planted` keeps the intent.
 - Seeds: 42 = development (thresholds tuned here), 101 and 7 = held-out for v2.0, 202 and 303 = M6 evaluation (retired), 404 to 1313 and 1414 = release 1 evaluation (#61, retired). Release 2's fresh seeds are named on its evaluation issue before they are generated. Tune only on development seeds.
 
 ## Evaluation (read before reporting any number)

@@ -171,13 +171,42 @@ CAVEATS = """
 - **Patient-level features add nothing here, by construction.** The justified level depends on the member's chronic-condition count only (age is drawn
   from it; new versus established is not modeled), so `rich_logit` is essentially `riskadj`. On real data richer patient-level adjustment may matter; this
   data cannot show it.
-- **Everything is easier than real claims.** Honest providers bill exactly the justified level in data 2.0/2.1. Issue 74 adds honest coding noise
-  (data 2.2); the seed 42 table on that data comes with it.
+- **Everything on data 2.0/2.1 is easier than real claims.** Honest providers bill exactly the justified level there. On the one data 2.2
+  dataset (seed 42, honest coding noise) the picture is mixed: `riskadj` has all 7 counted upcoders in its top 25 (the last at rank 24) and `eb_ratio`
+  6 of 7 (the same doctor at rank 26), while `eb_ratio` ranks the whole list better (AUPRC 0.75 against 0.46). One dataset, one doctor: it does not
+  support or reject the choice, it only says the 5-upcoder gain from the 14 older datasets is not guaranteed to carry over.
 - **Selection on seen data.** The 14 datasets are all development data now. Picking a method by this table is tuning; the choice is confirmed or
   rejected on the release 2 evaluation's fresh seeds, which have not been generated.
 - **`ensemble` is a rank average that includes the weak `level_z`**, so it is dragged down; it is reported because it was a named candidate, not because it
   is a fair best-of-the-rest ensemble.
 """
+
+
+def data22_section():
+    """Seed 42 on data 2.2 (issue 74): the same table, one dataset, plus where each planted upcoder ranks. Empty if the data is absent."""
+    view = os.path.join(ROOT, "data", "synthetic_v2_261016_1_code", "view")
+    key = os.path.join(ROOT, "eval", "answer_key", "ground_truth_v2_261016_1_code.json")
+    if not (os.path.exists(view) and os.path.exists(key)):
+        return ""
+    truth = json.load(open(key))
+    r = evaluate_dataset(view, truth, "s42_data22")
+    planted = {p: v for p, v in truth["providers"].items() if v.get("planted") == "upcoder"}
+    methods = ["riskadj", "priority", "eb_ratio"]
+    full = {m: {p: None for p in planted} for m in methods}
+    S = sm.score_all(view)
+    for m in methods:
+        order = sorted(S[m], key=lambda p: (-S[m][p], p))
+        for p in planted:
+            full[m][p] = order.index(p) + 1
+    lines = ["| Planted upcoder | Kind | Upcode rate | Counted as upcoder | " + " | ".join(f"`{m}` rank" for m in methods) + " |", "|---|---|---|---|" + "---|" * len(methods)]
+    for p, v in sorted(planted.items(), key=lambda kv: -kv[1]["upcode_rate"]):
+        lines.append(f"| {p} | {'subtle' if v['subtle'] else 'obvious'}, {'cloned' if v['clones_notes'] else 'honest'} notes | {v['upcode_rate']:.1%} "
+                     f"| {'yes' if v['role'] == 'upcoder' else 'no (below the margin)'} | " + " | ".join(str(full[m][p]) for m in methods) + " |")
+    return ("\n## Seed 42 on data 2.2 (honest coding noise, issue 74)\n\n"
+            "One development dataset (run `261016_1_code`: 216 doctors, 8 planted upcoders of which %d count under the margin rule; honest baseline upcoding rate %.1f%%, "
+            "margin %.0f points). One draw, so a single doctor moves any count here. Same columns as above.\n\n" % (
+                r["upcoders"], 100 * truth["honest_baseline_upcode_rate"], 100 * truth["upcoder_margin"])
+            + table([r]) + "\n\nWhere each planted upcoder ranks:\n\n" + "\n".join(lines) + "\n")
 
 
 def report(results, extra=CAVEATS):
@@ -208,7 +237,7 @@ def report(results, extra=CAVEATS):
             "hard-negative doctors in the top 25 against %d.\n\n" % ((totals(results)["riskadj"]["hn"] + totals(results)["riskadj"]["normal"], choice(results),
             totals(results)[choice(results)]["found"], sum(r["upcoders"] for r in results), totals(results)["riskadj"]["found"],
             totals(results)[choice(results)]["hn"], totals(results)["riskadj"]["hn"]))
-            + "## Where `riskadj` misses go\n\n" + misses_table(results, show[1:4]) + "\n" + extra)
+            + "## Where `riskadj` misses go\n\n" + misses_table(results, show[1:4]) + "\n" + data22_section() + extra)
 
 
 if __name__ == "__main__":

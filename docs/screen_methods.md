@@ -121,6 +121,38 @@ The rule (written down here after I had seen the ten-method table once, so it is
 
 Of these 16 upcoders that `riskadj` leaves outside its top 25, the top 25 of each method holds: `eb_ratio` 5, `priority` 3, `ensemble` 0.
 
+## Seed 42 on data 2.2 (honest coding noise, issue 74)
+
+One development dataset (run `261016_1_code`: 216 doctors, 8 planted upcoders of which 7 count under the margin rule; honest baseline upcoding rate 4.0%, margin 6 points). One draw, so a single doctor moves any count here. Same columns as above.
+
+| Method | Upcoders in top 25 (of 7) | Datasets with every upcoder in the top 25 (of 1) | Honest in top 25: hard negatives | Honest in top 25: ordinary | Upcoders at matched volume (same K as z >= 5) | z >= 5 (found / flagged) | AUPRC (mean) | ROC AUC (mean) | Precision at 10 | Precision at 25 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `zscore` | 6 (86%) | 0 | 4 | 15 | 5 | 0 / 0 | 0.398 | 0.943 | 0.50 | 0.24 |
+| `riskadj` | 7 (100%) | 1 | 1 | 17 | 3 | 3 / 10 | 0.457 | 0.963 | 0.30 | 0.28 |
+| `priority` | 6 (86%) | 0 | 1 | 18 | 5 | n/a | 0.663 | 0.974 | 0.50 | 0.24 |
+| `eb_ratio` | 6 (86%) | 0 | 1 | 18 | 5 | n/a | 0.754 | 0.979 | 0.50 | 0.24 |
+| `eb_prob` | 7 (100%) | 1 | 1 | 17 | 3 | n/a | 0.362 | 0.964 | 0.30 | 0.28 |
+| `eb_excess` | 5 (71%) | 0 | 3 | 17 | 1 | n/a | 0.300 | 0.921 | 0.10 | 0.20 |
+| `level_z` | 2 (29%) | 0 | 1 | 22 | 1 | 1 / 2 | 0.235 | 0.834 | 0.10 | 0.08 |
+| `rich_logit` | 7 (100%) | 1 | 1 | 17 | 3 | 3 / 10 | 0.457 | 0.963 | 0.30 | 0.28 |
+| `rich_level` | 2 (29%) | 0 | 1 | 22 | 1 | 1 / 2 | 0.234 | 0.833 | 0.10 | 0.08 |
+| `eb_upper` | 4 (57%) | 0 | 0 | 21 | 3 | n/a | 0.281 | 0.854 | 0.30 | 0.16 |
+| `eb_two` | 5 (71%) | 0 | 1 | 19 | 5 | n/a | 0.624 | 0.939 | 0.50 | 0.20 |
+| `ensemble` | 5 (71%) | 0 | 1 | 19 | 3 | n/a | 0.391 | 0.945 | 0.30 | 0.20 |
+
+Where each planted upcoder ranks:
+
+| Planted upcoder | Kind | Upcode rate | Counted as upcoder | `riskadj` rank | `priority` rank | `eb_ratio` rank |
+|---|---|---|---|---|---|---|
+| 1000000041 | obvious, cloned notes | 39.4% | yes | 4 | 2 | 1 |
+| 1000000095 | obvious, cloned notes | 29.6% | yes | 8 | 4 | 3 |
+| 1000000215 | obvious, honest notes | 28.8% | yes | 13 | 10 | 6 |
+| 1000000143 | obvious, honest notes | 24.8% | yes | 1 | 1 | 2 |
+| 1000000002 | obvious, honest notes | 23.6% | yes | 21 | 18 | 16 |
+| 1000000064 | subtle, cloned notes | 14.0% | yes | 24 | 26 | 26 |
+| 1000000161 | obvious, cloned notes | 12.4% | yes | 11 | 5 | 5 |
+| 1000000088 | subtle, honest notes | 9.6% | no (below the margin) | 12 | 8 | 7 |
+
 ## What this does and does not show
 
 - **The target is not met.** The aim of issue 88 is every planted upcoder in the top 25. The best method here still leaves upcoders out on
@@ -139,8 +171,10 @@ Of these 16 upcoders that `riskadj` leaves outside its top 25, the top 25 of eac
 - **Patient-level features add nothing here, by construction.** The justified level depends on the member's chronic-condition count only (age is drawn
   from it; new versus established is not modeled), so `rich_logit` is essentially `riskadj`. On real data richer patient-level adjustment may matter; this
   data cannot show it.
-- **Everything is easier than real claims.** Honest providers bill exactly the justified level in data 2.0/2.1. Issue 74 adds honest coding noise
-  (data 2.2); the seed 42 table on that data comes with it.
+- **Everything on data 2.0/2.1 is easier than real claims.** Honest providers bill exactly the justified level there. On the one data 2.2
+  dataset (seed 42, honest coding noise) the picture is mixed: `riskadj` has all 7 counted upcoders in its top 25 (the last at rank 24) and `eb_ratio`
+  6 of 7 (the same doctor at rank 26), while `eb_ratio` ranks the whole list better (AUPRC 0.75 against 0.46). One dataset, one doctor: it does not
+  support or reject the choice, it only says the 5-upcoder gain from the 14 older datasets is not guaranteed to carry over.
 - **Selection on seen data.** The 14 datasets are all development data now. Picking a method by this table is tuning; the choice is confirmed or
   rejected on the release 2 evaluation's fresh seeds, which have not been generated.
 - **`ensemble` is a rank average that includes the weak `level_z`**, so it is dragged down; it is reported because it was a named candidate, not because it
