@@ -105,9 +105,33 @@ RULES_22_INCONCLUSIVE = ("documentation supports billing but the 99215 share is 
                          "too few documented 99214 and 99215 claims to lean either way")
 
 
+PEER_CAP_22 = LOW_RATE      # rules 2.2: the peer unsupported rate never counts as higher than the "documentation supports billing" line (0.15)
+
+
+def _cap_peer(packet):
+    """Copy of the packet with the peer unsupported rates capped at PEER_CAP_22, and whether anything was capped. Honest coding errors lift the peer rate
+    on 99215 charts (to 54% on data 2.2, from 10% on data 2.1): the control sample's 99215 claims come mostly from low-volume billers, where a third are
+    honest up-slips from 99214. A provider billing 99215 at several times its expected share is mostly billing true 99215s, so its charts should look
+    cleaner than that peer rate, and a clause such as "3 times the peer rate" can never be met. Below the cap (every release 1 run) nothing changes."""
+    import copy
+    d = (packet.get("documentation_review") or {})
+    rows = d.get("by_billed_level") or []
+    if not any((r.get("all_provider_unsupported_rate") or 0) > PEER_CAP_22 for r in rows):
+        return packet, False
+    pk = copy.deepcopy(packet)
+    for r in pk["documentation_review"]["by_billed_level"]:
+        if (r.get("all_provider_unsupported_rate") or 0) > PEER_CAP_22:
+            r["all_provider_unsupported_rate"] = PEER_CAP_22
+    return pk, True
+
+
 def rule_leaning_22(packet):
-    """rule_leaning, with the ambiguous cases in RULES_22_INCONCLUSIVE decided inconclusive by rule."""
-    lean, reason = rule_leaning(packet)
+    """rule_leaning with the peer rate capped (rules 2.2, issue 91 and the data 2.2 diagnosis), and the ambiguous cases in RULES_22_INCONCLUSIVE decided
+    inconclusive by rule."""
+    pk, capped = _cap_peer(packet)
+    lean, reason = rule_leaning(pk)
+    if capped and lean in (UPCODING, HIGH_ACUITY):
+        reason += f"; the peer baseline is capped at {PEER_CAP_22:.0%} because honest coding errors inflate the control sample's rate"
     if lean is None and reason in RULES_22_INCONCLUSIVE:
         return INCONCLUSIVE, reason + "; rules 2.2 leave it inconclusive without a model call"
     return lean, reason

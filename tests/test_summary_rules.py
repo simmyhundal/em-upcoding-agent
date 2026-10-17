@@ -29,6 +29,23 @@ def packet(docs_total=30, n99215=10, bad=6, peer=0.08, share=0.2, exp=0.05, extr
             sr.LOW_KEY: [card], sr.HIGH_KEY: [], sr.COMPARE_KEY: [], "documentation_review": d}
 
 
+def test_rules_22_cap_the_peer_rate_so_noisy_peers_do_not_blind_the_chart_rule():
+    # data 2.2: honest coding errors lift the peer unsupported rate on 99215 charts to 54%; the frozen rule can then never lean upcoding
+    noisy = packet(bad=6, n99215=9, peer=0.536, share=0.3)
+    assert sr.rule_leaning(noisy)[0] is None                                          # frozen: 67% is not 3 times 54%, and "supports billing" is true up to 80%
+    lean, reason = sr.rule_leaning_22(noisy)
+    assert lean == sr.UPCODING and "capped at 15%" in reason
+    assert sr.rule_leaning_22(packet(bad=2, n99215=9, peer=0.536, share=0.3))[0] == sr.INCONCLUSIVE   # 22%: not upcoding, rules leave it inconclusive
+    assert sr.rule_leaning_22(packet(bad=1, n99215=9, peer=0.536, share=0.1))[0] == sr.HIGH_ACUITY       # clean charts, share within 3x expected
+    # below the cap (every release 1 run) rules 2.2 decide exactly as before, apart from the inconclusive-by-rule cases
+    for kw in ({"bad": 6}, {"bad": 1, "share": 0.1}, {"bad": 3}, {"n99215": 0}):
+        a, b = sr.rule_leaning(packet(**kw)), sr.rule_leaning_22(packet(**kw))
+        assert b[0] == a[0] or (a[0] is None and b[0] == sr.INCONCLUSIVE)
+    pk = packet(bad=6, n99215=9, peer=0.536, share=0.3)
+    sr.rule_leaning_22(pk)
+    assert pk["documentation_review"]["by_billed_level"][0]["all_provider_unsupported_rate"] == 0.536       # the packet is not modified
+
+
 def test_rule_leaning_cases():
     assert sr.rule_leaning(packet(bad=6))[0] == sr.UPCODING                          # 60% unsupported, peer 8%
     assert sr.rule_leaning(packet(bad=1, share=0.1))[0] == sr.HIGH_ACUITY            # 10% unsupported, share within 3x expected

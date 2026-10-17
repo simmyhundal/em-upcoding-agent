@@ -31,3 +31,18 @@ The evidence did not get worse: the upcoder's own chart rate is about the same (
 3. **Keep both as they are** and report that on realistic noise neither arm finds many upcoders from charts; the evaluation then answers a different question (which arm does better when evidence is weak) and needs more seeds for any significance.
 
 Free to try: 1 and 2 on the development seeds (42 and the defect twin), counting upcoders found by the workflow with no model calls. Not done yet.
+
+## Result of option 1 (built, tested free on the development seed only)
+
+**What changed (rules 2.2, `summary_rules.rule_leaning_22`; the frozen `rule_leaning` is untouched):** the peer unsupported rate is capped at 15% (the rule's own "documentation supports billing" line, `LOW_RATE`) before the rule runs. No new tuned number. The 54% peer rate comes from the control sample's 99215 claims, mostly from low-volume billers where a third are honest up-slips; a provider billing 99215 at several times its expected share is mostly billing true 99215s, so its charts should look cleaner than that. Below the cap (every release 1 run) nothing changes: regenerating the 26 stored #61 workflow summary files with rules 2.2 changes **0 leanings** (`docs/workflow_cost.md`; the text of 5 summaries gains a note that the baseline was capped). The v3.2 agent's `hybrid_review` uses the same rules.
+
+**Development seed 42, data 2.2, workflow v2.2 with the eb_ratio top-5% list (11 providers, no model calls, $0):**
+
+| Rules | Upcoders found (of 8) | Honest accused |
+|---|---|---|
+| Before (`r2w_dev42`) | 1 | 0 |
+| Capped peer rate (`r2w_dev42b`) | **4** | 0 |
+
+The four are the three honest-notes upcoders reached by charts (1000000143, 1000000215, 1000000088) and the one cloned-notes upcoder reached by the note rule (1000000095). The other two upcoders in the list are cloned-notes upcoders whose charts support the billed level (45 charts, 5% below) or never came back; no chart rule can reach them. That is the cloned-notes problem (#57), not this one. The sixth and eighth upcoders sit outside the top 5%.
+
+**Honest limits.** The cap was chosen after seeing the failure on this one seed, but it reuses an existing constant instead of a new tuned number; one dataset and three chart-detected upcoders cannot prove it generalizes, and the fresh seeds are where that gets tested. The seed 1515 smoke result (`r2w_1515`, 1 found) was produced with the old rules and is superseded; it is not rerun with them, so no evaluation seed informed this change. Even so, the chart evidence is weak (6 of 9 against honest providers at 15%), so a false accusation among high-share honest doctors is possible; seed 42's list has none.

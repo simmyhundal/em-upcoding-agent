@@ -39,7 +39,7 @@ Regenerated with rules 2.2 (`case_summary.py --v22`) on the same views and cache
 | Writer cost per arm per dataset | $0.144 | $0.014 |
 | Upcoders called / honest doctors called | 40 / 1 | 40 / 1 |
 | Leanings that changed | | 0 |
-| Summaries otherwise identical to the stored ones | | 87 of 87 |
+| Summaries otherwise identical to the stored ones | | 82 of 87 |
 
 The 104 summaries that moved from the model to rules, scored by the rule judge (j2.3, the release 2 judge): 4.83 model-written, 4.89 rule-written. The LLM judge had scored the model-written versions 2.83; it scored the rule-written inconclusive summaries already in these runs 3.52 (27 summaries). Read the rule judge's score with care: it shares rules with the writer, so a rule-written summary is partly graded by its own rules (#93).
 

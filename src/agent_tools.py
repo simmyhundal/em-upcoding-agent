@@ -239,7 +239,7 @@ class Environment:
                 continue
             chart = self._chart_rule(pid)
             packet = self._packet(pid)
-            rule, reason = sr.rule_leaning(packet)
+            rule, reason = (sr.rule_leaning_22 if self.v32 else sr.rule_leaning)(packet)       # version 3.2: the same noise-aware rules as workflow v2.2
             if chart["triggered"] and rule != sr.UPCODING:
                 lean, source, reason = sr.UPCODING, "chart_rule", f"{chart['below_billed']} of {chart['charts']} returned charts support a lower level than billed"
             elif rule:
