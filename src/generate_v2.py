@@ -203,6 +203,9 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
             goes_up = nrng.random(vol) < cfg["honest_up_share"]
             billed = np.where(slip & goes_up & (just < 4), just + 1, np.where(slip & ~goes_up & (just > 0), just - 1, billed))
         P["n_up_visits"], P["n_down_visits"] = int((billed > just).sum()), int((billed < just).sum())
+        if v22_on:      # the provider's true propensity to bill above the justified level: its parameters over its visit mix, not one year's draw
+            f_, ru = P["up"], P["miscode"] * cfg["honest_up_share"]
+            P["true_up"] = float(np.where(just == 0, ru, np.where(just <= 3, f_ + (1 - f_) * ru, 0.0)).mean())
         # data 2.2: a clinician billing under their own NPI often leaves the rendering field blank (it equals billing)
         omit = (orng.random(vol) < cfg["rendering_omitted_share"]) if (v22_on and cfg["rendering_omitted_share"] > 0 and P["billing"] == P["npi"]) \
             else np.zeros(vol, dtype=bool)
@@ -348,19 +351,23 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
         for P in provs:
             P["up_rate"], P["down_rate"] = P["n_up_visits"] / P["volume"], P["n_down_visits"] / P["volume"]
             P["planted"] = P["role"]
-        honest_rates = [P["up_rate"] for P in provs if P["planted"] != "upcoder"]
-        p95 = float(np.percentile(honest_rates, 95)) if honest_rates else 0.0
+        # The two tests use each provider's TRUE propensity (true_upcode_rate), not the share of one year's visits that happened to be billed high: small
+        # practices otherwise cross the line by luck (a first version of this definition labeled 11 honest doctors upcoders on 8 seeds).
+        # The realised rates stay in the key for the screens' side of the story.
+        honest_true = [P["true_up"] for P in provs if P["planted"] != "upcoder"]
+        true_base = float(np.mean(honest_true)) if honest_true else 0.0
+        p95 = float(np.percentile(honest_true, 95)) if honest_true else 0.0
         if cfg["upcoder_definition"] not in ("payer", "margin"):
             raise ValueError("upcoder_definition must be payer or margin")
         for P in provs:
-            # role by the stated definition (issue 74, docs/data_v2_2.md). margin: upcoding rate above the honest baseline by at least the margin.
-            # payer: that AND above the 95th percentile of the honest providers' rates (a peer-percentile outlier a payer's screen would call, confirmed as
-            # material by a sample review).
-            P["above_margin"] = P["up_rate"] - baseline >= cfg["upcoder_margin"]
-            P["above_p95"] = P["up_rate"] > p95
+            # role by the stated definition (issue 74, docs/data_v2_2.md). margin: true rate above the honest mean by at least the margin.
+            # payer: that AND above the 95th percentile of the honest providers' true rates (a peer-percentile outlier a payer's screen would call,
+            # confirmed as material by a sample review).
+            P["above_margin"] = P["true_up"] - true_base >= cfg["upcoder_margin"]
+            P["above_p95"] = P["true_up"] > p95
             is_up = P["above_margin"] and (P["above_p95"] or cfg["upcoder_definition"] == "margin")
             P["role"] = "upcoder" if is_up else ("hard_negative" if P["planted"] == "hard_negative" else "normal")
-        v22_key = {"honest_baseline_upcode_rate": round(baseline, 4), "honest_p95_upcode_rate": round(p95, 4), "upcoder_margin": cfg["upcoder_margin"],
+        v22_key = {"honest_baseline_upcode_rate": round(baseline, 4), "honest_baseline_true_rate": round(true_base, 4), "honest_p95_true_rate": round(p95, 4), "upcoder_margin": cfg["upcoder_margin"],
                    "upcoder_definition": cfg["upcoder_definition"],
                    "defects": {**({"dx_truncation": {"cap": cfg["dx_cap"], "months": list(cfg["dx_cap_months"]), "claims_shortened": dx_cut}}
                                   if cfg["dx_cap"] else {}), **defect_rec,
@@ -374,7 +381,7 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
                                             **({"billing_npi": P["billing"], "group_tin": P["tin"]} if v22_on else {}),
                                             "clones_notes": P["clones"],
                                             **({"planted": P["planted"], "subtle": P["subtle"], "honest_miscode_rate": round(P["miscode"], 4),
-                                                "upcode_rate": round(P["up_rate"], 4), "downcode_rate": round(P["down_rate"], 4),
+                                                "upcode_rate": round(P["up_rate"], 4), "true_upcode_rate": round(P["true_up"], 4), "downcode_rate": round(P["down_rate"], 4),
                                                 "above_margin": bool(P["above_margin"]), "above_p95": bool(P["above_p95"]),
                                                 "planted_below_line": bool(P["planted"] == "upcoder" and P["role"] != "upcoder"),
                                                 "corrections": P["n_corrections"], "corrections_up": P["n_corr_up"], "corrections_down": P["n_corr_down"]} if v22_on else {}),

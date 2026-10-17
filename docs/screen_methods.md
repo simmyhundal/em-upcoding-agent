@@ -134,35 +134,35 @@ Of these 16 upcoders that `riskadj` leaves outside its top 25, the top 25 of eac
 
 ## Seed 42 on data 2.2 (honest coding noise, issue 74)
 
-One development dataset (run `261016_1_code`: 216 doctors, 8 planted upcoders of which 7 count under the margin rule; honest baseline upcoding rate 4.1%, margin 6 points). One draw, so a single doctor moves any count here. Same columns as above.
+One development dataset (run `261016_1_code`: 216 doctors, 8 planted upcoders of which 8 count under the payer-based definition; honest mean true rate 3.9%, 95th percentile 5.9%, margin 6 points). One draw, so a single doctor moves any count here. Same columns as above.
 
-| Method | Upcoders in top 25 (of 7) | Datasets with every upcoder in the top 25 (of 1) | Honest in top 25: hard negatives | Honest in top 25: ordinary | Upcoders at matched volume (same K as z >= 5) | z >= 5 (found / flagged) | AUPRC (mean) | ROC AUC (mean) | Precision at 10 | Precision at 25 |
+| Method | Upcoders in top 25 (of 8) | Datasets with every upcoder in the top 25 (of 1) | Honest in top 25: hard negatives | Honest in top 25: ordinary | Upcoders at matched volume (same K as z >= 5) | z >= 5 (found / flagged) | AUPRC (mean) | ROC AUC (mean) | Precision at 10 | Precision at 25 |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `zscore` | 6 (86%) | 0 | 4 | 15 | 4 | 0 / 0 | 0.398 | 0.943 | 0.50 | 0.24 |
-| `riskadj` | 7 (100%) | 1 | 1 | 17 | 3 | 3 / 9 | 0.456 | 0.962 | 0.30 | 0.28 |
-| `priority` | 7 (100%) | 1 | 1 | 17 | 4 | n/a | 0.646 | 0.974 | 0.50 | 0.28 |
-| `eb_ratio` | 6 (86%) | 0 | 1 | 18 | 5 | n/a | 0.751 | 0.978 | 0.50 | 0.24 |
-| `eb_prob` | 7 (100%) | 1 | 1 | 17 | 3 | n/a | 0.360 | 0.963 | 0.30 | 0.28 |
-| `eb_excess` | 5 (71%) | 0 | 3 | 17 | 1 | n/a | 0.298 | 0.919 | 0.10 | 0.20 |
-| `level_z` | 2 (29%) | 0 | 1 | 22 | 1 | 1 / 2 | 0.234 | 0.835 | 0.10 | 0.08 |
-| `rich_logit` | 7 (100%) | 1 | 1 | 17 | 3 | 3 / 9 | 0.456 | 0.962 | 0.30 | 0.28 |
-| `rich_level` | 2 (29%) | 0 | 1 | 22 | 1 | 1 / 2 | 0.234 | 0.835 | 0.10 | 0.08 |
-| `eb_upper` | 4 (57%) | 0 | 0 | 21 | 3 | n/a | 0.276 | 0.850 | 0.30 | 0.16 |
-| `eb_two` | 5 (71%) | 0 | 1 | 19 | 4 | n/a | 0.612 | 0.935 | 0.40 | 0.20 |
-| `ensemble` | 5 (71%) | 0 | 1 | 19 | 2 | n/a | 0.393 | 0.943 | 0.30 | 0.20 |
+| `zscore` | 7 (88%) | 0 | 4 | 14 | 5 | 0 / 0 | 0.617 | 0.954 | 0.60 | 0.28 |
+| `riskadj` | 8 (100%) | 1 | 1 | 16 | 3 | 3 / 9 | 0.471 | 0.965 | 0.30 | 0.32 |
+| `priority` | 8 (100%) | 1 | 1 | 16 | 5 | n/a | 0.659 | 0.977 | 0.60 | 0.32 |
+| `eb_ratio` | 7 (88%) | 0 | 1 | 17 | 6 | n/a | 0.776 | 0.981 | 0.60 | 0.28 |
+| `eb_prob` | 8 (100%) | 1 | 1 | 16 | 3 | n/a | 0.388 | 0.965 | 0.30 | 0.32 |
+| `eb_excess` | 6 (75%) | 0 | 3 | 16 | 1 | n/a | 0.311 | 0.925 | 0.10 | 0.24 |
+| `level_z` | 2 (25%) | 0 | 1 | 22 | 1 | 1 / 2 | 0.222 | 0.826 | 0.10 | 0.08 |
+| `rich_logit` | 8 (100%) | 1 | 1 | 16 | 3 | 3 / 9 | 0.471 | 0.965 | 0.30 | 0.32 |
+| `rich_level` | 2 (25%) | 0 | 1 | 22 | 1 | 1 / 2 | 0.222 | 0.826 | 0.10 | 0.08 |
+| `eb_upper` | 4 (50%) | 0 | 0 | 21 | 3 | n/a | 0.249 | 0.788 | 0.30 | 0.16 |
+| `eb_two` | 5 (62%) | 0 | 1 | 19 | 4 | n/a | 0.551 | 0.906 | 0.40 | 0.20 |
+| `ensemble` | 6 (75%) | 0 | 1 | 18 | 2 | n/a | 0.390 | 0.943 | 0.30 | 0.24 |
 
 Where each planted upcoder ranks:
 
-| Planted upcoder | Kind | Upcode rate | Counted as upcoder | `riskadj` rank | `priority` rank | `eb_ratio` rank |
+| Planted upcoder | Kind | True rate / realised rate | Counted as upcoder | `riskadj` rank | `priority` rank | `eb_ratio` rank |
 |---|---|---|---|---|---|---|
-| 1000000041 | obvious, cloned notes | 39.7% | yes | 4 | 2 | 2 |
-| 1000000095 | obvious, cloned notes | 29.6% | yes | 8 | 4 | 3 |
-| 1000000215 | obvious, honest notes | 28.4% | yes | 13 | 10 | 6 |
-| 1000000143 | obvious, honest notes | 24.8% | yes | 1 | 1 | 1 |
-| 1000000002 | obvious, honest notes | 23.6% | yes | 21 | 18 | 17 |
-| 1000000064 | subtle, cloned notes | 14.2% | yes | 25 | 25 | 26 |
-| 1000000161 | obvious, cloned notes | 12.4% | yes | 11 | 6 | 5 |
-| 1000000088 | subtle, honest notes | 9.6% | no (below the margin) | 12 | 8 | 7 |
+| 1000000041 | obvious, cloned notes | 38.4% / 39.7% | yes | 4 | 2 | 2 |
+| 1000000095 | obvious, cloned notes | 30.7% / 29.6% | yes | 8 | 4 | 3 |
+| 1000000215 | obvious, honest notes | 29.7% / 28.4% | yes | 13 | 10 | 6 |
+| 1000000143 | obvious, honest notes | 24.2% / 24.8% | yes | 1 | 1 | 1 |
+| 1000000002 | obvious, honest notes | 22.1% / 23.6% | yes | 21 | 18 | 17 |
+| 1000000064 | subtle, cloned notes | 16.0% / 14.2% | yes | 25 | 25 | 26 |
+| 1000000161 | obvious, cloned notes | 14.5% / 12.4% | yes | 11 | 6 | 5 |
+| 1000000088 | subtle, honest notes | 10.5% / 9.6% | yes | 12 | 8 | 7 |
 
 ## Decision
 
@@ -189,10 +189,10 @@ as `flagging.py --method`, `make_v2_runs.run(screens=...)`, the v2.2 workflow ar
 - **Patient-level features add nothing here, by construction.** The justified level depends on the member's chronic-condition count only (age is drawn
   from it; new versus established is not modeled), so `rich_logit` is essentially `riskadj`. On real data richer patient-level adjustment may matter; this
   data cannot show it.
-- **Everything on data 2.0/2.1 is easier than real claims.** Honest providers bill exactly the justified level there. On the one data 2.2
-  dataset (seed 42, honest coding noise) the picture is mixed: `riskadj` and `priority` have all 7 counted upcoders in their top 25 (the last at rank 25) and `eb_ratio`
-  6 of 7 (the same doctor at rank 26), while `eb_ratio` ranks the whole list better (AUPRC 0.75 against 0.46 for `riskadj` and 0.65 for `priority`). One dataset, one doctor: it does not
-  support or reject the choice, it only says the 5-upcoder gain from the 14 older datasets is not guaranteed to carry over.
+- **Everything on data 2.0/2.1 is easier than real claims.** Honest providers bill exactly the justified level there. On the one data 2.2 dataset (seed 42, honest
+  coding noise) the picture is mixed: `riskadj` and `priority` have all 8 upcoders in their top 25, `eb_ratio` 7 of 8, while `eb_ratio` ranks the whole list better
+  (AUPRC 0.78 against 0.47 for `riskadj` and 0.66 for `priority`). One dataset, one doctor: it does not support or reject the choice, it only says the
+  5-upcoder gain from the 14 older datasets is not guaranteed to carry over.
 - **Selection on seen data.** The 14 datasets are all development data now. Picking a method by this table is tuning; the choice is confirmed or
   rejected on the release 2 evaluation's fresh seeds, which have not been generated.
 - **`ensemble` is a rank average that includes the weak `level_z`**, so it is dragged down; it is reported because it was a named candidate, not because it

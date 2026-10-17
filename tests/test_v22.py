@@ -51,21 +51,24 @@ def test_noise_bills_honest_visits_off_level_and_roles_follow_the_margin():
     P = key["providers"]
     honest = [v for v in P.values() if v["planted"] != "upcoder"]
     assert sum(v["upcode_rate"] for v in honest) / len(honest) > 0.02 and sum(v["downcode_rate"] for v in honest) / len(honest) > 0.02
-    base, margin = key["honest_baseline_upcode_rate"], key["upcoder_margin"]
+    base, margin = key["honest_baseline_true_rate"], key["upcoder_margin"]
     for v in P.values():
-        assert (v["role"] == "upcoder") == (v["upcode_rate"] - base >= margin), v
+        assert (v["role"] == "upcoder") == (v["true_upcode_rate"] - base >= margin), v
     assert all("planted" in v and "honest_miscode_rate" in v for v in P.values())
 
 
-def test_payer_definition_needs_both_the_percentile_and_the_margin():
+def test_payer_definition_needs_both_the_percentile_and_the_margin_on_true_rates():
     out, key = build("2.2", seed=6, honest_miscode_rate=0.12, subtle_upcoder_share=0.5)
-    P, base, p95, margin = key["providers"], key["honest_baseline_upcode_rate"], key["honest_p95_upcode_rate"], key["upcoder_margin"]
+    P, base, p95, margin = key["providers"], key["honest_baseline_true_rate"], key["honest_p95_true_rate"], key["upcoder_margin"]
     assert key["upcoder_definition"] == "payer"
-    honest = sorted(v["upcode_rate"] for v in P.values() if v["planted"] != "upcoder")
-    assert abs(p95 - honest[int(0.95 * (len(honest) - 1))]) < 0.05                    # the 95th percentile of the honest rates (interpolated)
+    honest = sorted(v["true_upcode_rate"] for v in P.values() if v["planted"] != "upcoder")
+    assert abs(p95 - honest[int(0.95 * (len(honest) - 1))]) < 0.02                    # the 95th percentile of the honest true rates (interpolated)
     for v in P.values():
-        assert (v["role"] == "upcoder") == (v["upcode_rate"] - base >= margin and v["upcode_rate"] > p95), v
-        assert v["above_p95"] == (v["upcode_rate"] > p95) and v["planted_below_line"] == (v["planted"] == "upcoder" and v["role"] != "upcoder")
+        assert (v["role"] == "upcoder") == (v["true_upcode_rate"] - base >= margin and v["true_upcode_rate"] > p95), v
+        assert v["above_p95"] == (v["true_upcode_rate"] > p95) and v["planted_below_line"] == (v["planted"] == "upcoder" and v["role"] != "upcoder")
+    # the label does not depend on one year's luck: an honest provider never crosses, and every default-range planted upcoder does
+    assert all(v["role"] != "upcoder" for v in P.values() if v["planted"] != "upcoder")
+    assert all(v["role"] == "upcoder" for v in P.values() if v["planted"] == "upcoder")
     # the margin-only definition labels a superset
     _, k2 = build("2.2", seed=6, honest_miscode_rate=0.12, subtle_upcoder_share=0.5, upcoder_definition="margin")
     up1 = {p for p, v in P.items() if v["role"] == "upcoder"}

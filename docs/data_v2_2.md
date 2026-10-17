@@ -35,20 +35,25 @@ included, miscodes a share of its visits (a separate random stream, so nothing e
 | `--upcoder-fraction LO HI` | 0.15 0.40 | share of visits an obvious upcoder bills one level up (unchanged from before) |
 | `--subtle-upcoder-share` | 0.25 | share of upcoders drawn from the subtle range |
 | `--subtle-upcoder-fraction LO HI` | 0.08 0.12 | the subtle range |
-| `--upcoder-margin` | 0.06 | an upcoder's upcoding rate must exceed the honest baseline by at least this many points of visits |
-| `--upcoder-definition` | `payer` | `payer`: the margin test **and** a rate above the 95th percentile of the honest providers ([why](#the-payer-based-upcoder-definition-built-the-default)); `margin`: the margin test alone |
+| `--upcoder-margin` | 0.06 | an upcoder's true overbilling rate must exceed the honest mean by at least this many points of visits |
+| `--upcoder-definition` | `payer` | `payer`: the margin test **and** a true rate above the 95th percentile of the honest providers ([why](#the-payer-based-upcoder-definition-built-the-default)); `margin`: the margin test alone |
 
 **The defaults are illustrative.** They are not calibrated to a published coding-error rate (none was used). They were chosen on the development seed 42 for
 plausibility and so that honest noise stays below the margin; the sweep below is the check, and it was not used to tune toward a result.
 
-**Answer key (evaluation only).** Each provider records its `planted` role, whether it is `subtle`, its `honest_miscode_rate`, and its realised `upcode_rate`
-and `downcode_rate` (share of visits billed above and below the justified level). The key's top level records `honest_baseline_upcode_rate` (the mean
-`upcode_rate` of providers planted honest) and the margin. The `role` that every evaluation reads is now **`upcoder` under the payer-based definition** ([below](#the-payer-based-upcoder-definition-built-the-default)): the provider's `upcode_rate` is above the 95th percentile of the honest providers' rates and at least the margin above their mean (`--upcoder-definition margin` drops the first test); otherwise `hard_negative` (a planted high-acuity panel) or `normal`. The key also records `honest_p95_upcode_rate`, `above_margin`, `above_p95` and `planted_below_line` for each provider. Consequences, said plainly:
+**Answer key (evaluation only).** Each provider records its `planted` role, whether it is `subtle`, its `honest_miscode_rate`, its realised `upcode_rate` and `downcode_rate` (share of
+visits billed above and below the justified level in the one simulated year) and its **`true_upcode_rate`**: the expected share of its visits billed above the justified level, computed from its
+parameters and visit mix (a visit already at 99215 cannot be upcoded, so a sick panel has a lower true rate). The key's top level records the honest mean true rate (`honest_baseline_true_rate`),
+the honest 95th percentile (`honest_p95_true_rate`), the realised honest mean (`honest_baseline_upcode_rate`) and the margin. The `role` that every evaluation reads is **`upcoder` under the payer-based
+definition** ([below](#the-payer-based-upcoder-definition-built-the-default)): the true rate is above the 95th percentile of the honest providers' true rates and at least the margin above their mean
+(`--upcoder-definition margin` drops the first test); otherwise `hard_negative` (a planted high-acuity panel) or `normal`. The key also records `above_margin`, `above_p95` and `planted_below_line`.
+Consequences, said plainly:
 
-- A planted upcoder whose realised rate fails either test is labeled `normal` (`planted_below_line`). In seed 42 one of eight planted upcoders (a subtle one at a 9.6% rate: above the honest 95th percentile of 6.8%, but under the margin line of 10.1% = baseline 4.1% + 6 points)
-  is therefore not counted: the data has 7 upcoders, not 8.
-- An honest provider that passes both tests would be labeled `upcoder`. None did in seed 42 (highest honest rate 9.6%, which passes the percentile test but not the margin test); a margin closer to the honest spread would produce such cases.
-- Everything that reads `role` (screen, scoreboard, judges) keeps working; the number of upcoders can now differ from the number planted.
+- **Labels do not depend on one year's luck.** A first version of this definition used realised rates and labeled 11 honest doctors, mostly small practices, as upcoders across 8 seeds; true rates fix that.
+  An honest provider's true rate tops out near 6% (a miscode rate of 0.12 times the up share of 0.5) against a line near 10%, so none crosses.
+- A planted upcoder whose **true** rate fails either test is labeled `normal` (`planted_below_line`). That happens when the panel leaves little room to upcode: on the 8 first-batch seeds of
+  [#90](https://github.com/simmyhundal/em-upcoding-agent/issues/90), 2 of 64 planted upcoders fell below the line (62 upcoders); in seed 42 all 8 count.
+- Everything that reads `role` (screen, scoreboard, judges) keeps working; the number of upcoders can differ slightly from the number planted.
 - Cloned notes still apply to every visit a cloning provider bills above the justified level, including honest slips upward. Small, and only for cloners.
 
 ### The payer-based upcoder definition (built, the default)
@@ -58,9 +63,9 @@ and `downcode_rate` (share of visits billed above and below the justified level)
 1. **Find outliers against specialty peers.** CMS Comparative Billing Reports compare a provider's code use with state and national peers in the same specialty by percentile ([secondary summary](https://AAO.ORG/eyenet/article/comparative-billing-reports-2)); a Blue Cross plan describes a vendor review of high-level E/M codes (99204, 99205, 99214, 99215, 99244, 99245) to find practitioners billing a higher share than like-specialty peers ([Blue Cross Minnesota](https://bluecrossmn.com/sites/default/files/DAM/2021-11/P11GA_13148857.pdf)); the HHS OIG's list of high-coding physicians used the top 1% of average code level in a specialty and about 95% of services in the two highest levels (secondary summaries of the [2012 report](https://oig.hhs.gov/reports/all/2012/coding-trends-of-medicare-evaluation-and-management-services); I did not retrieve the report's methodology section, so check the exact thresholds).
 2. **Confirm by reviewing a sample of claims against the records.** In Medicare's Targeted Probe and Educate, a contractor reviews 20 to 40 claims per round, up to three rounds, and computes a **claims error rate** (claims in error divided by claims reviewed) and a **payment error rate** (allowed dollars in error divided by allowed dollars); the threshold is set by the contractor and sent in the provider's letter, and a provider still above it after round three can face extrapolation, 100% prepayment review or referral ([CGS Medicare](https://www.cgsmedicare.com/parta/mr/tpe_process.html), [CGS FAQs](https://cgsmedicare.com/parta/mr/tpe_faqs.html)). A non-response counts as an error.
 
-**Definition: use the same two tests on the true values** (built as `--upcoder-definition payer`, Simmy's decision). A provider is an upcoder when its true overbilling rate, the share of its live claims billed above the level the chart supports, is
-(a) **above the 95th percentile of the honest providers' rates**, so a peer-percentile screen would call it an outlier, **and** (b) **at least a stated margin above the honest mean** (6 points of visits as built), so a claims-error-rate review of a sample would confirm it as material.
-`--upcoder-definition margin` is test (b) alone; (a) is added so a lucky honest provider does not cross the line. The numbers 95th percentile and 6 points are our choices: the sources fix the structure, not the thresholds (the OIG used top 1%; TPE thresholds are per contractor and unpublished).
+**Definition: use the same two tests on the true values** (built as `--upcoder-definition payer`, Simmy's decision). A provider is an upcoder when its true overbilling rate (its expected share of visits billed above the level the chart supports; not the luck of one year's draw) is
+(a) **above the 95th percentile of the honest providers' true rates**, so a peer-percentile screen would call it an outlier, **and** (b) **at least a stated margin above the honest mean** (6 points of visits as built), so a claims-error-rate review of a sample would confirm it as material.
+`--upcoder-definition margin` is test (b) alone; (a) is added so an honest provider does not cross the line. The numbers 95th percentile and 6 points are our choices: the sources fix the structure, not the thresholds (the OIG used top 1%; TPE thresholds are per contractor and unpublished).
 Consequence, said plainly: a planted subtle upcoder under the line (`planted_below_line` in the key) is **not** an upcoder, because a payer following these rules would not act on it either; the evaluation reports it separately as "planted below the payer line" instead of hiding it. The dollar side stays in the key (excess paid dollars per provider) so misses can be weighed.
 
 An earlier idea (labels fixed by planted intent) was dropped: payers cannot see intent, and a label no payer rule could reproduce would make the evaluation less comparable to practice.
@@ -72,14 +77,14 @@ An earlier idea (labels fixed by planted intent) was dropped: payers cannot see 
 |---|---|---|---|---|---|
 | 0% | 8 | 0.2% | 8 / 17 | 8 / 17 | 1 / 0 (of 11 sent) |
 | 4% | 8 | 2.2% | 8 / 17 | 8 / 17 | 1 / 0 (of 10 sent) |
-| 8% | 7 | 4.1% | 7 / 18 | 6 / 19 | 1 / 0 (of 9 sent) |
-| 16% | 7 | 5.6% | 6 / 19 | 6 / 19 | 1 / 0 (of 10 sent) |
+| 8% | 8 | 4.1% | 8 / 17 | 7 / 18 | 1 / 0 (of 9 sent) |
+| 16% | 8 | 5.6% | 7 / 18 | 7 / 18 | 1 / 0 (of 10 sent) |
 <!-- sweep:end -->
 
-Read with care: one dataset per row, 7 to 8 upcoders, so a difference of one doctor is noise (the 0% row still shows a 0.2% baseline because the corrections of issue 79 move a few levels). The rate column is the rate asked for; the cap
+Read with care: one dataset per row, 8 upcoders, so a difference of one doctor is noise (the 0% row still shows a 0.2% baseline because the corrections of issue 79 move a few levels). The rate column is the rate asked for; the cap
 (0.12) holds the 16% row to a lower realised rate, which the baseline column shows (5.5% of visits billed above the justified level). What the table
 supports: the screen still ranks planted upcoders high under honest noise (it works on the 99215 share, which honest slips both raise and lower), with
-`riskadj` and `eb_ratio` each missing about one upcoder from the top 25 once noise is on.
+`riskadj` and `eb_ratio` each missing at most one upcoder from the top 25 once noise is on.
 
 What it changes more clearly is the evidence from charts. Honest doctors now bill about 4% of visits above the level the chart supports (and about 4%
 below), so **a chart that supports a lower level than billed is no longer proof of upcoding**. The earlier zero-false-accusation result for the chart rule
@@ -134,16 +139,16 @@ The answer key records the defect under `defects.dx_truncation` (cap, months, nu
 <!-- dxcap:start -->
 | Diagnosis positions kept | Claims shortened | Mean derived conditions per patient | High-acuity doctors: 99215 share / expected | Doctors with suspicion >= 5 | `riskadj` top 25: upcoders / high-acuity / ordinary | `riskadj` AUPRC | `eb_ratio` top 25: upcoders / high-acuity / ordinary | `eb_ratio` AUPRC |
 |---|---|---|---|---|---|---|---|---|
-| 6 (no cap) | 0 | 1.54 | 1.16 | 9 | 7 / 1 / 17 | 0.456 | 6 / 1 / 18 | 0.751 |
-| 4 | 9,118 | 1.49 | 1.19 | 8 | 6 / 2 / 17 | 0.454 | 6 / 1 / 18 | 0.779 |
-| 3 | 19,294 | 1.38 | 1.34 | 8 | 6 / 2 / 17 | 0.450 | 6 / 2 / 17 | 0.735 |
-| 2 | 38,696 | 1.16 | 1.54 | 10 | 5 / 4 / 16 | 0.413 | 6 / 2 / 17 | 0.582 |
+| 6 (no cap) | 0 | 1.54 | 1.16 | 9 | 8 / 1 / 16 | 0.471 | 7 / 1 / 17 | 0.776 |
+| 4 | 9,118 | 1.49 | 1.19 | 8 | 7 / 2 / 16 | 0.469 | 7 / 1 / 17 | 0.777 |
+| 3 | 19,294 | 1.38 | 1.34 | 8 | 7 / 2 / 16 | 0.470 | 7 / 2 / 16 | 0.747 |
+| 2 | 38,696 | 1.16 | 1.54 | 10 | 6 / 4 / 15 | 0.458 | 7 / 2 / 16 | 0.645 |
 <!-- dxcap:end -->
 
 Reading it: a cap of 4 or 3 changes little (the mean derived count falls from 1.54 to 1.49 and 1.38, one more high-acuity doctor enters the top 25); a cap of
 2 is clear: the mean count falls to 1.16, the high-acuity doctors' 99215 share rises from 1.16 to 1.54 times what the model expects, four of them reach the
-top 25 (one before), and `riskadj` loses two upcoders from its top 25. `eb_ratio` is affected less in the top 25 but its AUPRC falls from 0.75 to 0.58.
-One dataset, 8 high-acuity doctors and 7 upcoders, so single doctors move these counts; the direction (sicker panels look healthier, honest
+top 25 (one before), and `riskadj` loses two upcoders from its top 25. `eb_ratio` is affected less in the top 25 but its AUPRC falls from 0.78 to 0.65.
+One dataset, 8 high-acuity doctors and 8 upcoders, so single doctors move these counts; the direction (sicker panels look healthier, honest
 high-acuity doctors look worse) is what the generator guarantees and the table confirms. Only the first `N` positions survive, and the generator puts
 chronic conditions first, so a low cap removes chronic conditions before acute ones; a plan that orders diagnoses differently would truncate differently.
 

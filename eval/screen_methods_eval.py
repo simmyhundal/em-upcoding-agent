@@ -198,10 +198,10 @@ as `flagging.py --method`, `make_v2_runs.run(screens=...)`, the v2.2 workflow ar
 - **Patient-level features add nothing here, by construction.** The justified level depends on the member's chronic-condition count only (age is drawn
   from it; new versus established is not modeled), so `rich_logit` is essentially `riskadj`. On real data richer patient-level adjustment may matter; this
   data cannot show it.
-- **Everything on data 2.0/2.1 is easier than real claims.** Honest providers bill exactly the justified level there. On the one data 2.2
-  dataset (seed 42, honest coding noise) the picture is mixed: `riskadj` and `priority` have all 7 counted upcoders in their top 25 (the last at rank 25) and `eb_ratio`
-  6 of 7 (the same doctor at rank 26), while `eb_ratio` ranks the whole list better (AUPRC 0.75 against 0.46 for `riskadj` and 0.65 for `priority`). One dataset, one doctor: it does not
-  support or reject the choice, it only says the 5-upcoder gain from the 14 older datasets is not guaranteed to carry over.
+- **Everything on data 2.0/2.1 is easier than real claims.** Honest providers bill exactly the justified level there. On the one data 2.2 dataset (seed 42, honest
+  coding noise) the picture is mixed: `riskadj` and `priority` have all 8 upcoders in their top 25, `eb_ratio` 7 of 8, while `eb_ratio` ranks the whole list better
+  (AUPRC 0.78 against 0.47 for `riskadj` and 0.66 for `priority`). One dataset, one doctor: it does not support or reject the choice, it only says the
+  5-upcoder gain from the 14 older datasets is not guaranteed to carry over.
 - **Selection on seen data.** The 14 datasets are all development data now. Picking a method by this table is tuning; the choice is confirmed or
   rejected on the release 2 evaluation's fresh seeds, which have not been generated.
 - **`ensemble` is a rank average that includes the weak `level_z`**, so it is dragged down; it is reported because it was a named candidate, not because it
@@ -225,14 +225,14 @@ def data22_section():
         order = sorted(S[m], key=lambda p: (-S[m][p], p))
         for p in planted:
             full[m][p] = order.index(p) + 1
-    lines = ["| Planted upcoder | Kind | Upcode rate | Counted as upcoder | " + " | ".join(f"`{m}` rank" for m in methods) + " |", "|---|---|---|---|" + "---|" * len(methods)]
-    for p, v in sorted(planted.items(), key=lambda kv: -kv[1]["upcode_rate"]):
-        lines.append(f"| {p} | {'subtle' if v['subtle'] else 'obvious'}, {'cloned' if v['clones_notes'] else 'honest'} notes | {v['upcode_rate']:.1%} "
-                     f"| {'yes' if v['role'] == 'upcoder' else 'no (below the margin)'} | " + " | ".join(str(full[m][p]) for m in methods) + " |")
+    lines = ["| Planted upcoder | Kind | True rate / realised rate | Counted as upcoder | " + " | ".join(f"`{m}` rank" for m in methods) + " |", "|---|---|---|---|" + "---|" * len(methods)]
+    for p, v in sorted(planted.items(), key=lambda kv: -kv[1]["true_upcode_rate"]):
+        lines.append(f"| {p} | {'subtle' if v['subtle'] else 'obvious'}, {'cloned' if v['clones_notes'] else 'honest'} notes | {v['true_upcode_rate']:.1%} / {v['upcode_rate']:.1%} "
+                     f"| {'yes' if v['role'] == 'upcoder' else 'no (below the line)'} | " + " | ".join(str(full[m][p]) for m in methods) + " |")
     return ("\n## Seed 42 on data 2.2 (honest coding noise, issue 74)\n\n"
-            "One development dataset (run `261016_1_code`: 216 doctors, 8 planted upcoders of which %d count under the margin rule; honest baseline upcoding rate %.1f%%, "
-            "margin %.0f points). One draw, so a single doctor moves any count here. Same columns as above.\n\n" % (
-                r["upcoders"], 100 * truth["honest_baseline_upcode_rate"], 100 * truth["upcoder_margin"])
+            "One development dataset (run `261016_1_code`: 216 doctors, 8 planted upcoders of which %d count under the payer-based definition; honest mean true rate %.1f%%, "
+            "95th percentile %.1f%%, margin %.0f points). One draw, so a single doctor moves any count here. Same columns as above.\n\n" % (
+                r["upcoders"], 100 * truth["honest_baseline_true_rate"], 100 * truth["honest_p95_true_rate"], 100 * truth["upcoder_margin"])
             + table([r]) + "\n\nWhere each planted upcoder ranks:\n\n" + "\n".join(lines) + "\n")
 
 
