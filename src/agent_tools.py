@@ -134,7 +134,7 @@ class Environment:
                 "data_without_tests": no_test, "data_without_tests_rate": round(no_test / n, 3) if n else None}
 
     # ---- tools -----------------------------------------------------------
-    def screen_providers(self, method="riskadj", top_n=None, min_score=None, max_flagged=None, min_claims=0):
+    def screen_providers(self, method="riskadj", top_n=None, min_score=None, max_flagged=None, min_claims=0, top_pct=None):
         """Rank providers by a statistical score and choose a cutoff. method: zscore | riskadj | combined."""
         key = {"zscore": ("z", True), "riskadj": ("z_adj", True), "combined": ("mean_rank", False)}.get(method)
         if self.v31 and method == "priority":
@@ -144,6 +144,10 @@ class Environment:
         if not key:
             return {"error": "method must be zscore, riskadj or combined" + (" or priority" if self.v31 else "") + (" or eb_ratio" if self.v32 else "")}
         field, desc = key
+        if top_pct is not None:
+            if not self.v32:
+                return {"error": "top_pct is not available in this version"}
+            top_n = flagging.top_n_from_pct(len(self.rows), float(top_pct))       # payers flag a percentile of the panel
         elig = [r for r in self.rows.values() if int(r["n_claims"]) >= min_claims]
         if self.v32 and field in ("priority", "eb_ratio"):       # version 3.2: the same scores the workflow v2.2 uses, unrounded
             sc = self.scores32[field]
@@ -413,7 +417,8 @@ class Environment:
                           "providers sit at or above several cutoffs. Free and deterministic; call it as often as you like.",
                           "input_schema": {"type": "object", "properties": {"method": {"type": "string", "enum": ["zscore", "riskadj", "combined"] + (["priority"] if self.v31 else []) + (["eb_ratio"] if self.v32 else [])},
                                            "top_n": {"type": "integer"}, "min_score": {"type": "number"}, "max_flagged": {"type": "integer"},
-                                           "min_claims": {"type": "integer"}}}})
+                                           "min_claims": {"type": "integer"},
+                                           **({"top_pct": {"type": "number", "description": "select the top PCT percent of providers instead of top_n (payers flag a percentile, for example 5)"}} if self.v32 else {})}}})
         else:
             tools.append({"name": "list_providers", "description": "List providers with claims counts and 99215 share, 40 per page. No scores.",
                           "input_schema": {"type": "object", "properties": {"page": {"type": "integer"}}}})

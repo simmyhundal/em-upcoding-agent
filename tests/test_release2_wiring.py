@@ -45,6 +45,18 @@ def test_flagging_cli_writes_the_method_columns():
     assert rows[0]["screen_method"] == "eb_ratio" and sum(r["flagged"] == "True" for r in rows) == 25
 
 
+def test_percentile_cutoff_in_flagging_and_the_agent_screen():
+    n = len(flagging.flag(VIEW, 25))
+    k = flagging.top_n_from_pct(n, 5)
+    assert k == -(-n * 5 // 100) and flagging.top_n_from_pct(7, 5) == 1
+    rows = flagging.flag(VIEW, 25, method="eb_ratio", top_pct=5)
+    assert sum(r["flagged"] for r in rows) == k
+    e32, e31 = at.Environment(D, VIEW, version="3.2"), at.Environment(D, VIEW, version="3.1")
+    out = e32.screen_providers(method="eb_ratio", top_pct=5)
+    assert out["selected"] == k and [r[0] for r in out["table"]["rows"]] == [r["provider_id"] for r in sorted(rows, key=lambda r: r["rank"])][:k]
+    assert "error" in e31.screen_providers(method="riskadj", top_pct=5)
+
+
 def test_agent_screen_tool_offers_the_new_scores_only_in_v32():
     e31, e32 = at.Environment(D, VIEW, version="3.1"), at.Environment(D, VIEW, version="3.2")
     assert "error" in e31.screen_providers(method="eb_ratio")

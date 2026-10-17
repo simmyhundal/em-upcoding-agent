@@ -25,9 +25,17 @@ import baseline_zscore as bz
 SCREEN_METHODS = ("riskadj", "eb_ratio", "priority")
 
 
-def flag(data_dir, top_n=25, min_suspicion=None, max_flagged=None, min_claims=0, method="riskadj"):
+def top_n_from_pct(n_providers, pct):
+    """Number of providers in the top `pct` percent of a panel (rounded up, at least 1): payers flag by percentile, not by a fixed count."""
+    import math
+    return max(1, math.ceil(n_providers * pct / 100.0))
+
+
+def flag(data_dir, top_n=25, min_suspicion=None, max_flagged=None, min_claims=0, method="riskadj", top_pct=None):
     """method "riskadj" (default) is the frozen screen of v2.0 to v3.1: combined rank, or a suspicion threshold. "eb_ratio" and "priority" (release 2,
     src/screen_methods.py) rank by their own score and flag the top N; they have no suspicion threshold. Rows gain screen_method and screen_score."""
+    if top_pct is not None:                            # a percentile cutoff replaces the fixed count (release 2; the frozen default stays top 25)
+        top_n = top_n_from_pct(len(bz.rank(data_dir, 1)[0]), top_pct)
     if method != "riskadj":
         return _flag_by_method(data_dir, method, top_n, min_suspicion, max_flagged, min_claims)
     z_rows, _, _ = bz.rank(data_dir, top_n)
@@ -107,13 +115,14 @@ if __name__ == "__main__":
     ap.add_argument("--min-suspicion", type=float, help="flag every provider at or above this suspicion score instead of a top N")
     ap.add_argument("--max-flagged", type=int, help="with --min-suspicion: keep at most this many (highest scores)")
     ap.add_argument("--min-claims", type=int, default=0, help="with --min-suspicion: ignore providers with fewer claims")
+    ap.add_argument("--top-pct", type=float, help="flag the top PCT percent of providers (rounded up) instead of --top-n, e.g. 5")
     ap.add_argument("--method", default="riskadj", choices=list(SCREEN_METHODS),
                     help="screen score: riskadj (frozen default), or the release 2 candidates eb_ratio and priority (top N only)")
     ap.add_argument("--preflight", metavar="V2_DIR", help="workflow v2.2: run the data-quality pre-flight on the plan tables in V2_DIR first, write "
                     "data_quality.json next to OUT_CSV, add a data_quality column, and stop on a block")
     ap.add_argument("--continue-on-block", action="store_true", help="with --preflight: carry on even if the pre-flight blocks")
     a = ap.parse_args()
-    rows = flag(a.data_dir, a.top_n, a.min_suspicion, a.max_flagged, a.min_claims, a.method)
+    rows = flag(a.data_dir, a.top_n, a.min_suspicion, a.max_flagged, a.min_claims, a.method, a.top_pct)
     cols = COLUMNS + (["screen_method", "screen_score"] if a.method != "riskadj" else [])
     os.makedirs(os.path.dirname(os.path.abspath(a.out_csv)), exist_ok=True)
     if a.preflight:

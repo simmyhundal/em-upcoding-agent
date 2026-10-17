@@ -8,7 +8,7 @@ Status: **proposal, nothing run.** No paid run starts, and no seed above 1414 is
 ## What is wired (all free, tested offline)
 | Piece | Workflow v2.2 | Agent v3.2 |
 |---|---|---|
-| Screen | `flagging.py --method eb_ratio` or `priority` (top 25); `make_v2_runs.run(screens=("eb_ratio", "priority"))` writes `flagged_<method>.csv`; arms send records to that list | `screen_providers(method="eb_ratio")` and `method="priority"` (unrounded, the same scores), `riskadj` still the default |
+| Screen | `flagging.py --method eb_ratio` or `priority` with `--top-n` or `--top-pct 5`; `make_v2_runs.run(screens=("eb_ratio", "priority"))` writes `flagged_<method>.csv` (top 25) and `flagged_<method>_top5pct.csv`; arms send records to the chosen list | `screen_providers(method="eb_ratio")` and `method="priority"` (unrounded, the same scores), optional `top_pct`, `riskadj` still the default |
 | Office and summaries | office 2.1, the fixed v2.1 policy, v2.1 summaries (unchanged) | office 2.1, note tools, lint (unchanged) |
 | Data quality | pre-flight, the data caveat on affected summaries, an upcoding leaning without 8 charts becomes inconclusive (`ai.run(preflight=True)`) | `data_quality`, `flag_data_issue`, hold in `submit_findings` |
 
@@ -42,7 +42,7 @@ honest doctors in the top 25 (hard negatives and ordinary separately), AUPRC, pr
 release-1 data. The 14 release-1 datasets are development data now; only the fresh seeds can confirm a choice.
 
 ## Decision rules (proposed, to be fixed on the issue before any run)
-1. **Screen:** adopt a candidate as the default screen if, over the 10 clean fresh seeds, its paired difference in upcoders found in the top 25 against `riskadj` has a 95% interval above zero **and** it puts no more honest doctors in the top 25 in total. If both candidates qualify, take the one with the higher AUPRC; if neither qualifies, `riskadj` stays.
+1. **Screen:** flag a percentile of the panel, as payers do, not a fixed count. The cutoff is the **top 5%** of providers by the score (11 of 216 doctors, 30 of 600), with the top 10% and the old top 25 reported beside it. Adopt a candidate as the default screen if, over the 10 clean fresh seeds, its paired difference in upcoders found in the top 5% against `riskadj` has a 95% interval above zero **and** it flags no more honest doctors in total. If both candidates qualify, take the one with the higher AUPRC; if neither qualifies, `riskadj` stays.
 2. **Streams:** compare W2.2 against W2.1 and A3.2 against A3.1 on upcoders found and honest doctors accused, paired by seed, with the same 95% intervals as #61; report records burden (honest practices asked, request rounds) next to it. No claim of improvement from a single seed or a one-doctor gap.
 3. **Defects:** on defect twins report, per arm, upcoders found, honest doctors accused, and findings held by the data-quality hold; the question is whether held findings protect against false accusations without losing upcoders, so the loss must be shown, not assumed.
 4. **Honesty:** results state what is easier by construction (billed level depends on patient complexity; the answer-key labels come from the generator) and what only a few seeds show. The upcoder definition ([data_v2_2.md](data_v2_2.md#a-proposed-upcoder-definition-not-built-awaiting-simmys-decision)) must be settled before any seed is generated.

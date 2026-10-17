@@ -60,7 +60,7 @@ def _write_csv(path, rows, cols):
 # plausibility and for keeping honest noise below the upcoder margin (docs/data_v2_2.md). Frozen data versions never read these.
 V22_DEFAULTS = {"honest_miscode_rate": 0.08, "honest_up_share": 0.5, "honest_miscode_spread": 0.4, "honest_miscode_max": 0.12,
                 "upcoder_fraction": g1.UPCODER_FRACTION, "subtle_upcoder_share": 0.25, "subtle_upcoder_fraction": (0.08, 0.12),
-                "upcoder_margin": 0.06, "group_billing": True, "rendering_omitted_share": 0.3,
+                "upcoder_margin": 0.06, "upcoder_definition": "payer", "group_billing": True, "rendering_omitted_share": 0.3,
                 "dx_cap": 0, "dx_cap_months": tuple(range(1, 13)),
                 "correction_level_change_share": 0.25, "correction_up_share": 0.4,
                 "defect_duplicate_share": 0.0, "defect_orphan_share": 0.0, "defect_unknown_member_share": 0.0, "defect_no_rendering_share": 0.0,
@@ -348,9 +348,20 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
         for P in provs:
             P["up_rate"], P["down_rate"] = P["n_up_visits"] / P["volume"], P["n_down_visits"] / P["volume"]
             P["planted"] = P["role"]
-            # role by the stated definition: upcoding rate above the honest baseline by at least the margin (issue 74)
-            P["role"] = "upcoder" if P["up_rate"] - baseline >= cfg["upcoder_margin"] else ("hard_negative" if P["planted"] == "hard_negative" else "normal")
-        v22_key = {"honest_baseline_upcode_rate": round(baseline, 4), "upcoder_margin": cfg["upcoder_margin"],
+        honest_rates = [P["up_rate"] for P in provs if P["planted"] != "upcoder"]
+        p95 = float(np.percentile(honest_rates, 95)) if honest_rates else 0.0
+        if cfg["upcoder_definition"] not in ("payer", "margin"):
+            raise ValueError("upcoder_definition must be payer or margin")
+        for P in provs:
+            # role by the stated definition (issue 74, docs/data_v2_2.md). margin: upcoding rate above the honest baseline by at least the margin.
+            # payer: that AND above the 95th percentile of the honest providers' rates (a peer-percentile outlier a payer's screen would call, confirmed as
+            # material by a sample review).
+            P["above_margin"] = P["up_rate"] - baseline >= cfg["upcoder_margin"]
+            P["above_p95"] = P["up_rate"] > p95
+            is_up = P["above_margin"] and (P["above_p95"] or cfg["upcoder_definition"] == "margin")
+            P["role"] = "upcoder" if is_up else ("hard_negative" if P["planted"] == "hard_negative" else "normal")
+        v22_key = {"honest_baseline_upcode_rate": round(baseline, 4), "honest_p95_upcode_rate": round(p95, 4), "upcoder_margin": cfg["upcoder_margin"],
+                   "upcoder_definition": cfg["upcoder_definition"],
                    "defects": {**({"dx_truncation": {"cap": cfg["dx_cap"], "months": list(cfg["dx_cap_months"]), "claims_shortened": dx_cut}}
                                   if cfg["dx_cap"] else {}), **defect_rec,
                                **({"control_totals": {"file": "control_totals.csv", "months": len(ctotals)}} if ctotals is not None else {})},
@@ -364,6 +375,8 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
                                             "clones_notes": P["clones"],
                                             **({"planted": P["planted"], "subtle": P["subtle"], "honest_miscode_rate": round(P["miscode"], 4),
                                                 "upcode_rate": round(P["up_rate"], 4), "downcode_rate": round(P["down_rate"], 4),
+                                                "above_margin": bool(P["above_margin"]), "above_p95": bool(P["above_p95"]),
+                                                "planted_below_line": bool(P["planted"] == "upcoder" and P["role"] != "upcoder"),
                                                 "corrections": P["n_corrections"], "corrections_up": P["n_corr_up"], "corrections_down": P["n_corr_down"]} if v22_on else {}),
                                             **({"uses_template": bool(ng.prov.get(P["npi"], {}).get("template"))} if ng is not None else {})}
                                    for P in provs},
@@ -390,6 +403,7 @@ if __name__ == "__main__":
     g.add_argument("--upcoder-fraction", type=float, nargs=2, metavar=("LO", "HI"), help="range of visits an upcoder bills one level up")
     g.add_argument("--subtle-upcoder-share", type=float, help="share of upcoders drawn from the subtle range instead")
     g.add_argument("--subtle-upcoder-fraction", type=float, nargs=2, metavar=("LO", "HI"), help="the subtle range")
+    g.add_argument("--upcoder-definition", choices=["payer", "margin"], help="payer (default): above the honest 95th percentile AND at least the margin above the honest mean; margin: the second test alone")
     g.add_argument("--upcoder-margin", type=float, help="an upcoder's upcoding rate exceeds the honest baseline by at least this")
     g.add_argument("--dx-cap", type=int, help="keep only the first N diagnosis positions in the delivered extract (the claim had more); 0 = off")
     g.add_argument("--dx-cap-months", type=int, nargs="+", help="service months (1 to 12) the cap applies to; default all")

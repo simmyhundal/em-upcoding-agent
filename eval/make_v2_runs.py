@@ -61,6 +61,7 @@ def run(spec, data_version="2.0", screens=(), **v22):
                     "--max-flagged", str(MAX_FLAGGED)], check=True, capture_output=True)
     for m in screens:                                  # release 2 candidates: the top 25 by that score, flagged_<method>.csv
         subprocess.run([py, flag, view, os.path.join(out, f"flagged_{m}.csv"), "--method", m], check=True, capture_output=True)
+        subprocess.run([py, flag, view, os.path.join(out, f"flagged_{m}_top5pct.csv"), "--method", m, "--top-pct", "5"], check=True, capture_output=True)
     docs, st = records.run_requests(data, view, os.path.join(out, "flagged_threshold.csv"), seed=seed)
     for name in ("documentation.csv", "records_requests.csv"):
         open(os.path.join(out, name), "w").write(open(os.path.join(view, name)).read())

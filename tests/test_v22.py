@@ -47,7 +47,7 @@ def test_options_are_refused_on_frozen_versions():
 
 
 def test_noise_bills_honest_visits_off_level_and_roles_follow_the_margin():
-    out, key = build("2.2", seed=6, honest_miscode_rate=0.12, subtle_upcoder_share=0.5)
+    out, key = build("2.2", seed=6, honest_miscode_rate=0.12, subtle_upcoder_share=0.5, upcoder_definition="margin")
     P = key["providers"]
     honest = [v for v in P.values() if v["planted"] != "upcoder"]
     assert sum(v["upcode_rate"] for v in honest) / len(honest) > 0.02 and sum(v["downcode_rate"] for v in honest) / len(honest) > 0.02
@@ -55,6 +55,27 @@ def test_noise_bills_honest_visits_off_level_and_roles_follow_the_margin():
     for v in P.values():
         assert (v["role"] == "upcoder") == (v["upcode_rate"] - base >= margin), v
     assert all("planted" in v and "honest_miscode_rate" in v for v in P.values())
+
+
+def test_payer_definition_needs_both_the_percentile_and_the_margin():
+    out, key = build("2.2", seed=6, honest_miscode_rate=0.12, subtle_upcoder_share=0.5)
+    P, base, p95, margin = key["providers"], key["honest_baseline_upcode_rate"], key["honest_p95_upcode_rate"], key["upcoder_margin"]
+    assert key["upcoder_definition"] == "payer"
+    honest = sorted(v["upcode_rate"] for v in P.values() if v["planted"] != "upcoder")
+    assert abs(p95 - honest[int(0.95 * (len(honest) - 1))]) < 0.05                    # the 95th percentile of the honest rates (interpolated)
+    for v in P.values():
+        assert (v["role"] == "upcoder") == (v["upcode_rate"] - base >= margin and v["upcode_rate"] > p95), v
+        assert v["above_p95"] == (v["upcode_rate"] > p95) and v["planted_below_line"] == (v["planted"] == "upcoder" and v["role"] != "upcoder")
+    # the margin-only definition labels a superset
+    _, k2 = build("2.2", seed=6, honest_miscode_rate=0.12, subtle_upcoder_share=0.5, upcoder_definition="margin")
+    up1 = {p for p, v in P.items() if v["role"] == "upcoder"}
+    up2 = {p for p, v in k2["providers"].items() if v["role"] == "upcoder"}
+    assert up1 <= up2
+    try:
+        build("2.2", upcoder_definition="nope")
+    except ValueError:
+        return
+    raise AssertionError("unknown definition accepted")
 
 
 def test_frozen_keys_carry_no_data_22_fields():

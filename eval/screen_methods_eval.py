@@ -143,6 +143,26 @@ def capacity_table(results, methods=("riskadj", "priority", "eb_ratio"), ks=(25,
     return "\n".join(lines)
 
 
+def percent_table(results, methods=("zscore", "riskadj", "priority", "eb_ratio"), pcts=(5, 10)):
+    """Payers flag a percentile of the panel, not a fixed count (CMS comparative billing reports, the OIG's top 1%). Upcoders reached when the top PCT
+    percent of providers (rounded up) is flagged, and the honest providers that costs. A fixed 25 is 11.6% of 216 doctors and 4.2% of 600."""
+    import math
+    n_up = sum(r["upcoders"] for r in results)
+    lines = ["| Method | " + " | ".join(f"top {p}%: upcoders found / honest flagged" for p in pcts) + " |", "|---|" + "---|" * len(pcts)]
+    for m in methods:
+        cells = []
+        for p in pcts:
+            found = flagged = 0
+            for r in results:
+                k = max(1, math.ceil(r["providers"] * p / 100))
+                found += sum(1 for rk in r["methods"][m]["ranks"].values() if rk <= k)
+                flagged += k
+            cells.append(f"{found} of {n_up} / {flagged - found:,}")
+        lines.append(f"| `{m}` | " + " | ".join(cells) + " |")
+    ks = sorted({math.ceil(r["providers"] * pcts[0] / 100) for r in results})
+    return "\n".join(lines) + f"\n\nThe top {pcts[0]}% is {', '.join(map(str, ks))} providers on these panels (216 and 600 doctors); the top {pcts[1]}% is double that."
+
+
 def choice(results):
     """The selection rule, fixed before looking at the table: most upcoders in the top 25 across the 14 datasets among methods whose
     honest doctors in the top 25 (hard negatives plus ordinary) do not exceed `riskadj`'s. Ties go to the simpler method."""
@@ -236,7 +256,8 @@ def report(results, extra=CAVEATS):
             "## Per dataset (selected methods)\n\n" + per_dataset(results) + "\n\n"
             "Paired by dataset, `eb_ratio` finds more upcoders in the top 25 than `riskadj` on %d datasets, the same on %d and fewer on %d; "
             "`priority` against `riskadj`: %d, %d, %d.\n\n" % (paired(results, "eb_ratio", "riskadj") + paired(results, "priority", "riskadj"))
-            + "## A longer list (600-doctor datasets, 21 upcoders)\n\n" + capacity_table([r for r in results if r["providers"] > 300]) + "\n\n"
+            + "## Flagging a percentile of the panel (how payers do it)\n\n" + percent_table(results) + "\n\n"
+            "## A longer list (600-doctor datasets, 21 upcoders)\n\n" + capacity_table([r for r in results if r["providers"] > 300]) + "\n\n"
             "## All 14 datasets, a longer list (109 upcoders)\n\n" + capacity_table(results) + "\n\n"
             "## Choice (rule stated after a first look at the table, so not blind)\n\n"
             "The rule (written down here after I had seen the ten-method table once, so it is not a blind pre-registration): most upcoders in the top 25 over the 14 datasets, among methods that put no more honest doctors in the top 25 than `riskadj` "
