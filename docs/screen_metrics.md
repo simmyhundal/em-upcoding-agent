@@ -36,7 +36,7 @@ Positives are planted upcoders; hard-negative and normal providers are negatives
 
 ## How to read this
 
-- Precision at 25 is capped by the number of upcoders: with 8 upcoders in 216 doctors the best possible is 8/25 = 0.32, and with 3 upcoders it is 0.12. Precision at 10 is capped at 0.8 for 8 upcoders and 0.3 for 3. Read these against the cap, not against 1.0. Recall in the top 25 per screen method is reported under issue 88.
+- Precision at 25 is capped by the number of upcoders: with 8 upcoders in 216 doctors the best possible is 8/25 = 0.32, and with 3 upcoders it is 0.12. Precision at 10 is capped at 0.8 for 8 upcoders and 0.3 for 3. Read these against the cap, not against 1.0. Recall in the top 25 per screen method is in [screen_methods.md](screen_methods.md).
 - These datasets are all development data now (release 1 evaluated on them), and the screen was never tuned on them, but they are not fresh seeds.
 - In this synthetic data the billed level depends on patient complexity by construction, which flatters risk adjustment, and honest providers bill exactly the justified level (data 2.0 and 2.1), so every score here is easier than real claims. Issue 74 (data 2.2) adds honest coding noise.
 - One draw per dataset, 3 to 12 upcoders each: a difference of one doctor moves precision at 10 by 0.1. The low-rate rows (600 doctors) are single datasets.
