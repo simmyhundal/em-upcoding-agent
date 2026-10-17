@@ -46,3 +46,14 @@ Free to try: 1 and 2 on the development seeds (42 and the defect twin), counting
 The four are the three honest-notes upcoders reached by charts (1000000143, 1000000215, 1000000088) and the one cloned-notes upcoder reached by the note rule (1000000095). The other two upcoders in the list are cloned-notes upcoders whose charts support the billed level (45 charts, 5% below) or never came back; no chart rule can reach them. That is the cloned-notes problem (#57), not this one. The sixth and eighth upcoders sit outside the top 5%.
 
 **Honest limits.** The cap was chosen after seeing the failure on this one seed, but it reuses an existing constant instead of a new tuned number; one dataset and three chart-detected upcoders cannot prove it generalizes, and the fresh seeds are where that gets tested. The seed 1515 smoke result (`r2w_1515`, 1 found) was produced with the old rules and is superseded; it is not rerun with them, so no evaluation seed informed this change. Even so, the chart evidence is weak (6 of 9 against honest providers at 15%), so a false accusation among high-share honest doctors is possible; seed 42's list has none.
+
+## First evaluation-style seed with the final rules (seed 1515; issue 98; run 2026-10-17)
+
+Both arms on the final code (commit 3b38d9e), eb_ratio top 5%. Seed 1515 was not used to choose the cap.
+
+| Arm | Cost | Upcoders found (of 7 counted) | Honest doctors called |
+|---|---|---|---|
+| Workflow v2.2 (`r2w_1515`) | $0.00 | 1 | 1 |
+| Agent v3.2, Opus medium (`r2a_1515`) | $0.353 | 1 | 1 |
+
+What limited recall: the top-5% list holds 3 of the 7 upcoders; of those, two (1000000135 and 1000000188) came back with too few records to judge, and the third (1000000138) was found through its notes. What limited precision: the one honest doctor both arms called (1000000213) has 4 of 6 documented 99215 charts below the billed level (67%), a chance cluster that the capped baseline (15%) cannot tell from an upcoder. The old baseline would not have called it. This is the price of the cap, seen on the first seed that did not help choose it: seed 42 gained three true calls and no false one; seed 1515 gained no true call and one false one. The honest summary of the rule so far is **real but unproven, with a false-accusation risk that is concentrated where few 99215 charts come back**. Raising the minimum number of documented 99215 charts above 6 would exclude this case, but choosing it now would be tuning on an evaluation seed; if wanted, it is a decision for before the next batch, taken on the development data only.

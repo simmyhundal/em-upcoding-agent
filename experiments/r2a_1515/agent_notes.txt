@@ -1,1 +1,9 @@
-Follow up on the deficient responses.
+I'll start by running the data-quality pre-flight and the requested screen side by side.
+
+The data checks came back clean: no truncation and no provider flags. Next I'll compare all 11 screened providers against their peers by patient complexity.
+
+Next I'm chasing the 12 missing visits from 1000000140 so its sample stays random, and running hybrid review on the six practices whose samples are complete.
+
+213 sent its targeted 99215 charts. I'll re-review it and request the EHR audit trail for 138's flagged notes.
+
+I'm closing the three requests that never produced charts. Non-response isn't evidence of upcoding, so those providers will be marked inconclusive.

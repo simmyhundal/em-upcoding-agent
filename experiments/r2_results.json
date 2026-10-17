@@ -5,8 +5,8 @@
    "run": "r2w_1515",
    "upcoders_found": 1,
    "upcoders": 7,
-   "honest_accused": 0,
-   "called": 1,
+   "honest_accused": 1,
+   "called": 2,
    "cost_usd": 0.0
   },
   "agent": {
@@ -15,7 +15,7 @@
    "upcoders": 7,
    "honest_accused": 1,
    "called": 2,
-   "cost_usd": 0.3778,
+   "cost_usd": 0.3534,
    "effort": "medium",
    "model": "claude-opus-5-5"
   }

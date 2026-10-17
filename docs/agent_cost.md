@@ -96,3 +96,15 @@ Total spent: $0.66 of the $1 approved. Rule from section 7: adopt a cheaper sett
 - **Opus 5.5 at low effort passes this one-seed check:** same 3 upcoders, no false accusation, 44% of the control's cost, half the tool calls. It is not confirmed: one draw, 3 of 8 found in both runs, and the agents are not deterministic.
 - **The agent found 3 of 8 here, against 7 and 8 of 8 in the top 25 by `riskadj` and `priority` on the same data (`docs/screen_methods.md`).** Its records budget and its own cutoff, not the screen, limit it.
 - The first-run price check: cost uses 5% of input for cache reads; compare `turn_usage.jsonl` with the billed total before trusting the third decimal.
+
+
+## 9. Second development dataset: Opus low against medium (issue 97; run 2026-10-17)
+
+Seed 42, data 2.2, **nobody clones notes** (`261017_4_code`; the only development seed with a different upcoder mix), final rules (capped peer rate, commit 3b38d9e), the starting screen named in the task (`--screen-method eb_ratio --top-pct 5`). One draw each.
+
+| Run | Model, effort | Cost | Tool calls | Upcoders found (of 8) | Honest doctors called | Honest practices asked |
+|---|---|---|---|---|---|---|
+| `261017_5_api` | Opus 5.5, medium | $0.291 | 42 | 3 | 0 | 6 |
+| `261017_6_api` | Opus 5.5, **low** | $0.213 | 27 | 3 | 0 | 6 |
+
+Decision rule fixed on #97 before the run: adopt low effort only if it finds at least as many upcoders as medium with no more honest doctors called, and it did on seed 42. **Met on both development datasets** (3 of 8 against 3 of 8 each time, no honest doctor called). Cost: low is 44% of medium on the first dataset ($0.177 against $0.398) and 73% on the second ($0.213 against $0.291), about 57% on average, so an agent arm is about $0.20 rather than $0.34. Two draws on the one development seed can reject a setting but still cannot confirm one: the evaluation reports the effort setting beside every result, and the agent in release 2 is "Opus 5.5 at low effort", not the v3.0 and v3.1 agent. Total spent on issue 97: $0.50.
