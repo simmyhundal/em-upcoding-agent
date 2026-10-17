@@ -53,7 +53,9 @@ class Environment:
         self.dq, self.data_issues, self.held = None, [], set()
         if self.v32:                                    # version 3.2: the data-quality pre-flight runs once per load (issue 81)
             import data_quality
+            import screen_methods
             self.dq = data_quality.run_checks(v2_dir)
+            self.scores32 = screen_methods.score_core(view_dir)       # eb_ratio and priority, the release 2 candidates (docs/screen_methods.md)
         self.note_rows = {}
         self.screen_candidates, self.set_aside, self.tool_calls = set(), {}, []
         self.view_dir, self.model_call, self.records_budget, self.screen_enabled = view_dir, model_call, records_budget, screen_enabled
@@ -137,15 +139,20 @@ class Environment:
         key = {"zscore": ("z", True), "riskadj": ("z_adj", True), "combined": ("mean_rank", False)}.get(method)
         if self.v31 and method == "priority":
             key = ("priority", True)
+        if self.v32 and method == "eb_ratio":
+            key = ("eb_ratio", True)
         if not key:
-            return {"error": "method must be zscore, riskadj or combined" + (" or priority" if self.v31 else "")}
+            return {"error": "method must be zscore, riskadj or combined" + (" or priority" if self.v31 else "") + (" or eb_ratio" if self.v32 else "")}
         field, desc = key
         elig = [r for r in self.rows.values() if int(r["n_claims"]) >= min_claims]
-        if field == "priority":
+        if self.v32 and field in ("priority", "eb_ratio"):       # version 3.2: the same scores the workflow v2.2 uses, unrounded
+            sc = self.scores32[field]
+            elig.sort(key=lambda r: (-sc[r["provider_id"]], r["provider_id"]))
+        elif field == "priority":
             elig.sort(key=lambda r: (-self.stats[r["provider_id"]]["priority"], r["provider_id"]))
         else:
             elig.sort(key=lambda r: (-float(r[field]) if desc else float(r[field]), r["provider_id"]))
-        if min_score is not None and method not in ("combined", "priority"):
+        if min_score is not None and method not in ("combined", "priority", "eb_ratio"):
             sel = [r for r in elig if float(r[field]) >= min_score]
         else:
             sel = elig[: int(top_n or 25)]
@@ -404,7 +411,7 @@ class Environment:
                           "Rank every provider by a statistical score and pick a cutoff. method zscore|riskadj|combined; select top_n or min_score "
                           "(riskadj/zscore); optional max_flagged and min_claims. Returns a ranked table, the score distribution and how many "
                           "providers sit at or above several cutoffs. Free and deterministic; call it as often as you like.",
-                          "input_schema": {"type": "object", "properties": {"method": {"type": "string", "enum": ["zscore", "riskadj", "combined"] + (["priority"] if self.v31 else [])},
+                          "input_schema": {"type": "object", "properties": {"method": {"type": "string", "enum": ["zscore", "riskadj", "combined"] + (["priority"] if self.v31 else []) + (["eb_ratio"] if self.v32 else [])},
                                            "top_n": {"type": "integer"}, "min_score": {"type": "number"}, "max_flagged": {"type": "integer"},
                                            "min_claims": {"type": "integer"}}}})
         else:

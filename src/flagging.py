@@ -22,7 +22,14 @@ import baseline_riskadj as ra
 import baseline_zscore as bz
 
 
-def flag(data_dir, top_n=25, min_suspicion=None, max_flagged=None, min_claims=0):
+SCREEN_METHODS = ("riskadj", "eb_ratio", "priority")
+
+
+def flag(data_dir, top_n=25, min_suspicion=None, max_flagged=None, min_claims=0, method="riskadj"):
+    """method "riskadj" (default) is the frozen screen of v2.0 to v3.1: combined rank, or a suspicion threshold. "eb_ratio" and "priority" (release 2,
+    src/screen_methods.py) rank by their own score and flag the top N; they have no suspicion threshold. Rows gain screen_method and screen_score."""
+    if method != "riskadj":
+        return _flag_by_method(data_dir, method, top_n, min_suspicion, max_flagged, min_claims)
     z_rows, _, _ = bz.rank(data_dir, top_n)
     r_rows, _, _ = ra.rank(data_dir, top_n)
     z = {r["provider_id"]: r for r in z_rows}
@@ -71,6 +78,24 @@ def add_preflight(rows, report):
     return rows
 
 
+def _flag_by_method(data_dir, method, top_n, min_suspicion, max_flagged, min_claims):
+    if method not in SCREEN_METHODS:
+        raise ValueError(f"method must be one of {SCREEN_METHODS}")
+    if min_suspicion is not None:
+        raise ValueError("a suspicion threshold is defined only for the riskadj score; use top_n with eb_ratio or priority")
+    import screen_methods as sm
+    rows = flag(data_dir, top_n)
+    score = sm.score_core(data_dir)[method]
+    rows.sort(key=lambda r: (-score[r["provider_id"]], r["provider_id"]))
+    eligible = [r for r in rows if r["n_claims"] >= min_claims][:int(max_flagged or top_n)]
+    chosen = {r["provider_id"] for r in eligible}
+    for i, r in enumerate(rows, 1):
+        r["rank"], r["flagged"] = i, r["provider_id"] in chosen
+        r["flagged_by"] = method if r["flagged"] else ""
+        r["screen_method"], r["screen_score"] = method, round(float(score[r["provider_id"]]), 5)
+    return rows
+
+
 COLUMNS = ["rank", "provider_id", "n_claims", "share_99215", "expected_share", "z", "z_adj", "suspicion",
            "rank_zscore", "rank_riskadj", "mean_rank", "flagged_zscore", "flagged_riskadj", "flagged", "flagged_by"]
 
@@ -82,12 +107,14 @@ if __name__ == "__main__":
     ap.add_argument("--min-suspicion", type=float, help="flag every provider at or above this suspicion score instead of a top N")
     ap.add_argument("--max-flagged", type=int, help="with --min-suspicion: keep at most this many (highest scores)")
     ap.add_argument("--min-claims", type=int, default=0, help="with --min-suspicion: ignore providers with fewer claims")
+    ap.add_argument("--method", default="riskadj", choices=list(SCREEN_METHODS),
+                    help="screen score: riskadj (frozen default), or the release 2 candidates eb_ratio and priority (top N only)")
     ap.add_argument("--preflight", metavar="V2_DIR", help="workflow v2.2: run the data-quality pre-flight on the plan tables in V2_DIR first, write "
                     "data_quality.json next to OUT_CSV, add a data_quality column, and stop on a block")
     ap.add_argument("--continue-on-block", action="store_true", help="with --preflight: carry on even if the pre-flight blocks")
     a = ap.parse_args()
-    rows = flag(a.data_dir, a.top_n, a.min_suspicion, a.max_flagged, a.min_claims)
-    cols = COLUMNS
+    rows = flag(a.data_dir, a.top_n, a.min_suspicion, a.max_flagged, a.min_claims, a.method)
+    cols = COLUMNS + (["screen_method", "screen_score"] if a.method != "riskadj" else [])
     os.makedirs(os.path.dirname(os.path.abspath(a.out_csv)), exist_ok=True)
     if a.preflight:
         import data_quality as dq
@@ -98,7 +125,7 @@ if __name__ == "__main__":
         if report["status"] == "block" and not a.continue_on_block:
             raise SystemExit("pre-flight blocked the run (rerun with --continue-on-block to override)")
         rows = add_preflight(rows, report)
-        cols = COLUMNS + ["data_quality"]
+        cols = cols + ["data_quality"]
     with open(a.out_csv, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=cols)
         w.writeheader()

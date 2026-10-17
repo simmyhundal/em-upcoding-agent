@@ -6,6 +6,21 @@ Release 2 pairs data 2.2 with workflow `v2.2` and agent `v3.2` (see [versioning.
 behind its own option of `src/generate_v2.py --data-version 2.2`. Claims, the records universe and the note package of data 2.0 and 2.1 are never changed:
 with every 2.2 option at zero a 2.2 build reproduces the 2.1 files byte for byte (`tests/test_v22.py`).
 
+## Where the defaults come from
+
+The defaults below were first picked on seed 42 for plausibility. A web search for published figures (October 2026) found the following; the first column says what each source can and cannot support.
+
+| Default | What the search found | How far it supports the default |
+|---|---|---|
+| `honest_miscode_rate` 0.08 | HHS OIG, claims for 2010: [42% of Medicare E/M claims were incorrectly coded](https://oig.hhs.gov/reports/all/2014/improper-payments-for-evaluation-and-management-services-cost-medicare-billions-in-2010/) (up and down) and 19% lacked documentation; a [secondary summary](https://www.oalaw.com/2014/05/hhs-oig-2010-medicare-audit-6-7-billion-misspent-for-evaluation-and-management-services/) says far more were upcoded than downcoded. CMS CERT puts established office visits at a payment-error rate of about 6 to 7% ([secondary source](https://medlearn.com/racmonitor/essential-information-to-protect-your-facility-from-auditors/); dollar-based and counts documentation errors). Observed family-practice visits matched the physician's code only [52 to 55% of the time](https://www.aafp.org/pubs/fpm/issues/2005/0600/p17.html) (Chao 1998, King 2001, as summarized in secondary reports). | Published error rates run from about 7% (payment) to about 45% (audit mismatch), and most of the high figures include a reviewer disagreeing with the coder, which this simulation models separately (`records.CODER_NOISE`, 15% of charts read one level off). 0.08 for the claim itself, plus 0.15 at chart review, lands between the two. It is a judgment, not a measurement. The evaluation should vary it (0.05, 0.08, 0.15) instead of trusting one value. |
+| `honest_up_share` 0.5 | Medicare audits found errors mostly upcoded; primary-care studies of observed visits found them [evenly split or mostly undercoded](https://www.aafp.org/pubs/fpm/issues/2005/0600/p17.html) for established patients (a pediatric study: 44% undercoded, 1% overcoded). | Evidence points both ways; 0.5 is the middle. Vary it (0.3, 0.5, 0.7). |
+| `honest_miscode_spread` 0.4, `honest_miscode_max` 0.12 | None found. OIG did find that [high-coding physicians](https://oig.hhs.gov/reports/all/2012/coding-trends-of-medicare-evaluation-and-management-services) bill high levels consistently, which supports provider-to-provider variation but not its size. | Unsourced. Chosen so honest noise stays below the upcoder margin. |
+| correction share 0.25, up 0.4, group billing, blank rendering 0.3 | None found for the share of corrected claims that change the level, or for how often a single-clinician claim leaves rendering blank. | Unsourced. Treat as structure to test the pipeline, not as realism. |
+| upcoder 15 to 40% of visits, subtle 8 to 12% | No published distribution of upcoding intensity was found. OIG's 2012 study found about 1,700 physicians who consistently billed the highest levels, [without deciding the claims were wrong](https://oig.hhs.gov/reports/all/2012/coding-trends-of-medicare-evaluation-and-management-services). | Unsourced; the 15 to 40% range predates data 2.2. |
+
+Nothing in the search justified changing a default, so none changed. The searches returned secondary summaries more than the CMS and OIG tables themselves; before quoting any
+of these figures outside this repository, check them against the original CMS CERT supplemental tables and OIG reports.
+
 ## Honest coding noise and an upcoder defined as above the honest baseline (issue 74)
 
 Before, honest providers billed exactly the justified level; the only noise was a coder disagreeing when a chart was read. Now every provider, upcoders
@@ -36,6 +51,21 @@ the baseline by at least the margin**; otherwise `hard_negative` (a planted high
   10.1% = baseline 4.1% + margin 6 points); a margin closer to the honest spread would produce such cases.
 - Everything that reads `role` (screen, scoreboard, judges) keeps working; the number of upcoders can now differ from the number planted.
 - Cloned notes still apply to every visit a cloning provider bills above the justified level, including honest slips upward. Small, and only for cloners.
+
+### A proposed upcoder definition (not built; awaiting Simmy's decision)
+
+The definition above labels a provider from its realised rate, so the label depends on sampling luck: in seed 42 one planted upcoder fell under the margin and an honest provider could cross
+it. Proposal for release 2:
+
+1. **An upcoder is a provider that deliberately bills a pattern of visits one level above what the chart supports**: a planted upgrade fraction of at least 5% of eligible visits (the obvious range stays
+   15 to 40%, the subtle range becomes 5 to 12%). The label is fixed when the data is generated, so the count of upcoders is the count planted (8 of 216) on every seed.
+2. **Honest providers keep their own slip rate and are never relabeled.** The top decile of honest slip rates is recorded as `gray_zone` (honest and aggressive but defensible), so false accusations of them are
+   reported on their own line, like hard negatives.
+3. **Materiality is reported, not used to relabel.** The key records each upcoder's realised excess upcoded visits and excess paid dollars, and the evaluation reports found upcoders by tier
+   (subtle under 15%, obvious from 15%) and by dollars, so a missed 5% upcoder is not counted the same as a missed 35% one.
+
+Why: a payer acts on a pattern and its dollars, not on one year's luck; fixed labels make seeds comparable and keep the paired comparison honest. Cost: a planted 5% upcoder can be indistinguishable from an
+honest provider's noise in one year, which is realistic, and the evaluation will show it as a miss rather than hiding it. The margin definition would stay available as `--upcoder-definition margin`.
 
 ### What honest noise does (development seed 42, free, one draw per row)
 
@@ -183,6 +213,17 @@ A graded example, seed 42, data 2.2 with defects (`experiments/261016_2_code`, d
 duplicates 1% (1,190 claims), orphans 30% (737 replacements and 378 voids lose their original), unknown members 0.5% (562 claims), no rendering NPI 3% of
 group-billed claims (2,981), diagnosis cap 3 from July (9,677 claims shortened). It is development data for building and grading the check (issue 81).
 Defects are not part of the default release 2 settings; whether the release 2 evaluation uses them is a decision for the evaluation plan.
+
+## Defect profiles for the evaluation runs with defects
+
+The release 2 evaluation includes runs on data with defects (a plan's extract is never clean). Two named profiles (`--defect-profile`; explicit `--defect-*` options override a profile):
+
+| Profile | Duplicates | Orphan chains | Unknown members | No rendering NPI (group-billed) | Diagnosis cap | Meant to be |
+|---|---|---|---|---|---|---|
+| `moderate` | 0.5% | 10% | 0.3% | 2% | 4, last three months | the ordinary problems a plan finds and fixes; the pre-flight should warn and the screens should still work |
+| `severe` | 1% | 30% | 0.5% | 3% | 3, from July | the graded stress dataset of issue 80; the pre-flight should hold findings |
+
+Defects are about the extract, not the doctors: the answer key's upcoders are unchanged, so a run on a defect profile is paired with the same seed without defects.
 
 ## Not yet built
 

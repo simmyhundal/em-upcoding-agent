@@ -153,6 +153,13 @@ Where each planted upcoder ranks:
 | 1000000161 | obvious, cloned notes | 12.4% | yes | 11 | 6 | 5 |
 | 1000000088 | subtle, honest notes | 9.6% | no (below the margin) | 12 | 8 | 7 |
 
+## Decision
+
+Simmy's call: **`eb_ratio` and `priority` are the release 2 candidates**, for both the workflow and the agent; `riskadj` (frozen) and `zscore` stay as the comparison. They are wired in
+as `flagging.py --method`, `make_v2_runs.run(screens=...)`, the v2.2 workflow arms (`eval/make_v2_office_workflow_runs.py`, screen `eb_ratio` or `priority`, top 25) and the
+`method` option of the v3.2 agent's `screen_providers`. The live runs and the free re-test of these screens against the originals on the same fresh seeds are laid out in
+[release2_plan.md](release2_plan.md).
+
 ## What this does and does not show
 
 - **The target is not met.** The aim of issue 88 is every planted upcoder in the top 25. The best method here still leaves upcoders out on
@@ -172,8 +179,8 @@ Where each planted upcoder ranks:
   from it; new versus established is not modeled), so `rich_logit` is essentially `riskadj`. On real data richer patient-level adjustment may matter; this
   data cannot show it.
 - **Everything on data 2.0/2.1 is easier than real claims.** Honest providers bill exactly the justified level there. On the one data 2.2
-  dataset (seed 42, honest coding noise) the picture is mixed: `riskadj` has all 7 counted upcoders in its top 25 (the last at rank 24) and `eb_ratio`
-  6 of 7 (the same doctor at rank 26), while `eb_ratio` ranks the whole list better (AUPRC 0.75 against 0.46). One dataset, one doctor: it does not
+  dataset (seed 42, honest coding noise) the picture is mixed: `riskadj` and `priority` have all 7 counted upcoders in their top 25 (the last at rank 25) and `eb_ratio`
+  6 of 7 (the same doctor at rank 26), while `eb_ratio` ranks the whole list better (AUPRC 0.75 against 0.46 for `riskadj` and 0.65 for `priority`). One dataset, one doctor: it does not
   support or reject the choice, it only says the 5-upcoder gain from the 14 older datasets is not guaranteed to carry over.
 - **Selection on seen data.** The 14 datasets are all development data now. Picking a method by this table is tuning; the choice is confirmed or
   rejected on the release 2 evaluation's fresh seeds, which have not been generated.

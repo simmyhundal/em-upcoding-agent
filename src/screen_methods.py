@@ -214,6 +214,21 @@ def _rank_avg(*score_dicts):
     return {p: -total[p] / len(score_dicts) for p in pids}
 
 
+CORE = ("riskadj", "priority", "eb_ratio")
+
+
+def score_core(data_dir):
+    """The three scores the release 2 workflow and agent use, without fitting the other candidates (about 3x faster than score_all).
+    Returns {"riskadj", "priority", "eb_ratio": {provider_id: score}, "_expected": {provider_id: expected count}}. Same numbers as score_all."""
+    D = load(data_dir)
+    _, sc = _binary_fit(D, design_count(D["cnt"]))
+    zr = np.array([v["z_raw"] for v in sc.values()])
+    ratio = {pid: (v["n_99215"] / v["expected"]) if v["expected"] else 0.0 for pid, v in sc.items()}
+    excess = {pid: v["n_99215"] - v["expected"] for pid, v in sc.items()}
+    return {"riskadj": dict(zip(sc, _robust(zr).tolist())), "priority": _rank_avg(ratio, excess), "eb_ratio": eb_scores(sc)["eb_ratio"],
+            "_expected": {pid: v["expected"] for pid, v in sc.items()}}
+
+
 def score_all(data_dir):
     """All candidate methods on one dataset directory (the view folder). Returns {method: {provider_id: score}}."""
     import baseline_zscore as bz

@@ -18,6 +18,14 @@ import os
 
 import numpy as np
 
+# Named defect profiles for the release 2 evaluation runs with defects (docs/release2_plan.md). "moderate" is an extract with ordinary problems
+# a plan would find and fix; "severe" is the graded stress dataset of issue 80. Explicit options override a profile.
+DEFECT_PROFILES = {
+    "moderate": {"defect_duplicate_share": 0.005, "defect_orphan_share": 0.10, "defect_unknown_member_share": 0.003,
+                 "defect_no_rendering_share": 0.02, "dx_cap": 4, "dx_cap_months": (10, 11, 12)},
+    "severe": {"defect_duplicate_share": 0.01, "defect_orphan_share": 0.30, "defect_unknown_member_share": 0.005,
+               "defect_no_rendering_share": 0.03, "dx_cap": 3, "dx_cap_months": (7, 8, 9, 10, 11, 12)},
+}
 DEFECT_OPTIONS = ("defect_duplicate_share", "defect_orphan_share", "defect_unknown_member_share", "defect_no_rendering_share")
 
 

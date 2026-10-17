@@ -276,6 +276,25 @@ def hold_decision(report, provider_id, charts_received=0, min_charts=8):
             "caveat": ("Data caveat (low confidence): " + "; ".join(reasons) + ". A person should ask the plan for a full re-extract before relying on the screen score.") if affected else ""}
 
 
+def apply_holds(records, report, charts_by_provider, min_charts=8):
+    """Workflow v2.2: apply the hold policy to checked summaries (a list of {"provider_id", "summary"}). An affected provider's summary gets the data caveat;
+    an upcoding leaning without enough charts becomes inconclusive. Returns (records, held provider ids). The input is not modified."""
+    out, held = [], []
+    for r in records:
+        h = hold_decision(report, r["provider_id"], charts_by_provider.get(r["provider_id"], 0), min_charts)
+        if not h["affected"]:
+            out.append(r)
+            continue
+        s = dict(r["summary"])
+        s["rationale"] = (s["rationale"] + " " + h["caveat"]).strip()
+        if s["leaning"] == "pattern_consistent_with_upcoding" and h["needs_chart_evidence"]:
+            s["leaning"] = "inconclusive"
+            s["headline"] = "Held for a data problem: " + s["headline"]
+            held.append(r["provider_id"])
+        out.append({**r, "summary": s, "data_quality_hold": True})
+    return out, held
+
+
 def write_report(report, out_dir):
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, "data_quality.json")

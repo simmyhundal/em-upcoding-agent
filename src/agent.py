@@ -57,7 +57,11 @@ Version 3.2 additions. A data-quality pre-flight has already checked the deliver
 join, duplicates, broken chains, recent months). Call data_quality early, and again with a provider_id for any provider you examine closely: a flag can mean the
 screen score is unreliable for that provider (for example truncated diagnoses make sicker panels look healthier). You cannot request data from the plan; use
 flag_data_issue to record a concern for a person to raise with it. An upcoding finding for a provider whose findings are held needs chart evidence; otherwise
-mark it inconclusive and say why."""
+mark it inconclusive and say why.
+
+The screen tool has two more ways to order providers. priority ranks by the average of the ratio to expected and the excess 99215 claims. eb_ratio ranks by
+the ratio to expected after shrinking small practices toward 1 (an estimate of how many times the expected 99215 rate the practice really bills), so a small
+practice with a few extra claims does not outrank a large one with a clear excess. Both take a top_n (no score cutoff). riskadj remains the default."""
 
 
 def _cost(usage, price=(4.00, 20.00)):

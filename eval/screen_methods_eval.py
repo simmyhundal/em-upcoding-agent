@@ -153,6 +153,13 @@ def choice(results):
 
 
 CAVEATS = """
+## Decision
+
+Simmy's call: **`eb_ratio` and `priority` are the release 2 candidates**, for both the workflow and the agent; `riskadj` (frozen) and `zscore` stay as the comparison. They are wired in
+as `flagging.py --method`, `make_v2_runs.run(screens=...)`, the v2.2 workflow arms (`eval/make_v2_office_workflow_runs.py`, screen `eb_ratio` or `priority`, top 25) and the
+`method` option of the v3.2 agent's `screen_providers`. The live runs and the free re-test of these screens against the originals on the same fresh seeds are laid out in
+[release2_plan.md](release2_plan.md).
+
 ## What this does and does not show
 
 - **The target is not met.** The aim of issue 88 is every planted upcoder in the top 25. The best method here still leaves upcoders out on

@@ -85,10 +85,13 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
     data_version "2.2" is 2.1 plus honest coding noise and an upcoder defined as above the honest baseline (docs/data_v2_2.md); keyword
     arguments override V22_DEFAULTS. With every noise parameter at zero a 2.2 build reproduces 2.1 claims and records exactly."""
     v22_on = data_version == "2.2"
-    unknown = set(v22) - set(V22_DEFAULTS)
+    unknown = set(v22) - set(V22_DEFAULTS) - {"defect_profile"}
     if unknown or (v22 and not v22_on):
         raise ValueError(f"unknown or data-2.2-only options: {sorted(v22)}")
-    cfg = {**V22_DEFAULTS, **v22}
+    profile = v22.pop("defect_profile", None)
+    if profile is not None and profile not in defects_v22.DEFECT_PROFILES:
+        raise ValueError(f"defect_profile must be one of {sorted(defects_v22.DEFECT_PROFILES)}")
+    cfg = {**V22_DEFAULTS, **(defects_v22.DEFECT_PROFILES[profile] if profile else {}), **v22}
     nrng = np.random.default_rng([seed, 19])      # data 2.2 only: honest coding noise and subtle-upcoder choice; its own stream
     crng = np.random.default_rng([seed, 29])      # data 2.2 only: which replacement claims change the level and in which direction
     orng = np.random.default_rng([seed, 23])      # data 2.2 only: which claims leave the rendering NPI blank; its own stream, so toggling it moves nothing else
@@ -351,7 +354,7 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
                    "defects": {**({"dx_truncation": {"cap": cfg["dx_cap"], "months": list(cfg["dx_cap_months"]), "claims_shortened": dx_cut}}
                                   if cfg["dx_cap"] else {}), **defect_rec,
                                **({"control_totals": {"file": "control_totals.csv", "months": len(ctotals)}} if ctotals is not None else {})},
-                   "noise": {k: cfg[k] for k in ("honest_miscode_rate", "honest_up_share", "honest_miscode_spread", "honest_miscode_max",
+                   "defect_profile": profile, "noise": {k: cfg[k] for k in ("honest_miscode_rate", "honest_up_share", "honest_miscode_spread", "honest_miscode_max",
                                                  "subtle_upcoder_share")}}
     with open(answer_key_path, "w") as f:
         json.dump({"seed": seed, "clone_share": clone_share, "data_version": data_version, **v22_key,
@@ -392,6 +395,7 @@ if __name__ == "__main__":
     g.add_argument("--dx-cap-months", type=int, nargs="+", help="service months (1 to 12) the cap applies to; default all")
     g.add_argument("--correction-level-change-share", type=float, help="share of replacement (corrected) claims that change the E/M level by one")
     g.add_argument("--correction-up-share", type=float, help="share of level-changing corrections that go up (the rest go down)")
+    g.add_argument("--defect-profile", choices=sorted(defects_v22.DEFECT_PROFILES), help="named set of defect shares (explicit --defect-* options override it)")
     g.add_argument("--defect-duplicate-share", type=float, help="issue 80: share of paid claims delivered twice under a new claim id")
     g.add_argument("--defect-orphan-share", type=float, help="issue 80: share of replacements and voids whose original is missing from the extract")
     g.add_argument("--defect-unknown-member-share", type=float, help="issue 80: share of claims whose member id does not join to eligibility")
@@ -402,7 +406,7 @@ if __name__ == "__main__":
     g.add_argument("--rendering-omitted-share", type=float, help="share of single-clinician claims with the rendering NPI left blank (it equals billing)")
     a = ap.parse_args()
     opts = {k: (tuple(v) if isinstance(v, list) else v) for k, v in vars(a).items()
-            if k in V22_DEFAULTS and v is not None}
+            if (k in V22_DEFAULTS or k == "defect_profile") and v is not None}
     out = build(a.out_dir, a.answer_key, a.seed, a.providers, a.upcoder_rate, a.hard_neg_rate, a.clone_share,
                 data_version=a.data_version, clone_signal_strength=a.clone_signal_strength, **opts)
     print(f"wrote {len(out)} providers to {a.out_dir}; answer key at {a.answer_key}")

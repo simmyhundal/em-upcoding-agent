@@ -43,7 +43,7 @@ RUNS = [
 ]
 
 
-def run(spec, data_version="2.0", **v22):
+def run(spec, data_version="2.0", screens=(), **v22):
     """data_version "2.1" also writes the note package; claims and the records universe are identical to 2.0 for the same seed.
     data_version "2.2" accepts the data 2.2 options of generate_v2.build (honest noise, group billing, defects, ...) as keyword arguments."""
     rid, seed, n, n_up, n_hn, clone, note = spec
@@ -59,6 +59,8 @@ def run(spec, data_version="2.0", **v22):
     subprocess.run([py, flag, view, os.path.join(out, "flagged.csv")], check=True, capture_output=True)
     subprocess.run([py, flag, view, os.path.join(out, "flagged_threshold.csv"), "--min-suspicion", str(MIN_SUSPICION),
                     "--max-flagged", str(MAX_FLAGGED)], check=True, capture_output=True)
+    for m in screens:                                  # release 2 candidates: the top 25 by that score, flagged_<method>.csv
+        subprocess.run([py, flag, view, os.path.join(out, f"flagged_{m}.csv"), "--method", m], check=True, capture_output=True)
     docs, st = records.run_requests(data, view, os.path.join(out, "flagged_threshold.csv"), seed=seed)
     for name in ("documentation.csv", "records_requests.csv"):
         open(os.path.join(out, name), "w").write(open(os.path.join(view, name)).read())
