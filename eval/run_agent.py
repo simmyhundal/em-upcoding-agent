@@ -34,7 +34,7 @@ EVAL_MAX_USD_32 = 1.00   # issue 92: the dollar cap for v3.2 runs; release 1 age
 
 
 def main(run_id, code_run, screen=True, max_usd=None, records_budget=15, max_tool_calls=60, use_model=False, correlation=0.0, client=None,
-         version="3.0", model=None, effort="medium"):
+         version="3.0", model=None, effort="medium", screen_method=None, top_pct=None):
     """version "3.1" runs the v3.1 agent (office 2.1, note tools, lint); the data folder must be data 2.1 (the note package).
     max_usd None: $3 for 3.0 and 3.1 (as run), EVAL_MAX_USD_32 for 3.2. model and effort default to Opus 5.5 at medium (as run); another model
     is priced from src/llm.py so the dollar cap means dollars for that model (issue 92)."""
@@ -49,9 +49,11 @@ def main(run_id, code_run, screen=True, max_usd=None, records_budget=15, max_too
     env = agent_tools.Environment(data, view, seed=1, model_call=model_call if use_model else None, records_budget=records_budget,
                                   screen_enabled=screen, correlation=correlation, roles=roles, version=version)
     n_prov, n_claims = len(env.claims), sum(len(v) for v in env.claims.values())
+    start_text = "Start by screening the claims." + (f" Begin with screen_providers using method {screen_method}" + (f" and top_pct {top_pct}" if top_pct else "") +
+                                                      "; you may change it." if screen_method else "")
     task = (f"The claims book has {n_prov} primary care providers and {n_claims:,} office-visit claims (99211 to 99215) for one year. "
             f"Find the providers most likely upcoding. You may request records for at most {records_budget} providers and make at most "
-            f"{max_tool_calls} tool calls. {'Start by screening the claims.' if screen else 'There is no statistical screen: list the providers and decide yourself where to look.'}")
+            f"{max_tool_calls} tool calls. {start_text if screen else 'There is no statistical screen: list the providers and decide yourself where to look.'}")
     out = os.path.join(ROOT, "experiments", run_id)
     res = agent.run_agent(env, task, client=client, max_tool_calls=max_tool_calls, max_usd=max_usd, out_dir=out, model=model, effort=effort,
                           price_scale=price_scale)
@@ -101,6 +103,8 @@ if __name__ == "__main__":
     ap.add_argument("--version", default="3.0", choices=["3.0", "3.1", "3.2"])
     ap.add_argument("--model", choices=sorted(llm.PRICES), help="agent model (default Opus 5.5, as every recorded run)")
     ap.add_argument("--effort", default="medium", choices=["low", "medium", "high"])
+    ap.add_argument("--screen-method", choices=["zscore", "riskadj", "combined", "priority", "eb_ratio"], help="name a starting screen in the task text (release 2: eb_ratio)")
+    ap.add_argument("--top-pct", type=float, help="with --screen-method: start with the top PCT percent (release 2: 5)")
     a = ap.parse_args()
     print(json.dumps(main(a.run_id, a.code_run, not a.no_screen, a.max_usd, a.records_budget, a.max_tool_calls, a.model_in_tools,
-                          a.correlation, version=a.version, model=a.model, effort=a.effort), indent=1))
+                          a.correlation, version=a.version, model=a.model, effort=a.effort, screen_method=a.screen_method, top_pct=a.top_pct), indent=1))
