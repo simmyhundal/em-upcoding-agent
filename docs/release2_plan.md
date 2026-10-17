@@ -54,6 +54,8 @@ release-1 data. The 14 release-1 datasets are development data now; only the fre
 - The spending cap and the seed list.
 - Whether the agent arms get a fixed default method or are left free (proposed: default stated in the task text, free to change, reported).
 
+**Hold (2026-10-17):** the smoke runs found about 1 upcoder per seed for both arms on data 2.2; the cause is honest noise raising the peer rate on 99215 charts to 54%, which the chart rule cannot beat ([recall_diagnosis.md](recall_diagnosis.md)). No further seeds run until that is decided.
+
 ## Final design under a $10 cap (Simmy's decision; details and numbers on [#90](https://github.com/simmyhundal/em-upcoding-agent/issues/90))
 This replaces the larger plan above wherever they differ.
 - **Question:** do workflow v2.2 and agent v3.2 differ in upcoders found, same data, same screen?
