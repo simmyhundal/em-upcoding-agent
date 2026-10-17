@@ -26,6 +26,7 @@ import os
 import sys
 
 import run_eval
+import screen_metrics
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MAX_RATE = 0.125       # false negative rate and false positive rate
@@ -73,7 +74,8 @@ def _screen_cells(d, r):
         c = d["ev"]["Combined list"]
         found, honest, prec = c["upcoders_found"], c["hard_neg_flagged"] + c["normal_flagged"], c["upcoders_found"] / TOP_N
         sel = [x["provider_id"] for x in d["rows"] if x["flagged"] == "True"]
-    return {"fn": (d["n_up"] - found, d["n_up"]), "fp": (honest, d["n_honest"]), "prec": prec, "called": sel}
+    return {"fn": (d["n_up"] - found, d["n_up"]), "fp": (honest, d["n_honest"]), "prec": prec, "called": sel,
+            "_rank": screen_metrics.metrics(d["rows"], d["truth"]) if d["rows"] and "z_adj" in d["rows"][0] else None}
 
 
 def _ai_cells(d, r):
@@ -111,7 +113,8 @@ COLUMNS = ["run_id", "stage", "tuning", "records_evidence", "code_version", "see
            "precision", "precision_pass", "citations_valid", "citations_pass", "usefulness", "usefulness_pass", "judge_version", "usefulness_rules", "usefulness_rules_version",
            "evals_passed", "evals_applicable", "evals_score_of_5",
            "honest_requested", "request_rounds_total", "request_rounds_honest", "request_rounds_called",
-           "overpaid_usd", "reached_usd", "reached_share", "notes"]
+           "overpaid_usd", "reached_usd", "reached_share",
+           "screen_auprc", "screen_roc_auc", "screen_p_at_10", "screen_p_at_25", "notes"]
 CSV_PATH = os.path.join(ROOT, "experiments", "results.csv")
 VERDICT = {True: "pass", False: "fail", None: ""}
 
@@ -180,6 +183,7 @@ def _row(meta, stage, tuning, records, cells, d=None, sent=None, transcript=None
     judge_version = cells.pop("_judge", "")
     rules_score = cells.pop("_rules", None)
     rules_version = cells.pop("_rules_version", "")
+    rank = cells.pop("_rank", None)
     cells = {**{k: None for k in ("fn", "fp", "prec", "cite", "useful")}, **cells}
     if cells["fp"] and cells["fp"][1] == 0:       # no honest doctors were in scope: the rate is undefined
         cells["fp"] = None
@@ -188,7 +192,11 @@ def _row(meta, stage, tuning, records, cells, d=None, sent=None, transcript=None
     fn, fp = cells["fn"], cells["fp"]
     f = lambda v, nd=6: "" if v is None else round(v, nd)
     extra = {"honest_requested": "", "request_rounds_total": "", "request_rounds_honest": "", "request_rounds_called": "",
-             "overpaid_usd": "", "reached_usd": "", "reached_share": ""}
+             "overpaid_usd": "", "reached_usd": "", "reached_share": "",
+             "screen_auprc": "", "screen_roc_auc": "", "screen_p_at_10": "", "screen_p_at_25": ""}
+    if rank:
+        extra.update({"screen_auprc": f(rank["auprc"], 4), "screen_roc_auc": f(rank["roc_auc"], 4),
+                      "screen_p_at_10": f(rank["p_at_10"], 2), "screen_p_at_25": f(rank["p_at_25"], 2)})
     if d is not None and called is not None:
         total, reached = _dollars(d, called)
         extra.update({"overpaid_usd": round(total), "reached_usd": round(reached), "reached_share": round(reached / total, 4) if total else ""})
@@ -320,20 +328,26 @@ def _reached_cell(r):
     return f"{_usd(r['reached_usd'])} ({float(r['reached_share']):.0%})" if r["reached_usd"] != "" and r["reached_share"] != "" else "–"
 
 
+def _rank_cell(r):
+    if not r.get("screen_auprc"):
+        return "–"
+    return f"{float(r['screen_auprc']):.3f} / {float(r['screen_roc_auc']):.3f} / {float(r['screen_p_at_10']):.2f} / {float(r['screen_p_at_25']):.2f}"
+
+
 def markdown_from_csv(path=CSV_PATH):
     """The README table, rendered from the committed results file (the source of truth), never recomputed."""
     rows = read_csv(path)
     head = ("| Run | Seed | Seed status | Source | Agents | Code version | Data version | Upcoders in data | Upcoder clone level "
             "| Screen / AI | Tuning | Records evidence | False negative rate | False positive rate | Precision of upcoding calls "
             "| Citations valid | Case Summary Usefulness (1-5) | Judge version | Defect-free score (rule judge) | Evals passed | Evals scored | Evals passed (of 5) | Honest doctors sent records requests "
-            "| Request rounds (honest / total) | Dollars overpaid to upcoders | Dollars at stake in upcoders called |\n" + "|---" * 26 + "|")
-    thr = "| **Threshold** |" + " |" * 11 + " at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% | at least 4 | | | | | | | | | |"
+            "| Request rounds (honest / total) | Dollars overpaid to upcoders | Dollars at stake in upcoders called | Screen ranking (AUPRC / ROC AUC / precision at 10 / at 25) |\n" + "|---" * 27 + "|")
+    thr = "| **Threshold** |" + " |" * 11 + " at most 12.5% | at most 12.5% | at least 80% (proposed) | 100% | at least 4 | | | | | | | | | | |"
     lines = [head, thr]
     for r in rows:
         lines.append(f"| {r['run_id']} | {r['seed']} | {r['seed_status']} | {r['source']} | {r['agents'] or '–'} | {r['code_version']} "
                      f"| {r['data_version']} | {r['upcoder_rate']} | {r['upcoder_clone_level']} | {r['stage']} | {r['tuning']} "
                      f"| {r['records_evidence']} | " + " | ".join(_cell(r, k) for k in ("fn", "fp", "prec", "cite", "useful"))
-                     + f" | {r['judge_version'] or '–'} | {(r['usefulness_rules'] + ' (' + r['usefulness_rules_version'] + ')') if r['usefulness_rules'] else '–'} | **{r['evals_passed']}** | {r['evals_applicable']} | {float(r['evals_score_of_5']):.1f} | {_blank(r['honest_requested'])} | {_rounds_cell(r)} | {_usd(r['overpaid_usd'])} | {_reached_cell(r)} |")
+                     + f" | {r['judge_version'] or '–'} | {(r['usefulness_rules'] + ' (' + r['usefulness_rules_version'] + ')') if r['usefulness_rules'] else '–'} | **{r['evals_passed']}** | {r['evals_applicable']} | {float(r['evals_score_of_5']):.1f} | {_blank(r['honest_requested'])} | {_rounds_cell(r)} | {_usd(r['overpaid_usd'])} | {_reached_cell(r)} | {_rank_cell(r)} |")
     descs = {}
     for r in rows:
         descs.setdefault(r["data_version"], r["data_description"])

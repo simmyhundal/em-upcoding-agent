@@ -38,7 +38,7 @@ def sh(*args):
         raise SystemExit(f"failed: {' '.join(args[:2])}")
 
 
-def run(rid, src, note, view_name="view", flagged_name="flagged_threshold.csv", v21=False):
+def run(rid, src, note, view_name="view", flagged_name="flagged_threshold.csv", v21=False, preflight=False):
     """view_name: a folder under the data dir holding documentation.csv and records_requests.csv from a different records request
     (the sample-size sweep); the screen always comes from the code-only run `src`. v21: version 2.1 summaries (conditional next steps,
     lint and repair)."""
@@ -46,7 +46,7 @@ def run(rid, src, note, view_name="view", flagged_name="flagged_threshold.csv", 
     os.makedirs(out, exist_ok=True)
     s = os.path.join(ROOT, "experiments", src)
     view = os.path.join(ROOT, "data", f"synthetic_v2_{src}", view_name)
-    for name in ("flagged.csv", "flagged_threshold.csv"):
+    for name in ("flagged.csv", "flagged_threshold.csv", flagged_name):
         shutil.copy(os.path.join(s, name), os.path.join(out, name))
     for name in ("documentation.csv", "records_requests.csv"):
         shutil.copy(os.path.join(view if view_name != "view" else s, name), os.path.join(out, name))
@@ -55,6 +55,21 @@ def run(rid, src, note, view_name="view", flagged_name="flagged_threshold.csv", 
     sh("src/case_summary.py", view, flagged, summaries, "--cache-dir", os.path.join(out, "llm_cache"),
        "--usage-jsonl", os.path.join(out, "usage_writer.jsonl"), *(["--v21"] if v21 else []))
     sh("src/guardrail.py", view, summaries, checked)
+    if preflight:                                      # workflow v2.2: data-quality pre-flight on the plan tables, then hold affected summaries
+        import csv
+        import json
+        import data_quality as dq
+        report = dq.run_checks(os.path.join(ROOT, "data", f"synthetic_v2_{src}"))
+        dq.write_report(report, out)
+        owner = {r["claim_id"]: r["provider_id"] for r in csv.DictReader(open(os.path.join(view, "claims.csv")))}
+        charts = {}
+        for r in csv.DictReader(open(os.path.join(out, "documentation.csv"))):
+            charts[owner.get(r["claim_id"])] = charts.get(owner.get(r["claim_id"]), 0) + 1
+        recs = [json.loads(x) for x in open(checked) if x.strip()]
+        recs, held = dq.apply_holds(recs, report, charts)
+        with open(checked, "w") as f:
+            f.writelines(json.dumps(x) + "\n" for x in recs)
+        print(f"data-quality pre-flight {report['status']}: {sum(1 for x in recs if x.get('data_quality_hold'))} summaries carry the data caveat, {len(held)} held", flush=True)
     sh("eval/judge_usefulness.py", view, flagged, checked, os.path.join(out, "usefulness.jsonl"),
        "--cache-dir", os.path.join(out, "llm_cache_judge"), "--usage-jsonl", os.path.join(out, "usage_judge.jsonl"))
     sh("src/finalize_run.py", out, view, flagged, checked)
