@@ -65,6 +65,7 @@ Release 2 (in development, branch `release2-overnight`). Data 2.2 is behind `--d
 | Screen ranking metrics (#83) | built: columns of `results.csv`, [screen_metrics.md](screen_metrics.md) | same (evaluation only) | shared |
 | Screen methods (#88) | `eb_ratio` and `priority` are the release 2 candidates ([screen_methods.md](screen_methods.md)): `flagging.py --method`, v2.2 workflow arms; `riskadj` stays frozen | `screen_providers` with method `eb_ratio` or `priority` in v3.2 | confirmed or rejected on the fresh seeds ([release2_plan.md](release2_plan.md)) |
 | Data-quality pre-flight (#81) | built: `flagging.py --preflight` ([data_quality.md](data_quality.md)); the case-summary step does not consume the column yet | built: `data_quality` and `flag_data_issue` tools, hold in `submit_findings`; offline tests only | |
+| Agent cost (#92) | n/a: the workflow has no agent loop (its cost is #91) | built: $1 cap for 3.2 (`run_agent.EVAL_MAX_USD_32`), no LLM judge (`judge_agent_runs.main(..., "3.2")` rebuilds the view only, replaying office 2.1), usage per turn (`turn_usage.jsonl`), `run_agent.py --model` and `--effort`; measured in [agent_cost.md](agent_cost.md) | agent loop only |
 
 Release 1 (frozen). Items still planned carry over to `v2.2` and `v3.2`.
 
