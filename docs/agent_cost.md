@@ -81,3 +81,18 @@ The screen table shows 30 rows. Over the 14 screen calls in the v3.1 runs, the d
 Behavior cannot be replayed: a different model or effort picks different tools. By price alone, the same tokens on Sonnet 5.5 would cost 50% of Opus 5.5, about $0.22 per v3.1-like run; `effort` low would cut output and thinking, which section 4 suggests is most of the bill, by an amount only a run can show. A cheaper agent that finds fewer upcoders is a different arm, not a saving.
 
 Proposed smoke test (not run; needs Simmy's OK): agent v3.2 on development seed 42 data 2.2, three runs: Opus 5.5 at medium (the control), Opus 5.5 at low, Sonnet 5.5 at medium (`python eval/run_agent.py <id> <code> --version 3.2 [--effort low | --model claude-sonnet-5-5]`). Estimated **about $0.45 + $0.30 + $0.25, roughly $1 in all**, under the $1 cap each. Compare upcoders found, honest doctors called, records burden, tools used and `turn_usage.jsonl`. Adopt a cheaper setting for the evaluation only if it finds as many upcoders with no new false accusations; one seed can reject a setting but cannot confirm one.
+
+
+## 8. Smoke test result (run 2026-10-17; development seed 42, data 2.2, `261016_1_code`; one draw each)
+
+| Run | Model, effort | Cost | Tool calls | Turns | Upcoders found (of 8) | Honest doctors called | Honest practices asked for records |
+|---|---|---|---|---|---|---|---|
+| `261017_1_api` | Opus 5.5, medium (control) | $0.398 | 46 | 11 | 3 | 0 | 5 |
+| `261017_2_api` | Opus 5.5, **low** | $0.177 | 23 | 7 | 3 | 0 | 4 |
+| `261017_3_api` | Sonnet 5.5, medium | $0.080 | 18 | 7 | 2 | 0 | 3 |
+
+Total spent: $0.66 of the $1 approved. Rule from section 7: adopt a cheaper setting only if it finds as many upcoders with no new false accusations; one seed can reject but not confirm.
+- **Sonnet 5.5 is rejected on this seed:** it found one fewer upcoder. A different (cheaper) agent is a different arm, not a saving.
+- **Opus 5.5 at low effort passes this one-seed check:** same 3 upcoders, no false accusation, 44% of the control's cost, half the tool calls. It is not confirmed: one draw, 3 of 8 found in both runs, and the agents are not deterministic.
+- **The agent found 3 of 8 here, against 7 and 8 of 8 in the top 25 by `riskadj` and `priority` on the same data (`docs/screen_methods.md`).** Its records budget and its own cutoff, not the screen, limit it.
+- The first-run price check: cost uses 5% of input for cache reads; compare `turn_usage.jsonl` with the billed total before trusting the third decimal.
