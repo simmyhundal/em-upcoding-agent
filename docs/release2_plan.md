@@ -53,3 +53,16 @@ release-1 data. The 14 release-1 datasets are development data now; only the fre
 - The upcoder definition (margin as built, or the planted-pattern definition proposed).
 - The spending cap and the seed list.
 - Whether the agent arms get a fixed default method or are left free (proposed: default stated in the task text, free to change, reported).
+
+## Lean plan and its estimated cost (estimate, not measured)
+Assumptions: rule judge only (no $0.11 judge per arm, so a workflow arm is about $0.14 and an agent arm about $0.43), agent arms only for the control and the screen that wins the free comparison, 5 clean seeds in the first batch, two defect twins (one `moderate`, one `severe`), 600-doctor datasets with workflow arms only (about 1.8 times a 216-doctor arm, from the release 1 low-base-rate runs), no savings yet from #91 and #92.
+
+| Part | Arms | Estimated cost |
+|---|---|---|
+| 5 clean seeds (the first doubles as the smoke run) | W2.1, W2.2-eb, W2.2-pri, A3.1, A3.2 (winner): 3 x $0.14 + 2 x $0.43 = $1.28 each | $6.4 |
+| 2 defect twins | the same five arms | $2.6 |
+| 3 low base rates (600 doctors) | three workflow arms each | $2.7 |
+| **First batch** | | **about $12** (range $10 to $15) |
+| Second batch of 5 seeds, only if the intervals are undecided | five arms each | +$6.4, **about $18 to $20 in all** |
+
+The full plan above was about $43. If #91 and #92 deliver (agent run cheaper, writer cheaper), the first batch could fall to about $8 to $10; if the v3.2 agent costs more than v3.1 because of the extra data-quality tools and prompt, it could rise by 10% or more. Suggested cap: $25. No run starts without Simmy's OK.

@@ -21,6 +21,9 @@ Three things carry version numbers: the **data** (generator, schemas and the sim
 
 Data 1 pairs only with workflow `v1.0`. In `experiments/results.csv`, runs so far record the data version as `v1` or `v2` (meaning data 2.0); runs on data 2.1 and later should record the full number.
 
+## Judge versions
+Judges are named after the release they belong to, like the other pieces. `j1`: LLM judge on the evidence card. `j2`: LLM judge plus the tool outputs the author saw. `j2.1` to `j2.3`: the deterministic rule judge (`eval/judge_rules.py`), release 1. **`j3.2`: the rule judge of release 2** (data 2.2, workflow v2.2, agent v3.2), planned in [#93](https://github.com/simmyhundal/em-upcoding-agent/issues/93); the release 2 evaluation uses it as its only usefulness judge. A judge version never changes after it is used: a change ships as a new version, and `experiments/results.csv` records the version beside each score.
+
 ## What "frozen" means
 - A frozen version's behavior lives behind its version flag (`Office(version="2.1")`, `Environment(version="3.1")`, `case_summary.py --v21`, data `--data-version 2.1`). Release 2 work adds new flags (`2.2`, `3.2`) and leaves the frozen paths alone, so `eval/run_eval61.py` reproduces the #61 runs from their response caches.
 - Code under `src/` and `eval/` that produces the v2 results does not change except through a `v2.x` patch: a commit that says what changed and re-runs the affected scoreboard rows.
