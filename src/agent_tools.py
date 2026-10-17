@@ -46,8 +46,14 @@ class Environment:
                  correlation=0.0, roles=None, version="3.0"):
         """model_call(system, user) -> (json_text, usd) is used only inside hybrid_review and draft_summary; None = never call a model.
         version "3.1" adds the note package (data v2.1): charts carry notes, a second request is allowed (random first, targeted after),
-        and the note_checks and request_audit_trail tools exist. "3.0" is the frozen agent."""
-        self.v31 = version == "3.1"
+        and the note_checks and request_audit_trail tools exist. "3.2" is 3.1 plus the data-quality pre-flight, the read-only data_quality tool and
+        flag_data_issue (issue 81). "3.0" is the frozen agent."""
+        self.v31 = version in ("3.1", "3.2")
+        self.v32 = version == "3.2"
+        self.dq, self.data_issues, self.held = None, [], set()
+        if self.v32:                                    # version 3.2: the data-quality pre-flight runs once per load (issue 81)
+            import data_quality
+            self.dq = data_quality.run_checks(v2_dir)
         self.note_rows = {}
         self.screen_candidates, self.set_aside, self.tool_calls = set(), {}, []
         self.view_dir, self.model_call, self.records_budget, self.screen_enabled = view_dir, model_call, records_budget, screen_enabled
@@ -313,6 +319,15 @@ class Environment:
             return {"error": f"invalid provider or leaning for: {bad}"}
         version = "2.1" if self.v31 else "2.0"
         built, problems = {}, {}
+        if self.v32:
+            held = {}
+            for f in findings:
+                h = self._hold(f["provider_id"])
+                if f["leaning"] == sr.UPCODING and h["affected"] and h["needs_chart_evidence"]:
+                    held[f["provider_id"]] = h["reasons"]
+            if held:
+                return {"error": "these providers' upcoding findings are held by a data problem and charts do not yet carry them (at least 8 charts received); "
+                                 "use leaning inconclusive and say why, or obtain charts first", "held": held}
         for f in findings:
             packet = self._packet(f["provider_id"])
             built[f["provider_id"]] = sr.assemble(packet, f["leaning"], f.get("headline"), f.get("interpretation"), version=version)
@@ -329,8 +344,49 @@ class Environment:
             if problems:
                 return {"error": "some findings fail the checks; fix the wording or the leaning and submit again", "problems": problems}
             self.set_aside = aside
+        if self.v32:                                    # the data caveat is added after the lint, so its percentages are not read as unmatched figures
+            for pid_, s_ in built.items():
+                h = self._hold(pid_)
+                if h["affected"]:
+                    s_["rationale"] = (s_["rationale"] + " " + h["caveat"]).strip()
         self.findings.update(built)
         return {"accepted": len(findings), "status": "drafts for human review; nothing is sent or decided automatically"}
+
+    def _hold(self, pid):
+        """Data-quality hold for one provider: flags from the pre-flight or from flag_data_issue (charts received lift the need for chart evidence)."""
+        import data_quality
+        rep = {"per_provider": {**(self.dq or {}).get("per_provider", {})}}
+        for issue in self.data_issues:
+            if issue["hold_findings"] and (not issue["provider_ids"] or pid in issue["provider_ids"]):
+                rep["per_provider"][pid] = rep["per_provider"].get(pid, []) + [{"flag": "agent_flag", "detail": issue["detail"]}]
+        charts = self._chart_rule(pid)["charts"] if pid in self.rows else 0
+        return data_quality.hold_decision(rep, pid, charts, MIN_STRATUM_REVIEWED)
+
+    def data_quality(self, provider_id=None):
+        """Read-only: the pre-flight's global flags and, for one provider, its flags (version 3.2)."""
+        if not self.v32:
+            return {"error": "tool not available"}
+        import data_quality
+        out = data_quality.short(self.dq, provider_id)
+        out["issues_you_flagged"] = [{"issue": i["issue"], "providers": i["provider_ids"], "hold": i["hold_findings"]} for i in self.data_issues]
+        if provider_id:
+            out["provider"]["hold"] = {k: v for k, v in self._hold(provider_id).items() if k != "caveat"}
+        return out
+
+    def flag_data_issue(self, issue, detail, provider_ids=None, hold_findings=True):
+        """Record a data concern for a person to raise with the plan; optionally hold the affected findings. The agent never requests data itself (version 3.2)."""
+        if not self.v32:
+            return {"error": "tool not available"}
+        if not str(issue).strip() or not str(detail).strip():
+            return {"error": "issue and detail are required"}
+        bad = [p for p in (provider_ids or []) if p not in self.rows]
+        if bad:
+            return {"error": f"unknown providers: {bad}"}
+        rec = {"issue": str(issue)[:120], "detail": str(detail)[:600], "provider_ids": list(provider_ids or []), "hold_findings": bool(hold_findings)}
+        self.data_issues.append(rec)
+        return {"recorded": True, "n_issues": len(self.data_issues),
+                "next": "A person will raise this with the plan; you cannot request data yourself. "
+                        + ("Upcoding findings for the affected providers now need chart evidence." if rec["hold_findings"] else "No findings are held.")}
 
     def _audit_log(self):
         return [{"tool": t, "args": a, "result": r} for t, a, r in self.tool_calls]
@@ -375,6 +431,7 @@ class Environment:
             {"name": "estimate_overpayment", "description": "Overpayment estimate for a provider from a RANDOM records sample.",
              "input_schema": {"type": "object", "properties": pid, "required": ["provider_id"]}},
             *self._v31_tools(),
+            *self._v32_tools(),
             {"name": "submit_findings", "description": "Submit your final findings and end the run. leaning is one of pattern_consistent_with_upcoding, "
              "pattern_consistent_with_high_acuity_panel, inconclusive. Include every provider you looked at closely; only 'upcoding' ones go to recovery.",
              "input_schema": {"type": "object", "properties": {"findings": {"type": "array", "items": {"type": "object", "properties": {
@@ -396,6 +453,19 @@ class Environment:
                  "Costs a round and the office may refuse.", "input_schema": {"type": "object", "properties": {**pid, "claim_ids": {"type": "array", "items": {"type": "string"}}},
                                                                              "required": ["provider_id", "claim_ids"]}}]
 
+    def _v32_tools(self):
+        if not self.v32:
+            return []
+        return [{"name": "data_quality", "description": "Read-only report from the data-quality pre-flight that ran on the delivered extract: global flags (control totals, "
+                 "diagnosis codes per claim, rendering NPIs, member join, duplicates, broken chains, recent months) and, with provider_id, that provider's flags and whether its "
+                 "findings are held. A flag can mean the screen score is unreliable for that provider.",
+                 "input_schema": {"type": "object", "properties": {"provider_id": {"type": "string"}}}},
+                {"name": "flag_data_issue", "description": "Record a data concern for a person to raise with the plan (for example suspected diagnosis truncation). You cannot request "
+                 "data from the plan yourself. hold_findings (default true) makes upcoding findings for the listed providers (all if none listed) need chart evidence.",
+                 "input_schema": {"type": "object", "properties": {"issue": {"type": "string"}, "detail": {"type": "string"},
+                                                                  "provider_ids": {"type": "array", "items": {"type": "string"}}, "hold_findings": {"type": "boolean"}},
+                                  "required": ["issue", "detail"]}}]
+
     def call(self, name, args):
         args = args or {}
         fn = {"screen_providers": lambda: self.screen_providers(**args) if self.screen_enabled else {"error": "tool not available"},
@@ -410,6 +480,8 @@ class Environment:
               "request_audit_trail": lambda: self.request_audit_trail(args["provider_id"], args["claim_ids"]),
               "draft_summary": lambda: self.draft_summary(args["provider_id"]),
               "estimate_overpayment": lambda: self.estimate_overpayment(args["provider_id"]),
+              "data_quality": lambda: self.data_quality(args.get("provider_id")),
+              "flag_data_issue": lambda: self.flag_data_issue(args["issue"], args["detail"], args.get("provider_ids"), args.get("hold_findings", True)),
               "submit_findings": lambda: self.submit_findings(args["findings"], args.get("set_aside"))}.get(name)
         if fn is None:
             return {"error": f"unknown tool {name}"}
@@ -417,6 +489,6 @@ class Environment:
             out = fn()
         except (KeyError, TypeError, ValueError, AttributeError) as e:      # malformed arguments go back to the model (issue 85)
             return {"error": f"bad arguments: {e}"}
-        if name in ("estimate_overpayment", "hybrid_review", "draft_summary", "note_checks"):
+        if name in ("estimate_overpayment", "hybrid_review", "draft_summary", "note_checks", "flag_data_issue"):
             self.tool_calls.append((name, dict(args), json.dumps(out)))
         return out

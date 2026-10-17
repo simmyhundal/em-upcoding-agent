@@ -6,7 +6,7 @@ writes), the citation check and a results file with burden on honest doctors cou
 
 Usage:
     python eval/run_agent.py RUN_ID CODE_RUN [--no-screen] [--max-usd 3.0] [--records-budget 15] [--max-tool-calls 60]
-                             [--model-in-tools] [--correlation 0.0] [--version 3.0|3.1]
+                             [--model-in-tools] [--correlation 0.0] [--version 3.0|3.1|3.2]
 e.g. python eval/run_agent.py 261013_3_api 261012_1_code
 """
 import argparse
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     ap.add_argument("--max-tool-calls", type=int, default=60)
     ap.add_argument("--model-in-tools", action="store_true")
     ap.add_argument("--correlation", type=float, default=0.0)
-    ap.add_argument("--version", default="3.0", choices=["3.0", "3.1"])
+    ap.add_argument("--version", default="3.0", choices=["3.0", "3.1", "3.2"])
     a = ap.parse_args()
     print(json.dumps(main(a.run_id, a.code_run, not a.no_screen, a.max_usd, a.records_budget, a.max_tool_calls, a.model_in_tools,
                           a.correlation, version=a.version), indent=1))

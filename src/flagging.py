@@ -63,6 +63,14 @@ def flag(data_dir, top_n=25, min_suspicion=None, max_flagged=None, min_claims=0)
     return rows
 
 
+def add_preflight(rows, report):
+    """Workflow v2.2: add a data_quality column (empty, or the data caveat for providers whose findings the pre-flight puts on hold)."""
+    import data_quality as dq
+    for r in rows:
+        r["data_quality"] = dq.hold_decision(report, r["provider_id"])["caveat"]
+    return rows
+
+
 COLUMNS = ["rank", "provider_id", "n_claims", "share_99215", "expected_share", "z", "z_adj", "suspicion",
            "rank_zscore", "rank_riskadj", "mean_rank", "flagged_zscore", "flagged_riskadj", "flagged", "flagged_by"]
 
@@ -74,11 +82,25 @@ if __name__ == "__main__":
     ap.add_argument("--min-suspicion", type=float, help="flag every provider at or above this suspicion score instead of a top N")
     ap.add_argument("--max-flagged", type=int, help="with --min-suspicion: keep at most this many (highest scores)")
     ap.add_argument("--min-claims", type=int, default=0, help="with --min-suspicion: ignore providers with fewer claims")
+    ap.add_argument("--preflight", metavar="V2_DIR", help="workflow v2.2: run the data-quality pre-flight on the plan tables in V2_DIR first, write "
+                    "data_quality.json next to OUT_CSV, add a data_quality column, and stop on a block")
+    ap.add_argument("--continue-on-block", action="store_true", help="with --preflight: carry on even if the pre-flight blocks")
     a = ap.parse_args()
     rows = flag(a.data_dir, a.top_n, a.min_suspicion, a.max_flagged, a.min_claims)
+    cols = COLUMNS
     os.makedirs(os.path.dirname(os.path.abspath(a.out_csv)), exist_ok=True)
+    if a.preflight:
+        import data_quality as dq
+        report = dq.run_checks(a.preflight)
+        print(f"data-quality pre-flight: {report['status']} -> {dq.write_report(report, os.path.dirname(os.path.abspath(a.out_csv)))}")
+        for line in report["global_flags"]:
+            print("  warning:", line)
+        if report["status"] == "block" and not a.continue_on_block:
+            raise SystemExit("pre-flight blocked the run (rerun with --continue-on-block to override)")
+        rows = add_preflight(rows, report)
+        cols = COLUMNS + ["data_quality"]
     with open(a.out_csv, "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=COLUMNS)
+        w = csv.DictWriter(f, fieldnames=cols)
         w.writeheader()
         w.writerows(rows)
     n = sum(r["flagged"] for r in rows)

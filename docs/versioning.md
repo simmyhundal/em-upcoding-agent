@@ -55,6 +55,14 @@ The product now develops on two lines at once, so we can keep learning from both
 
 Features roughly mirror one another: a change lands in both streams, or is marked one-stream-only below with a reason. Shared pieces (the data generator, the provider office, the number check, the results table, the judge) change once and are re-run for both. Frozen so far: `v2.0` and `v2.1` (workflow), `v3.0` and `v3.1` (agent); the next releases are `v2.2` and `v3.2`, and the baselines are never edited. New results are compared with the frozen baselines on fresh seeds, using the decision rules fixed in advance in the multi-seed evaluation issue (#61). The reason for keeping the agent in development whatever the comparison shows: an agent should adapt to whatever data and situation it meets, which a fixed workflow cannot, and that has not yet been tested at low base rates or on new kinds of evidence.
 
+Release 2 (in development, branch `release2-overnight`). Data 2.2 is behind `--data-version 2.2` ([data_v2_2.md](data_v2_2.md)); the frozen paths are unchanged and were checked by regenerating `261015_66_code`, `261015_1_code` and `261012_1_code` and diffing every file, and by replaying the recorded agent run `261015_70_api` through `Environment(version="3.1")` (all 14 findings identical).
+
+| Feature (issue) | v2.2 workflow | v3.2 agent | Reason if one-sided |
+|---|---|---|---|
+| Screen ranking metrics (#83) | built: columns of `results.csv`, [screen_metrics.md](screen_metrics.md) | same (evaluation only) | shared |
+| Screen methods (#88) | candidates scored on development data ([screen_methods.md](screen_methods.md)); `riskadj` stays frozen; no method adopted yet | not wired as a `method` option | waits for the choice and the fresh-seed evaluation |
+| Data-quality pre-flight (#81) | built: `flagging.py --preflight` ([data_quality.md](data_quality.md)); the case-summary step does not consume the column yet | built: `data_quality` and `flag_data_issue` tools, hold in `submit_findings`; offline tests only | |
+
 Release 1 (frozen). Items still planned carry over to `v2.2` and `v3.2`.
 
 | Feature (issue) | v2.1 workflow | v3.1 agent | Reason if one-sided |
