@@ -60,7 +60,8 @@ def _write_csv(path, rows, cols):
 V22_DEFAULTS = {"honest_miscode_rate": 0.08, "honest_up_share": 0.5, "honest_miscode_spread": 0.4, "honest_miscode_max": 0.12,
                 "upcoder_fraction": g1.UPCODER_FRACTION, "subtle_upcoder_share": 0.25, "subtle_upcoder_fraction": (0.08, 0.12),
                 "upcoder_margin": 0.06, "group_billing": True, "rendering_omitted_share": 0.3,
-                "dx_cap": 0, "dx_cap_months": tuple(range(1, 13))}
+                "dx_cap": 0, "dx_cap_months": tuple(range(1, 13)),
+                "correction_level_change_share": 0.25, "correction_up_share": 0.4}
 
 
 def _beta_rate(nrng, mean, cv, cap):
@@ -86,6 +87,7 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
         raise ValueError(f"unknown or data-2.2-only options: {sorted(v22)}")
     cfg = {**V22_DEFAULTS, **v22}
     nrng = np.random.default_rng([seed, 19])      # data 2.2 only: honest coding noise and subtle-upcoder choice; its own stream
+    crng = np.random.default_rng([seed, 29])      # data 2.2 only: which replacement claims change the level and in which direction
     orng = np.random.default_rng([seed, 23])      # data 2.2 only: which claims leave the rendering NPI blank; its own stream, so toggling it moves nothing else
     ng = notes_v21.NoteGen(seed, clone_signal_strength) if data_version in ("2.1", "2.2") else None
     if os.path.commonpath([os.path.abspath(out_dir), os.path.abspath(answer_key_path)]) == os.path.abspath(out_dir):
@@ -198,6 +200,10 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
         # data 2.2: a clinician billing under their own NPI often leaves the rendering field blank (it equals billing)
         omit = (orng.random(vol) < cfg["rendering_omitted_share"]) if (v22_on and cfg["rendering_omitted_share"] > 0 and P["billing"] == P["npi"]) \
             else np.zeros(vol, dtype=bool)
+        corr_chg = (crng.random(vol) < cfg["correction_level_change_share"]) if v22_on and cfg["correction_level_change_share"] > 0 else np.zeros(vol, dtype=bool)
+        corr_up = crng.random(vol) < cfg["correction_up_share"] if v22_on and cfg["correction_level_change_share"] > 0 else np.zeros(vol, dtype=bool)
+        final_b = billed.copy()                    # the level of the live claim for each visit (a correction can change it)
+        P["n_corrections"], P["n_corr_up"], P["n_corr_down"] = 0, 0, 0
         for v in range(vol):
             m = members[mem_idx[v]]
             cid += 1
@@ -259,9 +265,21 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
                 cid += 1
                 new_id = f"C{cid:07d}"
                 headers.append({**headers[-1], "claim_id": new_id, "claim_frequency": 7, "original_claim_id": claim_id})
-                for r in line_rows:
-                    lines.append({**r, "claim_id": new_id})
-                remit.append({"claim_id": new_id, "status": "paid", "paid_amount": round(total_paid, 2), "adjustment_amount": 0.0,
+                new_rows = [{**r, "claim_id": new_id} for r in line_rows]
+                paid2 = total_paid
+                if corr_chg[v]:                           # data 2.2: the corrected claim moves the E/M level by one
+                    B2 = int(np.clip(B + (1 if corr_up[v] else -1), 0, 4))
+                    if B2 == B:                           # at the edge of the range: go the other way instead
+                        B2 = int(np.clip(B - (1 if corr_up[v] else -1), 0, 4))
+                    a2 = allowed[CODES[B2]]
+                    new_rows[0].update({"cpt": CODES[B2], "billed_amount": round(a2 * 2.5, 2), "allowed_amount": a2, "paid_amount": round(a2 * 0.8, 2)})
+                    paid2 = sum(r["paid_amount"] for r in new_rows)
+                    final_b[v] = B2
+                    P["n_corr_up"] += int(B2 > B)
+                    P["n_corr_down"] += int(B2 < B)
+                P["n_corrections"] += 1
+                lines.extend(new_rows)
+                remit.append({"claim_id": new_id, "status": "paid", "paid_amount": round(paid2, 2), "adjustment_amount": 0.0,
                               "denial_reason": ""})
             elif u < DENIAL_SHARE + REPLACEMENT_SHARE + VOID_SHARE:   # original voided
                 remit.append({"claim_id": claim_id, "status": "reversed", "paid_amount": 0.0, "adjustment_amount": round(total_paid, 2),
@@ -273,6 +291,9 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
             else:
                 remit.append({"claim_id": claim_id, "status": "paid", "paid_amount": round(total_paid, 2), "adjustment_amount": 0.0,
                               "denial_reason": ""})
+
+        if v22_on:                                    # rates are of the live claims, so a downward correction counts for the provider
+            P["n_up_visits"], P["n_down_visits"] = int((final_b > just).sum()), int((final_b < just).sum())
 
     # ---- write
     pcols = ["npi", "taxonomy", "specialty", "state", "zip3", "group_tin", "network_status"]
@@ -325,7 +346,8 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
                                             **({"billing_npi": P["billing"], "group_tin": P["tin"]} if v22_on else {}),
                                             "clones_notes": P["clones"],
                                             **({"planted": P["planted"], "subtle": P["subtle"], "honest_miscode_rate": round(P["miscode"], 4),
-                                                "upcode_rate": round(P["up_rate"], 4), "downcode_rate": round(P["down_rate"], 4)} if v22_on else {}),
+                                                "upcode_rate": round(P["up_rate"], 4), "downcode_rate": round(P["down_rate"], 4),
+                                                "corrections": P["n_corrections"], "corrections_up": P["n_corr_up"], "corrections_down": P["n_corr_down"]} if v22_on else {}),
                                             **({"uses_template": bool(ng.prov.get(P["npi"], {}).get("template"))} if ng is not None else {})}
                                    for P in provs},
                    "justified_cpt_by_claim": truth}, f)
@@ -354,6 +376,8 @@ if __name__ == "__main__":
     g.add_argument("--upcoder-margin", type=float, help="an upcoder's upcoding rate exceeds the honest baseline by at least this")
     g.add_argument("--dx-cap", type=int, help="keep only the first N diagnosis positions in the delivered extract (the claim had more); 0 = off")
     g.add_argument("--dx-cap-months", type=int, nargs="+", help="service months (1 to 12) the cap applies to; default all")
+    g.add_argument("--correction-level-change-share", type=float, help="share of replacement (corrected) claims that change the E/M level by one")
+    g.add_argument("--correction-up-share", type=float, help="share of level-changing corrections that go up (the rest go down)")
     g.add_argument("--group-billing", action=argparse.BooleanOptionalAction, default=None,
                    help="groups of 2 or more clinicians bill under an organizational NPI (the clinician stays the rendering provider)")
     g.add_argument("--rendering-omitted-share", type=float, help="share of single-clinician claims with the rendering NPI left blank (it equals billing)")

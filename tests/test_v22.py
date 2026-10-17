@@ -30,7 +30,8 @@ def same_files(a, b):
 
 def test_zero_noise_reproduces_data_2_1_exactly():
     a, ka = build("2.1")
-    b, kb = build("2.2", honest_miscode_rate=0.0, subtle_upcoder_share=0.0, group_billing=False, rendering_omitted_share=0.0)
+    b, kb = build("2.2", honest_miscode_rate=0.0, subtle_upcoder_share=0.0, group_billing=False, rendering_omitted_share=0.0,
+                  correction_level_change_share=0.0)
     assert same_files(a, b) == []
     assert ka["justified_cpt_by_claim"] == kb["justified_cpt_by_claim"]
     assert {p: v["role"] for p, v in ka["providers"].items()} == {p: v["role"] for p, v in kb["providers"].items()}
@@ -143,6 +144,37 @@ def test_dx_cap_truncates_only_the_delivered_extract_and_moves_nothing_else():
     assert filecmp.cmp(os.path.join(a, "claim_lines.csv"), os.path.join(b, "claim_lines.csv"), shallow=False)
     assert filecmp.cmp(os.path.join(a, "records", "visit_notes.csv"), os.path.join(b, "records", "visit_notes.csv"), shallow=False)
     assert ka["justified_cpt_by_claim"] == kb["justified_cpt_by_claim"] and "defects" in kb and not ka["defects"]
+
+
+def test_corrections_change_the_level_and_the_view_keeps_the_live_claim():
+    import derive
+    out, key = build("2.2", seed=9, correction_level_change_share=1.0, correction_up_share=0.0)
+    hdr = {h["claim_id"]: h for h in _rows(os.path.join(out, "claims_header.csv"))}
+    em = {}
+    for r in _rows(os.path.join(out, "claim_lines.csv")):
+        if r["cpt"].startswith("992"):
+            em[r["claim_id"]] = r["cpt"]
+    pairs = [(h["original_claim_id"], cid) for cid, h in hdr.items() if h["claim_frequency"] == "7"]
+    assert pairs and all(em[new] < em[old] or em[old] == "99211" and em[new] > em[old] for old, new in pairs)    # all go down (up only at the floor)
+    view = _view(out)
+    v = {c["claim_id"]: c["cpt"] for c in _rows(os.path.join(view, "claims.csv"))}
+    live = [old for old, new in pairs if old in v]
+    assert live and all(v[old] == em[new] for old, new in pairs if old in v)                                       # the view shows the corrected level
+    st = derive.correction_stats(out)
+    assert sum(x["corrections"] for x in st.values()) == len(pairs)
+    assert sum(x["level_down"] for x in st.values()) == sum(p["corrections_down"] for p in key["providers"].values())
+    assert sum(p["corrections"] for p in key["providers"].values()) == len(pairs)
+
+
+def test_correction_option_moves_no_other_billed_level():
+    a, _ = build("2.2", seed=9, correction_level_change_share=0.0)
+    b, _ = build("2.2", seed=9, correction_level_change_share=0.5)
+    ha, hb = _rows(os.path.join(a, "claims_header.csv")), _rows(os.path.join(b, "claims_header.csv"))
+    assert ha == hb                                                                     # same claims, same ids, same dates, same diagnoses
+    la = {r["claim_id"]: r["cpt"] for r in _rows(os.path.join(a, "claim_lines.csv"))}
+    lb = {r["claim_id"]: r["cpt"] for r in _rows(os.path.join(b, "claim_lines.csv"))}
+    changed = {c for c in la if la[c] != lb[c]}
+    assert changed and all(hb_["claim_frequency"] == "7" for hb_ in hb if hb_["claim_id"] in changed)
 
 
 if __name__ == "__main__":

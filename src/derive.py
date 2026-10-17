@@ -142,6 +142,33 @@ def build_view(v2_dir, view_dir):
     return len(visits)
 
 
+def correction_stats(v2_dir):
+    """Per clinician: visits, replacement (corrected) claims, and how many corrections moved the E/M level up or down.
+    Context for a reviewer, not evidence: honest providers correct claims in both directions, and the live (latest) version is what the screen sees."""
+    npis = {r["npi"] for r in _rows(os.path.join(v2_dir, "providers.csv"))}
+    lines = defaultdict(list)
+    for r in _rows(os.path.join(v2_dir, "claim_lines.csv")):
+        if r["cpt"] in EM_CODES:
+            lines[r["claim_id"]].append(r["cpt"])
+    out = defaultdict(lambda: {"visits": 0, "corrections": 0, "level_up": 0, "level_down": 0})
+    headers = _rows(os.path.join(v2_dir, "claims_header.csv"))
+    by_id = {h["claim_id"]: h for h in headers}
+    for h in headers:
+        who = h["rendering_npi"] or h["billing_npi"]
+        if who not in npis:
+            continue
+        if h["claim_frequency"] == "1":
+            out[who]["visits"] += 1
+        elif h["claim_frequency"] == "7":
+            orig = by_id.get(h["original_claim_id"])
+            out[who]["corrections"] += 1
+            if orig and lines[orig["claim_id"]] and lines[h["claim_id"]]:
+                a, b = lines[orig["claim_id"]][0], lines[h["claim_id"]][0]
+                out[who]["level_up"] += int(b > a)
+                out[who]["level_down"] += int(b < a)
+    return dict(out)
+
+
 def billing_entity(view_dir):
     """provider_id (clinician) -> billing NPI that receives actions such as records requests and recovery. Identity when no report exists."""
     import json

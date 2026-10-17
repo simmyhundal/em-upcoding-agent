@@ -33,7 +33,7 @@ the baseline by at least the margin**; otherwise `hard_negative` (a planted high
 - A planted upcoder whose realised rate falls short of the margin is labeled `normal`. In seed 42 one of eight planted upcoders (a subtle one at a 9.6% rate)
   is therefore not counted: the data has 7 upcoders, not 8.
 - An honest provider whose luck pushes it over the margin would be labeled `upcoder`. None did in seed 42 (highest honest rate 9.6% against a threshold of
-  10.0% = baseline 4.0% + margin 6 points); a margin closer to the honest spread would produce such cases.
+  10.1% = baseline 4.1% + margin 6 points); a margin closer to the honest spread would produce such cases.
 - Everything that reads `role` (screen, scoreboard, judges) keeps working; the number of upcoders can now differ from the number planted.
 - Cloned notes still apply to every visit a cloning provider bills above the justified level, including honest slips upward. Small, and only for cloners.
 
@@ -42,21 +42,22 @@ the baseline by at least the margin**; otherwise `hard_negative` (a planted high
 <!-- sweep:start -->
 | Honest miscode rate | Counted upcoders (of 8 planted) | Honest baseline upcoding | `riskadj` top 25: upcoders / honest | `eb_ratio` top 25: upcoders / honest | Chart rule on screened doctors: upcoders / honest accused |
 |---|---|---|---|---|---|
-| 0% | 8 | 0.0% | 8 / 17 | 8 / 17 | 1 / 0 (of 11 sent) |
-| 4% | 8 | 2.1% | 8 / 17 | 8 / 17 | 1 / 0 (of 11 sent) |
-| 8% | 7 | 4.0% | 7 / 18 | 6 / 19 | 1 / 1 (of 10 sent) |
-| 16% | 7 | 5.5% | 6 / 19 | 6 / 19 | 1 / 0 (of 10 sent) |
+| 0% | 8 | 0.2% | 8 / 17 | 8 / 17 | 1 / 0 (of 11 sent) |
+| 4% | 8 | 2.2% | 8 / 17 | 8 / 17 | 1 / 0 (of 10 sent) |
+| 8% | 7 | 4.1% | 7 / 18 | 6 / 19 | 1 / 0 (of 9 sent) |
+| 16% | 7 | 5.6% | 6 / 19 | 6 / 19 | 1 / 0 (of 10 sent) |
 <!-- sweep:end -->
 
-Read with care: one dataset per row, 7 to 8 upcoders, so a difference of one doctor is noise. The rate column is the rate asked for; the cap
+Read with care: one dataset per row, 7 to 8 upcoders, so a difference of one doctor is noise (the 0% row still shows a 0.2% baseline because the corrections of issue 79 move a few levels). The rate column is the rate asked for; the cap
 (0.12) holds the 16% row to a lower realised rate, which the baseline column shows (5.5% of visits billed above the justified level). What the table
 supports: the screen still ranks planted upcoders high under honest noise (it works on the 99215 share, which honest slips both raise and lower), with
 `riskadj` and `eb_ratio` each missing about one upcoder from the top 25 once noise is on.
 
 What it changes more clearly is the evidence from charts. Honest doctors now bill about 4% of visits above the level the chart supports (and about 4%
 below), so **a chart that supports a lower level than billed is no longer proof of upcoding**. The earlier zero-false-accusation result for the chart rule
-was partly built in: with noise on, the chart rule in this run accused one honest doctor (at 8%; none in the other rows, where it selected only the one
-upcoder it faced). Those counts are too small to estimate a rate from; that belongs to the release 2 evaluation on fresh seeds.
+was partly built in, but this sweep cannot size the effect: with noise on, the chart rule accused no honest doctor in any of the four runs (it faced 9 to 11
+doctors each time and selected only the one upcoder). That is too small a sample to estimate a false-accusation rate; it belongs to the release 2
+evaluation on fresh seeds. The structural point stands: the chart rule's earlier zero was partly guaranteed by construction, and is no longer.
 
 ### Figure
 
@@ -105,14 +106,14 @@ The answer key records the defect under `defects.dx_truncation` (cap, months, nu
 <!-- dxcap:start -->
 | Diagnosis positions kept | Claims shortened | Mean derived conditions per patient | High-acuity doctors: 99215 share / expected | Doctors with suspicion >= 5 | `riskadj` top 25: upcoders / high-acuity / ordinary | `riskadj` AUPRC | `eb_ratio` top 25: upcoders / high-acuity / ordinary | `eb_ratio` AUPRC |
 |---|---|---|---|---|---|---|---|---|
-| 6 (no cap) | 0 | 1.54 | 1.17 | 10 | 7 / 1 / 17 | 0.457 | 6 / 1 / 18 | 0.754 |
-| 4 | 9,118 | 1.49 | 1.21 | 8 | 6 / 2 / 17 | 0.456 | 6 / 1 / 18 | 0.779 |
-| 3 | 19,294 | 1.38 | 1.35 | 8 | 6 / 2 / 17 | 0.458 | 6 / 2 / 17 | 0.738 |
-| 2 | 38,696 | 1.16 | 1.57 | 10 | 5 / 4 / 16 | 0.413 | 6 / 2 / 17 | 0.583 |
+| 6 (no cap) | 0 | 1.54 | 1.16 | 9 | 7 / 1 / 17 | 0.456 | 6 / 1 / 18 | 0.751 |
+| 4 | 9,118 | 1.49 | 1.19 | 8 | 6 / 2 / 17 | 0.454 | 6 / 1 / 18 | 0.779 |
+| 3 | 19,294 | 1.38 | 1.34 | 8 | 6 / 2 / 17 | 0.450 | 6 / 2 / 17 | 0.735 |
+| 2 | 38,696 | 1.16 | 1.54 | 10 | 5 / 4 / 16 | 0.413 | 6 / 2 / 17 | 0.582 |
 <!-- dxcap:end -->
 
 Reading it: a cap of 4 or 3 changes little (the mean derived count falls from 1.54 to 1.49 and 1.38, one more high-acuity doctor enters the top 25); a cap of
-2 is clear: the mean count falls to 1.16, the high-acuity doctors' 99215 share rises from 1.17 to 1.57 times what the model expects, four of them reach the
+2 is clear: the mean count falls to 1.16, the high-acuity doctors' 99215 share rises from 1.16 to 1.54 times what the model expects, four of them reach the
 top 25 (one before), and `riskadj` loses two upcoders from its top 25. `eb_ratio` is affected less in the top 25 but its AUPRC falls from 0.75 to 0.58.
 One dataset, 8 high-acuity doctors and 7 upcoders, so single doctors move these counts; the direction (sicker panels look healthier, honest
 high-acuity doctors look worse) is what the generator guarantees and the table confirms. Only the first `N` positions survive, and the generator puts
@@ -121,6 +122,44 @@ chronic conditions first, so a low cap removes chronic conditions before acute o
 **Response when truncation is suspected** (built with the data-quality check, issue 81): findings that rely on risk adjustment are held or marked
 low-confidence, and a person asks the plan for a full-fidelity re-extract from its original claim records. The agent does not request data itself.
 
+## Corrected claims that change the billed level (issue 79)
+
+Before, every replacement claim (frequency 7) was an exact copy of its original ("original replaced by a corrected claim with the same content"), so a
+correction never changed the code. Real corrections move the level up or down.
+
+| Option | Default | Meaning |
+|---|---|---|
+| `--correction-level-change-share` | 0.25 | share of replacement claims whose E/M line moves one level (amounts follow the new level) |
+| `--correction-up-share` | 0.4 | share of those that go up; the rest go down (at the edge of the range the direction flips) |
+
+Own random stream, so changing it moves no other claim. The original is reversed and the replacement is the live claim; `derive.py` already keeps the
+live version, so the detector view shows the corrected level (a test checks it). The answer key's `upcode_rate` and `downcode_rate` use the **live**
+claim: a provider whose claims are corrected downward is not an upcoder for the visits it fixed. Per-provider `corrections`, `corrections_up` and
+`corrections_down` are recorded.
+
+**Context signal, not evidence.** `derive.correction_stats(v2_dir)` gives each clinician's corrections and their direction, so a reviewer can see a
+provider's correction rate against peers. Honest providers correct in both directions, and a provider who corrects downward is fixing its own overbilling:
+the screen sees only the live level, so frequent correctors are not penalized for the original. On seed 42:
+
+<!-- corr:start -->
+- 122,716 visits and 2,443 corrected claims (2.0%); 613 corrections changed the level (241 up, 372 down).
+- Correction rate per clinician with at least 100 visits: median 1.9%, 5th to 95th percentile 0.7% to 3.4%, maximum 4.5%.
+
+The five clinicians with the most downward corrections:
+
+| Clinician | Visits | Corrections | Down | Up | Role | Screen rank (of 216) |
+|---|---|---|---|---|---|---|
+| 1000000110 | 2500 | 54 | 10 | 9 | normal | 43 |
+| 1000000069 | 2198 | 52 | 9 | 7 | normal | 209 |
+| 1000000056 | 2105 | 33 | 8 | 1 | normal | 14 |
+| 1000000058 | 2500 | 44 | 8 | 3 | normal | 214 |
+| 1000000075 | 2500 | 42 | 8 | 3 | normal | 210 |
+<!-- corr:end -->
+
+One of the five (1000000056, screen rank 14) is high in the screen for its 99215 share; its corrections are eight down and one up, so they lower its count if
+anything. The other four rank 43 to 214. Corrections are about 2% of visits, spread evenly across providers by the generator (no provider-level propensity), so "providers who correct often" here
+are sampling spread, not a modeled behavior. A provider-level correction habit is not built.
+
 ## Not yet built
 
-Items 79 and 80 of the milestone are listed here when built.
+Item 80 of the milestone are listed here when built.
