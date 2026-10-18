@@ -50,5 +50,5 @@ Best arm at each price: lambda 0.02: W2.1 (data 2.1), lambda 0.05: A3.1 (data 2.
 - **It favors what it trained.** L and GL are fitted to this reward, so their scores here are only fair when cross-validated (as shown) and only trustworthy on the fresh seeds. The agent and the hand-set workflows were never optimized for it; part of any gap is simply that.
 - **It leaves out things that matter:** dollars at stake (a missed large upcoder counts the same as a small one), summary quality (judge scores), cost in dollars, and recall as a share of all upcoders. Those stay as separate columns in the results.
 - **Free replays count a case the model would have answered as inconclusive,** so a workflow's found count can differ by one from its recorded run (W2.3 on the release 3 seeds: 36 here, 37 recorded).
-- **Different seeds, different agents:** the agent arms ran only on the seeds of their release, so each table compares the agent with the workflows on the same ten seeds; do not read across the two tables.
+- **Different seeds, different agents:** the agent arms ran only on the seeds of their release, so each table compares the agent with the workflows on the same ten seeds; do not read across the tables.
 - The pre-registered fresh test keeps its own primary criteria (#108); the score is a development summary.
