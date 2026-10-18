@@ -26,12 +26,12 @@ def logit_coef(Z, y):
     return [float(b) for b in ra.fit_logistic(Z, y.astype(float))]
 
 
-def main():
-    rows = json.load(open(r2.DATA))
+def fit_policy(rows, lam=LAMBDA):
+    """The policy dict (the JSON content) fitted on `rows` of the Stage 2 dataset."""
     X = r2.matrix(rows)
     mu, sd = X.mean(0), X.std(0) + 1e-9
     Z = np.column_stack([np.ones(len(X)), (X - mu) / sd])
-    out = {"features": r2.STATE, "mu": [float(v) for v in mu], "sd": [float(v) for v in sd], "lambda": LAMBDA, "kappa": KAPPA,
+    out = {"features": r2.STATE, "mu": [float(v) for v in mu], "sd": [float(v) for v in sd], "lambda": lam, "kappa": KAPPA,
            "fit_on_seeds": sorted({r["seed"] for r in rows}), "providers": len(rows),
            "honest": logit_coef(Z, np.array([not r["upcoder"] for r in rows])), "branches": {}}
     for b in r2.BRANCHES:
@@ -39,6 +39,11 @@ def main():
         ridge = np.linalg.solve(Z.T @ Z + 1.0 * np.eye(Z.shape[1]), Z.T @ extra)
         out["branches"][b] = {"found": logit_coef(Z, np.array([r[b]["found"] for r in rows])), "hc": logit_coef(Z, np.array([r[b]["honest_called"] for r in rows])),
                               "extra": [float(v) for v in ridge]}
+    return out
+
+
+def main():
+    out = fit_policy(json.load(open(r2.DATA)))
     path = os.path.join(ROOT, "src", "policy_24.json")
     json.dump(out, open(path, "w"), indent=1)
     print("wrote", path)

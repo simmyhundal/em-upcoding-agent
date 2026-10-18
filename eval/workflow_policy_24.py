@@ -13,7 +13,7 @@ import workflow_policy_v21 as v21
 
 
 def run_policy_24(office, provider_ids, claims_by_provider, tier1_n, ratio, gate_t=None, gate_all=False, stop_silent=False, learned=False):
-    policy = ep.load() if learned else None
+    policy = (learned if isinstance(learned, dict) else ep.load()) if learned else None
     office.policy_log = {}
     for rank, pid in enumerate(provider_ids):
         if gate_t is not None and (gate_all or rank >= tier1_n) and ratio.get(pid, 0.0) < gate_t:
