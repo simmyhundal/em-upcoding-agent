@@ -79,6 +79,17 @@ Release 3 (in development, branch `release3-dev`; data stays 2.2, [#99](https://
 | Wider list with a light tier | built, **the W2.3 default** (Simmy's decision: more upcoders found, about 94 more honest practices asked on the development seeds): top 10%, ranks 12 to 22 get one request unless the notes show cloning (`eval/workflow_policy_23.py`) | built: the prompt suggests the top 10% and a light touch beyond the first 5%; records budget 22 (v3.0 to v3.2: 15); the agent chooses | mirrored by design (the agent chooses) |
 | Audit-trail request on late signatures | built (adds nothing on the development seeds) | the existing `request_audit_trail` tool, prompted | mirrored |
 
+Release 4 (in development; issues #102 to #104, #108). Workflow v2.4 is built behind flags; agent v3.4 has the read-only advisor tool and nothing else new yet.
+
+| Feature | v2.4 workflow | v3.4 agent | Reason if one-sided |
+|---|---|---|---|
+| Learned stop-or-escalate formula (#108) | built: `eval/workflow_policy_24.py` with `learned`, `src/escalation_policy.py`, `src/policy_24.json`; variants G, L, GL ([learned_policy_plain.md](learned_policy_plain.md)) | built as **advice only**: tool `advise_next_step` (`Environment(version="3.4")`, `SYSTEM_34`); the agent decides | different mechanism by design: the workflow obeys the formula, the agent is advised |
+| Ratio gate on the light tier (#102) | built (variant G, 2.5) | the agent's own habit (asks at about 3x expected, helped by the v3.1 rule that every 3x provider is examined or set aside) | agent chooses; not a coded rule |
+| Silent offices (#103) | not built | not built | |
+| High-acuity override (#104) | not built (checked: not worth a rule on development seeds) | not built | |
+
+Known gaps in the mirror rule (checked 2026-10-18): dispositions for screened candidates (#66) exist only in the agent (`set_aside`); the workflow keeps rule reason strings. The "hybrid review (#49)" and "data-quality pre-flight (#81)" rows above are out of date: both streams now decide with rules first and a model only where the rules are silent, and the workflow's case-summary step applies the pre-flight holds. The agent alone flags data issues (`flag_data_issue`), reads its own estimate reliability, and chooses its own list size. The agent writes its own findings while the workflow's summaries are code-written; judges j3.2 and j3.3 score both.
+
 Release 1 (frozen). Items still planned carry over to `v2.2` and `v3.2`.
 
 | Feature (issue) | v2.1 workflow | v3.1 agent | Reason if one-sided |

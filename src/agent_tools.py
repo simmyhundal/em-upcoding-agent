@@ -48,9 +48,10 @@ class Environment:
         version "3.1" adds the note package (data v2.1): charts carry notes, a second request is allowed (random first, targeted after),
         and the note_checks and request_audit_trail tools exist. "3.2" is 3.1 plus the data-quality pre-flight, the read-only data_quality tool and
         flag_data_issue (issue 81). "3.0" is the frozen agent."""
-        self.v31 = version in ("3.1", "3.2", "3.3")
-        self.v32 = version in ("3.2", "3.3")
-        self.v33 = version == "3.3"                     # release 3 (issue 99): rules 2.3, the eb_ratio_t screen, a top-10% list; data stays 2.2
+        self.v31 = version in ("3.1", "3.2", "3.3", "3.4")
+        self.v32 = version in ("3.2", "3.3", "3.4")
+        self.v33 = version in ("3.3", "3.4")
+        self.v34 = version == "3.4"                     # release 4 (issue 108): everything in 3.3 plus the read-only advisor tool advise_next_step                     # release 3 (issue 99): rules 2.3, the eb_ratio_t screen, a top-10% list; data stays 2.2
         self.dq, self.data_issues, self.held = None, [], set()
         if self.v32:                                    # version 3.2: the data-quality pre-flight runs once per load (issue 81)
             import data_quality
@@ -376,6 +377,30 @@ class Environment:
         charts = self._chart_rule(pid)["charts"] if pid in self.rows else 0
         return data_quality.hold_decision(rep, pid, charts, MIN_STRATUM_REVIEWED)
 
+    def advise_next_step(self, provider_id):
+        """Version 3.4, read-only: what workflow v2.4's learned stop-or-escalate formula (src/policy_24.json) would do next for this provider, from what its first sample returned.
+        Advice only; the agent decides. The formula was fitted offline on simulated development seeds and was trained on a first sample of 30 random charts plus a follow-up."""
+        if not self.v34:
+            return {"error": "tool not available"}
+        if provider_id not in self.rows:
+            return {"error": "unknown provider"}
+        st = self.office.state.get(provider_id)
+        if not st or not st["round"]:
+            return {"error": "no records request for this provider yet; the advice reads what the first sample returned"}
+        import escalation_policy as ep
+        score = self.scores32["eb_ratio_t"]
+        order = sorted(score, key=lambda p: (-score[p], p))
+        row = self.rows[provider_id]
+        ratio = float(row["share_99215"]) / max(float(row["expected_share"]), 1e-9)
+        x = ep.state_vector(list(st["usable"].values()), self.claims[provider_id], order.index(provider_id) + 1, ratio, st["round"])
+        branch = ep.choose(ep.load(), x)
+        meaning = {"STOP": "nothing more: the first sample is enough, or more asking is unlikely to pay for the burden on the practice",
+                   "TARG": "send a targeted request for about 15 charts of 99215 (and follow up on any deficiency)",
+                   "AUD": "request the audit trail for the notes already received",
+                   "BOTH": "send the targeted request, then request the audit trail"}[branch]
+        return {"provider": provider_id, "recommended": branch, "meaning": meaning, "state": dict(zip(ep.STATE, [round(v, 3) for v in x])),
+                "note": "Advisory only. A formula fitted offline on simulated development seeds (price of 0.05 per extra round to an honest practice); you decide."}
+
     def data_quality(self, provider_id=None):
         """Read-only: the pre-flight's global flags and, for one provider, its flags (version 3.2)."""
         if not self.v32:
@@ -447,6 +472,7 @@ class Environment:
              "input_schema": {"type": "object", "properties": pid, "required": ["provider_id"]}},
             *self._v31_tools(),
             *self._v32_tools(),
+            *self._v34_tools(),
             {"name": "submit_findings", "description": "Submit your final findings and end the run. leaning is one of pattern_consistent_with_upcoding, "
              "pattern_consistent_with_high_acuity_panel, inconclusive. Include every provider you looked at closely; only 'upcoding' ones go to recovery.",
              "input_schema": {"type": "object", "properties": {"findings": {"type": "array", "items": {"type": "object", "properties": {
@@ -481,6 +507,13 @@ class Environment:
                                                                   "provider_ids": {"type": "array", "items": {"type": "string"}}, "hold_findings": {"type": "boolean"}},
                                   "required": ["issue", "detail"]}}]
 
+    def _v34_tools(self):
+        if not self.v34:
+            return []
+        return [{"name": "advise_next_step", "description": "Read-only advice: after a provider's first sample has come back (a random request and its follow-up), what workflow v2.4's learned "
+                 "formula would do next: stop, a targeted request, the audit trail, or both. It reads what the sample returned and the provider's screen rank and ratio. Advice only; you decide.",
+                 "input_schema": {"type": "object", "properties": {"provider_id": {"type": "string"}}, "required": ["provider_id"]}}]
+
     def call(self, name, args):
         args = args or {}
         fn = {"screen_providers": lambda: self.screen_providers(**args) if self.screen_enabled else {"error": "tool not available"},
@@ -496,6 +529,7 @@ class Environment:
               "draft_summary": lambda: self.draft_summary(args["provider_id"]),
               "estimate_overpayment": lambda: self.estimate_overpayment(args["provider_id"]),
               "data_quality": lambda: self.data_quality(args.get("provider_id")),
+              "advise_next_step": lambda: self.advise_next_step(args["provider_id"]),
               "flag_data_issue": lambda: self.flag_data_issue(args["issue"], args["detail"], args.get("provider_ids"), args.get("hold_findings", True)),
               "submit_findings": lambda: self.submit_findings(args["findings"], args.get("set_aside"))}.get(name)
         if fn is None:

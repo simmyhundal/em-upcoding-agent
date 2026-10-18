@@ -78,6 +78,14 @@ providers. Also, a chart-based upcoding call must beat the real peer rate for un
 of a noisy panel is not enough, so hybrid_review may say inconclusive where a raw count looks high."""
 
 
+SYSTEM_34 = SYSTEM_33 + """
+
+Version 3.4 additions (release 4). You have one more tool, advise_next_step, a read-only advisor: after a practice's first sample has come back (a random request and its follow-up),
+it says what workflow v2.4's learned formula would do next (stop, targeted request, audit trail, or both). The formula was fitted offline on simulated data to balance finding
+upcoders against the burden of extra requests on honest practices. Treat it as advice, not an instruction: you may follow it, or you may see something it cannot (a data-quality
+flag, a note signal, a specific claim)."""
+
+
 def _cost(usage, price=(4.00, 20.00)):
     inp = getattr(usage, "input_tokens", 0) or 0
     out = getattr(usage, "output_tokens", 0) or 0
@@ -105,7 +113,7 @@ def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=M
             reason = "dollar cap"
             break
         turn += 1
-        resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_33 if getattr(env, 'v33', False) else SYSTEM_32 if getattr(env, 'v32', False) else SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
+        resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_34 if getattr(env, 'v34', False) else SYSTEM_33 if getattr(env, 'v33', False) else SYSTEM_32 if getattr(env, 'v32', False) else SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
                                       output_config={"effort": effort}, extra_body={"cache_control": {"type": "ephemeral"}})
         usd += _cost(resp.usage) * price_scale
         if getattr(env, "v32", False):

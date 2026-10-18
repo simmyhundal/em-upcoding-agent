@@ -43,6 +43,32 @@ def test_runtime_features_equal_training_features_and_the_run_matches_the_traini
         assert branch == ep.choose(POL, train)
 
 
+def test_agent_advisor_agrees_with_the_workflow_policy_and_exists_only_in_v34():
+    if not os.path.isdir(os.path.join(ROOT, "data", "synthetic_v2_r2_1515")):
+        print("skipped (no development data)")
+        return
+    import agent_tools as at
+    import agent
+    import make_v2_office_workflow_runs as mw
+    data = os.path.join(ROOT, "data", "synthetic_v2_r2_1515")
+    view_dir = os.path.join(data, "view")
+    view, office, flagged_file = mw.build_view("p24test_1515", "r2_1515", "eb_ratio_t_10", version="2.4", tier1_n=11, policy24={"learned": True})
+    env = at.Environment(data, view_dir, seed=1, version="3.4")
+    env33 = at.Environment(data, view_dir, seed=1, version="3.3")
+    assert "advise_next_step" in [t["name"] for t in env.tool_schemas()] and "advise_next_step" not in [t["name"] for t in env33.tool_schemas()]
+    assert env33.call("advise_next_step", {"provider_id": next(iter(office.policy_log))}) == {"error": "tool not available"}
+    assert "Version 3.4" in agent.SYSTEM_34 and agent.SYSTEM_34.startswith(agent.SYSTEM_33)
+    pids = list(office.policy_log)[:4]
+    assert "error" in env.call("advise_next_step", {"provider_id": pids[0]})                      # no request yet
+    for pid in pids:
+        resp = env.call("request_records", {"provider_id": pid, "sample": {"kind": "random", "n": 30}})
+        if resp.get("deficiencies") and resp.get("rounds_left", 0) > 0:
+            env.call("follow_up_records", {"provider_id": pid, "addressed_codes": [d["code"] for d in resp["deficiencies"]]})
+        got = env.call("advise_next_step", {"provider_id": pid})
+        assert got["recommended"] == office.policy_log[pid][1], (pid, got, office.policy_log[pid])
+        assert all(abs(got["state"][k] - round(v, 3)) < 1e-6 for k, v in zip(ep.STATE, office.policy_log[pid][0]))
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):
