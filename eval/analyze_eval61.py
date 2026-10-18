@@ -74,6 +74,70 @@ def bootstrap(diffs, n=10000, seed=61):
     return sum(diffs) / len(diffs), means[int(0.025 * n)], means[int(0.975 * n) - 1]
 
 
+R2_SEEDS = [1515, 1616, 1717, 1818, 1919, 2020, 2121, 2222, 2323, 2424]
+R2_ARMS = [("W2.2", "r2w", "Opus 5.5 (Batch API), only where the rules were silent; no effort setting"),
+           ("A3.2", "r2a", "Opus 5.5, low effort")]
+
+
+def release2_lines():
+    """Release 2 (data 2.2) arms, ten seeds, in the same columns as the release 1 table. Free: stored runs only. Data 2.2 differs from 2.1
+    (honest coding noise, group billing, payer-based upcoder definition), so these rows are NOT directly comparable to the release 1 rows."""
+    import csv as _csv
+    rows = []
+    for arm, pre, how in R2_ARMS:
+        f = up = acc = hr = rh = 0
+        usd = est = total = 0.0
+        unrel = estd = 0
+        for seed in R2_SEEDS:
+            rid, code = f"{pre}_{seed}", f"r2_{seed}"
+            d = os.path.join(ROOT, "experiments", rid)
+            if not os.path.exists(os.path.join(d, "case_summaries_checked.jsonl")):
+                break
+            key = json.load(open(os.path.join(ROOT, "eval", "answer_key", f"ground_truth_v2_{code}.json")))
+            roles = key["providers"]
+            called = {x["provider_id"] for x in map(json.loads, open(os.path.join(d, "case_summaries_checked.jsonl")))
+                      if x["summary"]["leaning"] == "pattern_consistent_with_upcoding"}
+            f += sum(roles[p]["role"] == "upcoder" for p in called)
+            acc += sum(roles[p]["role"] != "upcoder" for p in called)
+            up += sum(v["role"] == "upcoder" for v in roles.values())
+            per = {}
+            for line in open(os.path.join(d, "office_transcript.jsonl")) if os.path.exists(os.path.join(d, "office_transcript.jsonl")) else []:
+                e = json.loads(line)
+                if e.get("action") in ("send_request", "follow_up") and "error" not in e:
+                    per[e["provider_id"]] = per.get(e["provider_id"], 0) + 1
+            hr += sum(roles[p]["role"] != "upcoder" for p in per)
+            rh += sum(n for p, n in per.items() if roles[p]["role"] != "upcoder")
+            usd += cost(rid)
+            r = rec61.recover(rid, code)
+            est += r["est"]
+            unrel += r["unreliable"]
+            estd += r["estimated"]
+            just = key["justified_cpt_by_claim"]
+            fees = rec61.allowed()
+            for c in _csv.DictReader(open(os.path.join(ROOT, "data", f"synthetic_v2_{code}", "view", "claims.csv"))):
+                j = just.get(c["claim_id"])
+                if j and c["cpt"] > j and roles[c["provider_id"]]["role"] == "upcoder":
+                    a, pd = float(c["allowed_amount"]), float(c["paid_amount"])
+                    total += max(a - fees[j], 0.0) * (pd / a if a else 0.8)
+        else:
+            n = len(R2_SEEDS)
+            prec = f"{f / (f + acc):.0%}" if f + acc else "–"
+            rows.append(f"| {arm} | {how} | {f} of {up} | {f / up:.0%} | {acc} | {prec} | {hr} | {rh} | {hr / f:.1f} | ${usd:.2f} | ${usd / n:.2f} | "
+                        f"${est:,.0f} | ${total:,.0f} | {est / total:.0%} | {unrel}/{estd} |")
+    if not rows:
+        return []
+    return ["", "## Release 2 arms on data 2.2 (ten seeds, 1515 to 2424)", "",
+            "Same columns as the table above. **Data 2.2 is harder and different** (honest coding noise of about 8%, an upcoder defined by true rate above the honest 95th percentile "
+            "and at least 6 points over the honest mean, group billing, 8 planted upcoders and 8 hard negatives per seed), so compare arms within this table, not across to release 1. "
+            "Screen: `eb_ratio`, top 5% of 216 doctors. Judge: rule judge j3.2 only (no LLM judge, so no usefulness columns). Seeds 1515 and 2424 each have one honest doctor called.", "",
+            "| Arm | Model and effort | Upcoders found | Recall | Honest doctors accused | Precision | Honest practices sent requests | Request rounds on honest | "
+            "Requests to honest per upcoder found | Cost | Cost per run | Estimated recovery from accused providers | Total recoverable from all upcoders | Share recovered | "
+            "Unreliable estimates |", "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"] + rows + [
+            "", "Paired result on these ten seeds: workflow found 10 upcoders the agent missed and the agent 1 the workflow missed (exact McNemar p = 0.012; with the design effect of 1.5 for "
+            "seed clusters, p = 0.027). This was an unplanned look at 10 seeds (the pre-registered looks were 22 and 44 seeds, alpha 0.0294); Simmy chose to stop at 10 and conclude "
+            "the workflow is stronger, to save cost. Full table and the rule: `docs/release2_results.md`."]
+
+
 def main():
     res = load()
     main_keys = sorted({k for k, _ in res if "_r" not in k}, key=lambda k: int(k[1:]))
@@ -173,6 +237,7 @@ def main():
                     lines.append(f"| {k} | {a} | {r['found']} of {r['upcoders']} | {r['accused']} | {r['precision'] or '–'} | ${r['cost']:.2f} |")
     lines += ["", f"Total estimated cost of these runs: ${sum(r['cost'] for r in res.values()):.2f}.", "",
               "Per-seed rows are in `experiments/results.csv` and `docs/results.md`; run folders under `experiments/`."]
+    lines += release2_lines()
     out = os.path.join(ROOT, "docs", "eval61.md")
     open(out, "w").write("\n".join(lines) + "\n")
     print("\n".join(lines))

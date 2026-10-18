@@ -67,3 +67,10 @@ This replaces the larger plan above wherever they differ.
 - **Judge and writer (#93; [rule_judge_32.md](rule_judge_32.md)):** the usefulness judge is the rule judge **j3.2** only (`eval/judge_rules_32.py`), with its reviewer checklist reported beside the score; it is not yet checked against a person ([human_spot_check.md](human_spot_check.md)), so usefulness is reported as unvalidated until then. The workflow writer stays rules first with the model only where the rules leave a real question (rules 2.2, #91): a fully deterministic writer would have lost 1 of 40 upcoder calls on the release 1 runs. The agent keeps free-text findings as in v3.1.
 - **Leftover budget** after an early stop: defect twins (one `moderate`, one `severe`), then one 600-doctor low-base-rate workflow-only run; descriptive only.
 - **Chance of success, stated plainly:** release 1 showed a gap of 5 upcoders in 80 (workflow ahead, p = 0.23). If the true gap is that size, power is about 24% at 16 seeds and **about 37% at 22 seeds (the design above)**; about 39% at 24 seeds. If the gap is twice as large it is much higher. Options to raise it without raising the cap (432-doctor panels with 16 upcoders per seed; a dollar-weighted outcome) are listed on #90.
+
+
+## Update: batch size going forward (Simmy's decision)
+
+Release 2 stopped at 10 seeds (1515 to 2424), not the 22 in the plan above, to save cost; the workflow-versus-agent conclusion was drawn from an unplanned 10-seed look
+(exact McNemar p = 0.012; design-effect version p = 0.027; this was not a pre-registered look). Future evaluations are planned as **10-seed batches**, which also matches the
+10-seed release 1 comparisons (#61). The stopping rule is fixed in advance for the 10 seeds, with no looks in between, so the p-value at the end counts.

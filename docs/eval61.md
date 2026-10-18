@@ -57,3 +57,14 @@ Half the planted upcoders clone their notes so the charts match the bill; the da
 Total estimated cost of these runs: $18.62.
 
 Per-seed rows are in `experiments/results.csv` and `docs/results.md`; run folders under `experiments/`.
+
+## Release 2 arms on data 2.2 (ten seeds, 1515 to 2424)
+
+Same columns as the table above. **Data 2.2 is harder and different** (honest coding noise of about 8%, an upcoder defined by true rate above the honest 95th percentile and at least 6 points over the honest mean, group billing, 8 planted upcoders and 8 hard negatives per seed), so compare arms within this table, not across to release 1. Screen: `eb_ratio`, top 5% of 216 doctors. Judge: rule judge j3.2 only (no LLM judge, so no usefulness columns). Seeds 1515 and 2424 each have one honest doctor called.
+
+| Arm | Model and effort | Upcoders found | Recall | Honest doctors accused | Precision | Honest practices sent requests | Request rounds on honest | Requests to honest per upcoder found | Cost | Cost per run | Estimated recovery from accused providers | Total recoverable from all upcoders | Share recovered | Unreliable estimates |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| W2.2 | Opus 5.5 (Batch API), only where the rules were silent; no effort setting | 21 of 78 | 27% | 2 | 91% | 66 | 208 | 3.1 | $0.10 | $0.01 | $95,806 | $345,354 | 28% | 7/23 |
+| A3.2 | Opus 5.5, low effort | 12 of 78 | 15% | 1 | 92% | 58 | 72 | 4.8 | $1.86 | $0.19 | $58,205 | $345,354 | 17% | 6/13 |
+
+Paired result on these ten seeds: workflow found 10 upcoders the agent missed and the agent 1 the workflow missed (exact McNemar p = 0.012; with the design effect of 1.5 for seed clusters, p = 0.027). This was an unplanned look at 10 seeds (the pre-registered looks were 22 and 44 seeds, alpha 0.0294); Simmy chose to stop at 10 and conclude the workflow is stronger, to save cost. Full table and the rule: `docs/release2_results.md`.
