@@ -137,6 +137,25 @@ def rule_leaning_22(packet):
     return lean, reason
 
 
+# Rules 2.3 (workflow v2.3, issue 99, data stays 2.2): cloned notes make the charts match the bill, so rules 2.2 end at "inconclusive" for an upcoder whose
+# 99215 share is far above expected. Late signatures are the clean sign in the returned notes: rule_leaning's own "inflated notes" test needs the problems
+# signal at 35% as well, a seed-42 cutoff that honest doctors on data 2.2 nearly reach (27% on average). Rules 2.3 lean upcoding when rules 2.2 would say
+# inconclusive (or still ask the model) and (a) at least MIN_NOTES_SIGNALS notes came back, (b) the late-signature rate is at least INFLATED_LATE (the existing constant, not refit) and
+# (c) the 99215 share is more than MAX_EXCESS_FOR_ACUITY times the expected share (the existing "far above expected" line). The thresholds are existing constants, not refit; the idea of the rule came from reading the release 2 evaluation seeds, which are development data from now on.
+def rule_leaning_23(packet):
+    lean, reason = rule_leaning_22(packet)
+    if lean not in (INCONCLUSIVE, None):          # None: the one case rules 2.2 still send to the model (notes claim data review the claims do not show)
+        return lean, reason
+    ns = (packet.get("documentation_review") or {}).get("note_signals")
+    exp = packet.get("expected_share_given_patient_complexity")
+    if ns and ns["notes"] >= MIN_NOTES_SIGNALS and exp and (ns["rates"].get("late") or 0) >= INFLATED_LATE \
+            and packet["share_99215"] > MAX_EXCESS_FOR_ACUITY * exp:
+        return UPCODING, (f"documentation supports the billed level, but {ns['rates']['late']:.0%} of {ns['notes']} returned notes were signed late "
+                          f"and the 99215 share is more than {MAX_EXCESS_FOR_ACUITY:g} times the expected share (rules 2.3)")
+    return lean, reason
+
+
+
 def _pooled(packet, d):
     rows = [r for r in d["by_billed_level"] if r["billed_cpt"] in ("99214", "99215")]
     n = sum(r["documented_claims"] for r in rows)

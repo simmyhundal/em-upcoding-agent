@@ -16,4 +16,5 @@ Live from this repository's [milestones](https://github.com/simmyhundal/em-upcod
 - ![Housekeeping: docs, visuals and releases](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/9) Keep the README, visuals and GitHub releases current and consistent with each tagged version.
 - ![v2.1 and v3.1: parallel workflow and agent builds](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/10) Two streams built side by side: v2.1 improves the fixed workflow, v3.1 improves the agent.
 - ![v2.2 and v3.2: data 2.2 realism and data quality](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/11) Release 2: data 2.2, workflow v2.2 and agent v3.2.
+- ![v2.3 and v3.3: release 3](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/12) Workflow 2.3, agent 3.3, data 2.3.
 <!-- roadmap:end -->
