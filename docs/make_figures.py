@@ -199,14 +199,17 @@ def progression_cells(rows=None):
     v3 = tot(pick({"261013_8_api", "261013_9_api"}, "Agent"))
     v3_h = sum(int(r["honest_requested"]) for r in pick({"261013_8_api", "261013_9_api"}, "Agent"))
     v2_h = sum(int(r["honest_requested"]) for r in pick({"261013_12_api", "261013_13_api"}, "AI"))
-    return {"v1.0": f"Held-out run: {v1[0]} of {v1[1]} upcoders called, {v1[2]} of {v1[3]} honest doctors accused (charts were handed over, so optimistic).",
+    import release_table
+    extra = release_table.headline_cells()
+    return {**extra, "v1.0": f"Held-out run: {v1[0]} of {v1[1]} upcoders called, {v1[2]} of {v1[3]} honest doctors accused (charts were handed over, so optimistic).",
             "v2.0": f"Two reserved seeds: {v2[0]} of {v2[1]} upcoders found, {v2[2]} honest accused; {v2_h} honest practices asked for charts.",
             "v3.0": f"Same two seeds: {v3[0]} of {v3[1]} upcoders found, {v3[2]} honest accused; {v3_h} honest practices asked for charts."}
 
 
 def progression():
     """One slide: how it works over time, as a table with icons and headline eval results."""
-    ev = {k.replace(".0", ".x"): v for k, v in progression_cells().items()}
+    cells = progression_cells()
+    ev = {"v1.x": cells["v1.0"], "v2.x": cells["v2.0"] + " " + cells["v2.3"], "v3.x": cells["v3.0"] + " " + cells["v3.3"]}
     cols = [("data", "Claims"), ("screen", "Screen"), ("records", "Charts"), ("write", "Who writes it"), ("decide", "Who decides"),
             ("eval", "Headline results")]
     rows = [("v1.x", "Fixed workflow", ["Provider, patient and claim tables with a stored condition count.", "Top 25 by statistics. Fixed.",
@@ -216,7 +219,7 @@ def progression():
                                       "Code, with a fixed policy."]),
             ("v3.x", "Agent", ["Same as v2.x.", "A tool the agent runs with any cutoff.", "The agent chooses whom to ask, what sample, and whether to follow up.",
                               "The agent submits findings; code adds facts and checks.", "The agent, within caps."])]
-    W, H = 1180, 410
+    W, H = 1380, 410
     x0, cw, rh, y0 = 150, 170, 118, 56
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="1000" height="{round(H * 1000 / W)}" {FONT}>',
          f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
@@ -233,7 +236,7 @@ def progression():
             s.append(f'<text x="34" y="{y + 52 + j * 16}" font-size="12.5" fill="{MUTED}">{escape(line)}</text>')
         for i, text in enumerate(cells + [ev[v]]):
             x = x0 + i * cw
-            width = 24 if i < 5 else 27
+            width = 24 if i < 5 else 52
             for j, line in enumerate(textwrap.wrap(text, width)[:6]):
                 s.append(f'<text x="{x}" y="{y + 24 + j * 16}" font-size="12" fill="{INK if i == 5 else MUTED}">{escape(line)}</text>')
     s.append("</svg>")
