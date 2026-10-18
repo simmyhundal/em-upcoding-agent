@@ -93,6 +93,16 @@ def report(rows):
                      f"({'significant' if pz <= ALPHA else 'not significant'}); exact McNemar p = {pe:.4f}.")
         else:
             L.append(f"**{name}** (descriptive only until all {len(SEEDS)} seeds are done): only {first} {b}, only {second} {c}.")
+    if rows:
+        L += ["", "## Reading", "",
+              f"- **Found per arm:** W2.2 {s('w2_found')} of {s('upcoders')}, W2.3 {s('w3_found')}, A3.3 {s('a3_found')}. The workflow changes helped on these fresh seeds about as much as on the development seeds "
+              "(38 of 78 in sample against the held-out result above), which is some evidence they were not fitted to the development data.",
+              f"- **Honest burden:** W2.3 sent requests to {s('w3_asked')} honest practices against {s('w2_asked')} for W2.2 and {s('a3_asked')} for A3.3 (request rounds {s('w3_rounds')}, {s('w2_rounds')}, {s('a3_rounds')}). "
+              "The wider list is where the extra upcoders come from, and it is what costs the practices; A3.3 found nearly as many with about half of W2.3's honest requests.",
+              f"- **False accusations:** {s('w2_honest')} honest doctors called by W2.2, {s('w3_honest')} by W2.3, {s('a3_honest')} by A3.3.",
+              "- **Cost:** the workflows cost about a cent a seed; the agent about $0.23 a seed.",
+              "- **Limits:** one data version (2.2) and generated notes, so cloned-notes signs are probably easier than real ones; the agent ran at low effort; ten seeds is a small sample. "
+              "The agent's gain over release 2 (A3.2 found 12 of 78 on other seeds) is not a paired result.", ""]
     return "\n".join(L)
 
 
