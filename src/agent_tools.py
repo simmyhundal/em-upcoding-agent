@@ -48,14 +48,17 @@ class Environment:
         version "3.1" adds the note package (data v2.1): charts carry notes, a second request is allowed (random first, targeted after),
         and the note_checks and request_audit_trail tools exist. "3.2" is 3.1 plus the data-quality pre-flight, the read-only data_quality tool and
         flag_data_issue (issue 81). "3.0" is the frozen agent."""
-        self.v31 = version in ("3.1", "3.2")
-        self.v32 = version == "3.2"
+        self.v31 = version in ("3.1", "3.2", "3.3")
+        self.v32 = version in ("3.2", "3.3")
+        self.v33 = version == "3.3"                     # release 3 (issue 99): rules 2.3, the eb_ratio_t screen, a top-10% list; data stays 2.2
         self.dq, self.data_issues, self.held = None, [], set()
         if self.v32:                                    # version 3.2: the data-quality pre-flight runs once per load (issue 81)
             import data_quality
             import screen_methods
             self.dq = data_quality.run_checks(v2_dir)
             self.scores32 = screen_methods.score_core(view_dir)       # eb_ratio and priority, the release 2 candidates (docs/screen_methods.md)
+            if self.v33:
+                self.scores32 = {**self.scores32, "eb_ratio_t": screen_methods.score_t(view_dir)}      # version 3.3: eb_ratio with the test-line covariate (the workflow v2.3 screen)
         self.note_rows = {}
         self.screen_candidates, self.set_aside, self.tool_calls = set(), {}, []
         self.view_dir, self.model_call, self.records_budget, self.screen_enabled = view_dir, model_call, records_budget, screen_enabled
@@ -139,24 +142,24 @@ class Environment:
         key = {"zscore": ("z", True), "riskadj": ("z_adj", True), "combined": ("mean_rank", False)}.get(method)
         if self.v31 and method == "priority":
             key = ("priority", True)
-        if self.v32 and method == "eb_ratio":
-            key = ("eb_ratio", True)
+        if self.v32 and method == "eb_ratio" or self.v33 and method == "eb_ratio_t":
+            key = (method, True)
         if not key:
-            return {"error": "method must be zscore, riskadj or combined" + (" or priority" if self.v31 else "") + (" or eb_ratio" if self.v32 else "")}
+            return {"error": "method must be zscore, riskadj or combined" + (" or priority" if self.v31 else "") + (" or eb_ratio" if self.v32 else "") + (" or eb_ratio_t" if self.v33 else "")}
         field, desc = key
         if top_pct is not None:
             if not self.v32:
                 return {"error": "top_pct is not available in this version"}
             top_n = flagging.top_n_from_pct(len(self.rows), float(top_pct))       # payers flag a percentile of the panel
         elig = [r for r in self.rows.values() if int(r["n_claims"]) >= min_claims]
-        if self.v32 and field in ("priority", "eb_ratio"):       # version 3.2: the same scores the workflow v2.2 uses, unrounded
+        if self.v32 and field in ("priority", "eb_ratio", "eb_ratio_t"):       # version 3.2: the same scores the workflow v2.2 uses, unrounded
             sc = self.scores32[field]
             elig.sort(key=lambda r: (-sc[r["provider_id"]], r["provider_id"]))
         elif field == "priority":
             elig.sort(key=lambda r: (-self.stats[r["provider_id"]]["priority"], r["provider_id"]))
         else:
             elig.sort(key=lambda r: (-float(r[field]) if desc else float(r[field]), r["provider_id"]))
-        if min_score is not None and method not in ("combined", "priority", "eb_ratio"):
+        if min_score is not None and method not in ("combined", "priority", "eb_ratio", "eb_ratio_t"):
             sel = [r for r in elig if float(r[field]) >= min_score]
         else:
             sel = elig[: int(top_n or 25)]
@@ -239,7 +242,7 @@ class Environment:
                 continue
             chart = self._chart_rule(pid)
             packet = self._packet(pid)
-            rule, reason = (sr.rule_leaning_22 if self.v32 else sr.rule_leaning)(packet)       # version 3.2: the same noise-aware rules as workflow v2.2
+            rule, reason = (sr.rule_leaning_23 if self.v33 else sr.rule_leaning_22 if self.v32 else sr.rule_leaning)(packet)       # 3.2: rules 2.2 as workflow v2.2; 3.3: rules 2.3
             if chart["triggered"] and rule != sr.UPCODING:
                 lean, source, reason = sr.UPCODING, "chart_rule", f"{chart['below_billed']} of {chart['charts']} returned charts support a lower level than billed"
             elif rule:
@@ -343,7 +346,7 @@ class Environment:
             packet = self._packet(f["provider_id"])
             built[f["provider_id"]] = sr.assemble(packet, f["leaning"], f.get("headline"), f.get("interpretation"), version=version)
             if self.v31:
-                lint = summary_lint.lint(built[f["provider_id"]], packet, summary_lint.evidence_from(self.office.transcript, self._audit_log(), f["provider_id"]))
+                lint = summary_lint.lint(built[f["provider_id"]], packet, summary_lint.evidence_from(self.office.transcript, self._audit_log(), f["provider_id"]), rules23=self.v33)
                 if lint["hard"]:
                     problems[f["provider_id"]] = lint["hard"]
         if self.v31:
@@ -415,7 +418,7 @@ class Environment:
                           "Rank every provider by a statistical score and pick a cutoff. method zscore|riskadj|combined; select top_n or min_score "
                           "(riskadj/zscore); optional max_flagged and min_claims. Returns a ranked table, the score distribution and how many "
                           "providers sit at or above several cutoffs. Free and deterministic; call it as often as you like.",
-                          "input_schema": {"type": "object", "properties": {"method": {"type": "string", "enum": ["zscore", "riskadj", "combined"] + (["priority"] if self.v31 else []) + (["eb_ratio"] if self.v32 else [])},
+                          "input_schema": {"type": "object", "properties": {"method": {"type": "string", "enum": ["zscore", "riskadj", "combined"] + (["priority"] if self.v31 else []) + (["eb_ratio"] if self.v32 else []) + (["eb_ratio_t"] if self.v33 else [])},
                                            "top_n": {"type": "integer"}, "min_score": {"type": "number"}, "max_flagged": {"type": "integer"},
                                            "min_claims": {"type": "integer"},
                                            **({"top_pct": {"type": "number", "description": "select the top PCT percent of providers instead of top_n (payers flag a percentile, for example 5)"}} if self.v32 else {})}}})

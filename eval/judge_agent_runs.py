@@ -5,7 +5,7 @@ The judge must see the charts the agent itself obtained. The office is determini
 view folder for the run, then calls eval/judge_usefulness.py (Batch API, cached). Costs real money (about $0.05 a run).
 
 Usage:
-    python eval/judge_agent_runs.py RUN_ID CODE_RUN [3.0|3.1|3.2]      (3.2: rebuild the view only; no LLM judge)
+    python eval/judge_agent_runs.py RUN_ID CODE_RUN [3.0|3.1|3.2|3.3]      (3.2 and 3.3: rebuild the view only; no LLM judge)
 """
 import csv
 import json
@@ -25,7 +25,7 @@ def replay(run_id, code_run, version="3.0"):
     data = os.path.join(ROOT, "data", f"synthetic_v2_{code_run}")
     base = os.path.join(data, "view")
     out = os.path.join(ROOT, "experiments", run_id)
-    office = provider_sim.Office(data, base, seed=1, version="2.1" if version in ("3.1", "3.2") else "2.0")
+    office = provider_sim.Office(data, base, seed=1, version="2.1" if version in ("3.1", "3.2", "3.3") else "2.0")
     for line in open(os.path.join(out, "audit.jsonl")):
         a = json.loads(line)
         args = a["args"]
@@ -74,7 +74,7 @@ def main(run_id, code_run, version="3.0", llm_judge=None):
     """llm_judge None: the LLM judge for 3.0 and 3.1 (as run); 3.2 skips it and only builds the view the rule judge reads (issues 92 and 93)."""
     view = build_view(run_id, code_run, version)
     if llm_judge is None:
-        llm_judge = version != "3.2"
+        llm_judge = version not in ("3.2", "3.3")
     if not llm_judge:
         print(run_id, "view rebuilt; no LLM judge")
         return

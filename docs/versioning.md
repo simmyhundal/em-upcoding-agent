@@ -70,14 +70,14 @@ Release 2 (merged to main, frozen once its evaluation is posted; was branch `rel
 | No LLM usefulness judge in the evaluation (#91, #93) | built: the 2.2 workflow path skips `judge_usefulness.py`; the rule judge runs | #92 | |
 | Agent cost (#92) | n/a: the workflow has no agent loop (its cost is #91) | built: $1 cap for 3.2 (`run_agent.EVAL_MAX_USD_32`), no LLM judge (`judge_agent_runs.main(..., "3.2")` rebuilds the view only, replaying office 2.1), usage per turn (`turn_usage.jsonl`), `run_agent.py --model` and `--effort`; measured in [agent_cost.md](agent_cost.md) | agent loop only |
 
-Release 3 (in development, branch `release3-dev`; data stays 2.2, [#99](https://github.com/simmyhundal/em-upcoding-agent/issues/99), [dev_release3.md](dev_release3.md)). Workflow v2.3 is built behind flags; agent v3.3 is not built yet, so every row below is one-sided for now.
+Release 3 (in development, branch `release3-dev`; data stays 2.2, [#99](https://github.com/simmyhundal/em-upcoding-agent/issues/99), [dev_release3.md](dev_release3.md)). Workflow v2.3 and agent v3.3 are built behind flags (`Environment(version="3.3")`, `run_agent.py --version 3.3`).
 
 | Feature (#99) | v2.3 workflow | v3.3 agent | Reason if one-sided |
 |---|---|---|---|
-| Rules 2.3: cloned-notes signs decide by rule | built: `summary_rules.rule_leaning_23` (late signatures, audit-trail signs, far-above-expected share; chart calls must beat the real peer rate) with `case_summary.py --v23` | planned: the same evidence in the agent's tools and prompt | agent not built yet |
-| Screen `eb_ratio_t` (test-line covariate) | built: `screen_methods.score_t`, `flagging.py --method eb_ratio_t` | planned: `screen_providers` method | agent not built yet |
-| Wider list with a light tier | built, **the W2.3 default** (Simmy's decision: more upcoders found, about 94 more honest practices asked on the development seeds): top 10%, ranks 12 to 22 get one request unless the notes show cloning (`eval/workflow_policy_23.py`) | planned: agent chooses its own list size within caps | agent not built yet |
-| Audit-trail request on late signatures | built (adds nothing on the development seeds) | planned | agent not built yet |
+| Rules 2.3: cloned-notes signs decide by rule | built: `summary_rules.rule_leaning_23` (late signatures, audit-trail signs, far-above-expected share; chart calls must beat the real peer rate) with `case_summary.py --v23` | built: `hybrid_review` uses rules 2.3, the lint accepts such calls, `SYSTEM_33` explains cloned notes and the chart test | mirrored |
+| Screen `eb_ratio_t` (test-line covariate) | built: `screen_methods.score_t`, `flagging.py --method eb_ratio_t` | built: `screen_providers` method `eb_ratio_t` | mirrored |
+| Wider list with a light tier | built, **the W2.3 default** (Simmy's decision: more upcoders found, about 94 more honest practices asked on the development seeds): top 10%, ranks 12 to 22 get one request unless the notes show cloning (`eval/workflow_policy_23.py`) | built: the prompt suggests the top 10% and a light touch beyond the first 5%; records budget 22 (v3.0 to v3.2: 15); the agent chooses | mirrored by design (the agent chooses) |
+| Audit-trail request on late signatures | built (adds nothing on the development seeds) | the existing `request_audit_trail` tool, prompted | mirrored |
 
 Release 1 (frozen). Items still planned carry over to `v2.2` and `v3.2`.
 

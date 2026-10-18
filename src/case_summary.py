@@ -351,9 +351,9 @@ def run(data_dir, flagged_csv, out_path, limit=None, dry_run=False, llm=None, ba
             rec = {"provider_id": pid, "model": MODEL, "summary": summary, "citations_checked": False,
                    "source": "llm", "rule_leaning": lean, "rule_reason": reason}
             if lint:
-                found = summary_lint.lint(summary, packets[pid])
+                found = summary_lint.lint(summary, packets[pid], rules23=rules == "2.3")
                 if found["hard"]:
-                    rec.update({"summary": summary_lint.repair(summary, packets[pid]), "lint_repaired": True, "lint_problems": found["hard"], "source": "llm+repair"})
+                    rec.update({"summary": summary_lint.repair(summary, packets[pid], rules23=rules == "2.3"), "lint_repaired": True, "lint_problems": found["hard"], "source": "llm+repair"})
             out.append(rec)
         else:
             out.append({"provider_id": pid, "model": "rules", "summary": sr.assemble(packets[pid], lean, version=version),

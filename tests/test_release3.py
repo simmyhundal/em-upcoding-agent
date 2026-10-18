@@ -7,10 +7,15 @@ import tempfile
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 sys.path.insert(0, os.path.join(ROOT, "eval"))
+sys.path.insert(0, os.path.join(ROOT, "tests"))
+import agent  # noqa: E402
+import agent_tools as at  # noqa: E402
 import derive  # noqa: E402
 import flagging  # noqa: E402
 import generate_v2 as g  # noqa: E402
 import screen_methods as sm  # noqa: E402
+import summary_lint  # noqa: E402
+import summary_rules as sr  # noqa: E402
 import workflow_policy_23 as wp23  # noqa: E402
 
 D = tempfile.mkdtemp()
@@ -70,6 +75,27 @@ def test_policy_23_light_tier_asks_once_unless_the_notes_show_cloning():
         assert ("a", "audit") in loud.log
     finally:
         wp23.cloning_signs = orig
+
+
+def test_agent_v33_screen_prompt_and_rules():
+    e32, e33 = at.Environment(D, VIEW, version="3.2"), at.Environment(D, VIEW, version="3.3")
+    t = sm.score_t(VIEW)
+    out = e33.screen_providers(method="eb_ratio_t", top_pct=10)
+    k = flagging.top_n_from_pct(len(e33.rows), 10)
+    assert out["selected"] == k and [r[0] for r in out["table"]["rows"]][:k] == sorted(t, key=lambda p: (-t[p], p))[:k]
+    assert "error" in e32.screen_providers(method="eb_ratio_t")                            # 3.2 is unchanged
+    enum = lambda e: [x for x in e.tool_schemas() if x["name"] == "screen_providers"][0]["input_schema"]["properties"]["method"]["enum"]
+    assert "eb_ratio_t" in enum(e33) and "eb_ratio_t" not in enum(e32)
+    assert e33.v31 and e33.v32 and e33.v33 and not e32.v33 and e33.scores32["eb_ratio"] == e32.scores32["eb_ratio"]          # 3.3 keeps every 3.2 tool and score
+    assert "Version 3.3" in agent.SYSTEM_33 and agent.SYSTEM_33.startswith(agent.SYSTEM_32) and "Version 3.3" not in agent.SYSTEM_32
+
+
+def test_lint_accepts_a_rules_23_upcoding_call_only_in_v33():
+    import test_summary_rules as ts
+    sig = {"note_signals": {"notes": 30, "audit_trail_received": False, "rates": {"late": 0.2, "problems": 0.2}}}
+    pk = ts.packet(bad=1, share=0.3, extra=sig)                                              # documentation supports billing, share 15x expected, 20% late
+    assert sr.rule_leaning_23(pk)[0] == sr.UPCODING and sr.rule_leaning_22(pk)[0] == sr.INCONCLUSIVE
+    assert summary_lint.leaning_supported(sr.UPCODING, pk, rules23=True) and not summary_lint.leaning_supported(sr.UPCODING, pk)
 
 
 if __name__ == "__main__":
