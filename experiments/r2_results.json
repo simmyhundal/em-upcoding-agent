@@ -166,5 +166,47 @@
    "effort": "low",
    "model": "claude-opus-5-5"
   }
+ },
+ "2323": {
+  "seed": 2323,
+  "workflow": {
+   "run": "r2w_2323",
+   "upcoders_found": 2,
+   "upcoders": 8,
+   "honest_accused": 0,
+   "called": 2,
+   "cost_usd": 0.0
+  },
+  "agent": {
+   "run": "r2a_2323",
+   "upcoders_found": 2,
+   "upcoders": 8,
+   "honest_accused": 0,
+   "called": 2,
+   "cost_usd": 0.1264,
+   "effort": "low",
+   "model": "claude-opus-5-5"
+  }
+ },
+ "2424": {
+  "seed": 2424,
+  "workflow": {
+   "run": "r2w_2424",
+   "upcoders_found": 4,
+   "upcoders": 8,
+   "honest_accused": 1,
+   "called": 5,
+   "cost_usd": 0.0
+  },
+  "agent": {
+   "run": "r2a_2424",
+   "upcoders_found": 1,
+   "upcoders": 8,
+   "honest_accused": 0,
+   "called": 1,
+   "cost_usd": 0.1628,
+   "effort": "low",
+   "model": "claude-opus-5-5"
+  }
  }
 }
