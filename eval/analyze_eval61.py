@@ -135,7 +135,7 @@ def release2_lines():
             "Unreliable estimates |", "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"] + rows + [
             "", "Paired result on these ten seeds: workflow found 10 upcoders the agent missed and the agent 1 the workflow missed (exact McNemar p = 0.012; with the design effect of 1.5 for "
             "seed clusters, p = 0.027). This was an unplanned look at 10 seeds (the pre-registered looks were 22 and 44 seeds, alpha 0.0294); Simmy chose to stop at 10 and conclude "
-            "the workflow is stronger, to save cost. Full table and the rule: `docs/release2_results.md`."]
+            "the workflow is stronger, to save cost. Full table and the rule: `docs/release2_results.md`. **Superseded for the workflow-versus-agent question:** the fresh pre-registered release 3 test (workflow v2.3 37, agent v3.3 34 of 79) found no significant gap (`docs/release3_results.md`)."]
 
 
 def main():

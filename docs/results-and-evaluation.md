@@ -43,6 +43,14 @@ Workflow costs include the usefulness judge; agent costs do not (about $0.05 mor
 - The rows, with dollars at stake and request rounds, are in the Eval table below; the protocol (arms, seeds, rules) is [issue 50](https://github.com/simmyhundal/em-upcoding-agent/issues/50).
 
 
+## Releases 2 and 3: harder data (2.2), and what the fresh seeds showed
+
+Data 2.2 adds honest coding noise (about 8% of honest visits miscoded, half upward), group billing, and an upcoder defined as billing above the honest baseline by a margin (set from payer practice; [data_v2_2.md](data_v2_2.md)). Every number below is on generated data with generated notes, so cloned-notes signs are probably easier than real ones.
+
+- **Release 2 (workflow v2.2, agent v3.2, ten seeds, [release2_results.md](release2_results.md)).** The workflow found 21 of 78 upcoders and the agent 12. The pre-registered looks were at 22 and 44 seeds; the ten-seed result was an **unplanned look** and no significance claim is valid for it, whatever its p-value (exact McNemar 0.012; with the design effect for seed clusters 0.027). It was reported as suggestive, and the cheaper decision to stop at ten seeds was Simmy's.
+- **Release 3 (workflow v2.3, agent v3.3, ten fresh seeds, pre-registered on issue 99, [release3_results.md](release3_results.md)).** Workflow v2.3 found 37 of 79, agent v3.3 34, workflow v2.2 24. Workflow against agent: **no significant gap** (p = 0.59). Workflow v2.3 against v2.2: 21 upcoders found only by v2.3 against 8 (p = 0.049 against the pre-registered 0.025, so not significant by the rule; exact McNemar 0.024). The wider list behind v2.3 asks 150 honest practices for records against 64 for v2.2 (the agent 79).
+- **Where the misses are** ([release2_misses.md](release2_misses.md), [dev_release3.md](dev_release3.md)): the screen's top 5% held only 44 of 78 upcoders; cloned-notes upcoders were the largest hole (workflow v2.2 called 4 of 23 screened ones; rules 2.3 raise that to about 17 on the development seeds, in sample).
+
 ## Thresholds
 Every run is graded against the same thresholds. How each is computed is in `eval/`; per-run detail tables are in `reports/eval_report.md`.
 
