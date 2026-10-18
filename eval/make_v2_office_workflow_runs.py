@@ -23,6 +23,7 @@ import provider_sim  # noqa: E402
 import records  # noqa: E402
 import run_office_baseline as rob  # noqa: E402
 import workflow_policy_23 as wp23  # noqa: E402
+import workflow_policy_24 as wp24  # noqa: E402
 import workflow_policy_v21 as wp  # noqa: E402
 
 RUNS = [("261013_12_api", "261013_4_code", "threshold", "reserved seed 202; screen suspicion >= 5; fixed office policy"),
@@ -31,7 +32,7 @@ RUNS = [("261013_12_api", "261013_4_code", "threshold", "reserved seed 202; scre
         ("261013_15_api", "261013_5_code", "top25", "reserved seed 303; screen top 25; fixed office policy")]
 
 
-def build_view(rid, src, screen, version="2.0", tier1_n=None):
+def build_view(rid, src, screen, version="2.0", tier1_n=None, policy24=None):
     """version "2.1": office 2.1 and the fixed v2.1 policy (eval/workflow_policy_v21.py) on data 2.1; the notes go into documentation.csv.
     version "2.2": the same, with the screen named by `screen` (eb_ratio or priority: experiments/<src>/flagged_<screen>.csv, top 25) and the data-quality pre-flight."""
     data = os.path.join(ROOT, "data", f"synthetic_v2_{src}")
@@ -44,12 +45,18 @@ def build_view(rid, src, screen, version="2.0", tier1_n=None):
             os.symlink(os.path.join(base, name), dst)
     flagged_file = os.path.join(ROOT, "experiments", src, {"threshold": "flagged_threshold.csv", "top25": "flagged.csv"}.get(screen, f"flagged_{screen}.csv"))
     flagged = [r["provider_id"] for r in csv.DictReader(open(flagged_file)) if r["flagged"] == "True"]
-    if version in ("2.1", "2.2", "2.3"):               # 2.2: the same office and policy as 2.1; the screen is eb_ratio or priority (top 25)
+    if version in ("2.1", "2.2", "2.3", "2.4"):        # 2.2: the same office and policy as 2.1; the screen is eb_ratio or priority (top 25)
         office = provider_sim.Office(data, base, seed=1, version="2.1")
         by_provider = {}
         for r in csv.DictReader(open(os.path.join(base, "claims.csv"))):
             by_provider.setdefault(r["provider_id"], []).append(r)
-        if version == "2.3":                           # 2.3: two tiers on the top-10% list (workflow_policy_23.py)
+        if version == "2.4":                           # 2.4 candidates (development, issue 102): policy 2.3 plus a ratio gate and a stop for silent offices
+            ratio = {}
+            for r in csv.DictReader(open(flagged_file)):
+                exp = float(r["expected_share"])
+                ratio[r["provider_id"]] = float(r["share_99215"]) / exp if exp else 0.0
+            wp24.run_policy_24(office, flagged, by_provider, tier1_n or len(flagged), ratio, **(policy24 or {}))
+        elif version == "2.3":                         # 2.3: two tiers on the top-10% list (workflow_policy_23.py)
             wp23.run_policy_23(office, flagged, by_provider, tier1_n or len(flagged))
         else:
             wp.run_policy_v21(office, flagged, by_provider)
@@ -69,7 +76,7 @@ def build_view(rid, src, screen, version="2.0", tier1_n=None):
         for p in sorted(control):
             w.writerow([p, "control", 0, 0, 0, 0])
         for p in flagged:
-            st = office.state[p]
+            st = office._st(p)
             w.writerow([p, "flagged", len(st["requested"]), len(st["usable"]), 0, 0])
     return view, office, flagged_file
 
