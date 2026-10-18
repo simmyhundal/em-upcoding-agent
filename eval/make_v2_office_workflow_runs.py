@@ -22,6 +22,7 @@ import make_v2_ai_runs as ai  # noqa: E402
 import provider_sim  # noqa: E402
 import records  # noqa: E402
 import run_office_baseline as rob  # noqa: E402
+import workflow_policy_23 as wp23  # noqa: E402
 import workflow_policy_v21 as wp  # noqa: E402
 
 RUNS = [("261013_12_api", "261013_4_code", "threshold", "reserved seed 202; screen suspicion >= 5; fixed office policy"),
@@ -30,7 +31,7 @@ RUNS = [("261013_12_api", "261013_4_code", "threshold", "reserved seed 202; scre
         ("261013_15_api", "261013_5_code", "top25", "reserved seed 303; screen top 25; fixed office policy")]
 
 
-def build_view(rid, src, screen, version="2.0"):
+def build_view(rid, src, screen, version="2.0", tier1_n=None):
     """version "2.1": office 2.1 and the fixed v2.1 policy (eval/workflow_policy_v21.py) on data 2.1; the notes go into documentation.csv.
     version "2.2": the same, with the screen named by `screen` (eb_ratio or priority: experiments/<src>/flagged_<screen>.csv, top 25) and the data-quality pre-flight."""
     data = os.path.join(ROOT, "data", f"synthetic_v2_{src}")
@@ -43,12 +44,15 @@ def build_view(rid, src, screen, version="2.0"):
             os.symlink(os.path.join(base, name), dst)
     flagged_file = os.path.join(ROOT, "experiments", src, {"threshold": "flagged_threshold.csv", "top25": "flagged.csv"}.get(screen, f"flagged_{screen}.csv"))
     flagged = [r["provider_id"] for r in csv.DictReader(open(flagged_file)) if r["flagged"] == "True"]
-    if version in ("2.1", "2.2"):                      # 2.2: the same office and policy as 2.1; the screen is eb_ratio or priority (top 25)
+    if version in ("2.1", "2.2", "2.3"):               # 2.2: the same office and policy as 2.1; the screen is eb_ratio or priority (top 25)
         office = provider_sim.Office(data, base, seed=1, version="2.1")
         by_provider = {}
         for r in csv.DictReader(open(os.path.join(base, "claims.csv"))):
             by_provider.setdefault(r["provider_id"], []).append(r)
-        wp.run_policy_v21(office, flagged, by_provider)
+        if version == "2.3":                           # 2.3: two tiers on the top-10% list (workflow_policy_23.py)
+            wp23.run_policy_23(office, flagged, by_provider, tier1_n or len(flagged))
+        else:
+            wp.run_policy_v21(office, flagged, by_provider)
     else:
         office = provider_sim.Office(data, base, seed=1)
         rob.run_policy(office, flagged)
@@ -70,12 +74,12 @@ def build_view(rid, src, screen, version="2.0"):
     return view, office, flagged_file
 
 
-def run(rid, src, screen, note, version="2.0"):
-    view, office, flagged_file = build_view(rid, src, screen, version)
+def run(rid, src, screen, note, version="2.0", tier1_n=None):
+    view, office, flagged_file = build_view(rid, src, screen, version, **({} if tier1_n is None else {"tier1_n": tier1_n}))
     name = os.path.basename(view)
     # 2.2: rules 2.2 decide more summaries without the model, and no LLM usefulness judge (the rule judge runs after; issues 91 and 93)
-    ai.run(rid, src, note, view_name=name, flagged_name=os.path.basename(flagged_file), v21=version in ("2.1", "2.2"), preflight=version == "2.2",
-           v22=version == "2.2", llm_judge=version != "2.2")
+    ai.run(rid, src, note, view_name=name, flagged_name=os.path.basename(flagged_file), v21=version in ("2.1", "2.2", "2.3"), preflight=version in ("2.2", "2.3"),
+           v22=version in ("2.2", "2.3"), v23=version == "2.3", llm_judge=version not in ("2.2", "2.3"))
     office.write_transcript(os.path.join(ROOT, "experiments", rid, "office_transcript.jsonl"))
 
 

@@ -59,7 +59,7 @@ The product now develops on two lines at once, so we can keep learning from both
 
 Features roughly mirror one another: a change lands in both streams, or is marked one-stream-only below with a reason. Shared pieces (the data generator, the provider office, the number check, the results table, the judge) change once and are re-run for both. Frozen so far: `v2.0` and `v2.1` (workflow), `v3.0` and `v3.1` (agent); the next releases are `v2.2` and `v3.2`, and the baselines are never edited. New results are compared with the frozen baselines on fresh seeds, using the decision rules fixed in advance in the multi-seed evaluation issue (#61). The reason for keeping the agent in development whatever the comparison shows: an agent should adapt to whatever data and situation it meets, which a fixed workflow cannot, and that has not yet been tested at low base rates or on new kinds of evidence.
 
-Release 2 (in development, branch `release2-overnight`). Data 2.2 is behind `--data-version 2.2` ([data_v2_2.md](data_v2_2.md)); the frozen paths are unchanged and were checked by regenerating `261015_66_code`, `261015_1_code` and `261012_1_code` and diffing every file, and by replaying the recorded agent run `261015_70_api` through `Environment(version="3.1")` (all 14 findings identical).
+Release 2 (merged to main, frozen once its evaluation is posted; was branch `release2-overnight`). Data 2.2 is behind `--data-version 2.2` ([data_v2_2.md](data_v2_2.md)); the frozen paths are unchanged and were checked by regenerating `261015_66_code`, `261015_1_code` and `261012_1_code` and diffing every file, and by replaying the recorded agent run `261015_70_api` through `Environment(version="3.1")` (all 14 findings identical).
 
 | Feature (issue) | v2.2 workflow | v3.2 agent | Reason if one-sided |
 |---|---|---|---|
@@ -69,6 +69,15 @@ Release 2 (in development, branch `release2-overnight`). Data 2.2 is behind `--d
 | Fewer model calls in the writer (#91) | built: rules 2.2 (`case_summary.py --v22`, `summary_rules.rule_leaning_22`) decide inconclusive the ambiguous cases where the v2.1 model always said inconclusive; 115 to 11 model calls on the release 1 runs, no leaning changed ([workflow_cost.md](workflow_cost.md)) | n/a: the agent writes its own findings (its cost is #92) | the agent has no rule-then-model writer |
 | No LLM usefulness judge in the evaluation (#91, #93) | built: the 2.2 workflow path skips `judge_usefulness.py`; the rule judge runs | #92 | |
 | Agent cost (#92) | n/a: the workflow has no agent loop (its cost is #91) | built: $1 cap for 3.2 (`run_agent.EVAL_MAX_USD_32`), no LLM judge (`judge_agent_runs.main(..., "3.2")` rebuilds the view only, replaying office 2.1), usage per turn (`turn_usage.jsonl`), `run_agent.py --model` and `--effort`; measured in [agent_cost.md](agent_cost.md) | agent loop only |
+
+Release 3 (in development, branch `release3-dev`; data stays 2.2, [#99](https://github.com/simmyhundal/em-upcoding-agent/issues/99), [dev_release3.md](dev_release3.md)). Workflow v2.3 is built behind flags; agent v3.3 is not built yet, so every row below is one-sided for now.
+
+| Feature (#99) | v2.3 workflow | v3.3 agent | Reason if one-sided |
+|---|---|---|---|
+| Rules 2.3: cloned-notes signs decide by rule | built: `summary_rules.rule_leaning_23` (late signatures, audit-trail signs, far-above-expected share; chart calls must beat the real peer rate) with `case_summary.py --v23` | planned: the same evidence in the agent's tools and prompt | agent not built yet |
+| Screen `eb_ratio_t` (test-line covariate) | built: `screen_methods.score_t`, `flagging.py --method eb_ratio_t` | planned: `screen_providers` method | agent not built yet |
+| Wider list with a light tier | built: top 10%, ranks 12 to 22 get one request unless the notes show cloning (`eval/workflow_policy_23.py`) | planned: agent chooses its own list size within caps | agent not built yet |
+| Audit-trail request on late signatures | built (adds nothing on the development seeds) | planned | agent not built yet |
 
 Release 1 (frozen). Items still planned carry over to `v2.2` and `v3.2`.
 

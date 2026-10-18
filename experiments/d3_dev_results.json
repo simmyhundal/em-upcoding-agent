@@ -1,0 +1,802 @@
+[
+ {
+  "seed": 1515,
+  "variant": "V0",
+  "found": 1,
+  "honest_called": 1,
+  "upcoders": 7,
+  "honest_asked": 8,
+  "rounds_honest": 24,
+  "model_cases": 0
+ },
+ {
+  "seed": 1616,
+  "variant": "V0",
+  "found": 2,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 7,
+  "rounds_honest": 22,
+  "model_cases": 0
+ },
+ {
+  "seed": 1717,
+  "variant": "V0",
+  "found": 1,
+  "honest_called": 0,
+  "upcoders": 7,
+  "honest_asked": 7,
+  "rounds_honest": 22,
+  "model_cases": 0
+ },
+ {
+  "seed": 1818,
+  "variant": "V0",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 20,
+  "model_cases": 0
+ },
+ {
+  "seed": 1919,
+  "variant": "V0",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 22,
+  "model_cases": 0
+ },
+ {
+  "seed": 2020,
+  "variant": "V0",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 16,
+  "model_cases": 0
+ },
+ {
+  "seed": 2121,
+  "variant": "V0",
+  "found": 0,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 8,
+  "rounds_honest": 25,
+  "model_cases": 0
+ },
+ {
+  "seed": 2222,
+  "variant": "V0",
+  "found": 2,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 18,
+  "model_cases": 0
+ },
+ {
+  "seed": 2323,
+  "variant": "V0",
+  "found": 2,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 19,
+  "model_cases": 0
+ },
+ {
+  "seed": 2424,
+  "variant": "V0",
+  "found": 4,
+  "honest_called": 1,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 20,
+  "model_cases": 0
+ },
+ {
+  "seed": 1515,
+  "variant": "V1",
+  "found": 2,
+  "honest_called": 1,
+  "upcoders": 7,
+  "honest_asked": 8,
+  "rounds_honest": 26,
+  "model_cases": 0
+ },
+ {
+  "seed": 1515,
+  "variant": "V1c",
+  "found": 2,
+  "honest_called": 0,
+  "upcoders": 7,
+  "honest_asked": 8,
+  "rounds_honest": 26,
+  "model_cases": 0
+ },
+ {
+  "seed": 1515,
+  "variant": "V2",
+  "found": 2,
+  "honest_called": 0,
+  "upcoders": 7,
+  "honest_asked": 8,
+  "rounds_honest": 26,
+  "model_cases": 0
+ },
+ {
+  "seed": 1515,
+  "variant": "V3",
+  "found": 2,
+  "honest_called": 0,
+  "upcoders": 7,
+  "honest_asked": 8,
+  "rounds_honest": 26,
+  "model_cases": 0
+ },
+ {
+  "seed": 1515,
+  "variant": "V4n",
+  "found": 2,
+  "honest_called": 2,
+  "upcoders": 7,
+  "honest_asked": 17,
+  "rounds_honest": 46,
+  "model_cases": 0
+ },
+ {
+  "seed": 1515,
+  "variant": "V4",
+  "found": 2,
+  "honest_called": 0,
+  "upcoders": 7,
+  "honest_asked": 17,
+  "rounds_honest": 46,
+  "model_cases": 0
+ },
+ {
+  "seed": 1515,
+  "variant": "V5",
+  "found": 2,
+  "honest_called": 0,
+  "upcoders": 7,
+  "honest_asked": 17,
+  "rounds_honest": 46,
+  "model_cases": 0
+ },
+ {
+  "seed": 1616,
+  "variant": "V1",
+  "found": 4,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 7,
+  "rounds_honest": 23,
+  "model_cases": 0
+ },
+ {
+  "seed": 1616,
+  "variant": "V1c",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 7,
+  "rounds_honest": 23,
+  "model_cases": 0
+ },
+ {
+  "seed": 1616,
+  "variant": "V2",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 7,
+  "rounds_honest": 23,
+  "model_cases": 0
+ },
+ {
+  "seed": 1616,
+  "variant": "V3",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 7,
+  "rounds_honest": 23,
+  "model_cases": 0
+ },
+ {
+  "seed": 1616,
+  "variant": "V4n",
+  "found": 4,
+  "honest_called": 1,
+  "upcoders": 8,
+  "honest_asked": 15,
+  "rounds_honest": 47,
+  "model_cases": 0
+ },
+ {
+  "seed": 1616,
+  "variant": "V4",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 15,
+  "rounds_honest": 47,
+  "model_cases": 0
+ },
+ {
+  "seed": 1616,
+  "variant": "V5",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 15,
+  "rounds_honest": 44,
+  "model_cases": 0
+ },
+ {
+  "seed": 1717,
+  "variant": "V1",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 7,
+  "honest_asked": 7,
+  "rounds_honest": 24,
+  "model_cases": 0
+ },
+ {
+  "seed": 1717,
+  "variant": "V1c",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 7,
+  "honest_asked": 7,
+  "rounds_honest": 24,
+  "model_cases": 0
+ },
+ {
+  "seed": 1717,
+  "variant": "V2",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 7,
+  "honest_asked": 7,
+  "rounds_honest": 24,
+  "model_cases": 0
+ },
+ {
+  "seed": 1717,
+  "variant": "V3",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 7,
+  "honest_asked": 7,
+  "rounds_honest": 24,
+  "model_cases": 0
+ },
+ {
+  "seed": 1717,
+  "variant": "V4n",
+  "found": 3,
+  "honest_called": 1,
+  "upcoders": 7,
+  "honest_asked": 16,
+  "rounds_honest": 46,
+  "model_cases": 0
+ },
+ {
+  "seed": 1717,
+  "variant": "V4",
+  "found": 3,
+  "honest_called": 1,
+  "upcoders": 7,
+  "honest_asked": 16,
+  "rounds_honest": 46,
+  "model_cases": 0
+ },
+ {
+  "seed": 1717,
+  "variant": "V5",
+  "found": 3,
+  "honest_called": 1,
+  "upcoders": 7,
+  "honest_asked": 16,
+  "rounds_honest": 46,
+  "model_cases": 0
+ },
+ {
+  "seed": 1818,
+  "variant": "V1",
+  "found": 5,
+  "honest_called": 1,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 21,
+  "model_cases": 0
+ },
+ {
+  "seed": 1818,
+  "variant": "V1c",
+  "found": 5,
+  "honest_called": 1,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 21,
+  "model_cases": 0
+ },
+ {
+  "seed": 1818,
+  "variant": "V2",
+  "found": 6,
+  "honest_called": 1,
+  "upcoders": 8,
+  "honest_asked": 5,
+  "rounds_honest": 17,
+  "model_cases": 0
+ },
+ {
+  "seed": 1818,
+  "variant": "V3",
+  "found": 6,
+  "honest_called": 1,
+  "upcoders": 8,
+  "honest_asked": 5,
+  "rounds_honest": 18,
+  "model_cases": 0
+ },
+ {
+  "seed": 1818,
+  "variant": "V4n",
+  "found": 6,
+  "honest_called": 3,
+  "upcoders": 8,
+  "honest_asked": 16,
+  "rounds_honest": 45,
+  "model_cases": 0
+ },
+ {
+  "seed": 1818,
+  "variant": "V4",
+  "found": 6,
+  "honest_called": 1,
+  "upcoders": 8,
+  "honest_asked": 16,
+  "rounds_honest": 45,
+  "model_cases": 0
+ },
+ {
+  "seed": 1818,
+  "variant": "V5",
+  "found": 6,
+  "honest_called": 1,
+  "upcoders": 8,
+  "honest_asked": 16,
+  "rounds_honest": 46,
+  "model_cases": 0
+ },
+ {
+  "seed": 1919,
+  "variant": "V1",
+  "found": 5,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 23,
+  "model_cases": 0
+ },
+ {
+  "seed": 1919,
+  "variant": "V1c",
+  "found": 4,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 23,
+  "model_cases": 0
+ },
+ {
+  "seed": 1919,
+  "variant": "V2",
+  "found": 4,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 22,
+  "model_cases": 0
+ },
+ {
+  "seed": 1919,
+  "variant": "V3",
+  "found": 4,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 22,
+  "model_cases": 0
+ },
+ {
+  "seed": 1919,
+  "variant": "V4n",
+  "found": 6,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 16,
+  "rounds_honest": 54,
+  "model_cases": 0
+ },
+ {
+  "seed": 1919,
+  "variant": "V4",
+  "found": 5,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 16,
+  "rounds_honest": 54,
+  "model_cases": 0
+ },
+ {
+  "seed": 1919,
+  "variant": "V5",
+  "found": 4,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 17,
+  "rounds_honest": 62,
+  "model_cases": 0
+ },
+ {
+  "seed": 2020,
+  "variant": "V1",
+  "found": 4,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 16,
+  "model_cases": 0
+ },
+ {
+  "seed": 2020,
+  "variant": "V1c",
+  "found": 4,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 16,
+  "model_cases": 0
+ },
+ {
+  "seed": 2020,
+  "variant": "V2",
+  "found": 4,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 16,
+  "model_cases": 0
+ },
+ {
+  "seed": 2020,
+  "variant": "V3",
+  "found": 4,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 16,
+  "model_cases": 0
+ },
+ {
+  "seed": 2020,
+  "variant": "V4n",
+  "found": 4,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 16,
+  "rounds_honest": 36,
+  "model_cases": 0
+ },
+ {
+  "seed": 2020,
+  "variant": "V4",
+  "found": 4,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 16,
+  "rounds_honest": 36,
+  "model_cases": 0
+ },
+ {
+  "seed": 2020,
+  "variant": "V5",
+  "found": 4,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 16,
+  "rounds_honest": 36,
+  "model_cases": 0
+ },
+ {
+  "seed": 2121,
+  "variant": "V1",
+  "found": 1,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 8,
+  "rounds_honest": 26,
+  "model_cases": 0
+ },
+ {
+  "seed": 2121,
+  "variant": "V1c",
+  "found": 1,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 8,
+  "rounds_honest": 26,
+  "model_cases": 0
+ },
+ {
+  "seed": 2121,
+  "variant": "V2",
+  "found": 1,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 7,
+  "rounds_honest": 22,
+  "model_cases": 0
+ },
+ {
+  "seed": 2121,
+  "variant": "V3",
+  "found": 1,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 7,
+  "rounds_honest": 22,
+  "model_cases": 0
+ },
+ {
+  "seed": 2121,
+  "variant": "V4n",
+  "found": 4,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 15,
+  "rounds_honest": 38,
+  "model_cases": 0
+ },
+ {
+  "seed": 2121,
+  "variant": "V4",
+  "found": 4,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 15,
+  "rounds_honest": 38,
+  "model_cases": 0
+ },
+ {
+  "seed": 2121,
+  "variant": "V5",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 16,
+  "rounds_honest": 42,
+  "model_cases": 0
+ },
+ {
+  "seed": 2222,
+  "variant": "V1",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 18,
+  "model_cases": 0
+ },
+ {
+  "seed": 2222,
+  "variant": "V1c",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 18,
+  "model_cases": 0
+ },
+ {
+  "seed": 2222,
+  "variant": "V2",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 18,
+  "model_cases": 0
+ },
+ {
+  "seed": 2222,
+  "variant": "V3",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 18,
+  "model_cases": 0
+ },
+ {
+  "seed": 2222,
+  "variant": "V4n",
+  "found": 4,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 15,
+  "rounds_honest": 38,
+  "model_cases": 0
+ },
+ {
+  "seed": 2222,
+  "variant": "V4",
+  "found": 4,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 15,
+  "rounds_honest": 38,
+  "model_cases": 0
+ },
+ {
+  "seed": 2222,
+  "variant": "V5",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 16,
+  "rounds_honest": 40,
+  "model_cases": 0
+ },
+ {
+  "seed": 2323,
+  "variant": "V1",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 20,
+  "model_cases": 0
+ },
+ {
+  "seed": 2323,
+  "variant": "V1c",
+  "found": 2,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 20,
+  "model_cases": 0
+ },
+ {
+  "seed": 2323,
+  "variant": "V2",
+  "found": 2,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 23,
+  "model_cases": 0
+ },
+ {
+  "seed": 2323,
+  "variant": "V3",
+  "found": 2,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 23,
+  "model_cases": 0
+ },
+ {
+  "seed": 2323,
+  "variant": "V4n",
+  "found": 4,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 15,
+  "rounds_honest": 43,
+  "model_cases": 1
+ },
+ {
+  "seed": 2323,
+  "variant": "V4",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 15,
+  "rounds_honest": 43,
+  "model_cases": 1
+ },
+ {
+  "seed": 2323,
+  "variant": "V5",
+  "found": 3,
+  "honest_called": 0,
+  "upcoders": 8,
+  "honest_asked": 16,
+  "rounds_honest": 42,
+  "model_cases": 0
+ },
+ {
+  "seed": 2424,
+  "variant": "V1",
+  "found": 5,
+  "honest_called": 1,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 23,
+  "model_cases": 0
+ },
+ {
+  "seed": 2424,
+  "variant": "V1c",
+  "found": 3,
+  "honest_called": 1,
+  "upcoders": 8,
+  "honest_asked": 6,
+  "rounds_honest": 23,
+  "model_cases": 0
+ },
+ {
+  "seed": 2424,
+  "variant": "V2",
+  "found": 4,
+  "honest_called": 1,
+  "upcoders": 8,
+  "honest_asked": 5,
+  "rounds_honest": 18,
+  "model_cases": 0
+ },
+ {
+  "seed": 2424,
+  "variant": "V3",
+  "found": 4,
+  "honest_called": 1,
+  "upcoders": 8,
+  "honest_asked": 5,
+  "rounds_honest": 18,
+  "model_cases": 0
+ },
+ {
+  "seed": 2424,
+  "variant": "V4n",
+  "found": 6,
+  "honest_called": 1,
+  "upcoders": 8,
+  "honest_asked": 16,
+  "rounds_honest": 44,
+  "model_cases": 0
+ },
+ {
+  "seed": 2424,
+  "variant": "V4",
+  "found": 4,
+  "honest_called": 1,
+  "upcoders": 8,
+  "honest_asked": 16,
+  "rounds_honest": 44,
+  "model_cases": 0
+ },
+ {
+  "seed": 2424,
+  "variant": "V5",
+  "found": 3,
+  "honest_called": 1,
+  "upcoders": 8,
+  "honest_asked": 16,
+  "rounds_honest": 44,
+  "model_cases": 0
+ }
+]

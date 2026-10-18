@@ -63,6 +63,18 @@ def test_rules_23_lean_upcoding_on_late_signatures_when_the_share_is_far_above_e
     assert sr.rule_leaning_23(packet(extra=ask, **base))[0] is None
 
 
+def test_rules_23_chart_call_must_beat_the_real_peer_rate():
+    # 4 of 6 documented 99215 charts below billed: rules 2.2 call it upcoding because the peer rate is capped at 15%; the real peer rate is 39%
+    noisy = packet(bad=4, n99215=6, peer=0.39, share=0.3)
+    assert sr.rule_leaning_22(noisy)[0] == sr.UPCODING
+    lean, reason = sr.rule_leaning_23(noisy)
+    assert lean == sr.INCONCLUSIVE and "more than chance" in reason
+    clear = packet(bad=9, n99215=10, peer=0.39, share=0.3)                       # 9 of 10 against 39%: beats it
+    assert sr.rule_leaning_23(clear)[0] == sr.UPCODING and "beats the uncapped peer rate" in sr.rule_leaning_23(clear)[1]
+    assert sr.rule_leaning_23(packet(bad=6, n99215=10, peer=0.08, share=0.3))[0] == sr.UPCODING     # release 1 style peers: unchanged
+    assert abs(sr._binom_sf(2, 4, 0.5) - 0.6875) < 1e-9
+
+
 def test_rule_leaning_cases():
     assert sr.rule_leaning(packet(bad=6))[0] == sr.UPCODING                          # 60% unsupported, peer 8%
     assert sr.rule_leaning(packet(bad=1, share=0.1))[0] == sr.HIGH_ACUITY            # 10% unsupported, share within 3x expected

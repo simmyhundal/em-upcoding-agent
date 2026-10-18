@@ -71,12 +71,13 @@ def test_office_workflow_flags_by_version():
     real_bv, real_run = ow.build_view, ow.ai.run
     try:
         ow.build_view = lambda rid, src, screen, version="2.0": ("/tmp/view_x", Office(), "/tmp/flagged_x.csv")
-        ow.ai.run = lambda *a, **k: seen.update({k.get("v22"): k})
-        for v in ("2.0", "2.1", "2.2"):
+        ow.ai.run = lambda *a, **k: seen.update({"k": k})
+        for v in ("2.0", "2.1", "2.2", "2.3"):
             seen.clear()
             ow.run("r", "c", "threshold", "n", version=v)
             k = next(iter(seen.values()))
-            assert k["v22"] == (v == "2.2") and k["llm_judge"] == (v != "2.2") and k["v21"] == (v != "2.0")
+            assert k["v22"] == (v in ("2.2", "2.3")) and k["llm_judge"] == (v not in ("2.2", "2.3")) and k["v21"] == (v != "2.0")
+            assert k["v23"] == (v == "2.3")
     finally:
         ow.build_view, ow.ai.run = real_bv, real_run
 

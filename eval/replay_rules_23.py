@@ -54,7 +54,7 @@ def main():
          "(1515 to 2424, now development data for release 3), so this shows what it can do on data it came from, not how it generalises. A fresh 10-seed batch is the test "
          "(posted in advance). Data stays 2.2 for release 3.", "",
          "Rule 2.3 (`summary_rules.rule_leaning_23`): where rules 2.2 would say inconclusive or still ask the model, lean upcoding when at least 8 notes came back, 12% or more were signed late "
-         "(the existing `INFLATED_LATE`), and the 99215 share is more than 3 times the expected share (the existing `MAX_EXCESS_FOR_ACUITY`). No new cutoff was fitted.", "",
+         "(the existing `INFLATED_LATE`), and the 99215 share is more than 3 times the expected share (the existing `MAX_EXCESS_FOR_ACUITY`). A chart-based upcoding call (rules 2.2) must also beat the real, uncapped peer unsupported rate at one-sided exact binomial 0.05; the 15% cap alone let honest doctors through once the list was widened (`dev_release3.md`). No new cutoff was fitted.", "",
          f"**Faithful replay:** rules 2.2 reproduce the stored leaning on {faithful} of {n} providers.", ""]
     L += ["| Seed | Workflow 2.2 called (right / wrong) | Rules 2.3 called (right / wrong) |", "|---|---|---|"]
     tot = Counter()

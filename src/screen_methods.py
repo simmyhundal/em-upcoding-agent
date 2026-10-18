@@ -53,7 +53,7 @@ def load(data_dir):
             conds = set(filter(None, (r.get("conditions") or "").split(";")))
             pat[r["patient_id"]] = (min(int(r["chronic_condition_count"]), MAX_COUNT), int(r["age"]),
                                     float(r.get("risk_score") or 0.0), conds)
-    prov, level, cnt, age, risk, conds, date = [], [], [], [], [], [], []
+    prov, level, cnt, age, risk, conds, date, test = [], [], [], [], [], [], [], []
     with open(os.path.join(data_dir, "claims.csv")) as f:
         for r in csv.DictReader(f):
             if r["cpt"] not in LEVELS:
@@ -66,10 +66,11 @@ def load(data_dir):
             risk.append(k)
             conds.append(cs)
             date.append((r["patient_id"], r["service_date"]))
+            test.append(1.0 if r.get("has_test_line") in ("1", "True", "true") else 0.0)
     prov = np.array(prov)
     first = _first_visit_flags(prov, date)
     return {"prov": prov, "level": np.array(level), "cnt": np.array(cnt), "age": np.array(age), "risk": np.array(risk),
-            "conds": conds, "first": first}
+            "conds": conds, "first": first, "test": np.array(test)}
 
 
 def _first_visit_flags(prov, keys):
@@ -227,6 +228,20 @@ def score_core(data_dir):
     excess = {pid: v["n_99215"] - v["expected"] for pid, v in sc.items()}
     return {"riskadj": dict(zip(sc, _robust(zr).tolist())), "priority": _rank_avg(ratio, excess), "eb_ratio": eb_scores(sc)["eb_ratio"],
             "_expected": {pid: v["expected"] for pid, v in sc.items()}}
+
+
+def score_t(data_dir):
+    """{provider_id: eb_ratio_t score} for a dataset folder (workflow v2.3). score_core, used by the frozen release 2 paths, is unchanged."""
+    return eb_ratio_t(load(data_dir))
+
+
+def eb_ratio_t(D):
+    """eb_ratio with one more visit-level covariate in the expected-99215 model: whether the claim carries a lab or test line (workflow v2.3, issue 99).
+    A 99215 billed with no test line on it is less expected than one with, so providers whose 99215s lack the support a high-level visit usually has score higher.
+    Payer-visible (derived from the claim lines). On the ten release 2 seeds it listed 47 of 78 upcoders in the top 5% against 44 for eb_ratio (in sample)."""
+    X = np.hstack([design_count(D["cnt"]), D["test"][:, None]])
+    _, sc = _binary_fit(D, X)
+    return eb_scores(sc)["eb_ratio"]
 
 
 def score_all(data_dir):
