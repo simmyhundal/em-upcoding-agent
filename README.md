@@ -2,7 +2,7 @@
 
 An investigator agent for payment integrity: it screens primary care providers for E/M (Evaluation and Management) upcoding on synthetic Medicare-style claims, decides which practices to ask for charts and how, checks the notes against the claims, and hands drafts to people to review. The practices are simulated too. **TL;DR:** <!-- tldr:start -->
 On ten fresh test seeds (80 planted upcoders), workflow v2.1 found 32 and agent v3.1 27 (up from 19 and 18 for v2.0 and v3.0); neither accused an honest practice.
-<!-- tldr:end --> Both upgrades helped, but the workflow and the agent are not reliably different, so the workflow stays the main line. Neither is close to the 12.5% miss-rate target: both still miss most upcoders. **Next:** harder, more realistic data (honest coding noise, billing versus rendering, diagnosis-code truncation, claims lag) and data-quality checks in v2.2 and v3.2.
+<!-- tldr:end --> Both upgrades helped, but the workflow and the agent are not reliably different, so the workflow stays the main line. Neither is close to the 12.5% miss-rate target: both still miss most upcoders. **Since then (harder data with honest coding noise, group billing and data defects):** a first ten-seed look favored the workflow, but it was not a planned test; on ten fresh seeds workflow v2.3 found 37 of 79 upcoders and agent v3.3 34, with no significant gap ([details](docs/release3_results.md)).
 
 ## How it works
 ![The agent and the actions it chooses from: screen, look closer, request charts, follow up, check notes, estimate, review, submit findings; simulated practices answer, checks gate the findings, people review the drafts](docs/images/agent.svg)

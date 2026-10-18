@@ -1,0 +1,29 @@
+{
+ "seed": 3030,
+ "workflow_v22": {
+  "run": "r3w2_3030",
+  "upcoders_found": 2,
+  "upcoders": 8,
+  "honest_accused": 1,
+  "called": 3,
+  "cost_usd": 0.0
+ },
+ "workflow_v23": {
+  "run": "r3w_3030",
+  "upcoders_found": 4,
+  "upcoders": 8,
+  "honest_accused": 1,
+  "called": 5,
+  "cost_usd": 0.0
+ },
+ "agent_v33": {
+  "run": "r3a_3030",
+  "upcoders_found": 3,
+  "upcoders": 8,
+  "honest_accused": 1,
+  "called": 4,
+  "cost_usd": 0.22,
+  "effort": "low",
+  "model": "claude-opus-5-5"
+ }
+}

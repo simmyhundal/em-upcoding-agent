@@ -137,6 +137,57 @@ def rule_leaning_22(packet):
     return lean, reason
 
 
+# Rules 2.3 (workflow v2.3, issue 99, data stays 2.2): cloned notes make the charts match the bill, so rules 2.2 end at "inconclusive" for an upcoder whose
+# 99215 share is far above expected. Late signatures are the clean sign in the returned notes: rule_leaning's own "inflated notes" test needs the problems
+# signal at 35% as well, a seed-42 cutoff that honest doctors on data 2.2 nearly reach (27% on average). Rules 2.3 lean upcoding when rules 2.2 would say
+# inconclusive (or still ask the model) and (a) at least MIN_NOTES_SIGNALS notes came back, (b) the late-signature rate is at least INFLATED_LATE, or an audit trail came back with bulk-created or paste-heavy notes at INFLATED_AUDIT (existing constants, not refit) and
+# (c) the 99215 share is more than MAX_EXCESS_FOR_ACUITY times the expected share (the existing "far above expected" line). The thresholds are existing constants, not refit; the idea of the rule came from reading the release 2 evaluation seeds, which are development data from now on.
+ALPHA_CHART_23 = 0.05        # rules 2.3: a chart-based upcoding call must beat the peer unsupported rate at this one-sided exact binomial level
+
+
+def _binom_sf(x, n, p):
+    """P(X >= x) for X ~ Binomial(n, p), exact."""
+    from math import comb
+    return sum(comb(n, k) * p ** k * (1 - p) ** (n - k) for k in range(x, n + 1))
+
+
+def _chart_test_23(packet):
+    """(documented 99215 claims, unsupported, peer rate, one-sided p) for the 99215 row; the peer rate is the packet's own, NOT capped."""
+    row = _row_99215(packet)
+    n, x = row["documented_claims"], row["documentation_does_not_support_billed_level"]
+    peer = row.get("all_provider_unsupported_rate")
+    peer = PEER_FALLBACK if peer is None else peer
+    return n, x, peer, _binom_sf(x, n, peer)
+
+
+def rule_leaning_23(packet):
+    lean, reason = rule_leaning_22(packet)
+    if lean == UPCODING and "documented 99215 claims are below the billed level" in reason:
+        # rules 2.2 cap the peer rate at 15% so that noisy honest peers (40% unsupported on data 2.2) do not blind the chart rule. With a wider list that cap lets
+        # honest doctors through on small samples, so rules 2.3 also ask whether the provider's unsupported share beats the real peer rate by more than chance.
+        n, x, peer, p = _chart_test_23(packet)
+        if p > ALPHA_CHART_23:
+            return INCONCLUSIVE, (f"{x} of {n} documented 99215 claims are below the billed level, but that does not beat the peer rate of {peer:.0%} "
+                                  f"by more than chance (one-sided p = {p:.2f}, rules 2.3)")
+        return lean, reason + f"; it beats the uncapped peer rate (one-sided p = {p:.3f}, rules 2.3)"
+    if lean not in (INCONCLUSIVE, None):          # None: the one case rules 2.2 still send to the model (notes claim data review the claims do not show)
+        return lean, reason
+    ns = (packet.get("documentation_review") or {}).get("note_signals")
+    exp = packet.get("expected_share_given_patient_complexity")
+    if not (ns and ns["notes"] >= MIN_NOTES_SIGNALS and exp and packet["share_99215"] > MAX_EXCESS_FOR_ACUITY * exp):
+        return lean, reason
+    r = ns["rates"]
+    if (r.get("late") or 0) >= INFLATED_LATE:
+        sign = f"{r['late']:.0%} of {ns['notes']} returned notes were signed late"
+    elif ns.get("audit_trail_received") and ((r.get("bulk_created") or 0) >= INFLATED_AUDIT or (r.get("paste_heavy") or 0) >= INFLATED_AUDIT):
+        sign = "the audit trail shows bulk-created or paste-heavy notes"      # an audit trail came back and shows the cloning directly
+    else:
+        return lean, reason
+    return UPCODING, (f"documentation supports the billed level, but {sign} and the 99215 share is more than {MAX_EXCESS_FOR_ACUITY:g} times the expected share "
+                      "(rules 2.3)")
+
+
+
 def _pooled(packet, d):
     rows = [r for r in d["by_billed_level"] if r["billed_cpt"] in ("99214", "99215")]
     n = sum(r["documented_claims"] for r in rows)

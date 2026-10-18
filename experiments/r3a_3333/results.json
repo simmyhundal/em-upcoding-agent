@@ -1,0 +1,18 @@
+{
+ "run": "r3a_3333",
+ "version": "3.3",
+ "screen_run": "r3_3333",
+ "screen_tool": true,
+ "stop_reason": "submitted",
+ "tool_calls": 30,
+ "estimated_usd": 0.2668,
+ "providers_with_findings": 14,
+ "providers_called_upcoding": 4,
+ "upcoders_found": 4,
+ "honest_called_upcoding": 0,
+ "upcoders_total": 8,
+ "records_requests_to_honest": 10,
+ "records_requests_total": 14,
+ "rounds_on_honest": 14,
+ "citation_accuracy": 1.0
+}

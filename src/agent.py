@@ -64,6 +64,20 @@ the ratio to expected after shrinking small practices toward 1 (an estimate of h
 practice with a few extra claims does not outrank a large one with a clear excess. Both take a top_n (no score cutoff). riskadj remains the default."""
 
 
+SYSTEM_33 = SYSTEM_32 + """
+
+Version 3.3 additions (release 3). The screen tool has one more ordering, eb_ratio_t: eb_ratio with the lab or test line on the claim as an extra covariate, so a
+99215 with no test line counts as less expected. Payers review a percentile of the panel; a list of the top 10% (about 22 providers) is a sensible start.
+Spend the records budget in rank order. For providers ranked beyond the first 5%, take one random sample first and go further (a targeted request, the audit
+trail) only where the notes show the signs below.
+
+Cloned notes. Notes copied or written to match the bill make the charts look as if they support it, so supportive charts are NOT reassuring when the 99215 share is
+more than 3 times the expected share. The signs are a late-signature rate of 12% or more over at least 8 notes, or an audit trail showing bulk-created or
+paste-heavy notes (8% or more). hybrid_review applies these rules (rules 2.3) and gives its reason; read note_checks and consider request_audit_trail for such
+providers. Also, a chart-based upcoding call must beat the real peer rate for unsupported charts by more than chance: a few unsupported charts from a small sample
+of a noisy panel is not enough, so hybrid_review may say inconclusive where a raw count looks high."""
+
+
 def _cost(usage, price=(4.00, 20.00)):
     inp = getattr(usage, "input_tokens", 0) or 0
     out = getattr(usage, "output_tokens", 0) or 0
@@ -91,7 +105,7 @@ def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=M
             reason = "dollar cap"
             break
         turn += 1
-        resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_32 if getattr(env, 'v32', False) else SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
+        resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_33 if getattr(env, 'v33', False) else SYSTEM_32 if getattr(env, 'v32', False) else SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
                                       output_config={"effort": effort}, extra_body={"cache_control": {"type": "ephemeral"}})
         usd += _cost(resp.usage) * price_scale
         if getattr(env, "v32", False):

@@ -1,0 +1,13 @@
+{
+ "1000000181": "2.45x expected; only 4% of patients are low complexity, which fits a high-acuity panel. Below 3x.",
+ "1000000112": "2.6x expected; only 6% low complexity, likely a sicker panel. Below 3x.",
+ "1000000183": "Below 3x expected; no records requested this round.",
+ "1000000201": "Below 3x expected; no records requested this round.",
+ "1000000024": "Below 3x expected; no records requested this round.",
+ "1000000175": "Below 3x expected; no records requested this round.",
+ "1000000016": "Below 3x expected; only 12% low complexity.",
+ "1000000141": "Below 3x expected; no records requested this round.",
+ "1000000151": "Below 3x expected; small excess.",
+ "1000000166": "Below 3x expected; small excess.",
+ "1000000169": "Below 3x expected; no records requested this round."
+}
