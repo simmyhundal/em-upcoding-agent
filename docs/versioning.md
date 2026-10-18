@@ -76,7 +76,7 @@ Release 3 (in development, branch `release3-dev`; data stays 2.2, [#99](https://
 |---|---|---|---|
 | Rules 2.3: cloned-notes signs decide by rule | built: `summary_rules.rule_leaning_23` (late signatures, audit-trail signs, far-above-expected share; chart calls must beat the real peer rate) with `case_summary.py --v23` | planned: the same evidence in the agent's tools and prompt | agent not built yet |
 | Screen `eb_ratio_t` (test-line covariate) | built: `screen_methods.score_t`, `flagging.py --method eb_ratio_t` | planned: `screen_providers` method | agent not built yet |
-| Wider list with a light tier | built: top 10%, ranks 12 to 22 get one request unless the notes show cloning (`eval/workflow_policy_23.py`) | planned: agent chooses its own list size within caps | agent not built yet |
+| Wider list with a light tier | built, **the W2.3 default** (Simmy's decision: more upcoders found, about 94 more honest practices asked on the development seeds): top 10%, ranks 12 to 22 get one request unless the notes show cloning (`eval/workflow_policy_23.py`) | planned: agent chooses its own list size within caps | agent not built yet |
 | Audit-trail request on late signatures | built (adds nothing on the development seeds) | planned | agent not built yet |
 
 Release 1 (frozen). Items still planned carry over to `v2.2` and `v3.2`.

@@ -13,6 +13,8 @@ import note_checks
 import summary_rules as sr
 import workflow_policy_v21 as v21
 
+# W2.3 default (Simmy's decision on #99): list = top 10% by eb_ratio_t, tier 1 = the first 5% of providers; the narrow top-5% list is the alternative (V3 in dev_release3.md)
+DEFAULT_SCREEN, LIST_PCT, TIER1_PCT = "eb_ratio_t", 10, 5
 RANDOM_N, TARGETED_N, MIN_TOP_CHARTS, MIN_TOP_BILLED, AUDIT_MAX = v21.RANDOM_N, v21.TARGETED_N, v21.MIN_TOP_CHARTS, v21.MIN_TOP_BILLED, v21.AUDIT_MAX
 AUDIT_IF_PROBLEMS, AUDIT_IF_LATE, MIN_NOTES = v21.AUDIT_IF_PROBLEMS, sr.INFLATED_LATE, sr.MIN_NOTES_SIGNALS
 
