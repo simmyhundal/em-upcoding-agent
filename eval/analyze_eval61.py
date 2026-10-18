@@ -75,8 +75,8 @@ def bootstrap(diffs, n=10000, seed=61):
 
 
 R2_SEEDS = [1515, 1616, 1717, 1818, 1919, 2020, 2121, 2222, 2323, 2424]
-R2_ARMS = [("W2.2", "r2w", "Opus 5.5 (Batch API), only where the rules were silent; no effort setting"),
-           ("A3.2", "r2a", "Opus 5.5, low effort")]
+R2_ARMS = [("W2.2", "r2w", "Opus 5.5 (Batch API, only where the rules were silent)", "default (not set)", "2.2"),
+           ("A3.2", "r2a", "Opus 5.5", "low", "2.2")]
 
 
 def release2_lines():
@@ -84,7 +84,7 @@ def release2_lines():
     (honest coding noise, group billing, payer-based upcoder definition), so these rows are NOT directly comparable to the release 1 rows."""
     import csv as _csv
     rows = []
-    for arm, pre, how in R2_ARMS:
+    for arm, pre, how, effort, dv in R2_ARMS:
         f = up = acc = hr = rh = 0
         usd = est = total = 0.0
         unrel = estd = 0
@@ -122,7 +122,7 @@ def release2_lines():
         else:
             n = len(R2_SEEDS)
             prec = f"{f / (f + acc):.0%}" if f + acc else "–"
-            rows.append(f"| {arm} | {how} | {f} of {up} | {f / up:.0%} | {acc} | {prec} | {hr} | {rh} | {hr / f:.1f} | ${usd:.2f} | ${usd / n:.2f} | "
+            rows.append(f"| {arm} | {dv} | {how} | {effort} | {f} of {up} | {f / up:.0%} | {acc} | {prec} | {hr} | {rh} | {hr / f:.1f} | ${usd:.2f} | ${usd / n:.2f} | "
                         f"${est:,.0f} | ${total:,.0f} | {est / total:.0%} | {unrel}/{estd} |")
     if not rows:
         return []
@@ -130,9 +130,9 @@ def release2_lines():
             "Same columns as the table above. **Data 2.2 is harder and different** (honest coding noise of about 8%, an upcoder defined by true rate above the honest 95th percentile "
             "and at least 6 points over the honest mean, group billing, 8 planted upcoders and 8 hard negatives per seed), so compare arms within this table, not across to release 1. "
             "Screen: `eb_ratio`, top 5% of 216 doctors. Judge: rule judge j3.2 only (no LLM judge, so no usefulness columns). Seeds 1515 and 2424 each have one honest doctor called.", "",
-            "| Arm | Model and effort | Upcoders found | Recall | Honest doctors accused | Precision | Honest practices sent requests | Request rounds on honest | "
+            "| Arm | Data version | Model | Effort | Upcoders found | Recall | Honest doctors accused | Precision | Honest practices sent requests | Request rounds on honest | "
             "Requests to honest per upcoder found | Cost | Cost per run | Estimated recovery from accused providers | Total recoverable from all upcoders | Share recovered | "
-            "Unreliable estimates |", "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"] + rows + [
+            "Unreliable estimates |", "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"] + rows + [
             "", "Paired result on these ten seeds: workflow found 10 upcoders the agent missed and the agent 1 the workflow missed (exact McNemar p = 0.012; with the design effect of 1.5 for "
             "seed clusters, p = 0.027). This was an unplanned look at 10 seeds (the pre-registered looks were 22 and 44 seeds, alpha 0.0294); Simmy chose to stop at 10 and conclude "
             "the workflow is stronger, to save cost. Full table and the rule: `docs/release2_results.md`."]
