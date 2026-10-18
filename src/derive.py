@@ -44,8 +44,16 @@ def _rows(path):
         return list(csv.DictReader(f))
 
 
-def accepted_visits(v2_dir):
-    """Return {visit_id: {...}} after replacement, void and denial rules. visit_id is the original claim id."""
+def accepted_visits(v2_dir, stats=None):
+    """Return {visit_id: {...}} after replacement, void and denial rules. visit_id is the original claim id.
+    The visit belongs to the rendering clinician; when the rendering NPI is blank (it equals billing on a single-clinician claim) it falls
+    back to billing. A blank rendering NPI with an organizational billing NPI cannot be attributed to a clinician and the visit is dropped.
+    `stats`, if given, is filled with counts of the fallbacks (see build_view)."""
+    npis = {r["npi"] for r in _rows(os.path.join(v2_dir, "providers.csv"))}
+    members = {r["member_id"] for r in _rows(os.path.join(v2_dir, "members.csv"))}
+    stats = stats if stats is not None else {}
+    for k in ("visits", "fallback_to_billing", "unattributed", "group_billed", "member_not_in_eligibility"):
+        stats.setdefault(k, 0)
     header = {r["claim_id"]: r for r in _rows(os.path.join(v2_dir, "claims_header.csv"))}
     status = {r["claim_id"]: r["status"] for r in _rows(os.path.join(v2_dir, "remittance.csv"))}
     lines = defaultdict(list)
@@ -62,7 +70,19 @@ def accepted_visits(v2_dir):
         em = [x for x in lines[cid] if x["cpt"] in EM_CODES]
         if not em:
             continue
-        out[visit_id] = {"claim_id": cid, "member_id": h["member_id"], "provider_id": h["rendering_npi"],
+        if h["member_id"] not in members:             # does not join to eligibility: dropped from the detector view and counted
+            stats["member_not_in_eligibility"] += 1
+            continue
+        who = h["rendering_npi"]
+        if not who:
+            if h["billing_npi"] not in npis:          # an organization: no clinician to attribute the visit to
+                stats["unattributed"] += 1
+                continue
+            who = h["billing_npi"]
+            stats["fallback_to_billing"] += 1
+        stats["visits"] += 1
+        stats["group_billed"] += int(h["billing_npi"] != who)
+        out[visit_id] = {"claim_id": cid, "member_id": h["member_id"], "provider_id": who, "billing_npi": h["billing_npi"],
                          "service_date": h["service_date"], "cpt": em[0]["cpt"], "place_of_service": em[0]["place_of_service"],
                          "diagnosis_codes": ";".join(h[c] for c in DX_COLS if h[c]),
                          "has_test_line": any(x["cpt"] in TEST_CODES for x in lines[cid]),
@@ -85,7 +105,8 @@ def derive_members(visits):
 def build_view(v2_dir, view_dir):
     """Write providers.csv, patients.csv, claims.csv (v1 shapes, derived from plan tables) to view_dir."""
     os.makedirs(view_dir, exist_ok=True)
-    visits = accepted_visits(v2_dir)
+    stats = {}
+    visits = accepted_visits(v2_dir, stats)
     derived = derive_members(visits)
     members = {r["member_id"]: r for r in _rows(os.path.join(v2_dir, "members.csv"))}
     n_claims, pats = defaultdict(int), defaultdict(set)
@@ -113,7 +134,50 @@ def build_view(v2_dir, view_dir):
             v = visits[vid]
             w.writerow([vid, v["provider_id"], v["member_id"], v["service_date"], v["cpt"], v["place_of_service"],
                         v["diagnosis_codes"], int(v["has_test_line"]), v["allowed_amount"], v["paid_amount"]])
+    if stats["fallback_to_billing"] or stats["unattributed"] or stats["group_billed"] or stats["member_not_in_eligibility"]:
+        # only data with group billing or blank rendering NPIs gets this report, so views of earlier data stay byte-identical
+        import json
+        entity = {}
+        for v in visits.values():
+            entity.setdefault(v["provider_id"], v["billing_npi"])
+        with open(os.path.join(view_dir, "attribution.json"), "w") as f:
+            json.dump({**stats, "share_fallback_to_billing": round(stats["fallback_to_billing"] / max(stats["visits"], 1), 4),
+                       "billing_entity": entity}, f, indent=1, sort_keys=True)
     return len(visits)
+
+
+def correction_stats(v2_dir):
+    """Per clinician: visits, replacement (corrected) claims, and how many corrections moved the E/M level up or down.
+    Context for a reviewer, not evidence: honest providers correct claims in both directions, and the live (latest) version is what the screen sees."""
+    npis = {r["npi"] for r in _rows(os.path.join(v2_dir, "providers.csv"))}
+    lines = defaultdict(list)
+    for r in _rows(os.path.join(v2_dir, "claim_lines.csv")):
+        if r["cpt"] in EM_CODES:
+            lines[r["claim_id"]].append(r["cpt"])
+    out = defaultdict(lambda: {"visits": 0, "corrections": 0, "level_up": 0, "level_down": 0})
+    headers = _rows(os.path.join(v2_dir, "claims_header.csv"))
+    by_id = {h["claim_id"]: h for h in headers}
+    for h in headers:
+        who = h["rendering_npi"] or h["billing_npi"]
+        if who not in npis:
+            continue
+        if h["claim_frequency"] == "1":
+            out[who]["visits"] += 1
+        elif h["claim_frequency"] == "7":
+            orig = by_id.get(h["original_claim_id"])
+            out[who]["corrections"] += 1
+            if orig and lines[orig["claim_id"]] and lines[h["claim_id"]]:
+                a, b = lines[orig["claim_id"]][0], lines[h["claim_id"]][0]
+                out[who]["level_up"] += int(b > a)
+                out[who]["level_down"] += int(b < a)
+    return dict(out)
+
+
+def billing_entity(view_dir):
+    """provider_id (clinician) -> billing NPI that receives actions such as records requests and recovery. Identity when no report exists."""
+    import json
+    path = os.path.join(view_dir, "attribution.json")
+    return json.load(open(path))["billing_entity"] if os.path.exists(path) else {}
 
 
 if __name__ == "__main__":

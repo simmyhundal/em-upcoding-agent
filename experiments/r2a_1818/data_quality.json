@@ -1,0 +1,343 @@
+{
+ "status": "ok",
+ "checks": [
+  {
+   "id": "control_totals",
+   "title": "Control totals",
+   "status": "ok",
+   "detail": "Delivered claims and paid dollars match the control totals in every month.",
+   "numbers": {
+    "months_mismatched": {},
+    "worst_relative_difference": 0.0
+   }
+  },
+  {
+   "id": "em_mix",
+   "title": "E/M mix against the Family Practice benchmark",
+   "status": "ok",
+   "detail": "The delivered E/M mix is 10.2% away from the Family Practice benchmark (total variation distance; informational, the synthetic data is calibrated only roughly).",
+   "numbers": {
+    "mix": {
+     "99211": 0.0114,
+     "99212": 0.0255,
+     "99213": 0.3565,
+     "99214": 0.5407,
+     "99215": 0.0658
+    },
+    "benchmark": {
+     "99211": 0.0052,
+     "99212": 0.0076,
+     "99213": 0.3023,
+     "99214": 0.6428,
+     "99215": 0.042
+    },
+    "total_variation_distance": 0.1021
+   }
+  },
+  {
+   "id": "dx_per_claim",
+   "title": "Diagnosis codes per claim",
+   "status": "ok",
+   "detail": "Diagnosis codes per claim look uncapped: every month reaches the extract's full width or has no pile-up at a lower maximum.",
+   "numbers": {
+    "distribution": {
+     "1": 0.4769,
+     "2": 0.2568,
+     "3": 0.149,
+     "4": 0.0694,
+     "5": 0.035,
+     "6": 0.0129
+    },
+    "by_month": {
+     "2024-01": {
+      "claims": 7675,
+      "max_codes": 6,
+      "share_at_max": 0.014
+     },
+     "2024-02": {
+      "claims": 7391,
+      "max_codes": 6,
+      "share_at_max": 0.013
+     },
+     "2024-03": {
+      "claims": 7572,
+      "max_codes": 6,
+      "share_at_max": 0.013
+     },
+     "2024-04": {
+      "claims": 8044,
+      "max_codes": 6,
+      "share_at_max": 0.014
+     },
+     "2024-05": {
+      "claims": 8688,
+      "max_codes": 6,
+      "share_at_max": 0.013
+     },
+     "2024-06": {
+      "claims": 7684,
+      "max_codes": 6,
+      "share_at_max": 0.013
+     },
+     "2024-07": {
+      "claims": 8894,
+      "max_codes": 6,
+      "share_at_max": 0.013
+     },
+     "2024-08": {
+      "claims": 8332,
+      "max_codes": 6,
+      "share_at_max": 0.012
+     },
+     "2024-09": {
+      "claims": 7747,
+      "max_codes": 6,
+      "share_at_max": 0.014
+     },
+     "2024-10": {
+      "claims": 8101,
+      "max_codes": 6,
+      "share_at_max": 0.011
+     },
+     "2024-11": {
+      "claims": 7361,
+      "max_codes": 6,
+      "share_at_max": 0.012
+     },
+     "2024-12": {
+      "claims": 7509,
+      "max_codes": 6,
+      "share_at_max": 0.014
+     }
+    },
+    "suspected_cap_months": {}
+   }
+  },
+  {
+   "id": "rendering_npi",
+   "title": "Rendering NPI",
+   "status": "ok",
+   "detail": "4.5% of claims have a blank rendering NPI; 0.0% of all claims are blank under an organizational biller and cannot be attributed to a clinician (single-clinician claims fall back to the billing NPI). Billing entities with a high blank share: 0.",
+   "numbers": {
+    "blank_share": 0.0453,
+    "unattributable_share": 0.0,
+    "fallback_to_billing_share": 0.0453,
+    "entities_flagged": {}
+   }
+  },
+  {
+   "id": "member_join",
+   "title": "Member join to eligibility",
+   "status": "ok",
+   "detail": "100.0% of claims join to eligibility (0 do not).",
+   "numbers": {
+    "join_rate": 1.0,
+    "unmatched_claims": 0
+   }
+  },
+  {
+   "id": "duplicates",
+   "title": "Duplicate claims",
+   "status": "ok",
+   "detail": "41 paid claims (0.0%) repeat another claim's member, date, biller, diagnoses and E/M line under a new claim id.",
+   "numbers": {
+    "duplicate_claims": 41,
+    "rate": 0.00046,
+    "pairs": [
+     [
+      "C0002924",
+      "C0002229"
+     ],
+     [
+      "C0004161",
+      "C0004155"
+     ],
+     [
+      "C0005531",
+      "C0005087"
+     ],
+     [
+      "C0006125",
+      "C0006106"
+     ],
+     [
+      "C0006305",
+      "C0006176"
+     ],
+     [
+      "C0007006",
+      "C0006917"
+     ],
+     [
+      "C0007583",
+      "C0007135"
+     ],
+     [
+      "C0007704",
+      "C0007568"
+     ],
+     [
+      "C0010458",
+      "C0010191"
+     ],
+     [
+      "C0016494",
+      "C0015690"
+     ],
+     [
+      "C0020392",
+      "C0019526"
+     ],
+     [
+      "C0020797",
+      "C0019099"
+     ],
+     [
+      "C0021877",
+      "C0021851"
+     ],
+     [
+      "C0027871",
+      "C0027824"
+     ],
+     [
+      "C0031325",
+      "C0031248"
+     ],
+     [
+      "C0036678",
+      "C0036485"
+     ],
+     [
+      "C0037755",
+      "C0037464"
+     ],
+     [
+      "C0039490",
+      "C0038700"
+     ],
+     [
+      "C0040259",
+      "C0040049"
+     ],
+     [
+      "C0042845",
+      "C0042837"
+     ],
+     [
+      "C0046121",
+      "C0046029"
+     ],
+     [
+      "C0048071",
+      "C0047595"
+     ],
+     [
+      "C0048961",
+      "C0048955"
+     ],
+     [
+      "C0053050",
+      "C0052929"
+     ],
+     [
+      "C0056372",
+      "C0056356"
+     ],
+     [
+      "C0056888",
+      "C0056848"
+     ],
+     [
+      "C0064329",
+      "C0064115"
+     ],
+     [
+      "C0067116",
+      "C0065697"
+     ],
+     [
+      "C0067206",
+      "C0066725"
+     ],
+     [
+      "C0069384",
+      "C0067756"
+     ],
+     [
+      "C0071390",
+      "C0071282"
+     ],
+     [
+      "C0074116",
+      "C0073179"
+     ],
+     [
+      "C0075015",
+      "C0074505"
+     ],
+     [
+      "C0075265",
+      "C0075199"
+     ],
+     [
+      "C0078792",
+      "C0078747"
+     ],
+     [
+      "C0082973",
+      "C0081021"
+     ],
+     [
+      "C0084314",
+      "C0083378"
+     ],
+     [
+      "C0084696",
+      "C0084602"
+     ],
+     [
+      "C0090072",
+      "C0089514"
+     ],
+     [
+      "C0090544",
+      "C0090061"
+     ],
+     [
+      "C0097152",
+      "C0096988"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "chains",
+   "title": "Replacement and void chains",
+   "status": "ok",
+   "detail": "0 of 2,768 replacement and void claims (0.0%) have no original claim in the extract.",
+   "numbers": {
+    "orphans": 0,
+    "rate": 0.0,
+    "claim_ids": []
+   }
+  },
+  {
+   "id": "claims_lag",
+   "title": "Immature recent months",
+   "status": "ok",
+   "detail": "The two latest months are about as large as earlier months.",
+   "numbers": {
+    "latest_vs_median": {
+     "2024-11": 0.915,
+     "2024-12": 0.933
+    }
+   }
+  }
+ ],
+ "global_flags": [],
+ "per_provider": {},
+ "truncation_suspected": false,
+ "claims": 97766,
+ "policy": "A suspected extract problem holds findings that depend on it: an upcoding finding for an affected provider needs chart evidence, and every held finding carries the data caveat. The agent never requests data from the plan; a person does."
+}

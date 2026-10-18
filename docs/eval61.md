@@ -6,12 +6,14 @@ Arms: **W2.0** frozen workflow (provider office 2.0, screen suspicion >= 5, fixe
 
 ## Per arm, ten seeds at 3.7% upcoders (8 of 216 each)
 
-| Arm | Upcoders found | Honest doctors accused | Precision | Honest practices sent requests | Request rounds on honest | Requests to honest per upcoder found | Usefulness (LLM judge) | Usefulness (rule judge) | Cost |
-|---|---|---|---|---|---|---|---|---|---|
-| W2.0 | 19 of 80 | 3 | 86% | 61 | 80 | 3.2 | 3.42 | 3.31 | $1.96 |
-| W2.1 | 32 of 80 | 0 | 100% | 61 | 203 | 1.9 | 3.13 | 4.70 | $1.94 |
-| A3.0 | 18 of 80 | 0 | 100% | 50 | 68 | 2.8 | 3.03 | 3.04 | $3.70 |
-| A3.1 | 27 of 80 | 0 | 100% | 63 | 101 | 2.3 | 3.30 | 4.80 | $5.29 |
+| Arm | Upcoders found | Recall | Honest doctors accused | Precision | Honest practices sent requests | Request rounds on honest | Requests to honest per upcoder found | Usefulness (LLM judge) | Usefulness (rule judge) | Cost | Cost per run | Estimated recovery from accused providers | Total recoverable from all upcoders | Share recovered |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| W2.0 | 19 of 80 | 24% | 3 | 86% | 61 | 80 | 3.2 | 3.42 | 3.31 | $1.96 | $0.20 | $77,056 | $338,279 | 23% |
+| W2.1 | 32 of 80 | 40% | 0 | 100% | 61 | 203 | 1.9 | 3.13 | 4.70 | $1.94 | $0.19 | $122,017 | $338,279 | 36% |
+| A3.0 | 18 of 80 | 22% | 0 | 100% | 50 | 68 | 2.8 | 3.03 | 3.04 | $3.70 | $0.37 | $85,794 | $338,279 | 25% |
+| A3.1 | 27 of 80 | 34% | 0 | 100% | 63 | 101 | 2.3 | 3.30 | 4.80 | $5.29 | $0.53 | $96,257 | $338,279 | 28% |
+
+**Recall** is upcoders found divided by upcoders planted. **Cost per run** is the arm's total cost divided by its ten runs. **Estimated recovery** is what the extrapolation tool (`src/pi_estimate.py`, the arithmetic behind the agent's `estimate_overpayment`) would estimate if run on every provider the arm accused, using the random charts the office returned for that provider (point estimate, negative estimates count as zero; honest doctors the arm accused are included). **Total recoverable** is what upcoders were paid above the justified levels (answer key), the same for every arm because the data is the same; **Share recovered** divides the two. Read these as upper-bound arithmetic, not recovered money: charts are read by a simulated reviewer with coder noise, a provider with no random charts adds nothing, and estimates from few charts are unreliable (accused providers with fewer than 8 charts in the main stratum, as the agent tool counts: W2.0 9/22, W2.1 9/32, A3.0 7/18, A3.1 7/27). Check against the truth: the estimate is 83% (W2.0), 70% (W2.1), 94% (A3.0), 73% (A3.1) of the dollars actually sitting with the upcoders each arm called, so the extrapolation tends to fall short rather than overshoot. Method and code: `eval/eval61_recovery.py`.
 
 ## Paired comparisons (upcoders found per seed)
 
@@ -55,3 +57,14 @@ Half the planted upcoders clone their notes so the charts match the bill; the da
 Total estimated cost of these runs: $18.62.
 
 Per-seed rows are in `experiments/results.csv` and `docs/results.md`; run folders under `experiments/`.
+
+## Release 2 arms on data 2.2 (ten seeds, 1515 to 2424)
+
+Same columns as the table above. **Data 2.2 is harder and different** (honest coding noise of about 8%, an upcoder defined by true rate above the honest 95th percentile and at least 6 points over the honest mean, group billing, 8 planted upcoders and 8 hard negatives per seed), so compare arms within this table, not across to release 1. Screen: `eb_ratio`, top 5% of 216 doctors. Judge: rule judge j3.2 only (no LLM judge, so no usefulness columns). Seeds 1515 and 2424 each have one honest doctor called.
+
+| Arm | Data version | Model | Effort | Upcoders found | Recall | Honest doctors accused | Precision | Honest practices sent requests | Request rounds on honest | Requests to honest per upcoder found | Cost | Cost per run | Estimated recovery from accused providers | Total recoverable from all upcoders | Share recovered | Unreliable estimates |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| W2.2 | 2.2 | Opus 5.5 (Batch API, only where the rules were silent) | default (not set) | 21 of 78 | 27% | 2 | 91% | 66 | 208 | 3.1 | $0.10 | $0.01 | $95,806 | $345,354 | 28% | 7/23 |
+| A3.2 | 2.2 | Opus 5.5 | low | 12 of 78 | 15% | 1 | 92% | 58 | 72 | 4.8 | $1.86 | $0.19 | $58,205 | $345,354 | 17% | 6/13 |
+
+Paired result on these ten seeds: workflow found 10 upcoders the agent missed and the agent 1 the workflow missed (exact McNemar p = 0.012; with the design effect of 1.5 for seed clusters, p = 0.027). This was an unplanned look at 10 seeds (the pre-registered looks were 22 and 44 seeds, alpha 0.0294); Simmy chose to stop at 10 and conclude the workflow is stronger, to save cost. Full table and the rule: `docs/release2_results.md`.

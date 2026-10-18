@@ -1,0 +1,8 @@
+{
+ "1000000002": "3.02x expected but only 242 claims, risk-adjusted score 2.62 (below 3), excess about 24 claims; weaker evidence than the 11 sampled, so not worth burdening the practice.",
+ "1000000081": "3.23x expected on 190 claims, risk-adjusted score 2.56, excess about 21 claims; too small to justify a records request.",
+ "1000000117": "3.71x expected on 171 claims, risk-adjusted score 2.91, excess about 22 claims; small practice; candidate for monitoring.",
+ "1000000203": "3.37x expected on 144 claims, risk-adjusted score 2.71, excess about 21 claims; too small; monitor.",
+ "1000000169": "Risk-adjusted score 5.32 but ratio 2.19; within-stratum excess is modest, so it ranked below the 11 sampled.",
+ "1000000175": "Risk-adjusted score 4.93, ratio 2.32; excess concentrated in sicker strata (4 and 5+ conditions), so lower priority than those sampled."
+}

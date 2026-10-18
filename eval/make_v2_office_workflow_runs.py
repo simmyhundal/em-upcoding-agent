@@ -31,7 +31,8 @@ RUNS = [("261013_12_api", "261013_4_code", "threshold", "reserved seed 202; scre
 
 
 def build_view(rid, src, screen, version="2.0"):
-    """version "2.1": office 2.1 and the fixed v2.1 policy (eval/workflow_policy_v21.py) on data 2.1; the notes go into documentation.csv."""
+    """version "2.1": office 2.1 and the fixed v2.1 policy (eval/workflow_policy_v21.py) on data 2.1; the notes go into documentation.csv.
+    version "2.2": the same, with the screen named by `screen` (eb_ratio or priority: experiments/<src>/flagged_<screen>.csv, top 25) and the data-quality pre-flight."""
     data = os.path.join(ROOT, "data", f"synthetic_v2_{src}")
     base = os.path.join(data, "view")
     view = os.path.join(data, f"view_{rid}")
@@ -40,9 +41,9 @@ def build_view(rid, src, screen, version="2.0"):
         dst = os.path.join(view, name)
         if not os.path.exists(dst):
             os.symlink(os.path.join(base, name), dst)
-    flagged_file = os.path.join(ROOT, "experiments", src, "flagged_threshold.csv" if screen == "threshold" else "flagged.csv")
+    flagged_file = os.path.join(ROOT, "experiments", src, {"threshold": "flagged_threshold.csv", "top25": "flagged.csv"}.get(screen, f"flagged_{screen}.csv"))
     flagged = [r["provider_id"] for r in csv.DictReader(open(flagged_file)) if r["flagged"] == "True"]
-    if version == "2.1":
+    if version in ("2.1", "2.2"):                      # 2.2: the same office and policy as 2.1; the screen is eb_ratio or priority (top 25)
         office = provider_sim.Office(data, base, seed=1, version="2.1")
         by_provider = {}
         for r in csv.DictReader(open(os.path.join(base, "claims.csv"))):
@@ -72,7 +73,9 @@ def build_view(rid, src, screen, version="2.0"):
 def run(rid, src, screen, note, version="2.0"):
     view, office, flagged_file = build_view(rid, src, screen, version)
     name = os.path.basename(view)
-    ai.run(rid, src, note, view_name=name, flagged_name=os.path.basename(flagged_file), v21=version == "2.1")
+    # 2.2: rules 2.2 decide more summaries without the model, and no LLM usefulness judge (the rule judge runs after; issues 91 and 93)
+    ai.run(rid, src, note, view_name=name, flagged_name=os.path.basename(flagged_file), v21=version in ("2.1", "2.2"), preflight=version == "2.2",
+           v22=version == "2.2", llm_judge=version != "2.2")
     office.write_transcript(os.path.join(ROOT, "experiments", rid, "office_transcript.jsonl"))
 
 

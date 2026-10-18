@@ -43,14 +43,15 @@ RUNS = [
 ]
 
 
-def run(spec, data_version="2.0"):
-    """data_version "2.1" also writes the note package; claims and the records universe are identical to 2.0 for the same seed."""
+def run(spec, data_version="2.0", screens=(), **v22):
+    """data_version "2.1" also writes the note package; claims and the records universe are identical to 2.0 for the same seed.
+    data_version "2.2" accepts the data 2.2 options of generate_v2.build (honest noise, group billing, defects, ...) as keyword arguments."""
     rid, seed, n, n_up, n_hn, clone, note = spec
     data = os.path.join(ROOT, "data", f"synthetic_v2_{rid}")
     key = os.path.join(ROOT, "eval", "answer_key", f"ground_truth_v2_{rid}.json")
     out = os.path.join(ROOT, "experiments", rid)
     os.makedirs(out, exist_ok=True)
-    generate_v2.build(data, key, seed=seed, n_providers=n, n_upcoders=n_up, n_hard_neg=n_hn, clone_share=clone, data_version=data_version)
+    generate_v2.build(data, key, seed=seed, n_providers=n, n_upcoders=n_up, n_hard_neg=n_hn, clone_share=clone, data_version=data_version, **v22)
     view = os.path.join(data, "view")
     derive.build_view(data, view)
     py = sys.executable
@@ -58,6 +59,9 @@ def run(spec, data_version="2.0"):
     subprocess.run([py, flag, view, os.path.join(out, "flagged.csv")], check=True, capture_output=True)
     subprocess.run([py, flag, view, os.path.join(out, "flagged_threshold.csv"), "--min-suspicion", str(MIN_SUSPICION),
                     "--max-flagged", str(MAX_FLAGGED)], check=True, capture_output=True)
+    for m in screens:                                  # release 2 candidates: the top 25 by that score, flagged_<method>.csv
+        subprocess.run([py, flag, view, os.path.join(out, f"flagged_{m}.csv"), "--method", m], check=True, capture_output=True)
+        subprocess.run([py, flag, view, os.path.join(out, f"flagged_{m}_top5pct.csv"), "--method", m, "--top-pct", "5"], check=True, capture_output=True)
     docs, st = records.run_requests(data, view, os.path.join(out, "flagged_threshold.csv"), seed=seed)
     for name in ("documentation.csv", "records_requests.csv"):
         open(os.path.join(out, name), "w").write(open(os.path.join(view, name)).read())

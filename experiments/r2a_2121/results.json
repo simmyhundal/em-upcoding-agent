@@ -1,0 +1,18 @@
+{
+ "run": "r2a_2121",
+ "version": "3.2",
+ "screen_run": "r2_2121",
+ "screen_tool": true,
+ "stop_reason": "submitted",
+ "tool_calls": 26,
+ "estimated_usd": 0.216,
+ "providers_with_findings": 9,
+ "providers_called_upcoding": 0,
+ "upcoders_found": 0,
+ "honest_called_upcoding": 0,
+ "upcoders_total": 8,
+ "records_requests_to_honest": 5,
+ "records_requests_total": 7,
+ "rounds_on_honest": 8,
+ "citation_accuracy": 1.0
+}

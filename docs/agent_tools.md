@@ -32,3 +32,15 @@ Every tool call and result goes to `audit.jsonl` (arguments, result, running cos
 - Forced tool choice is not used (the model chooses); thinking blocks are passed back unchanged.
 - The agent's own spend is estimated from usage (list prices; cache reads and writes included). `hybrid_review` and `draft_summary` can call a model inside a tool (`--model-in-tools`); that spend is tracked separately.
 - Live runs: a pilot on the development seed (`261013_3_api`) and the v3.0 evaluation on seeds 202 and 303 (`261013_8_api` to `261013_11_api`, `261013_16_api` to `261013_19_api`); results are in `docs/results.md`. The tests use a scripted client (`tests/test_agent.py`).
+
+## Version 3.2: data quality (issue 81)
+
+`Environment(version="3.2")` is 3.1 plus a data-quality pre-flight that runs once when the environment loads (`src/data_quality.py`, graded in [data_quality.md](data_quality.md)) and two tools:
+
+| Tool | What it does |
+|---|---|
+| `data_quality` | Read-only. The pre-flight's status, check sentences and global flags; with `provider_id`, that provider's flags and whether its findings are held. |
+| `flag_data_issue` | Records a data concern (issue, detail, optional providers, `hold_findings` default true) for a person to raise with the plan. The agent cannot request data from the plan. |
+
+`submit_findings` refuses a `pattern_consistent_with_upcoding` finding for a held provider (flagged by the pre-flight or by `flag_data_issue`) that has fewer than 8 charts received, and
+appends the data caveat to every affected finding after the lint. The run folder gets `data_quality.json` and `data_issues.json`. Built and unit tested offline; no model run has used it.

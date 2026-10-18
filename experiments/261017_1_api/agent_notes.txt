@@ -1,0 +1,11 @@
+I'll start with the data-quality pre-flight and a risk-adjusted screen in parallel.
+
+The data checks came back clean, with no provider flags. Next I'll compare peers for the top candidates, split between likely sick panels (low share of low-complexity patients) and likely upcoders.
+
+I'll request random samples from the 11 strongest candidates. Each one is elevated even after comparing patients of similar complexity.
+
+I'll follow up on the clarification request from 041 and the missing visits from 181, 095 and 088.
+
+Office 041 never responded, so I'll close that request; no response is not evidence. Next I'll run the hybrid chart review on the 10 providers whose charts came back.
+
+The chart review splits the group. I'll get overpayment estimates for the four providers the chart rule flagged, and run note checks on 018, 161 and 095.

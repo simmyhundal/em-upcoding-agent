@@ -51,6 +51,19 @@ refused). Honest practices also copy forward, sign late and miss orders, so trea
 list that you set aside or never examined, say why in your findings."""
 
 
+SYSTEM_32 = SYSTEM_31 + """
+
+Version 3.2 additions. A data-quality pre-flight has already checked the delivered extract (control totals, diagnosis codes per claim, rendering NPIs, member
+join, duplicates, broken chains, recent months). Call data_quality early, and again with a provider_id for any provider you examine closely: a flag can mean the
+screen score is unreliable for that provider (for example truncated diagnoses make sicker panels look healthier). You cannot request data from the plan; use
+flag_data_issue to record a concern for a person to raise with it. An upcoding finding for a provider whose findings are held needs chart evidence; otherwise
+mark it inconclusive and say why.
+
+The screen tool has two more ways to order providers. priority ranks by the average of the ratio to expected and the excess 99215 claims. eb_ratio ranks by
+the ratio to expected after shrinking small practices toward 1 (an estimate of how many times the expected 99215 rate the practice really bills), so a small
+practice with a few extra claims does not outrank a large one with a clear excess. Both take a top_n (no score cutoff). riskadj remains the default."""
+
+
 def _cost(usage, price=(4.00, 20.00)):
     inp = getattr(usage, "input_tokens", 0) or 0
     out = getattr(usage, "output_tokens", 0) or 0
@@ -69,6 +82,7 @@ def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=M
     tools = env.tool_schemas()
     messages = [{"role": "user", "content": task}]
     audit, usd, calls, turn, reason, nudged, texts = [], 0.0, 0, 0, "", False, []
+    turn_usage = []              # version 3.2: token usage per turn (issue 92), so cache reads and output can be checked on every run
     while True:
         if turn >= max_turns:
             reason = "turn cap"
@@ -77,9 +91,12 @@ def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=M
             reason = "dollar cap"
             break
         turn += 1
-        resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
+        resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_32 if getattr(env, 'v32', False) else SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
                                       output_config={"effort": effort}, extra_body={"cache_control": {"type": "ephemeral"}})
         usd += _cost(resp.usage) * price_scale
+        if getattr(env, "v32", False):
+            turn_usage.append({"turn": turn, **{k: getattr(resp.usage, k, 0) or 0 for k in ("input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens")},
+                               "usd_so_far": round(usd, 4)})
         messages.append({"role": "assistant", "content": resp.content})
         texts += [b.text for b in resp.content if b.type == "text" and b.text.strip()]
         if resp.stop_reason == "refusal":
@@ -134,5 +151,10 @@ def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=M
         env.office.write_transcript(os.path.join(out_dir, "office_transcript.jsonl"))
         if getattr(env, "v31", False):
             json.dump(env.set_aside, open(os.path.join(out_dir, "set_aside.json"), "w"), indent=1)
+        if getattr(env, "v32", False):
+            json.dump(env.dq, open(os.path.join(out_dir, "data_quality.json"), "w"), indent=1)
+            json.dump(env.data_issues, open(os.path.join(out_dir, "data_issues.json"), "w"), indent=1)
+            with open(os.path.join(out_dir, "turn_usage.jsonl"), "w") as f:
+                f.writelines(json.dumps(t) + "\n" for t in turn_usage)
     summary["audit"] = audit
     return summary

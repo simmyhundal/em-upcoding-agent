@@ -1,0 +1,3 @@
+Request random samples from all 11.
+
+Follow up on the fixable ones.
