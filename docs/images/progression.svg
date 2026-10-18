@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 410" width="1000" height="347" font-family="Helvetica, Arial, sans-serif">
-<rect width="1180" height="410" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1380 410" width="1000" height="297" font-family="Helvetica, Arial, sans-serif">
+<rect width="1380" height="410" fill="#ffffff"/>
 <g transform="translate(150,14)"><rect x="3" y="2" width="16" height="21" rx="2" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 8h8M7 12h8M7 16h5" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
 <text x="184" y="32" font-size="12.5" font-weight="bold" fill="#1f2937">Claims</text>
 <g transform="translate(320,14)"><path d="M2 3h22l-8 9v9l-6-3v-6z" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
@@ -12,7 +12,7 @@
 <text x="864" y="32" font-size="12.5" font-weight="bold" fill="#1f2937">Who decides</text>
 <g transform="translate(1000,14)"><path d="M3 22V10M10 22V4M17 22V14M24 22H2" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
 <text x="1034" y="32" font-size="12.5" font-weight="bold" fill="#1f2937">Headline results</text>
-<rect x="20" y="56" width="1140" height="110" rx="10" fill="#f9fafb" stroke="#d1d5db"/>
+<rect x="20" y="56" width="1340" height="110" rx="10" fill="#f9fafb" stroke="#d1d5db"/>
 <text x="34" y="86" font-size="18" font-weight="bold" fill="#1f2937">v1.x</text>
 <text x="34" y="108" font-size="12.5" fill="#6b7280">Fixed workflow</text>
 <text x="150" y="80" font-size="12" fill="#6b7280">Provider, patient and</text>
@@ -26,12 +26,10 @@
 <text x="660" y="96" font-size="12" fill="#6b7280">facts, citations, next</text>
 <text x="660" y="112" font-size="12" fill="#6b7280">steps.</text>
 <text x="830" y="80" font-size="12" fill="#6b7280">Code, in a fixed order.</text>
-<text x="1000" y="80" font-size="12" fill="#1f2937">Held-out run: 8 of 8</text>
-<text x="1000" y="96" font-size="12" fill="#1f2937">upcoders called, 0 of 17</text>
-<text x="1000" y="112" font-size="12" fill="#1f2937">honest doctors accused</text>
-<text x="1000" y="128" font-size="12" fill="#1f2937">(charts were handed over,</text>
-<text x="1000" y="144" font-size="12" fill="#1f2937">so optimistic).</text>
-<rect x="20" y="174" width="1140" height="110" rx="10" fill="#f9fafb" stroke="#d1d5db"/>
+<text x="1000" y="80" font-size="12" fill="#1f2937">Held-out run: 8 of 8 upcoders called, 0 of 17 honest</text>
+<text x="1000" y="96" font-size="12" fill="#1f2937">doctors accused (charts were handed over, so</text>
+<text x="1000" y="112" font-size="12" fill="#1f2937">optimistic).</text>
+<rect x="20" y="174" width="1340" height="110" rx="10" fill="#f9fafb" stroke="#d1d5db"/>
 <text x="34" y="204" font-size="18" font-weight="bold" fill="#1f2937">v2.x</text>
 <text x="34" y="226" font-size="12.5" fill="#6b7280">Fixed workflow</text>
 <text x="150" y="198" font-size="12" fill="#6b7280">Plan-shaped claims;</text>
@@ -48,11 +46,11 @@
 <text x="660" y="230" font-size="12" fill="#6b7280">rest.</text>
 <text x="830" y="198" font-size="12" fill="#6b7280">Code, with a fixed</text>
 <text x="830" y="214" font-size="12" fill="#6b7280">policy.</text>
-<text x="1000" y="198" font-size="12" fill="#1f2937">Two reserved seeds: 6 of 16</text>
-<text x="1000" y="214" font-size="12" fill="#1f2937">upcoders found, 0 honest</text>
-<text x="1000" y="230" font-size="12" fill="#1f2937">accused; 17 honest</text>
-<text x="1000" y="246" font-size="12" fill="#1f2937">practices asked for charts.</text>
-<rect x="20" y="292" width="1140" height="110" rx="10" fill="#f9fafb" stroke="#d1d5db"/>
+<text x="1000" y="198" font-size="12" fill="#1f2937">Two reserved seeds: 6 of 16 upcoders found, 0 honest</text>
+<text x="1000" y="214" font-size="12" fill="#1f2937">accused; 17 honest practices asked for charts.</text>
+<text x="1000" y="230" font-size="12" fill="#1f2937">Harder data, ten later seeds: 37 of 79 upcoders</text>
+<text x="1000" y="246" font-size="12" fill="#1f2937">found, 1 honest accused (24 of 79 for v2.2).</text>
+<rect x="20" y="292" width="1340" height="110" rx="10" fill="#f9fafb" stroke="#d1d5db"/>
 <text x="34" y="322" font-size="18" font-weight="bold" fill="#1f2937">v3.x</text>
 <text x="34" y="344" font-size="12.5" fill="#6b7280">Agent</text>
 <text x="150" y="316" font-size="12" fill="#6b7280">Same as v2.x.</text>
@@ -65,8 +63,8 @@
 <text x="660" y="332" font-size="12" fill="#6b7280">findings; code adds</text>
 <text x="660" y="348" font-size="12" fill="#6b7280">facts and checks.</text>
 <text x="830" y="316" font-size="12" fill="#6b7280">The agent, within caps.</text>
-<text x="1000" y="316" font-size="12" fill="#1f2937">Same two seeds: 4 of 16</text>
-<text x="1000" y="332" font-size="12" fill="#1f2937">upcoders found, 0 honest</text>
-<text x="1000" y="348" font-size="12" fill="#1f2937">accused; 9 honest practices</text>
-<text x="1000" y="364" font-size="12" fill="#1f2937">asked for charts.</text>
+<text x="1000" y="316" font-size="12" fill="#1f2937">Same two seeds: 4 of 16 upcoders found, 0 honest</text>
+<text x="1000" y="332" font-size="12" fill="#1f2937">accused; 9 honest practices asked for charts. Same</text>
+<text x="1000" y="348" font-size="12" fill="#1f2937">data and seeds: 34 of 79 upcoders found, 1 honest</text>
+<text x="1000" y="364" font-size="12" fill="#1f2937">accused; not significantly different from v2.3.</text>
 </svg>
