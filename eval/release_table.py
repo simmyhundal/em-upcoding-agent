@@ -8,6 +8,7 @@ import os
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "eval"))
 PATH = os.path.join(ROOT, "experiments", "release23_table.json")
 R2 = [1515, 1616, 1717, 1818, 1919, 2020, 2121, 2222, 2323, 2424]
 R3 = [2525, 2626, 2727, 2828, 2929, 3030, 3131, 3232, 3333, 3434]
@@ -45,9 +46,10 @@ def rows():
 
 def markdown():
     r = rows()
-    lines = ["| Arm | Seeds | Upcoders found | Honest practices accused | Honest practices asked for charts | Requests and follow-ups sent to practices |", "|---|---|---|---|---|---|"]
+    from scoreboard import pct
+    lines = ["| Arm | Seeds | Upcoders found | Recall | Honest practices accused | Precision | Honest practices asked for charts | Requests and follow-ups sent to practices |", "|---|---|---|---|---|---|---|---|"]
     for x in r:
-        lines.append(f"| {x['arm']} | {x['seeds']} | {x['found']} of {x['upcoders']} | {x['accused']} | {x['asked']} | {x['requests']} |")
+        lines.append(f"| {x['arm']} | {x['seeds']} | {x['found']} of {x['upcoders']} | {pct(x['found'], x['upcoders'])} | {x['accused']} | {pct(x['found'], x['found'] + x['accused'])} | {x['asked']} | {x['requests']} |")
     lines += ["", "Harder data (honest coding noise, group billing, data defects), ten seeds in each set, 8 planted upcoders each. The release 2 comparison was an unplanned ten-seed look, so it "
               "carries no significance claim; on the later pre-registered ten seeds workflow v2.3 and agent v3.3 are not significantly different. "
               "Details: [release 2](docs/release2_results.md), [release 3](docs/release3_results.md)."]
