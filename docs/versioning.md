@@ -96,4 +96,4 @@ Release 1 (frozen). Items still planned carry over to `v2.2` and `v3.2`.
 | Screen cutoff choice (#48) | planned: budget-based rule | planned: agent chooses | mirrored by design |
 | Multi-seed paired evaluation (#61) | done ([eval61.md](eval61.md)) | done | shared |
 
-Release 4 (planned; milestone "v2.4 and v3.4"): narrow the wide list for both arms, taking the agent's habits into the fixed workflow ([release4_agent_narrowing.md](release4_agent_narrowing.md)); silent offices; high-acuity override. Fresh seeds only: 1515 to 3434 are development data.
+Release 4 (in development; workflow v2.4 is still a fixed workflow, with one decision made by a learned scoring formula: [learned_policy_plain.md](learned_policy_plain.md); milestone "v2.4 and v3.4"): narrow the wide list for both arms, taking the agent's habits into the fixed workflow ([release4_agent_narrowing.md](release4_agent_narrowing.md)); silent offices; high-acuity override. Fresh seeds only: 1515 to 3434 are development data.
