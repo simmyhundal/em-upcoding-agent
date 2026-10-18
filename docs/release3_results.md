@@ -31,6 +31,7 @@ W2.3 minus W2.2, upcoders found per seed: +1.30 (95% bootstrap interval +0.20 to
 - **Found per arm:** W2.2 24 of 79, W2.3 37, A3.3 34. The workflow changes helped on these fresh seeds about as much as on the development seeds (38 of 78 in sample against the held-out result above), which is some evidence they were not fitted to the development data.
 - **Honest burden:** W2.3 sent requests to 150 honest practices against 64 for W2.2 and 79 for A3.3 (request rounds 390, 193, 109). The wider list is where the extra upcoders come from, and it is what costs the practices; A3.3 found nearly as many with about half of W2.3's honest requests.
 - **False accusations:** 2 honest doctors called by W2.2, 1 by W2.3, 1 by A3.3.
+- **Usefulness (defect score of the written summaries, run afterwards, not a pre-registered test):** judged by j3.3 with j3.2 beside it; see [judge_release3.md](judge_release3.md).
 - **Cost:** the workflows cost about a cent a seed; the agent about $0.23 a seed.
 - **Limits:** one data version (2.2) and generated notes, so cloned-notes signs are probably easier than real ones; the agent ran at low effort; ten seeds is a small sample. The agent's gain over release 2 (A3.2 found 12 of 78 on other seeds) is not a paired result.
 

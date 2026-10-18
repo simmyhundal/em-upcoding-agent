@@ -10,7 +10,7 @@ Pre-registered rule (posted on issue 99 before the first fresh seed):
     SECONDARY  workflow v2.3 against workflow v2.2 on the same seeds (did the release 3 changes help?)
   The agent's change from 3.2 to 3.3 is not tested (release 2 used other seeds); it is described only.
 - Reported, never a stopping rule: honest doctors called, honest practices asked, request rounds, cost, found per seed with a paired bootstrap interval.
-- Cap $5 for the batch (estimate $2.5). The rule judge is not run (j3.2 predates rules 2.3).
+- Cap $5 for the batch (estimate $2.5). The rule judge was not part of the pre-registered tests; it was run afterwards as j3.3 (j3.2 beside it), see judge_release3.md.
 
 Usage: python eval/analyze_release3.py [--write]      # --write writes docs/release3_results.md
 """
@@ -100,6 +100,7 @@ def report(rows):
               f"- **Honest burden:** W2.3 sent requests to {s('w3_asked')} honest practices against {s('w2_asked')} for W2.2 and {s('a3_asked')} for A3.3 (request rounds {s('w3_rounds')}, {s('w2_rounds')}, {s('a3_rounds')}). "
               "The wider list is where the extra upcoders come from, and it is what costs the practices; A3.3 found nearly as many with about half of W2.3's honest requests.",
               f"- **False accusations:** {s('w2_honest')} honest doctors called by W2.2, {s('w3_honest')} by W2.3, {s('a3_honest')} by A3.3.",
+              "- **Usefulness (defect score of the written summaries, run afterwards, not a pre-registered test):** judged by j3.3 with j3.2 beside it; see [judge_release3.md](judge_release3.md).",
               "- **Cost:** the workflows cost about a cent a seed; the agent about $0.23 a seed.",
               "- **Limits:** one data version (2.2) and generated notes, so cloned-notes signs are probably easier than real ones; the agent ran at low effort; ten seeds is a small sample. "
               "The agent's gain over release 2 (A3.2 found 12 of 78 on other seeds) is not a paired result.", ""]
