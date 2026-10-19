@@ -401,14 +401,21 @@ def _arm(rows, ids, stage):
             "use": sum(float(r["usefulness"]) for r in rs if r["usefulness"]) / max(sum(1 for r in rs if r["usefulness"]), 1)}
 
 
+def pct(num, den):
+    """A whole-number percentage for the README tables, or a dash when nothing was called."""
+    return f"{100 * num / den:.0f}%" if den else "–"
+
+
 def headline_table(path=CSV_PATH):
     """The README's short results table: the four arms of the issue-61 evaluation on ten fresh seeds, summed, rendered from the results file."""
     rows = read_csv(path)
-    out = ["| Arm | Upcoders found | Honest practices accused | Honest practices asked for charts | Requests and follow-ups sent to practices | Summary usefulness (1-5, LLM judge) |", "|---|---|---|---|---|---|"]
+    out = ["| Arm | Upcoders found | Recall | Honest practices accused | Precision | Honest practices asked for charts | Requests and follow-ups sent to practices | Summary usefulness (1-5, LLM judge) |",
+           "|---|---|---|---|---|---|---|---|"]
     for name, ids, stage in ARMS:
         a = _arm(rows, ids, stage)
-        out.append(f"| {name} | {a['found']} of {a['of']} | {a['accused']} | {a['asked']} | {a['rounds']} | {a['use']:.1f} |")
-    out += ["", "Ten fresh test seeds, 8 planted upcoders each, all four arms on the same data. \"Requests and follow-ups sent\" counts every chart request and "
+        out.append(f"| {name} | {a['found']} of {a['of']} | {pct(a['found'], a['of'])} | {a['accused']} | {pct(a['found'], a['found'] + a['accused'])} | {a['asked']} | {a['rounds']} | {a['use']:.1f} |")
+    out += ["", "Ten fresh test seeds, 8 planted upcoders each, all four arms on the same data. **Recall** is upcoders found out of those planted; **precision** is upcoders found out of "
+            "all providers the arm called upcoding (found plus honest accused). \"Requests and follow-ups sent\" counts every chart request and "
             "follow-up message to a practice, a measure of the burden on practices. Paired comparisons and the decision rules: [the evaluation](docs/eval61.md); "
             "every run: [the full results](docs/results.md)."]
     return "\n".join(out)

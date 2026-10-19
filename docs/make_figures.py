@@ -199,14 +199,17 @@ def progression_cells(rows=None):
     v3 = tot(pick({"261013_8_api", "261013_9_api"}, "Agent"))
     v3_h = sum(int(r["honest_requested"]) for r in pick({"261013_8_api", "261013_9_api"}, "Agent"))
     v2_h = sum(int(r["honest_requested"]) for r in pick({"261013_12_api", "261013_13_api"}, "AI"))
-    return {"v1.0": f"Held-out run: {v1[0]} of {v1[1]} upcoders called, {v1[2]} of {v1[3]} honest doctors accused (charts were handed over, so optimistic).",
+    import release_table
+    extra = release_table.headline_cells()
+    return {**extra, "v1.0": f"Held-out run: {v1[0]} of {v1[1]} upcoders called, {v1[2]} of {v1[3]} honest doctors accused (charts were handed over, so optimistic).",
             "v2.0": f"Two reserved seeds: {v2[0]} of {v2[1]} upcoders found, {v2[2]} honest accused; {v2_h} honest practices asked for charts.",
             "v3.0": f"Same two seeds: {v3[0]} of {v3[1]} upcoders found, {v3[2]} honest accused; {v3_h} honest practices asked for charts."}
 
 
 def progression():
     """One slide: how it works over time, as a table with icons and headline eval results."""
-    ev = {k.replace(".0", ".x"): v for k, v in progression_cells().items()}
+    cells = progression_cells()
+    ev = {"v1.x": cells["v1.0"], "v2.x": cells["v2.0"] + " " + cells["v2.3"], "v3.x": cells["v3.0"] + " " + cells["v3.3"]}
     cols = [("data", "Claims"), ("screen", "Screen"), ("records", "Charts"), ("write", "Who writes it"), ("decide", "Who decides"),
             ("eval", "Headline results")]
     rows = [("v1.x", "Fixed workflow", ["Provider, patient and claim tables with a stored condition count.", "Top 25 by statistics. Fixed.",
@@ -216,7 +219,7 @@ def progression():
                                       "Code, with a fixed policy."]),
             ("v3.x", "Agent", ["Same as v2.x.", "A tool the agent runs with any cutoff.", "The agent chooses whom to ask, what sample, and whether to follow up.",
                               "The agent submits findings; code adds facts and checks.", "The agent, within caps."])]
-    W, H = 1180, 410
+    W, H = 1380, 410
     x0, cw, rh, y0 = 150, 170, 118, 56
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="1000" height="{round(H * 1000 / W)}" {FONT}>',
          f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
@@ -233,7 +236,7 @@ def progression():
             s.append(f'<text x="34" y="{y + 52 + j * 16}" font-size="12.5" fill="{MUTED}">{escape(line)}</text>')
         for i, text in enumerate(cells + [ev[v]]):
             x = x0 + i * cw
-            width = 24 if i < 5 else 27
+            width = 24 if i < 5 else 52
             for j, line in enumerate(textwrap.wrap(text, width)[:6]):
                 s.append(f'<text x="{x}" y="{y + 24 + j * 16}" font-size="12" fill="{INK if i == 5 else MUTED}">{escape(line)}</text>')
     s.append("</svg>")
@@ -242,40 +245,82 @@ def progression():
 
 def em_levels():
     """How an office-visit level is really chosen and how it is checked later."""
-    W, H = 1000, 405
+    W, H = 1000, 560
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>',
          f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
          f'<text x="30" y="38" font-size="19" font-weight="bold" fill="{INK}">How an office-visit level is chosen, and checked later</text>',
          f'<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">'
          f'<path d="M0 0 L10 5 L0 10 z" fill="{MUTED}"/></marker></defs>']
 
-    def box(x, y, w, h, col, title, lines):
-        s.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="10" fill="#f9fafb" stroke="{col}" stroke-width="2.5"/>')
+    def box(x, y, w, h, col, title, lines, dash=''):
+        s.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="10" fill="#f9fafb" stroke="{col}" stroke-width="2.5"{dash}/>')
         s.append(f'<text x="{x + 16}" y="{y + 28}" font-size="14.5" font-weight="bold" fill="{INK}">{escape(title)}</text>')
         for j, line in enumerate(lines):
             s.append(f'<text x="{x + 16}" y="{y + 54 + j * 20}" font-size="12.5" fill="{MUTED}">{escape(line)}</text>')
 
     def arrow(x1, y1, x2, y2):
         s.append(f'<path d="M{x1} {y1} L{x2} {y2}" stroke="{MUTED}" stroke-width="2" marker-end="url(#a)"/>')
-    s.append(f'<text x="30" y="72" font-size="13" font-weight="bold" fill="{BLUE}">1. At the visit: the doctor picks one method</text>')
+
+    def line(x1, y1, x2, y2):
+        s.append(f'<path d="M{x1} {y1} L{x2} {y2}" stroke="{MUTED}" stroke-width="2"/>')
+    s.append(f'<text x="30" y="72" font-size="13" font-weight="bold" fill="{BLUE}">1. At the visit: two ways to support a level</text>')
     box(30, 84, 300, 150, BLUE, "Medical decision making", ["Three elements, two of three must match:",
         "- how serious the problems are", "- how much data was reviewed or ordered",
         "- risk of the treatment (e.g. prescriptions)"])
-    box(30, 248, 300, 110, BLUE, "Or: total time that day", ["About 10 / 20 / 30 / 40+ minutes of the",
+    s.append(f'<text x="180" y="259" font-size="14" font-style="italic" text-anchor="middle" fill="{MUTED}">or</text>')
+    box(30, 272, 300, 100, BLUE, "Total time that day", ["About 10 / 20 / 30 / 40+ minutes of the",
         "doctor's own time for 99212 to 99215.", "History and exam no longer set the level."])
-    arrow(330, 190, 392, 190)
-    s.append(f'<text x="400" y="72" font-size="13" font-weight="bold" fill="{ORANGE}">2. The code on the claim</text>')
-    box(400, 84, 200, 274, ORANGE, "Level billed", ["99212  straightforward", "99213  low", "99214  moderate", "99215  high",
+    line(330, 159, 350, 159)
+    line(330, 322, 350, 322)
+    line(350, 159, 350, 322)
+    arrow(350, 240, 422, 240)
+    s.append(f'<text x="356" y="228" font-size="12" font-weight="bold" fill="{INK}">higher</text>')
+    s.append(f'<text x="356" y="266" font-size="12" font-weight="bold" fill="{INK}">wins</text>')
+    s.append(f'<text x="430" y="72" font-size="13" font-weight="bold" fill="{ORANGE}">2. The code on the claim</text>')
+    box(430, 84, 190, 288, ORANGE, "Level billed", ["99212  straightforward", "99213  low", "99214  moderate", "99215  high",
         "", "99211 is a nurse visit", "with no decision-making", "requirement."])
-    arrow(600, 190, 662, 190)
+    arrow(620, 228, 662, 228)
     s.append(f'<text x="670" y="72" font-size="13" font-weight="bold" fill="{GREEN}">3. After payment: someone re-scores it</text>')
-    box(670, 84, 300, 274, GREEN, "Contractors and auditors", ["Pull the record for a sample of visits.",
+    box(670, 84, 300, 288, GREEN, "Contractors and auditors", ["Pull the record for a sample of visits.",
         "Coders and nurses re-score the note", "against the same rules.", "",
         "Typical finding: the note does not", "support the level (or supports a higher", "one). Big audits extrapolate the", "overpayment from the sample."])
-    s.append(f'<text x="30" y="386" font-size="12.5" fill="{MUTED}">This project simplifies step 1 to a documented MDM level plus minutes. '
-             f'It does not model the two-of-three rule or real notes.</text>')
+    d = ' stroke-dasharray="6 4"'
+    s.append(f'<text x="30" y="404" font-size="13" font-weight="bold" fill="{INK}">Example: one visit that is upcoded</text>')
+    box(30, 414, 300, 132, BLUE, "Note supports 99214", ["No time recorded. Problems high,", "data moderate, risk low. The second-",
+        "highest element is moderate, so", "the visit justifies 99214."], d)
+    box(430, 414, 190, 132, ORANGE, "Billed 99215", ["One level above what", "the note supports:", "upcoded."], d)
+    box(670, 414, 300, 132, GREEN, "Audit finds the gap", ["Second-highest is moderate, not high: data", "is from one category (2 labs, 1 outside", "note); high needs at least two. So the", "note supports 99214, not 99215."], d)
+    arrow(330, 480, 422, 480)
+    arrow(620, 480, 662, 480)
     s.append("</svg>")
     write("em_levels.svg", "\n".join(s))
+
+
+def cms_mix():
+    """Visit mix 99211-99215: CMS GA Family Practice (observed) against the synthetic normal providers."""
+    codes = ["99211", "99212", "99213", "99214", "99215"]
+    cms = [0.007, 0.010, 0.287, 0.665, 0.031]
+    syn = [0.012, 0.012, 0.362, 0.570, 0.044]
+    W, H, x0, y0, ph = 640, 340, 70, 60, 220
+    s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>',
+         f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
+         f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">Share of office visits by level: CMS vs synthetic</text>']
+    for v in (0, 0.2, 0.4, 0.6):
+        y = y0 + ph - v / 0.7 * ph
+        s.append(f'<line x1="{x0}" y1="{y:.0f}" x2="{W - 30}" y2="{y:.0f}" stroke="#e5e7eb"/>')
+        s.append(f'<text x="{x0 - 8}" y="{y + 4:.0f}" font-size="11" text-anchor="end" fill="{MUTED}">{int(v * 100)}%</text>')
+    gw = (W - 30 - x0) / 5
+    for i, c in enumerate(codes):
+        for j, (vals, col) in enumerate(((cms, BLUE), (syn, ORANGE))):
+            h = vals[i] / 0.7 * ph
+            x = x0 + i * gw + 18 + j * 50
+            s.append(f'<rect x="{x:.0f}" y="{y0 + ph - h:.1f}" width="44" height="{h:.1f}" fill="{col}"/>')
+            s.append(f'<text x="{x + 22:.0f}" y="{y0 + ph - h - 5:.1f}" font-size="11" text-anchor="middle" fill="{INK}">{vals[i] * 100:.1f}%</text>')
+        s.append(f'<text x="{x0 + i * gw + gw / 2:.0f}" y="{y0 + ph + 20}" font-size="12.5" text-anchor="middle" fill="{INK}">{c}</text>')
+    s.append(f'<rect x="{x0}" y="{H - 38}" width="12" height="12" fill="{BLUE}"/><text x="{x0 + 18}" y="{H - 28}" font-size="12" fill="{MUTED}">CMS, GA Family Practice (observed)</text>')
+    s.append(f'<rect x="{x0 + 250}" y="{H - 38}" width="12" height="12" fill="{ORANGE}"/><text x="{x0 + 268}" y="{H - 28}" font-size="12" fill="{MUTED}">Synthetic, normal providers</text>')
+    s.append("</svg>")
+    write("cms_mix.svg", "\n".join(s))
 
 
 def results():
@@ -419,6 +464,7 @@ if __name__ == "__main__":
     agent_actions()
     progression()
     em_levels()
+    cms_mix()
     funnel()
     print("results:", results())
     case_card()

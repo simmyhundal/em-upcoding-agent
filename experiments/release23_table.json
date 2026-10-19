@@ -1,0 +1,47 @@
+[
+ {
+  "arm": "Workflow v2.2",
+  "seeds": "release 2 seeds",
+  "found": 21,
+  "upcoders": 78,
+  "accused": 2,
+  "asked": 66,
+  "requests": 327
+ },
+ {
+  "arm": "Agent v3.2",
+  "seeds": "release 2 seeds",
+  "found": 12,
+  "upcoders": 78,
+  "accused": 1,
+  "asked": 58,
+  "requests": 124
+ },
+ {
+  "arm": "Workflow v2.2",
+  "seeds": "release 3 seeds",
+  "found": 24,
+  "upcoders": 79,
+  "accused": 2,
+  "asked": 64,
+  "requests": 326
+ },
+ {
+  "arm": "Workflow v2.3",
+  "seeds": "release 3 seeds",
+  "found": 37,
+  "upcoders": 79,
+  "accused": 1,
+  "asked": 150,
+  "requests": 583
+ },
+ {
+  "arm": "Agent v3.3",
+  "seeds": "release 3 seeds",
+  "found": 34,
+  "upcoders": 79,
+  "accused": 1,
+  "asked": 79,
+  "requests": 177
+ }
+]

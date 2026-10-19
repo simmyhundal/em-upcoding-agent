@@ -16,15 +16,27 @@ v1.x and v2.x are fixed workflows: code picks the steps and a model writes only 
 
 ## Results
 <!-- scoreboard:start -->
-| Arm | Upcoders found | Honest practices accused | Honest practices asked for charts | Requests and follow-ups sent to practices | Summary usefulness (1-5, LLM judge) |
-|---|---|---|---|---|---|
-| Workflow v2.0 (frozen) | 19 of 80 | 3 | 61 | 162 | 3.4 |
-| Workflow v2.1 | 32 of 80 | 0 | 61 | 379 | 3.1 |
-| Agent v3.0 (frozen) | 18 of 80 | 0 | 50 | 153 | 3.0 |
-| Agent v3.1 | 27 of 80 | 0 | 63 | 204 | 3.3 |
+| Arm | Upcoders found | Recall | Honest practices accused | Precision | Honest practices asked for charts | Requests and follow-ups sent to practices | Summary usefulness (1-5, LLM judge) |
+|---|---|---|---|---|---|---|---|
+| Workflow v2.0 (frozen) | 19 of 80 | 24% | 3 | 86% | 61 | 162 | 3.4 |
+| Workflow v2.1 | 32 of 80 | 40% | 0 | 100% | 61 | 379 | 3.1 |
+| Agent v3.0 (frozen) | 18 of 80 | 22% | 0 | 100% | 50 | 153 | 3.0 |
+| Agent v3.1 | 27 of 80 | 34% | 0 | 100% | 63 | 204 | 3.3 |
 
-Ten fresh test seeds, 8 planted upcoders each, all four arms on the same data. "Requests and follow-ups sent" counts every chart request and follow-up message to a practice, a measure of the burden on practices. Paired comparisons and the decision rules: [the evaluation](docs/eval61.md); every run: [the full results](docs/results.md).
+Ten fresh test seeds, 8 planted upcoders each, all four arms on the same data. **Recall** is upcoders found out of those planted; **precision** is upcoders found out of all providers the arm called upcoding (found plus honest accused). "Requests and follow-ups sent" counts every chart request and follow-up message to a practice, a measure of the burden on practices. Paired comparisons and the decision rules: [the evaluation](docs/eval61.md); every run: [the full results](docs/results.md).
 <!-- scoreboard:end -->
+
+<!-- release23:start -->
+| Arm | Seeds | Upcoders found | Recall | Honest practices accused | Precision | Honest practices asked for charts | Requests and follow-ups sent to practices |
+|---|---|---|---|---|---|---|---|
+| Workflow v2.2 | release 2 seeds | 21 of 78 | 27% | 2 | 91% | 66 | 327 |
+| Agent v3.2 | release 2 seeds | 12 of 78 | 15% | 1 | 92% | 58 | 124 |
+| Workflow v2.2 | release 3 seeds | 24 of 79 | 30% | 2 | 92% | 64 | 326 |
+| Workflow v2.3 | release 3 seeds | 37 of 79 | 47% | 1 | 97% | 150 | 583 |
+| Agent v3.3 | release 3 seeds | 34 of 79 | 43% | 1 | 97% | 79 | 177 |
+
+Harder data (honest coding noise, group billing, data defects), ten seeds in each set, 8 planted upcoders each. The release 2 comparison was an unplanned ten-seed look, so it carries no significance claim; on the later pre-registered ten seeds workflow v2.3 and agent v3.3 are not significantly different. Details: [release 2](docs/release2_results.md), [release 3](docs/release3_results.md).
+<!-- release23:end -->
 
 - The note checks are what helped: upcoders who clone their notes went from 3 to 10 of 40 found (workflow) and 1 to 8 of 40 (agent). The clone signals are planted by the data generator, so this is easier than real notes.
 - No arm meets the 12.5% miss-rate threshold. Workflow v2.1's extra requests (second samples, audit trails) more than double the requests and follow-ups sent; the agent v3.1 sends about half as many as workflow v2.1.
