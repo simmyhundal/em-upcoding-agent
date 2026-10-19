@@ -95,8 +95,8 @@ SYSTEM_35 = SYSTEM_34 + """
 Version 3.5 additions (release 5). The score is net dollars: the recoverable overpayment of the upcoders you call, less the copying and review costs of every round and the cost of
 calling an honest doctor. Advice now comes inside the tool results: request_records, follow_up_records and request_audit_trail each return an advice field (the learned formula of workflow v2.5:
 ASK or SKIP before a request; stop, targeted request, audit trail or both after a sample), and screen_providers rows carry an ask_advice column. It is advice: follow it unless you see
-something it cannot, and your choices are logged beside it. Rules are binding: where hybrid_review returns a leaning decided by a rule (summary_rule or chart_rule), submit_findings refuses
-a different leaning unless the finding has an override_reason naming a fact the rules cannot see (a data-quality flag, a claim id of that provider, a note sign). Every turn shows each practice's status
+something it cannot, and your choices are logged beside it. Rules are binding in one case: where hybrid_review calls a provider upcoding and the chart rule also supports it (the returned charts support a lower level than billed), submit_findings
+refuses a different leaning unless the finding has an override_reason naming a fact the rules cannot see (a data-quality flag, a claim id of that provider, a note sign). Other rule results are advice. Every turn shows each practice's status
 and the rounds sent. A silent office or a thin first sample is a reason to follow up or send one targeted request before closing, but a clean first sample is not."""
 
 

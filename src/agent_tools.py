@@ -328,7 +328,7 @@ class Environment:
                 lean, source = None, "undecided"
             if lean and pid not in self.summaries:
                 self.summaries[pid] = sr.assemble(packet, lean)
-            self.rule_result[pid] = (lean, source)
+            self.rule_result[pid] = (lean, source, bool(chart["triggered"]))
             item = {"provider": pid, "leaning": lean, "source": source, "reason": reason, "chart_rule": chart}
             ns = (packet.get("documentation_review") or {}).get("note_signals")
             if ns:
@@ -412,19 +412,19 @@ class Environment:
             if unreviewed:
                 return {"error": "run hybrid_review on every provider whose records arrived before submitting, so the deterministic rules are applied to all of them",
                         "missing": unreviewed[:20], "how": "call hybrid_review with these provider ids (up to 20 per call), then submit again"}
-        if self.v35:                                    # version 3.5 (issue 112): a rule-decided leaning is binding unless the finding states a reason naming a fact the rules cannot see
+        if self.v35:                                    # version 3.5 (issue 112, narrowed by Simmy): an upcoding call from the rules that the chart rule also supports is binding unless the finding states a reason naming a fact the rules cannot see
             refused, logged = {}, []
             for f in findings:
                 lean_src = self.rule_result.get(f["provider_id"])
-                if lean_src and lean_src[1] in ("summary_rule", "chart_rule") and lean_src[0] != f["leaning"]:
+                if lean_src and lean_src[0] == sr.UPCODING and lean_src[2] and f["leaning"] != sr.UPCODING:       # binding only for an upcoding call the chart rule also supports
                     ok, why = self._override_ok(f["provider_id"], f.get("override_reason", ""))
                     if ok:
                         logged.append({"provider": f["provider_id"], "rules": lean_src[0], "source": lean_src[1], "agent": f["leaning"], "reason": f["override_reason"]})
                     else:
                         refused[f["provider_id"]] = f"rules said {lean_src[0]} ({lean_src[1]}); {why}"
             if refused:
-                return {"error": "a rule-decided leaning is binding unless the finding has an override_reason that names a fact the rules cannot see (a data-quality flag, a specific claim id "
-                                 "of this provider, or a note sign such as late signatures or paste-heavy notes). Use the rules' leaning or add the reason.", "refused": refused}
+                return {"error": "an upcoding call that the rules made and the chart rule supports is binding unless the finding has an override_reason that names a fact the rules cannot see (a data-quality flag, a specific claim id "
+                                 "of this provider, or a note sign such as late signatures or paste-heavy notes). Use upcoding or add the reason.", "refused": refused}
             self.overrides += logged
         version = "2.1" if self.v31 else "2.0"
         built, problems = {}, {}

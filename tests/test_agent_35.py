@@ -1,4 +1,4 @@
-"""Agent v3.5 (issues 111 to 113): the advice inside tool results equals the workflow v2.5 policy, rule-decided leanings are binding unless a reason names a fact, status is shown.
+"""Agent v3.5 (issues 111 to 113): the advice inside tool results equals the workflow v2.5 policy, a chart-supported upcoding call is binding unless a reason names a fact, status is shown.
 Run: python tests/test_agent_35.py   (needs the gitignored data of development seed 1515; skipped otherwise)"""
 import os
 import sys
@@ -39,29 +39,28 @@ def test_advice_equals_the_workflow_policy_and_is_only_in_v35():
     assert env.advice_summary()["actions"] >= 4
 
 
-def test_rules_are_binding_unless_a_reason_names_a_fact():
+def test_only_a_chart_supported_upcoding_call_is_binding():
+    import agent_tools as at
     env = _env()
-    for pid in sorted(env.rows, key=lambda p: -float(env.rows[p]["share_99215"])):
-        _sample(env, pid)
-        if not env.office.state[pid]["usable"]:
-            continue
-        out = env.call("hybrid_review", {"provider_ids": [pid]})
-        if env.rule_result[pid][1] in ("summary_rule", "chart_rule"):
+    pid = None
+    for p in sorted(env.rows, key=lambda p: -float(env.rows[p]["share_99215"])):
+        _sample(env, p)
+        if env.office.state[p]["usable"]:
+            pid = p
             break
-    else:
-        print("no rule-decided provider found"); return
-    rules = env.rule_result[pid][0]
-    other = "inconclusive" if rules != "inconclusive" else "pattern_consistent_with_upcoding"
-    f = {"provider_id": pid, "leaning": other, "headline": "h", "interpretation": "i"}
-    got = env.call("submit_findings", {"findings": [f]})
-    assert "binding" in got["error"] and pid in got["refused"]
+    env.call("hybrid_review", {"provider_ids": [pid]})
+    f = {"provider_id": pid, "leaning": "inconclusive", "headline": "h", "interpretation": "i"}
+    up = at.sr.UPCODING
+    for state, bound in (((up, "chart_rule", True), True), ((up, "summary_rule", True), True), ((up, "summary_rule", False), False), (("inconclusive", "summary_rule", True), False)):
+        env.rule_result[pid] = state
+        got = env.call("submit_findings", {"findings": [f]})
+        assert ("binding" in got.get("error", "")) == bound, (state, got)
+    env.rule_result[pid] = (up, "chart_rule", True)
     got = env.call("submit_findings", {"findings": [{**f, "override_reason": "I just think the doctor is fine, nothing else to add here."}]})
     assert "binding" in got["error"]
     claim = env.claims[pid][0]["claim_id"]
     got = env.call("submit_findings", {"findings": [{**f, "override_reason": f"claim {claim} shows a note the rules do not read as upcoding"}]})
     assert "binding" not in got.get("error", "") and env.overrides and env.overrides[0]["provider"] == pid
-    same = _env()
-    assert "binding" not in same.call("submit_findings", {"findings": []}).get("error", "")
 
 
 def test_status_is_shown_and_earlier_versions_are_unchanged():
@@ -79,6 +78,6 @@ if __name__ == "__main__":
         print("skipped (no development data)")
     else:
         test_advice_equals_the_workflow_policy_and_is_only_in_v35()
-        test_rules_are_binding_unless_a_reason_names_a_fact()
+        test_only_a_chart_supported_upcoding_call_is_binding()
         test_status_is_shown_and_earlier_versions_are_unchanged()
         print("ok")
