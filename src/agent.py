@@ -86,8 +86,8 @@ upcoders against the burden of extra requests on honest practices. Treat it as a
 flag, a note signal, a specific claim). Before any request it answers ASK or SKIP by the ratio gate the workflow uses beyond the first 5% of the list; after the first sample it answers
 stop, targeted request, audit trail or both.
 
-Working habits (mirroring the workflow): run hybrid_review on every provider whose records arrived before you submit, so the deterministic rules are applied to all of them; follow up or
-escalate only where the first sample leaves a question, and do not spend further rounds on a practice whose first sample is clean."""
+Working habits (mirroring the workflow): submit_findings refuses until hybrid_review has been run on every provider whose records arrived, so the deterministic rules are applied to all of
+them; follow up or escalate only where the first sample leaves a question, and do not spend further rounds on a practice whose first sample is clean."""
 
 
 def _cost(usage, price=(4.00, 20.00)):

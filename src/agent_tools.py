@@ -62,6 +62,7 @@ class Environment:
                 self.scores32 = {**self.scores32, "eb_ratio_t": screen_methods.score_t(view_dir)}      # version 3.3: eb_ratio with the test-line covariate (the workflow v2.3 screen)
         self.note_rows = {}
         self.screen_candidates, self.set_aside, self.tool_calls = set(), {}, []
+        self.reviewed = set()                           # version 3.4: providers hybrid_review has been run on
         self.view_dir, self.model_call, self.records_budget, self.screen_enabled = view_dir, model_call, records_budget, screen_enabled
         self.chronic, self.age, self.conditions, self.claims = cs.load(view_dir)
         self.rates = cs.peer_rates(self.claims, self.chronic)
@@ -241,6 +242,7 @@ class Environment:
             if pid not in self.rows:
                 out.append({"provider": pid, "error": "unknown provider"})
                 continue
+            self.reviewed.add(pid)
             chart = self._chart_rule(pid)
             packet = self._packet(pid)
             rule, reason = (sr.rule_leaning_23 if self.v33 else sr.rule_leaning_22 if self.v32 else sr.rule_leaning)(packet)       # 3.2: rules 2.2 as workflow v2.2; 3.3: rules 2.3
@@ -332,6 +334,11 @@ class Environment:
                (sr.UPCODING, sr.HIGH_ACUITY, sr.INCONCLUSIVE)]
         if bad:
             return {"error": f"invalid provider or leaning for: {bad}"}
+        if self.v34:                                    # version 3.4: the rules are applied to every provider whose records arrived (mirrors the workflow, which always does)
+            unreviewed = sorted(p for p, st in self.office.state.items() if st["usable"] and p not in self.reviewed)
+            if unreviewed:
+                return {"error": "run hybrid_review on every provider whose records arrived before submitting, so the deterministic rules are applied to all of them",
+                        "missing": unreviewed[:20], "how": "call hybrid_review with these provider ids (up to 20 per call), then submit again"}
         version = "2.1" if self.v31 else "2.0"
         built, problems = {}, {}
         if self.v32:

@@ -76,6 +76,27 @@ def test_agent_advisor_agrees_with_the_workflow_policy_and_exists_only_in_v34():
         assert all(abs(got["state"][k] - round(v, 3)) < 1e-6 for k, v in zip(ep.STATE, office.policy_log[pid][0]))
 
 
+def test_v34_submit_refuses_until_hybrid_review_has_run_on_every_provider_with_records():
+    if not os.path.isdir(os.path.join(ROOT, "data", "synthetic_v2_r2_1515")):
+        print("skipped (no development data)")
+        return
+    import agent_tools as at
+    data = os.path.join(ROOT, "data", "synthetic_v2_r2_1515")
+    env, env33 = at.Environment(data, os.path.join(data, "view"), seed=1, version="3.4"), at.Environment(data, os.path.join(data, "view"), seed=1, version="3.3")
+    for pid in sorted(env.rows, key=lambda p: -float(env.rows[p]["share_99215"])):                    # the first provider whose charts come back
+        env.call("request_records", {"provider_id": pid, "sample": {"kind": "random", "n": 30}})
+        if env.office.state[pid]["usable"]:
+            break
+    finding = {"provider_id": pid, "leaning": "inconclusive", "headline": "h", "interpretation": "i"}
+    env33.call("request_records", {"provider_id": pid, "sample": {"kind": "random", "n": 30}})
+    got = env.call("submit_findings", {"findings": [finding]})
+    assert "hybrid_review" in got["error"] and got["missing"] == [pid]
+    env.call("hybrid_review", {"provider_ids": [pid]})
+    again = env.call("submit_findings", {"findings": [finding]})
+    assert "hybrid_review" not in again.get("error", "")                                           # other checks may still apply, this one is satisfied
+    assert "hybrid_review" not in env33.call("submit_findings", {"findings": [finding]}).get("error", "")   # 3.3 is unchanged
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):
