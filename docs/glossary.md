@@ -21,3 +21,14 @@
 | LLM | "Large language model": the kind of AI that writes the case summaries |
 | Hard negative | An honest provider who looks suspicious at first glance |
 
+## Words this project uses one way
+| Word | Used for | Not used for |
+|---|---|---|
+| Provider | the clinician or group billing under one ID: what the screen ranks, what is accused or cleared, and the party that answers record requests | "doctor" or "practice" (older pages still use them; they mean the same thing) |
+| Chart | the medical record a provider returns for one visit, in answer to a records request | the claim itself |
+| Note | the clinician's visit note inside a chart, when the point is about the note's text or signs: signatures, late signing, copied text ("cloned notes") | a synonym for chart |
+| Version | one built release of a design, such as workflow v2.5 or agent v3.5; a row in a results table | "arm" or "line" (an arm is a version as run in one test, for example a variant with a gate; avoid in new text) |
+| Workflow and agent | the two designs: code fixes the steps, or a model chooses them within caps | "pipeline" |
+| PI team | the payment integrity staff who review drafts | "people" |
+| Net dollars | the score since release 5: the overpayment a records sample supports for the upcoders found (90% lower bound) minus request and false-accusation costs | the release 1 to 4 point scores |
+

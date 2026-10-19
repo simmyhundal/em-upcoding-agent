@@ -26,7 +26,8 @@ def test_total_ignores_unscored_evals():
 
 def test_readme_table_and_tldr_are_rendered_from_the_results_file():
     text = open(os.path.join(ROOT, "README.md")).read()
-    for name, expected in (("scoreboard", sb.headline_table()), ("tldr", sb.headline_sentence())):
+    import release_table as rt
+    for name, expected in (("release23", rt.markdown()), ("tldr", rt.tldr())):
         start = text.index(f"<!-- {name}:start -->") + len(f"<!-- {name}:start -->")
         end = text.index(f"<!-- {name}:end -->")
         assert text[start:end].strip() == expected.strip(), f"README {name} block is stale: run python docs/update_readme.py"

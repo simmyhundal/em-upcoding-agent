@@ -1,8 +1,6 @@
 """Refresh the generated parts of the README so they cannot go stale.
 
-  * the README's TL;DR sentence and headline table (between the tldr and scoreboard markers), rendered from experiments/results.csv (the source of truth,
-    written from the saved outputs listed in experiments/runs.json by `python eval/scoreboard.py --write`);
-  * the table of releases 2 and 3 (release23 markers), rendered from experiments/release23_table.json (eval/release_table.py);
+  * the README's TL;DR (tldr markers, from experiments/release5_results.json) and its table of releases 1 to 5 (release23 markers, from experiments/release23_table.json), both in eval/release_table.py;
   * docs/results.md (every run) and docs/roadmap.md (built from this repository's GitHub milestones as live progress badges; running this script
     also picks up milestones created later).
 
@@ -60,9 +58,8 @@ def results_doc():
 
 
 def build(text, with_roadmap=True):
-    text = replace_block(text, "tldr", scoreboard.headline_sentence())
-    text = replace_block(text, "scoreboard", scoreboard.headline_table())
-    text = replace_block(text, "release23", release_table.markdown())      # releases 2 and 3 (data 2.2), from experiments/release23_table.json
+    text = replace_block(text, "tldr", release_table.tldr())
+    text = replace_block(text, "release23", release_table.markdown())      # releases 1 to 5, from experiments/release23_table.json
     return text
 
 

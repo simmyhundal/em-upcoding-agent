@@ -1,6 +1,7 @@
 """The README's second results table: workflow v2.2 to v2.5 and agent v3.2 to v3.5 on data 2.2 (releases 2 to 5), rendered from experiments/release23_table.json.
 
-The JSON is written by `python eval/release_table.py --compute [--key-root PATH]` from the saved run folders and the (gitignored) answer keys, and committed, the way
+The table now starts with the four release 1 versions (from experiments/results.csv) and every row carries net dollars per seed (the release 5 score: experiments/release5_dollar_results.json,
+experiments/release5_results.json). The JSON is written by `python eval/release_table.py --compute [--key-root PATH]` from the saved run folders and the (gitignored) answer keys, and committed, the way
 experiments/results.csv is; the README block is rendered from the JSON so it cannot drift from it (tests/test_release_table.py).
 """
 import json
@@ -21,8 +22,36 @@ ROWS = [("Workflow v2.2", "release 2 seeds", "r2", "r2w", R2), ("Agent v3.2", "r
         ("Workflow v2.5", "release 5 seeds", "r5", "r5w25", R5), ("Agent v3.5", "release 5 seeds", "r5", "r5a", R5)]
 
 
-def compute(key_root=ROOT):
+DOLLAR_SET = {"release 2 seeds": "r2", "release 3 seeds": "r3", "release 4 seeds": "r4"}
+DOLLAR_ARM = {"Workflow v2.2": "W2.2", "Agent v3.2": "A3.2", "Workflow v2.3": "W2.3", "Agent v3.3": "A3.3", "Workflow v2.4": "GL", "Agent v3.4": "A3.4"}
+R5_ARM = {"Workflow v2.5": "W2.5", "Agent v3.5": "A3.5", "Workflow v2.3": "W2.3"}
+R1 = [("Workflow v2.0", 0, "W2.0"), ("Workflow v2.1", 1, "W2.1"), ("Agent v3.0", 2, "A3.0"), ("Agent v3.1", 3, "A3.1")]
+
+
+def net_per_seed(seeds_label, arm):
+    """Net dollars per seed (eval/dollar_reward.py: option 2, 90% lower bound) for one table row."""
+    import dollar_reward as dr
+    if seeds_label == "release 5 seeds":
+        per = json.load(open(os.path.join(ROOT, "experiments", "release5_results.json")))[R5_ARM[arm]]["per_seed"]
+        return sum(per) / len(per)
+    key = {"release 1 seeds": "r1"}.get(seeds_label) or DOLLAR_SET[seeds_label]
+    name = DOLLAR_ARM.get(arm) or dict((a, c) for a, _, c in R1)[arm]
+    rows = [r for r in json.load(open(os.path.join(ROOT, "experiments", "release5_dollar_results.json"))) if r["set"] == key and r["arm"] == name]
+    return dr.net(dr.add(rows)) / len(rows)
+
+
+def release1_rows():
+    import scoreboard
+    rows = scoreboard.read_csv(scoreboard.CSV_PATH)
     out = []
+    for label, i, _ in R1:
+        a = scoreboard._arm(rows, scoreboard.ARMS[i][1], scoreboard.ARMS[i][2])
+        out.append({"arm": label, "seeds": "release 1 seeds", "found": a["found"], "upcoders": a["of"], "accused": a["accused"], "asked": a["asked"], "requests": a["rounds"]})
+    return out
+
+
+def compute(key_root=ROOT):
+    out = release1_rows()
     for label, which, code, pre, seeds in ROWS:
         found = up = honest = asked = rounds = 0
         for s in seeds:
@@ -40,6 +69,8 @@ def compute(key_root=ROOT):
                         seen.add(e["provider_id"])
             asked += len(seen)
         out.append({"arm": label, "seeds": which, "found": found, "upcoders": up, "accused": honest, "asked": asked, "requests": rounds})
+    for r in out:
+        r["net_per_seed"] = round(net_per_seed(r["seeds"], r["arm"]))
     json.dump(out, open(PATH, "w"), indent=1)
     return out
 
@@ -51,13 +82,23 @@ def rows():
 def markdown():
     r = rows()
     from scoreboard import pct
-    lines = ["| Arm | Seeds | Upcoders found | Recall | Honest practices accused | Precision | Honest practices asked for charts | Requests and follow-ups sent to practices |", "|---|---|---|---|---|---|---|---|"]
+    lines = ["| Version | Seeds | Upcoders found | Honest providers accused | Requests sent to providers | Net $ per seed |", "|---|---|---|---|---|---|"]
     for x in r:
-        lines.append(f"| {x['arm']} | {x['seeds']} | {x['found']} of {x['upcoders']} | {pct(x['found'], x['upcoders'])} | {x['accused']} | {pct(x['found'], x['found'] + x['accused'])} | {x['asked']} | {x['requests']} |")
-    lines += ["", "Harder data (honest coding noise, group billing, data defects), ten seeds in each set, 8 planted upcoders each. The release 2 comparison was an unplanned ten-seed look (no significance claim); "
-              "in the pre-registered sets the workflow and the agent are not significantly different. Release 4 and 5 score best in net dollars rather than upcoders found (recall stays near 46 to 62%): "
-              "[release 3](docs/release3_results.md), [release 4](docs/release4_results.md), [release 5](docs/release5_results.md)."]
+        lines.append(f"| {x['arm']} | {x['seeds']} | {x['found']} of {x['upcoders']} ({pct(x['found'], x['upcoders'])}) | {x['accused']} | {x['requests']} | ${x['net_per_seed']:,} |")
+    lines += ["", "Ten seeds per set, 8 planted upcoders each; releases 2 to 5 use harder data. **Net $** is the overpayment a records sample supports for the upcoders found (90% lower bound) minus request and false-accusation costs: compare rows within a seed set only. "
+              "Details: [release 1](docs/eval61.md), [2](docs/release2_results.md), [3](docs/release3_results.md), [4](docs/release4_results.md), [5](docs/release5_results.md); [every run](docs/results.md)."]
     return "\n".join(lines)
+
+
+def tldr():
+    """The README's TL;DR, rendered from experiments/release5_results.json (release 5 fresh test, ten seeds)."""
+    d = json.load(open(os.path.join(ROOT, "experiments", "release5_results.json")))
+    n = len(d["A3.5"]["per_seed"])
+    net = {k: sum(v["per_seed"]) / n for k, v in d.items()}
+    return (f"A fixed workflow and an AI agent both screen providers, request charts and draft cases for PI teams. On ten fresh seeds ({d['A3.5']['upcoders']} planted upcoders), the latest agent (v3.5) and workflow (v2.5) "
+            f"each earn about ${net['A3.5'] / 1000:.0f}k net per seed and are not reliably different; the release 3 workflow earned ${net['W2.3'] / 1000:.0f}k on the same seeds. "
+            f"The gain is lower cost (fewer requests and fewer false accusations), not more catches: each still finds under half of the upcoders ({d['W2.5']['found']} and {d['A3.5']['found']} of {d['A3.5']['upcoders']}), "
+            "far from the 12.5% miss-rate target.")
 
 
 def headline_cells():
