@@ -88,12 +88,13 @@ def build_view(rid, src, screen, version="2.0", tier1_n=None, policy24=None):
     return view, office, flagged_file
 
 
-def run(rid, src, screen, note, version="2.0", tier1_n=None, policy24=None):
+def run(rid, src, screen, note, version="2.0", tier1_n=None, policy24=None, no_model=None):
+    """no_model None: on for workflow 2.5 only (older versions keep their frozen behavior); pass True to run an older arm API-free on future tests."""
     view, office, flagged_file = build_view(rid, src, screen, version, **({} if tier1_n is None else {"tier1_n": tier1_n}), **({} if policy24 is None else {"policy24": policy24}))
     name = os.path.basename(view)
     # 2.2: rules 2.2 decide more summaries without the model, and no LLM usefulness judge (the rule judge runs after; issues 91 and 93)
     ai.run(rid, src, note, view_name=name, flagged_name=os.path.basename(flagged_file), v21=version in ("2.1", "2.2", "2.3", "2.4", "2.5"), preflight=version in ("2.2", "2.3", "2.4", "2.5"),
-           v22=version in ("2.2", "2.3", "2.4", "2.5"), v23=version in ("2.3", "2.4", "2.5"), llm_judge=version not in ("2.2", "2.3", "2.4", "2.5"))
+           v22=version in ("2.2", "2.3", "2.4", "2.5"), v23=version in ("2.3", "2.4", "2.5"), llm_judge=version not in ("2.2", "2.3", "2.4", "2.5"), no_model=(version == "2.5") if no_model is None else no_model)       # 2.5 onward: no API call at all
     office.write_transcript(os.path.join(ROOT, "experiments", rid, "office_transcript.jsonl"))
 
 
