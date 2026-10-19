@@ -385,13 +385,23 @@ class Environment:
         if provider_id not in self.rows:
             return {"error": "unknown provider"}
         st = self.office.state.get(provider_id)
-        if not st or not st["round"]:
-            return {"error": "no records request for this provider yet; the advice reads what the first sample returned"}
         import escalation_policy as ep
         score = self.scores32["eb_ratio_t"]
         order = sorted(score, key=lambda p: (-score[p], p))
         row = self.rows[provider_id]
         ratio = float(row["share_99215"]) / max(float(row["expected_share"]), 1e-9)
+        if not st or not st["round"]:                   # before any request: the same gate as workflow variant G (issue 102), advice only
+            rank = order.index(provider_id) + 1
+            list_n = flagging.top_n_from_pct(len(self.rows), 10)           # the top-10% list the workflow works from
+            if rank > list_n:
+                return {"provider": provider_id, "recommended": "SKIP", "meaning": f"skip: outside the top 10 percent of the screen (rank {rank} of {len(order)})",
+                        "state": {"rank": rank, "ratio": round(ratio, 2)}, "note": "Advisory only; the workflow works from the top 10%."}
+            ask = rank <= ep.GATE_TIER1_N or ratio >= ep.GATE_RATIO
+            why = (f"one of the first {ep.GATE_TIER1_N} on the list" if rank <= ep.GATE_TIER1_N else f"ratio to expected {ratio:.1f} is at least {ep.GATE_RATIO}") if ask \
+                else f"beyond the first {ep.GATE_TIER1_N} on the list and the ratio to expected is {ratio:.1f}, below {ep.GATE_RATIO}"
+            return {"provider": provider_id, "recommended": "ASK" if ask else "SKIP", "meaning": ("ask for records: " if ask else "skip for now: ") + why,
+                    "state": {"rank": rank, "ratio": round(ratio, 2)},
+                    "note": "Advisory only; the same ask-or-skip gate as workflow v2.4 variant G. After the first sample, call this tool again for the stop-or-escalate advice."}
         x = ep.state_vector(list(st["usable"].values()), self.claims[provider_id], order.index(provider_id) + 1, ratio, st["round"])
         branch = ep.choose(ep.load(), x)
         meaning = {"STOP": "nothing more: the first sample is enough, or more asking is unlikely to pay for the burden on the practice",

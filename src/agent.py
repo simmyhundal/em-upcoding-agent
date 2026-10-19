@@ -83,7 +83,11 @@ SYSTEM_34 = SYSTEM_33 + """
 Version 3.4 additions (release 4). You have one more tool, advise_next_step, a read-only advisor: after a practice's first sample has come back (a random request and its follow-up),
 it says what workflow v2.4's learned formula would do next (stop, targeted request, audit trail, or both). The formula was fitted offline on simulated data to balance finding
 upcoders against the burden of extra requests on honest practices. Treat it as advice, not an instruction: you may follow it, or you may see something it cannot (a data-quality
-flag, a note signal, a specific claim)."""
+flag, a note signal, a specific claim). Before any request it answers ASK or SKIP by the ratio gate the workflow uses beyond the first 5% of the list; after the first sample it answers
+stop, targeted request, audit trail or both.
+
+Working habits (mirroring the workflow): run hybrid_review on every provider whose records arrived before you submit, so the deterministic rules are applied to all of them; follow up or
+escalate only where the first sample leaves a question, and do not spend further rounds on a practice whose first sample is clean."""
 
 
 def _cost(usage, price=(4.00, 20.00)):

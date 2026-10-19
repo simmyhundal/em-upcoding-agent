@@ -16,6 +16,7 @@ from case_summary import BILLED_LEVEL, MDM_LEVELS
 PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "policy_24.json")
 STATE = ["rank", "log_ratio", "charts", "docs99215", "unsupp99215", "notes", "late", "problems", "data", "silent", "first_rounds"]
 BRANCHES = ("STOP", "TARG", "AUD", "BOTH")
+GATE_RATIO, GATE_TIER1_N = 2.5, 11      # the ask-or-skip gate of workflow v2.4 variant G: beyond the first 11 of 216 (5%), ask only when the ratio to expected is at least 2.5
 
 
 def load(path=PATH):
