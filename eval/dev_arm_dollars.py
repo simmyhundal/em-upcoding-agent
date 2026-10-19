@@ -1,0 +1,132 @@
+"""Release 4: every arm on the development seeds in dollars (issue 108). Free. See eval/dollar_reward.py for the reward and the sources of every cost.
+
+Workflow arms are re-run in the simulated office (free) so the value of each call is the estimate extrapolated from the random charts that arm obtained: W2.2, W2.3, G (gate 2.5),
+L and GL (the learned stop-or-escalate policy, **fitted on the other seeds only**: five folds of four seeds, as in docs/rl_escalate_policy.md). Agent and release 1 arms are scored from their
+stored runs. Leanings of the re-run workflow arms come from the rules (cases left to the model count as inconclusive).
+
+Usage: python eval/dev_arm_dollars.py     (writes docs/dev_arm_dollars.md and experiments/dollar_results.json)
+"""
+import csv
+import json
+import multiprocessing as mp
+import os
+import sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "src"))
+sys.path.insert(0, os.path.join(ROOT, "eval"))
+import case_summary as cs  # noqa: E402
+import dev_release3 as dev3  # noqa: E402
+import dev_release4 as dev4  # noqa: E402
+import dollar_reward as dr  # noqa: E402
+import export_policy_24 as ex  # noqa: E402
+import make_v2_office_workflow_runs as mw  # noqa: E402
+import rl_escalate_policy as r2  # noqa: E402
+import summary_rules as sr  # noqa: E402
+
+OUT = os.path.join(ROOT, "experiments", "dollar_results.json")
+CONFIGS = ("W2.2", "W2.3", "G", "L", "GL")
+
+
+def fold_policies():
+    rows = json.load(open(r2.DATA))
+    seeds = sorted({r["seed"] for r in rows})
+    fold_of = {s: i % 5 for i, s in enumerate(seeds)}
+    pols = {}
+    for k in range(5):
+        pols[k] = ex.fit_policy([r for r in rows if fold_of[r["seed"]] != k])
+    return fold_of, pols
+
+
+def run_config(job):
+    pre, seed, cfg, policy = job
+    src = f"{pre}_{seed}"
+    key = json.load(open(os.path.join(ROOT, "eval", "answer_key", f"ground_truth_v2_{src}.json")))["providers"]
+    rid = f"dd{cfg.replace('.', '').lower()}_{seed}"
+    if cfg == "W2.2":
+        view, office, flagged_file = mw.build_view(rid, src, "eb_ratio_top5pct", version="2.2")
+        rules = "2.2"
+    else:
+        name = dev3.write_flagged(src, "eb_ratio_t", 10)
+        if cfg == "W2.3":
+            view, office, flagged_file = mw.build_view(rid, src, name, version="2.3", tier1_n=dev4.TIER1_N)
+        else:
+            opts = {"G": {"gate_t": 2.5}, "L": {"learned": policy}, "GL": {"gate_t": 2.5, "learned": policy}}[cfg]
+            view, office, flagged_file = mw.build_view(rid, src, name, version="2.4", tier1_n=dev4.TIER1_N, policy24=opts)
+        rules = "2.3"
+    out = cs.run(view, flagged_file, os.path.join("/tmp", f"{rid}.jsonl"), dry_run=True, rules=rules)
+    lean = sr.rule_leaning_23 if rules == "2.3" else sr.rule_leaning_22
+    called = {o["provider_id"] for o in out if lean(o["packet"])[0] == sr.UPCODING}
+    claims = {}
+    for r in csv.DictReader(open(os.path.join(ROOT, "data", f"synthetic_v2_{src}", "view", "claims.csv"))):
+        claims.setdefault(r["provider_id"], []).append(r)
+    rows = [row for st in office.state.values() for row in st["usable"].values()]
+    comp = dr.seed_result(called, key, claims, office.random_claim_ids, dr.level_of_rows(rows),
+                          {p: st["round"] for p, st in office.state.items() if st["round"] > 0 and p in key}, {p: len(st["usable"]) for p, st in office.state.items() if p in key})
+    return {"set": pre, "seed": seed, "arm": cfg, **comp}
+
+
+def main():
+    if os.path.exists(OUT) and "--rerun" not in sys.argv:
+        res = json.load(open(OUT))
+    else:
+        fold_of, pols = fold_policies()
+        jobs = [(pre, s, c, pols[fold_of[s]] if c in ("L", "GL") else None) for pre, s in dev4.SEEDS for c in CONFIGS]
+        with mp.Pool(4) as pool:
+            res = pool.map(run_config, jobs)
+        for pre, s in dev4.SEEDS:
+            if pre == "r2":
+                res.append({"set": pre, "seed": s, "arm": "A3.2", **dr.from_run(f"r2a_{s}", f"r2_{s}")})
+            else:
+                res.append({"set": pre, "seed": s, "arm": "A3.3", **dr.from_run(f"r3a_{s}", f"r3_{s}")})
+        import analyze_eval61 as a61
+        r61 = a61.load()
+        keys = sorted({k for k, _ in r61 if "_r" not in k}, key=lambda k: int(k[1:]))
+        for arm in a61.ARMS:
+            for k in keys:
+                r = r61[(k, arm)]
+                try:
+                    res.append({"set": "r1", "seed": k, "arm": {"W2.0": "W2.0", "W2.1": "W2.1", "A3.0": "A3.0", "A3.1": "A3.1"}[arm], **dr.from_run(r["run"], r["code"])})
+                except Exception as e:                                        # a run folder without a view or transcript: skip and say so
+                    res.append({"set": "r1", "seed": k, "arm": arm, "error": str(e)[:80]})
+        json.dump(res, open(OUT, "w"), indent=1)
+    L = ["# Release 4: every arm on the development seeds, in dollars (issue 108)", "", "[Back to the README](../README.md)", "",
+         "Generated by `python eval/dev_arm_dollars.py`. Free. **Release 5 groundwork, not release 4.** Release 4 sticks to the points-based reinforcement learning (reward +1 per upcoder found, -1 per honest doctor flagged, -0.05 per extra round sent to an honest practice); the dollar reward and everything trained on it moves to release 5 (issue 109), where the value of a call becomes the 90% lower bound of the extrapolated estimate. **Net dollars = what the arm would demand from the upcoders it calls (extrapolated from its own random charts) minus what it costs: "
+         "request rounds, burden on honest practices, chart reviews, and a charge for each honest doctor called.** The cost parameters and their sources are in `eval/dollar_reward.py`: "
+         f"${dr.C_COPY:.0f} per round for copied records (CMS Transmittal 786: $0.15 a page, up to $15 a record), ${dr.C_BURDEN:.2f} per round to an honest practice (Premier 2022 average cost of fighting a denial), "
+         f"${dr.C_REVIEW:.0f} per practice reviewed (GAO-16-394: Recovery Auditors, $158 per review), and ${dr.C_FALSE:,.0f} per honest doctor called (**an assumption**; no published figure found). "
+         "L and GL are fitted on other seeds only. **Read the dollars as a ranking, not a business case:** synthetic providers have about 240 claims a year, far fewer than a real practice, so "
+         "extrapolated recoveries are small beside per-round costs (see the break-even scale).", ""]
+    titles = {"r2": "Release 2 seeds (1515 to 2424)", "r3": "Release 3 seeds (2525 to 3434)", "r1": "Release 1 seeds (404 to 1313, data 2.0 and 2.1; not comparable with the tables above)"}
+    for st in ("r2", "r3", "r1"):
+        arms = [a for a in dict.fromkeys(r["arm"] for r in res if r["set"] == st)]
+        L += [f"## {titles[st]}", "", "| Arm | Upcoders found | Honest doctors called | Value (extrapolated) | Costs | Net $ per seed | Net, honest-call charge $0 | Net, charge $10,000 | Net if values were 3x | Net if values were 10x | Break-even scale |", "|---|---|---|---|---|---|---|---|---|---|---|"]
+        for a in arms:
+            xs = [r for r in res if r["set"] == st and r["arm"] == a and "error" not in r]
+            if not xs:
+                continue
+            c = dr.add(xs)
+            n = len(xs)
+            cost = dr.C_COPY * c["all_rounds"] + dr.C_BURDEN * c["honest_rounds"] + dr.C_REVIEW * c["reviewed"] + dr.C_FALSE * c["honest_called"]
+            be = f"{cost / c['value']:.1f}x" if c["value"] else "none"
+            L.append(f"| {a} | {c['found']} of {c['upcoders']} | {c['honest_called']} | ${c['value']:,.0f} | ${cost:,.0f} | ${dr.net(c) / n:,.0f} | ${dr.net(c, c_false=0) / n:,.0f} | ${dr.net(c, c_false=10000) / n:,.0f} | ${dr.net(c, scale=3) / n:,.0f} | ${dr.net(c, scale=10) / n:,.0f} | {be} |")
+        L.append("")
+        tot = {a: dr.add([r for r in res if r["set"] == st and r["arm"] == a and "error" not in r]) for a in arms if any(r["set"] == st and r["arm"] == a and "error" not in r for r in res)}
+        if "W2.2" in tot and "W2.3" in tot and tot["W2.3"]["value"] > tot["W2.2"]["value"]:
+            cc = lambda c: dr.C_COPY * c["all_rounds"] + dr.C_BURDEN * c["honest_rounds"] + dr.C_REVIEW * c["reviewed"] + dr.C_FALSE * c["honest_called"]
+            s_star = (cc(tot["W2.3"]) - cc(tot["W2.2"])) / (tot["W2.3"]["value"] - tot["W2.2"]["value"])
+            L += [f"The wide list (W2.3) beats the narrow one (W2.2) in net dollars only if values are at least {s_star:.1f} times the simulated ones.", ""]
+    L += ["## Reading", "",
+          "- **Value is the extrapolated estimate, so an arm is paid only for what it can document.** A provider called on targeted charts only, or with no random charts, adds nothing, however right the call.",
+          "- **Cloned-notes upcoders are worth little in this score, and that is realistic:** their charts support the billed level, so an estimate extrapolated from their charts is about zero. "
+          "Rules 2.3 find many more of them (more upcoders found), but the dollars cannot be demanded from chart review alone; they would need the audit trail or another way to document the overbilling. "
+          "That is why the wider list finds more upcoders yet adds little value in dollars.",
+          "- **Break-even scale** is total costs divided by total value: values would have to be that many times larger (a bigger real practice, a longer look-back) for the arm to break even. Below 1.0x the arm pays for itself as simulated.",
+          "- **The cost figures are published proxies, not this project's costs:** per-review and per-denial figures are from other settings and years (see `eval/dollar_reward.py`). The honest-call charge is an assumption, shown at $0 and $10,000 beside the base case.",
+          "- **Same caution as the points score:** the learned variants were fitted to a reward (in points), not to these dollars, and only cross-validated rows are fair; the fresh test is the real comparison."]
+    open(os.path.join(ROOT, "docs", "dev_arm_dollars.md"), "w").write("\n".join(L) + "\n")
+    print("\n".join(L))
+
+
+if __name__ == "__main__":
+    main()

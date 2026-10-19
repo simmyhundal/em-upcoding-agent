@@ -1,0 +1,10 @@
+{
+ "stop_reason": "submitted",
+ "turns": 8,
+ "tool_calls": 28,
+ "estimated_usd": 0.2688,
+ "model": "claude-opus-5-5",
+ "findings": 14,
+ "records_providers_requested": 14,
+ "model_spend_in_tools_usd": 0.0
+}

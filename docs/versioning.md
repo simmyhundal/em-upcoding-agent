@@ -81,6 +81,18 @@ Release 3 (in development, branch `release3-dev`; data stays 2.2, [#99](https://
 | Wider list with a light tier | built, **the W2.3 default** (Simmy's decision: more upcoders found, about 94 more honest practices asked on the development seeds): top 10%, ranks 12 to 22 get one request unless the notes show cloning (`eval/workflow_policy_23.py`) | built: the prompt suggests the top 10% and a light touch beyond the first 5%; records budget 22 (v3.0 to v3.2: 15); the agent chooses | mirrored by design (the agent chooses) |
 | Audit-trail request on late signatures | built (adds nothing on the development seeds) | the existing `request_audit_trail` tool, prompted | mirrored |
 
+Release 4 (in development; issues #102 to #104, #108). Workflow v2.4 is built behind flags; agent v3.4 has the read-only advisor tool and nothing else new yet.
+
+| Feature | v2.4 workflow | v3.4 agent | Reason if one-sided |
+|---|---|---|---|
+| Learned stop-or-escalate formula (#108) | built: `eval/workflow_policy_24.py` with `learned`, `src/escalation_policy.py`, `src/policy_24.json`; variants G, L, GL ([learned_policy_plain.md](learned_policy_plain.md)); fresh test on ten seeds: **GL is the v2.4 default** by the pre-registered rule ([release4_results.md](release4_results.md)) | built as **advice only**: tool `advise_next_step` (`Environment(version="3.4")`, `SYSTEM_34`) answers after a first sample; the agent decides (**in the ten-seed test it never called the tool**: [release4_agent_results.md](release4_agent_results.md)) | different mechanism by design: the workflow obeys the formula, the agent is advised |
+| Ratio gate on the light tier (#102) | built (variant G, 2.5) | built as **advice only**: `advise_next_step` before any request says ASK or SKIP by the same gate (ratio 2.5 beyond the first 5%), plus the agent's own habit of asking at about 3x expected | the workflow obeys the gate, the agent is advised and chooses |
+| Rules first, then spend rounds only where the sample leaves a question (#102) | built (rules 2.3 decide every provider asked; learned stop-or-escalate) | built: **enforced in code** (`submit_findings` refuses until `hybrid_review` has been run on every provider whose records arrived); follow-up only where the first sample leaves a question is a prompt rule in `SYSTEM_34`, measured from the audit log | the rule-application invariant is code; the escalation judgment stays with the agent |
+| Silent offices (#103) | moved to release 5 (#109) | moved to release 5 | depends on how non-response is modeled (#68) |
+| High-acuity override (#104) | **do not build** (checked: one upcoder and one honest doctor on 20 development seeds) | do not build | evidence too thin to justify a rule in either stream |
+
+Known gaps in the mirror rule (checked 2026-10-18): dispositions for screened candidates (#66) exist only in the agent (`set_aside`); the workflow keeps rule reason strings. The "hybrid review (#49)" and "data-quality pre-flight (#81)" rows above are out of date: both streams now decide with rules first and a model only where the rules are silent, and the workflow's case-summary step applies the pre-flight holds. The agent alone flags data issues (`flag_data_issue`), reads its own estimate reliability, and chooses its own list size. The agent writes its own findings while the workflow's summaries are code-written; judges j3.2 and j3.3 score both.
+
 Release 1 (frozen). Items still planned carry over to `v2.2` and `v3.2`.
 
 | Feature (issue) | v2.1 workflow | v3.1 agent | Reason if one-sided |
@@ -98,4 +110,6 @@ Release 1 (frozen). Items still planned carry over to `v2.2` and `v3.2`.
 | Screen cutoff choice (#48) | planned: budget-based rule | planned: agent chooses | mirrored by design |
 | Multi-seed paired evaluation (#61) | done ([eval61.md](eval61.md)) | done | shared |
 
-Release 4 (planned; milestone "v2.4 and v3.4"): narrow the wide list for both arms, taking the agent's habits into the fixed workflow ([release4_agent_narrowing.md](release4_agent_narrowing.md)); silent offices; high-acuity override. Fresh seeds only: 1515 to 3434 are development data.
+Release 4 (in development; workflow v2.4 is still a fixed workflow, with one decision made by a learned scoring formula: [learned_policy_plain.md](learned_policy_plain.md); milestone "v2.4 and v3.4"): narrow the wide list for both arms, taking the agent's habits into the fixed workflow ([release4_agent_narrowing.md](release4_agent_narrowing.md)); silent offices; high-acuity override. Fresh seeds only: 1515 to 3434 are development data.
+
+Release 5 (planned; milestone "v2.5 and v3.5", [#109](https://github.com/simmyhundal/em-upcoding-agent/issues/109)): a recovery model of cloned claims and the dollar reward on the 90% lower bound of the extrapolated estimate; the release 4 dollar documents (`dev_arm_dollars.md`, `rl_escalate_dollars.md`, `rl_ask_dollars.md`) are its groundwork.

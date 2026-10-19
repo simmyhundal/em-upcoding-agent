@@ -18,4 +18,5 @@ Live from this repository's [milestones](https://github.com/simmyhundal/em-upcod
 - ![v2.2 and v3.2: data 2.2 realism and data quality](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/11) Release 2: data 2.2, workflow v2.2 and agent v3.2.
 - ![v2.3 and v3.3: release 3 (data stays 2.2)](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/12) Workflow 2.3 and agent 3.3 on data 2.2 (same data as release 2, for like-for-like comparison).
 - ![v2.4 and v3.4: release 4 (data stays 2.2)](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/13) Workflow 2.4 and agent 3.4.
+- ![v2.5 and v3.5: release 5 (recovery model)](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/14) Recovery in dollars: a model of how payers recover from cloned-notes claims, a dollar reward with sourced costs and the 90% lower bound of the extrapolated estimate.
 <!-- roadmap:end -->

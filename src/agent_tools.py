@@ -48,9 +48,10 @@ class Environment:
         version "3.1" adds the note package (data v2.1): charts carry notes, a second request is allowed (random first, targeted after),
         and the note_checks and request_audit_trail tools exist. "3.2" is 3.1 plus the data-quality pre-flight, the read-only data_quality tool and
         flag_data_issue (issue 81). "3.0" is the frozen agent."""
-        self.v31 = version in ("3.1", "3.2", "3.3")
-        self.v32 = version in ("3.2", "3.3")
-        self.v33 = version == "3.3"                     # release 3 (issue 99): rules 2.3, the eb_ratio_t screen, a top-10% list; data stays 2.2
+        self.v31 = version in ("3.1", "3.2", "3.3", "3.4")
+        self.v32 = version in ("3.2", "3.3", "3.4")
+        self.v33 = version in ("3.3", "3.4")
+        self.v34 = version == "3.4"                     # release 4 (issue 108): everything in 3.3 plus the read-only advisor tool advise_next_step                     # release 3 (issue 99): rules 2.3, the eb_ratio_t screen, a top-10% list; data stays 2.2
         self.dq, self.data_issues, self.held = None, [], set()
         if self.v32:                                    # version 3.2: the data-quality pre-flight runs once per load (issue 81)
             import data_quality
@@ -61,6 +62,7 @@ class Environment:
                 self.scores32 = {**self.scores32, "eb_ratio_t": screen_methods.score_t(view_dir)}      # version 3.3: eb_ratio with the test-line covariate (the workflow v2.3 screen)
         self.note_rows = {}
         self.screen_candidates, self.set_aside, self.tool_calls = set(), {}, []
+        self.reviewed = set()                           # version 3.4: providers hybrid_review has been run on
         self.view_dir, self.model_call, self.records_budget, self.screen_enabled = view_dir, model_call, records_budget, screen_enabled
         self.chronic, self.age, self.conditions, self.claims = cs.load(view_dir)
         self.rates = cs.peer_rates(self.claims, self.chronic)
@@ -240,6 +242,7 @@ class Environment:
             if pid not in self.rows:
                 out.append({"provider": pid, "error": "unknown provider"})
                 continue
+            self.reviewed.add(pid)
             chart = self._chart_rule(pid)
             packet = self._packet(pid)
             rule, reason = (sr.rule_leaning_23 if self.v33 else sr.rule_leaning_22 if self.v32 else sr.rule_leaning)(packet)       # 3.2: rules 2.2 as workflow v2.2; 3.3: rules 2.3
@@ -331,6 +334,11 @@ class Environment:
                (sr.UPCODING, sr.HIGH_ACUITY, sr.INCONCLUSIVE)]
         if bad:
             return {"error": f"invalid provider or leaning for: {bad}"}
+        if self.v34:                                    # version 3.4: the rules are applied to every provider whose records arrived (mirrors the workflow, which always does)
+            unreviewed = sorted(p for p, st in self.office.state.items() if st["usable"] and p not in self.reviewed)
+            if unreviewed:
+                return {"error": "run hybrid_review on every provider whose records arrived before submitting, so the deterministic rules are applied to all of them",
+                        "missing": unreviewed[:20], "how": "call hybrid_review with these provider ids (up to 20 per call), then submit again"}
         version = "2.1" if self.v31 else "2.0"
         built, problems = {}, {}
         if self.v32:
@@ -375,6 +383,40 @@ class Environment:
                 rep["per_provider"][pid] = rep["per_provider"].get(pid, []) + [{"flag": "agent_flag", "detail": issue["detail"]}]
         charts = self._chart_rule(pid)["charts"] if pid in self.rows else 0
         return data_quality.hold_decision(rep, pid, charts, MIN_STRATUM_REVIEWED)
+
+    def advise_next_step(self, provider_id):
+        """Version 3.4, read-only: what workflow v2.4's learned stop-or-escalate formula (src/policy_24.json) would do next for this provider, from what its first sample returned.
+        Advice only; the agent decides. The formula was fitted offline on simulated development seeds and was trained on a first sample of 30 random charts plus a follow-up."""
+        if not self.v34:
+            return {"error": "tool not available"}
+        if provider_id not in self.rows:
+            return {"error": "unknown provider"}
+        st = self.office.state.get(provider_id)
+        import escalation_policy as ep
+        score = self.scores32["eb_ratio_t"]
+        order = sorted(score, key=lambda p: (-score[p], p))
+        row = self.rows[provider_id]
+        ratio = float(row["share_99215"]) / max(float(row["expected_share"]), 1e-9)
+        if not st or not st["round"]:                   # before any request: the same gate as workflow variant G (issue 102), advice only
+            rank = order.index(provider_id) + 1
+            list_n = flagging.top_n_from_pct(len(self.rows), 10)           # the top-10% list the workflow works from
+            if rank > list_n:
+                return {"provider": provider_id, "recommended": "SKIP", "meaning": f"skip: outside the top 10 percent of the screen (rank {rank} of {len(order)})",
+                        "state": {"rank": rank, "ratio": round(ratio, 2)}, "note": "Advisory only; the workflow works from the top 10%."}
+            ask = rank <= ep.GATE_TIER1_N or ratio >= ep.GATE_RATIO
+            why = (f"one of the first {ep.GATE_TIER1_N} on the list" if rank <= ep.GATE_TIER1_N else f"ratio to expected {ratio:.1f} is at least {ep.GATE_RATIO}") if ask \
+                else f"beyond the first {ep.GATE_TIER1_N} on the list and the ratio to expected is {ratio:.1f}, below {ep.GATE_RATIO}"
+            return {"provider": provider_id, "recommended": "ASK" if ask else "SKIP", "meaning": ("ask for records: " if ask else "skip for now: ") + why,
+                    "state": {"rank": rank, "ratio": round(ratio, 2)},
+                    "note": "Advisory only; the same ask-or-skip gate as workflow v2.4 variant G. After the first sample, call this tool again for the stop-or-escalate advice."}
+        x = ep.state_vector(list(st["usable"].values()), self.claims[provider_id], order.index(provider_id) + 1, ratio, st["round"])
+        branch = ep.choose(ep.load(), x)
+        meaning = {"STOP": "nothing more: the first sample is enough, or more asking is unlikely to pay for the burden on the practice",
+                   "TARG": "send a targeted request for about 15 charts of 99215 (and follow up on any deficiency)",
+                   "AUD": "request the audit trail for the notes already received",
+                   "BOTH": "send the targeted request, then request the audit trail"}[branch]
+        return {"provider": provider_id, "recommended": branch, "meaning": meaning, "state": dict(zip(ep.STATE, [round(v, 3) for v in x])),
+                "note": "Advisory only. A formula fitted offline on simulated development seeds (price of 0.05 per extra round to an honest practice); you decide."}
 
     def data_quality(self, provider_id=None):
         """Read-only: the pre-flight's global flags and, for one provider, its flags (version 3.2)."""
@@ -447,6 +489,7 @@ class Environment:
              "input_schema": {"type": "object", "properties": pid, "required": ["provider_id"]}},
             *self._v31_tools(),
             *self._v32_tools(),
+            *self._v34_tools(),
             {"name": "submit_findings", "description": "Submit your final findings and end the run. leaning is one of pattern_consistent_with_upcoding, "
              "pattern_consistent_with_high_acuity_panel, inconclusive. Include every provider you looked at closely; only 'upcoding' ones go to recovery.",
              "input_schema": {"type": "object", "properties": {"findings": {"type": "array", "items": {"type": "object", "properties": {
@@ -481,6 +524,13 @@ class Environment:
                                                                   "provider_ids": {"type": "array", "items": {"type": "string"}}, "hold_findings": {"type": "boolean"}},
                                   "required": ["issue", "detail"]}}]
 
+    def _v34_tools(self):
+        if not self.v34:
+            return []
+        return [{"name": "advise_next_step", "description": "Read-only advice: after a provider's first sample has come back (a random request and its follow-up), what workflow v2.4's learned "
+                 "formula would do next: stop, a targeted request, the audit trail, or both. It reads what the sample returned and the provider's screen rank and ratio. Advice only; you decide.",
+                 "input_schema": {"type": "object", "properties": {"provider_id": {"type": "string"}}, "required": ["provider_id"]}}]
+
     def call(self, name, args):
         args = args or {}
         fn = {"screen_providers": lambda: self.screen_providers(**args) if self.screen_enabled else {"error": "tool not available"},
@@ -496,6 +546,7 @@ class Environment:
               "draft_summary": lambda: self.draft_summary(args["provider_id"]),
               "estimate_overpayment": lambda: self.estimate_overpayment(args["provider_id"]),
               "data_quality": lambda: self.data_quality(args.get("provider_id")),
+              "advise_next_step": lambda: self.advise_next_step(args["provider_id"]),
               "flag_data_issue": lambda: self.flag_data_issue(args["issue"], args["detail"], args.get("provider_ids"), args.get("hold_findings", True)),
               "submit_findings": lambda: self.submit_findings(args["findings"], args.get("set_aside"))}.get(name)
         if fn is None:

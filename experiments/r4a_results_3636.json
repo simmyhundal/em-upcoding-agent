@@ -1,0 +1,10 @@
+{
+ "run": "r4a_3636",
+ "upcoders_found": 3,
+ "upcoders": 8,
+ "honest_accused": 0,
+ "called": 3,
+ "cost_usd": 0.2792,
+ "effort": "low",
+ "model": "claude-opus-5-5"
+}
