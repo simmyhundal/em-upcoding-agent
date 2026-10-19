@@ -1,12 +1,53 @@
 [
  {
+  "arm": "Workflow v2.0",
+  "seeds": "release 1 seeds",
+  "found": 19,
+  "upcoders": 80,
+  "accused": 3,
+  "asked": 61,
+  "requests": 162,
+  "net_per_seed": 988
+ },
+ {
+  "arm": "Workflow v2.1",
+  "seeds": "release 1 seeds",
+  "found": 32,
+  "upcoders": 80,
+  "accused": 0,
+  "asked": 61,
+  "requests": 379,
+  "net_per_seed": 14984
+ },
+ {
+  "arm": "Agent v3.0",
+  "seeds": "release 1 seeds",
+  "found": 18,
+  "upcoders": 80,
+  "accused": 0,
+  "asked": 50,
+  "requests": 153,
+  "net_per_seed": 2299
+ },
+ {
+  "arm": "Agent v3.1",
+  "seeds": "release 1 seeds",
+  "found": 27,
+  "upcoders": 80,
+  "accused": 0,
+  "asked": 63,
+  "requests": 204,
+  "net_per_seed": 13931
+ },
+ {
   "arm": "Workflow v2.2",
   "seeds": "release 2 seeds",
   "found": 21,
   "upcoders": 78,
   "accused": 2,
   "asked": 66,
-  "requests": 327
+  "requests": 327,
+  "net_per_seed": 368
  },
  {
   "arm": "Agent v3.2",
@@ -15,7 +56,8 @@
   "upcoders": 78,
   "accused": 1,
   "asked": 58,
-  "requests": 124
+  "requests": 124,
+  "net_per_seed": 1325
  },
  {
   "arm": "Workflow v2.2",
@@ -24,7 +66,8 @@
   "upcoders": 79,
   "accused": 2,
   "asked": 64,
-  "requests": 326
+  "requests": 326,
+  "net_per_seed": 4362
  },
  {
   "arm": "Workflow v2.3",
@@ -33,7 +76,8 @@
   "upcoders": 79,
   "accused": 1,
   "asked": 150,
-  "requests": 583
+  "requests": 583,
+  "net_per_seed": 4923
  },
  {
   "arm": "Agent v3.3",
@@ -42,7 +86,8 @@
   "upcoders": 79,
   "accused": 1,
   "asked": 79,
-  "requests": 177
+  "requests": 177,
+  "net_per_seed": 12666
  },
  {
   "arm": "Workflow v2.4",
@@ -51,7 +96,8 @@
   "upcoders": 80,
   "accused": 2,
   "asked": 120,
-  "requests": 449
+  "requests": 449,
+  "net_per_seed": 32245
  },
  {
   "arm": "Agent v3.4",
@@ -60,7 +106,8 @@
   "upcoders": 80,
   "accused": 3,
   "asked": 75,
-  "requests": 181
+  "requests": 181,
+  "net_per_seed": 26505
  },
  {
   "arm": "Workflow v2.5",
@@ -69,7 +116,8 @@
   "upcoders": 79,
   "accused": 3,
   "asked": 81,
-  "requests": 462
+  "requests": 462,
+  "net_per_seed": 31888
  },
  {
   "arm": "Agent v3.5",
@@ -78,6 +126,7 @@
   "upcoders": 79,
   "accused": 1,
   "asked": 60,
-  "requests": 166
+  "requests": 166,
+  "net_per_seed": 32159
  }
 ]

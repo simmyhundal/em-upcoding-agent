@@ -108,10 +108,10 @@ def how_it_works(version):
 
 
 AGENT_ACTIONS = [
-    ("Screen", "Rank providers by z-score, risk-adjusted score or priority, with any cutoff, as often as it likes.", BLUE),
+    ("Screen", "Rank providers by risk-adjusted score, priority or eb_ratio_t (99215 share vs expected), any cutoff.", BLUE),
     ("Look closer", "Evidence card and peer comparison for one provider: billing mix, complexity, sample claims.", GREEN),
-    ("Request charts", "Ask a practice for a random sample first, then a targeted one if needed.", GREEN),
-    ("Follow up", "Answer deficiencies (unsigned, missing results), or ask for the EHR audit trail.", GREEN),
+    ("Request charts", "Ask a provider for a random sample first, then a targeted one if needed.", GREEN),
+    ("Follow up", "Fix deficiencies (unsigned, missing results), or ask for the EHR audit trail.", GREEN),
     ("Check notes", "Notes against claims: problems addressed, orders and results, signatures, copy-forward.", GREEN),
     ("Estimate", "Extrapolate an overpayment from a random sample, flagged when the sample is too thin.", GREEN),
     ("Review", "Chart rule and summary rules first, a model only where they are silent.", GREEN),
@@ -122,7 +122,8 @@ def agent_actions():
     """The agent and the actions it chooses from (the README's main figure)."""
     W, H = 1000, 606
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>', f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
-         f'<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="{MUTED}"/></marker></defs>']
+         f'<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="{MUTED}"/></marker>'
+         f'<marker id="b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="{ORANGE}"/></marker></defs>']
     bw, bh = 290, 96
     pos = [(30, 30), (355, 30), (680, 30), (30, 200), (680, 200), (30, 370), (355, 370), (680, 370)]
     cx, cy, cw, ch = 355, 190, 290, 116
@@ -146,13 +147,15 @@ def agent_actions():
         else:
             x1, y1, x2, y2 = (cx if mx < tx else cx + cw), ty, (x + bw if mx < tx else x), my
         s.append(f'<path d="M{x1} {y1} L{x2} {y2}" stroke="{MUTED}" stroke-width="1.5" marker-end="url(#a)" fill="none"/>')
-    chips = [("Simulated practices answer", "complete, partial, late, unsigned or silent", GREEN, 30), ("Checks before anything is accepted", "citations, numbers, contradictions, leaning", GREEN, 355),
-             ("People review the drafts", "nothing is sent or decided automatically", PEOPLE, 680)]
+    chips = [("Simulated providers answer", "complete, partial, late or silent", GREEN, 30), ("Checks before anything is accepted", "citations, numbers, contradictions, leaning", GREEN, 355),
+             ("PI teams review the drafts", "nothing is sent or decided automatically", PEOPLE, 680)]
     for t, sub, col, x in chips:
         s.append(f'<rect x="{x}" y="490" width="{bw}" height="56" rx="10" fill="none" stroke="{col}" stroke-width="2" stroke-dasharray="6 4"/>')
         s.append(f'<text x="{x + 16}" y="513" font-size="13" font-weight="bold" fill="{INK}">{escape(t)}</text>')
         s.append(f'<text x="{x + 16}" y="533" font-size="12" fill="{MUTED}">{escape(sub)}</text>')
-    key = [(BLUE, "statistics (the screen)"), (GREEN, "plain code and checks"), (ORANGE, "the agent (a model)"), (PEOPLE, "people")]
+    s.append(f'<path d="M30 248 H12 V518 H30" stroke="{ORANGE}" stroke-width="2.5" fill="none" marker-start="url(#b)" marker-end="url(#b)"/>')       # follow-ups go out, answers come back
+    s.append(f'<text x="38" y="478" font-size="11.5" fill="{ORANGE}">follow-up and answer loop</text>')
+    key = [(BLUE, "statistics (the screen)"), (GREEN, "plain code and checks"), (ORANGE, "the agent (a model)"), (PEOPLE, "PI teams")]
     kx = 30
     s.append(f'<text x="{kx}" y="586" font-size="12.5" font-weight="bold" fill="{INK}">Key</text>')
     for col, label in key:
@@ -162,6 +165,42 @@ def agent_actions():
     s.append(f'<text x="{W - 30}" y="586" text-anchor="end" font-size="12.5" fill="{MUTED}">dashed boxes: what surrounds the agent</text>')
     s.append("</svg>")
     write("agent.svg", "\n".join(s))
+
+
+def workflow_v25():
+    """The fixed workflow (v2.5) under the agent figure in the README: code sets the order; the learned formulas decide whom to ask and when to stop."""
+    W, H = 1000, 400
+    s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>', f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
+         f'<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="{MUTED}"/></marker>'
+         f'<marker id="b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="{ORANGE}"/></marker></defs>',
+         f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">The fixed workflow (v2.5): code sets the order of the steps</text>']
+    steps = [("Screen", "eb_ratio_t: billed 99215 share against expected, shrunk for small panels. Top 10% of providers.", BLUE),
+             ("Ask or skip", "A learned formula (fitted on net dollars) decides whom to ask for charts.", GREEN),
+             ("Request charts", "30 random charts, then one follow-up on any deficiency.", GREEN),
+             ("Stop or escalate", "A learned formula picks: stop, a targeted request, the audit trail, or both.", GREEN),
+             ("Rules decide", "Chart rule and summary rules (2.3) set the leaning; where silent: inconclusive, no model is called.", GREEN),
+             ("Checks", "Citations and numbers must match the evidence; data-quality holds apply.", GREEN),
+             ("PI teams review", "Drafts only. Nothing is sent or decided automatically.", PEOPLE)]
+    bw, bh, gap = 205, 118, 28
+    pos = [(30 + i * (bw + gap), 112) for i in range(4)] + [(30 + i * (bw + gap), 262) for i in range(3)]
+    for (n, body, col), (x, y) in zip(steps, pos):
+        s.append(f'<rect x="{x}" y="{y}" width="{bw}" height="{bh}" rx="10" fill="#f9fafb" stroke="{col}" stroke-width="2.5"/>')
+        s.append(f'<text x="{x + 14}" y="{y + 28}" font-size="14.5" font-weight="bold" fill="{INK}">{escape(n)}</text>')
+        for j, line in enumerate(textwrap.wrap(body, 30)[:5]):
+            s.append(f'<text x="{x + 14}" y="{y + 50 + j * 16}" font-size="12" fill="{MUTED}">{escape(line)}</text>')
+    for i in (0, 1, 2, 4, 5):                            # left to right within a row
+        x, y = pos[i]
+        s.append(f'<path d="M{x + bw} {y + bh / 2} L{x + bw + gap} {y + bh / 2}" stroke="{MUTED}" stroke-width="1.5" marker-end="url(#a)" fill="none"/>')
+    x3, y3 = pos[3]                                      # down from Stop or escalate to Rules decide
+    s.append(f'<path d="M{x3 + bw / 2} {y3 + bh} V{y3 + bh + 22} H{pos[4][0] + bw / 2} V{pos[4][1]}" stroke="{MUTED}" stroke-width="1.5" marker-end="url(#a)" fill="none"/>')
+    cx = pos[2][0]                                       # providers answer: requests go out and answers come back (both ways)
+    s.append(f'<rect x="{cx}" y="50" width="{bw * 2 + gap}" height="34" rx="8" fill="none" stroke="{GREEN}" stroke-width="2" stroke-dasharray="6 4"/>')
+    s.append(f'<text x="{cx + 14}" y="72" font-size="12.5" font-weight="bold" fill="{INK}">Simulated providers answer every request and follow-up</text>')
+    for i in (2, 3):
+        x = pos[i][0] + bw / 2
+        s.append(f'<path d="M{x} 84 V{pos[i][1] - 2}" stroke="{ORANGE}" stroke-width="2.5" fill="none" marker-start="url(#b)" marker-end="url(#b)"/>')
+    s.append("</svg>")
+    write("workflow.svg", "\n".join(s))
 
 
 def pipeline():
@@ -201,24 +240,24 @@ def progression_cells(rows=None):
     v2_h = sum(int(r["honest_requested"]) for r in pick({"261013_12_api", "261013_13_api"}, "AI"))
     import release_table
     extra = release_table.headline_cells()
-    return {**extra, "v1.0": f"Held-out run: {v1[0]} of {v1[1]} upcoders called, {v1[2]} of {v1[3]} honest doctors accused (charts were handed over, so optimistic).",
-            "v2.0": f"Two reserved seeds: {v2[0]} of {v2[1]} upcoders found, {v2[2]} honest accused; {v2_h} honest practices asked for charts.",
-            "v3.0": f"Same two seeds: {v3[0]} of {v3[1]} upcoders found, {v3[2]} honest accused; {v3_h} honest practices asked for charts."}
+    return {**extra, "v1.0": f"Held-out run: {v1[0]} of {v1[1]} upcoders called, {v1[2]} of {v1[3]} honest providers accused (charts were handed over, so optimistic).",
+            "v2.0": f"Two reserved seeds: {v2[0]} of {v2[1]} upcoders found, {v2[2]} honest accused; {v2_h} honest providers asked for charts.",
+            "v3.0": f"Same two seeds: {v3[0]} of {v3[1]} upcoders found, {v3[2]} honest accused; {v3_h} honest providers asked for charts."}
 
 
 def progression():
     """One slide: how it works over time, as a table with icons and headline eval results."""
     cells = progression_cells()
-    ev = {"v1.x": cells["v1.0"], "v2.x": cells["v2.0"] + " " + cells["v2.3"], "v3.x": cells["v3.0"] + " " + cells["v3.3"]}
-    cols = [("data", "Claims"), ("screen", "Screen"), ("records", "Charts"), ("write", "Who writes it"), ("decide", "Who decides"),
+    ev = {"v1.x": cells["v1.0"], "v2.x": cells["v2.0"] + " " + cells["v2.5"], "v3.x": cells["v3.0"] + " " + cells["v3.5"]}
+    cols = [("data", "Claims"), ("screen", "Screen"), ("records", "Charts"), ("write", "Summaries"), ("decide", "Who decides"),
             ("eval", "Headline results")]
     rows = [("v1.x", "Fixed workflow", ["Provider, patient and claim tables with a stored condition count.", "Top 25 by statistics. Fixed.",
                                       "A sample handed to the AI up front.", "The AI writes it all: facts, citations, next steps.", "Code, in a fixed order."]),
-            ("v2.x", "Fixed workflow", ["Plan-shaped claims; conditions derived from them.", "Suspicion 5 or higher (or top 25).",
-                                      "Requested: 30 per flagged doctor, one follow-up; some late or missing.", "Code writes facts and clear cases; a model the rest.",
-                                      "Code, with a fixed policy."]),
-            ("v3.x", "Agent", ["Same as v2.x.", "A tool the agent runs with any cutoff.", "The agent chooses whom to ask, what sample, and whether to follow up.",
-                              "The agent submits findings; code adds facts and checks.", "The agent, within caps."])]
+            ("v2.x", "Fixed workflow", ["Plan-shaped claims; conditions derived from them. Harder data from v2.2.", "eb_ratio_t, top 10% of providers (v2.0: suspicion 5 or higher).",
+                                      "Learned ask-or-skip, 30 random charts, one follow-up, then a learned stop or escalate.", "Code writes the facts and decides; no model from v2.5.",
+                                      "Code, with formulas fitted on net dollars."]),
+            ("v3.x", "Agent", ["Same as v2.x.", "A tool the agent runs with any cutoff, eb_ratio_t included.", "The agent chooses whom to ask, what sample, and whether to follow up; advice arrives in the tool results.",
+                              "The agent submits findings; code adds facts and checks.", "The agent, within caps; an upcoding call the chart rule supports is binding."])]
     W, H = 1380, 410
     x0, cw, rh, y0 = 150, 170, 118, 56
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="1000" height="{round(H * 1000 / W)}" {FONT}>',
@@ -462,6 +501,7 @@ if __name__ == "__main__":
     os.makedirs(os.path.join(ROOT, "docs", "images"), exist_ok=True)
     pipeline()
     agent_actions()
+    workflow_v25()
     progression()
     em_levels()
     cms_mix()

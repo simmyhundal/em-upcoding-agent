@@ -19,12 +19,12 @@ def test_readme_block_is_the_rendered_json():
 
 def test_rows_are_consistent_and_cover_the_arms():
     rows = rt.rows()
-    assert [(r["arm"], r["seeds"]) for r in rows] == [(a, w) for a, w, *_ in rt.ROWS]
+    assert [(r["arm"], r["seeds"]) for r in rows[len(rt.R1):]] == [(a, w) for a, w, *_ in rt.ROWS] and len(rows) == len(rt.R1) + len(rt.ROWS)
     for r in rows:
         assert 0 <= r["found"] <= r["upcoders"] and r["accused"] >= 0 and r["asked"] <= r["requests"]
 
 
-def test_progression_slide_shows_the_release_3_numbers():
+def test_progression_slide_shows_the_release_5_numbers():
     svg = " ".join(re.findall(r">([^<]+)</text>", open(os.path.join(ROOT, "docs", "images", "progression.svg")).read())).replace("  ", " ")
     for line in rt.headline_cells().values():
         for n in re.findall(r"\d+ of \d+", line):
