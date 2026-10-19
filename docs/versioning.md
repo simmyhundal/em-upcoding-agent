@@ -5,7 +5,7 @@
 | `v1.0` | Workflow with one LLM step on version-1 synthetic data (provider, patient, claim and documentation tables). Held-out run 261009_2_api. | `v1.0` (commit 25f5ade; also `heldout-freeze-261009`) |
 | `v2.0` | Version-2 workflow: plan-shaped data (`docs/v2_schemas.md`), conditions derived from claims, records requests with limits, code-written summary parts, rule-decided clear cases, Batch API, cache, number check. Runs `261012_8_api` to `261012_18_api` and the code-only runs `261012_*_code`. | `v2.0` |
 | `v3.0` | The investigator **agent** design (Milestone 6): a model that chooses its own tools and steps, with a simulated provider office, guardrails, audit log, the results table (`experiments/results.csv`) and the new metrics. Runs `261013_8_api` to `261013_11_api` and the repeats `261013_16_api` to `261013_19_api`. The workflow stays in the repository frozen as `v2.0` and is the comparison arm. | `v3.0` |
-| `v2.1` | Workflow on data 2.1: office 2.1 (second records request, note package, audit-trail request), the note rule and fixed v2.1 office policy (`eval/workflow_policy_v21.py`), conditional next steps and the summary lint (`case_summary.py --v21`). Evaluated in #61 (runs `261015_*`, arm W2.1); the main line. | `v2.1` |
+| `v2.1` | Workflow on data 2.1: office 2.1 (second records request, note package, audit-trail request), the note rule and fixed v2.1 office policy (`eval/workflow_policy_v21.py`), conditional next steps and the summary lint (`case_summary.py --v21`). Evaluated in #61 (runs `261015_*`, arm W2.1). | `v2.1` |
 | `v3.1` | Agent on data 2.1: `note_checks`, `request_audit_trail`, `set_aside`, the `submit_findings` lint, estimate reliability, screen magnitude columns and `priority` ordering. Evaluated in #61 (arm A3.1). | `v3.1` |
 
 A major version marks a change in what the product is (v1 to v2: the data model; v2 to v3: who decides the next step), not a claim that it performs better; on the reserved seeds the agent found fewer upcoders than the workflow.
@@ -16,7 +16,7 @@ Three things carry version numbers: the **data** (generator, schemas and the sim
 | Release | Data | Workflow | Agent | Status |
 |---|---|---|---|---|
 | 0 | 2.0 (`docs/v2_schemas.md`, office 2.0) | `v2.0` | `v3.0` | frozen and evaluated |
-| 1 | 2.1 (adds the note package, `docs/data_v2_1.md`; office 2.1) | `v2.1` | `v3.1` | frozen and evaluated on ten fresh seeds (#61, [eval61.md](eval61.md)); workflow is the main line |
+| 1 | 2.1 (adds the note package, `docs/data_v2_1.md`; office 2.1) | `v2.1` | `v3.1` | frozen and evaluated on ten fresh seeds (#61, [eval61.md](eval61.md)) |
 | 2 | 2.2 (realism and data defects, issues #74 to #80; [data_v2_2.md](data_v2_2.md)) | `v2.2` | `v3.2` | frozen once its evaluation is posted: ten fresh seeds, workflow ahead of agent ([eval61.md](eval61.md), [release2_results.md](release2_results.md)) |
 | 3 | **2.2 again** (data stays; Simmy's decision, so release 3 compares with release 2 on the same data) | `v2.3` | `v3.3` | built and tested once on ten fresh seeds ([release3_results.md](release3_results.md)): cloned-notes detection first ([#99](https://github.com/simmyhundal/em-upcoding-agent/issues/99), [replay_rules_23.md](replay_rules_23.md)) |
 

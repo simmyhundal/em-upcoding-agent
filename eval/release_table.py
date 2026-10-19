@@ -82,11 +82,15 @@ def rows():
 def markdown():
     r = rows()
     from scoreboard import pct
-    lines = ["| Version | Seeds | Upcoders found | Honest providers accused | Requests sent to providers | Net $ per seed |", "|---|---|---|---|---|---|"]
+    lines = ["| Version | Data model | Upcoders found (recall) | Calls that were upcoders (precision) | Net $ per seed |", "|---|---|---|---|---|"]
     for x in r:
-        lines.append(f"| {x['arm']} | {x['seeds']} | {x['found']} of {x['upcoders']} ({pct(x['found'], x['upcoders'])}) | {x['accused']} | {x['requests']} | ${x['net_per_seed']:,} |")
-    lines += ["", "Ten seeds per set, 8 planted upcoders each; releases 2 to 5 use harder data. **Net $** is the overpayment a records sample supports for the upcoders found (90% lower bound) minus request and false-accusation costs: compare rows within a seed set only. "
-              "Details: [release 1](docs/eval61.md), [2](docs/release2_results.md), [3](docs/release3_results.md), [4](docs/release4_results.md), [5](docs/release5_results.md); [every run](docs/results.md)."]
+        model = "Easy" if x["seeds"] == "release 1 seeds" else "Hard"
+        lines.append(f"| {x['arm']} | {model} | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | ${x['net_per_seed']:,} |")
+    lines += ["", "**Data model.** Easy (release 1, data 2.1): clean coding, documentation generated from the true visit level, clone signs planted in notes. Hard (releases 2 to 5, data 2.2): adds honest coding noise "
+              "(honest providers sometimes bill one level up), group billing and incident-to billing, truncated diagnoses, claims lag, corrections that change a level, and injected data defects. "
+              "**Recall** is upcoders found out of those planted; **precision** is upcoders found out of all providers called upcoding. **Net $** is the overpayment a records sample supports for the "
+              "upcoders found (90% lower bound) minus request and false-accusation costs, so compare rows within one seed set only. Each release has its own ten seeds: "
+              "[1](docs/eval61.md), [2](docs/release2_results.md), [3](docs/release3_results.md), [4](docs/release4_results.md), [5](docs/release5_results.md); [every run](docs/results.md)."]
     return "\n".join(lines)
 
 

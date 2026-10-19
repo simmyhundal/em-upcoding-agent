@@ -5,7 +5,7 @@
 
 
 ## Built responsibly
-- **Synthetic data only.** No real patients, doctors or claims, and no real provider is ever flagged.
+- **Synthetic data only.** No real patients, providers or claims, and no real provider is ever flagged.
 - **The AI advises; people decide.** Statistics choose who is reviewed. The AI sorts the flagged cases (upcoding, sicker patients, or unclear) as advice to a reviewer, and nothing happens to anyone without a person checking the records.
 - **A guardrail on the AI.** Invented evidence is rejected automatically.
 - **Honest reporting.** The reports state what is easier by construction, what is simulated, and where the data is thin.

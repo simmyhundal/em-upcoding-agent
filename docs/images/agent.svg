@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 606" width="1000" height="606" font-family="Helvetica, Arial, sans-serif">
 <rect width="1000" height="606" fill="#ffffff"/>
-<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#6b7280"/></marker></defs>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#6b7280"/></marker><marker id="b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#c2410c"/></marker></defs>
 <rect x="30" y="30" width="290" height="96" rx="10" fill="#f9fafb" stroke="#2563eb" stroke-width="2.5"/>
 <text x="46" y="58" font-size="14.5" font-weight="bold" fill="#1f2937">Screen</text>
-<text x="46" y="82" font-size="12.5" fill="#6b7280">Rank providers by z-score, risk-adjusted</text>
-<text x="46" y="99" font-size="12.5" fill="#6b7280">score or priority, with any cutoff, as</text>
-<text x="46" y="116" font-size="12.5" fill="#6b7280">often as it likes.</text>
+<text x="46" y="82" font-size="12.5" fill="#6b7280">Rank providers by risk-adjusted score,</text>
+<text x="46" y="99" font-size="12.5" fill="#6b7280">priority or eb_ratio_t (99215 share vs</text>
+<text x="46" y="116" font-size="12.5" fill="#6b7280">expected), any cutoff.</text>
 <rect x="355" y="30" width="290" height="96" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
 <text x="371" y="58" font-size="14.5" font-weight="bold" fill="#1f2937">Look closer</text>
 <text x="371" y="82" font-size="12.5" fill="#6b7280">Evidence card and peer comparison for</text>
@@ -13,11 +13,11 @@
 <text x="371" y="116" font-size="12.5" fill="#6b7280">sample claims.</text>
 <rect x="680" y="30" width="290" height="96" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
 <text x="696" y="58" font-size="14.5" font-weight="bold" fill="#1f2937">Request charts</text>
-<text x="696" y="82" font-size="12.5" fill="#6b7280">Ask a practice for a random sample</text>
+<text x="696" y="82" font-size="12.5" fill="#6b7280">Ask a provider for a random sample</text>
 <text x="696" y="99" font-size="12.5" fill="#6b7280">first, then a targeted one if needed.</text>
 <rect x="30" y="200" width="290" height="96" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
 <text x="46" y="228" font-size="14.5" font-weight="bold" fill="#1f2937">Follow up</text>
-<text x="46" y="252" font-size="12.5" fill="#6b7280">Answer deficiencies (unsigned, missing</text>
+<text x="46" y="252" font-size="12.5" fill="#6b7280">Fix deficiencies (unsigned, missing</text>
 <text x="46" y="269" font-size="12.5" fill="#6b7280">results), or ask for the EHR audit</text>
 <text x="46" y="286" font-size="12.5" fill="#6b7280">trail.</text>
 <rect x="680" y="200" width="290" height="96" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
@@ -53,14 +53,16 @@
 <path d="M500.0 306 L500.0 370" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)" fill="none"/>
 <path d="M645 248.0 L680 418.0" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)" fill="none"/>
 <rect x="30" y="490" width="290" height="56" rx="10" fill="none" stroke="#15803d" stroke-width="2" stroke-dasharray="6 4"/>
-<text x="46" y="513" font-size="13" font-weight="bold" fill="#1f2937">Simulated practices answer</text>
-<text x="46" y="533" font-size="12" fill="#6b7280">complete, partial, late, unsigned or silent</text>
+<text x="46" y="513" font-size="13" font-weight="bold" fill="#1f2937">Simulated providers answer</text>
+<text x="46" y="533" font-size="12" fill="#6b7280">complete, partial, late or silent</text>
 <rect x="355" y="490" width="290" height="56" rx="10" fill="none" stroke="#15803d" stroke-width="2" stroke-dasharray="6 4"/>
 <text x="371" y="513" font-size="13" font-weight="bold" fill="#1f2937">Checks before anything is accepted</text>
 <text x="371" y="533" font-size="12" fill="#6b7280">citations, numbers, contradictions, leaning</text>
 <rect x="680" y="490" width="290" height="56" rx="10" fill="none" stroke="#7c3aed" stroke-width="2" stroke-dasharray="6 4"/>
-<text x="696" y="513" font-size="13" font-weight="bold" fill="#1f2937">People review the drafts</text>
+<text x="696" y="513" font-size="13" font-weight="bold" fill="#1f2937">PI teams review the drafts</text>
 <text x="696" y="533" font-size="12" fill="#6b7280">nothing is sent or decided automatically</text>
+<path d="M30 248 H12 V518 H30" stroke="#c2410c" stroke-width="2.5" fill="none" marker-start="url(#b)" marker-end="url(#b)"/>
+<text x="38" y="478" font-size="11.5" fill="#c2410c">follow-up and answer loop</text>
 <text x="30" y="586" font-size="12.5" font-weight="bold" fill="#1f2937">Key</text>
 <rect x="66" y="574" width="14" height="14" rx="3" fill="none" stroke="#2563eb" stroke-width="2.5"/>
 <text x="86" y="586" font-size="12.5" fill="#6b7280">statistics (the screen)</text>
@@ -69,6 +71,6 @@
 <rect x="446" y="574" width="14" height="14" rx="3" fill="none" stroke="#c2410c" stroke-width="2.5"/>
 <text x="466" y="586" font-size="12.5" fill="#6b7280">the agent (a model)</text>
 <rect x="636" y="574" width="14" height="14" rx="3" fill="none" stroke="#7c3aed" stroke-width="2.5"/>
-<text x="656" y="586" font-size="12.5" fill="#6b7280">people</text>
+<text x="656" y="586" font-size="12.5" fill="#6b7280">PI teams</text>
 <text x="970" y="586" text-anchor="end" font-size="12.5" fill="#6b7280">dashed boxes: what surrounds the agent</text>
 </svg>
