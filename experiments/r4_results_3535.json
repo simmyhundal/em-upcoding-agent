@@ -1,0 +1,35 @@
+{
+ "seed": 3535,
+ "W23": {
+  "run": "r4w23_3535",
+  "upcoders_found": 4,
+  "upcoders": 8,
+  "honest_accused": 1,
+  "called": 5,
+  "cost_usd": 0.0158
+ },
+ "G": {
+  "run": "r4g_3535",
+  "upcoders_found": 4,
+  "upcoders": 8,
+  "honest_accused": 1,
+  "called": 5,
+  "cost_usd": 0.0
+ },
+ "L": {
+  "run": "r4l_3535",
+  "upcoders_found": 5,
+  "upcoders": 8,
+  "honest_accused": 0,
+  "called": 5,
+  "cost_usd": 0.0
+ },
+ "GL": {
+  "run": "r4gl_3535",
+  "upcoders_found": 4,
+  "upcoders": 8,
+  "honest_accused": 0,
+  "called": 4,
+  "cost_usd": 0.0
+ }
+}
