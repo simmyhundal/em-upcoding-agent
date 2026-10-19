@@ -113,3 +113,8 @@ Release 1 (frozen). Items still planned carry over to `v2.2` and `v3.2`.
 Release 4 (in development; workflow v2.4 is still a fixed workflow, with one decision made by a learned scoring formula: [learned_policy_plain.md](learned_policy_plain.md); milestone "v2.4 and v3.4"): narrow the wide list for both arms, taking the agent's habits into the fixed workflow ([release4_agent_narrowing.md](release4_agent_narrowing.md)); silent offices; high-acuity override. Fresh seeds only: 1515 to 3434 are development data.
 
 Release 5 (started on branch `release5-dev`; dollars are the primary score from the start, baseline in [release5_dollar_baseline.md](release5_dollar_baseline.md); milestone "v2.5 and v3.5", [#109](https://github.com/simmyhundal/em-upcoding-agent/issues/109)): a recovery model of cloned claims and the dollar reward on the 90% lower bound of the extrapolated estimate; the release 4 dollar documents (`dev_arm_dollars.md`, `rl_escalate_dollars.md`, `rl_ask_dollars.md`) are its groundwork.
+
+| Feature | v2.5 workflow | v3.5 agent | Reason if one-sided |
+|---|---|---|---|
+| Learned ask-or-skip and stop-or-escalate fitted on net dollars (#109) | built: `eval/workflow_policy_25.py`, `src/policy_25.py`, `src/policy_25.json` (fitted by `eval/export_policy_25.py` on 30 development seeds); chosen start by Simmy after [release5_train.md](release5_train.md) | planned: advice inside tool results (#111), binding rules (#112), escalation where the first sample leaves a question (#113) | the workflow obeys the formulas; the agent is advised and, where code can enforce an invariant, bound |
+

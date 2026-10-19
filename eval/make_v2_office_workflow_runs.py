@@ -24,6 +24,7 @@ import records  # noqa: E402
 import run_office_baseline as rob  # noqa: E402
 import workflow_policy_23 as wp23  # noqa: E402
 import workflow_policy_24 as wp24  # noqa: E402
+import workflow_policy_25 as wp25  # noqa: E402
 import workflow_policy_v21 as wp  # noqa: E402
 
 RUNS = [("261013_12_api", "261013_4_code", "threshold", "reserved seed 202; screen suspicion >= 5; fixed office policy"),
@@ -45,12 +46,18 @@ def build_view(rid, src, screen, version="2.0", tier1_n=None, policy24=None):
             os.symlink(os.path.join(base, name), dst)
     flagged_file = os.path.join(ROOT, "experiments", src, {"threshold": "flagged_threshold.csv", "top25": "flagged.csv"}.get(screen, f"flagged_{screen}.csv"))
     flagged = [r["provider_id"] for r in csv.DictReader(open(flagged_file)) if r["flagged"] == "True"]
-    if version in ("2.1", "2.2", "2.3", "2.4"):        # 2.2: the same office and policy as 2.1; the screen is eb_ratio or priority (top 25)
+    if version in ("2.1", "2.2", "2.3", "2.4", "2.5"):        # 2.2: the same office and policy as 2.1; the screen is eb_ratio or priority (top 25)
         office = provider_sim.Office(data, base, seed=1, version="2.1")
         by_provider = {}
         for r in csv.DictReader(open(os.path.join(base, "claims.csv"))):
             by_provider.setdefault(r["provider_id"], []).append(r)
-        if version == "2.4":                           # 2.4 candidates (development, issue 102): policy 2.3 plus a ratio gate and a stop for silent offices
+        if version == "2.5":                           # 2.5 (issue 109): learned ask-or-skip and learned escalation, fitted on net dollars
+            ratio = {}
+            for r in csv.DictReader(open(flagged_file)):
+                exp = float(r["expected_share"])
+                ratio[r["provider_id"]] = float(r["share_99215"]) / exp if exp else 0.0
+            wp25.run_policy_25(office, flagged, by_provider, flagged_file, ratio)
+        elif version == "2.4":                           # 2.4 candidates (development, issue 102): policy 2.3 plus a ratio gate and a stop for silent offices
             ratio = {}
             for r in csv.DictReader(open(flagged_file)):
                 exp = float(r["expected_share"])
@@ -85,8 +92,8 @@ def run(rid, src, screen, note, version="2.0", tier1_n=None, policy24=None):
     view, office, flagged_file = build_view(rid, src, screen, version, **({} if tier1_n is None else {"tier1_n": tier1_n}), **({} if policy24 is None else {"policy24": policy24}))
     name = os.path.basename(view)
     # 2.2: rules 2.2 decide more summaries without the model, and no LLM usefulness judge (the rule judge runs after; issues 91 and 93)
-    ai.run(rid, src, note, view_name=name, flagged_name=os.path.basename(flagged_file), v21=version in ("2.1", "2.2", "2.3", "2.4"), preflight=version in ("2.2", "2.3", "2.4"),
-           v22=version in ("2.2", "2.3", "2.4"), v23=version in ("2.3", "2.4"), llm_judge=version not in ("2.2", "2.3", "2.4"))
+    ai.run(rid, src, note, view_name=name, flagged_name=os.path.basename(flagged_file), v21=version in ("2.1", "2.2", "2.3", "2.4", "2.5"), preflight=version in ("2.2", "2.3", "2.4", "2.5"),
+           v22=version in ("2.2", "2.3", "2.4", "2.5"), v23=version in ("2.3", "2.4", "2.5"), llm_judge=version not in ("2.2", "2.3", "2.4", "2.5"))
     office.write_transcript(os.path.join(ROOT, "experiments", rid, "office_transcript.jsonl"))
 
 
