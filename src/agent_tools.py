@@ -41,6 +41,9 @@ def _doc_entry(row):
     return lvl, (int(mins) if mins not in ("", None) else None)
 
 
+ROUND_COPY_USD, ROUND_BURDEN_USD = 90.0, 43.84       # per round: copying fees (CMS Transmittal 786) and burden on an honest practice (Premier 2022); see eval/dollar_reward.py
+
+
 class Environment:
     def __init__(self, v2_dir, view_dir, seed=1, model_call=None, records_budget=15, screen_enabled=True,
                  correlation=0.0, roles=None, version="3.0"):
@@ -48,10 +51,12 @@ class Environment:
         version "3.1" adds the note package (data v2.1): charts carry notes, a second request is allowed (random first, targeted after),
         and the note_checks and request_audit_trail tools exist. "3.2" is 3.1 plus the data-quality pre-flight, the read-only data_quality tool and
         flag_data_issue (issue 81). "3.0" is the frozen agent."""
-        self.v31 = version in ("3.1", "3.2", "3.3", "3.4")
-        self.v32 = version in ("3.2", "3.3", "3.4")
-        self.v33 = version in ("3.3", "3.4")
-        self.v34 = version == "3.4"                     # release 4 (issue 108): everything in 3.3 plus the read-only advisor tool advise_next_step                     # release 3 (issue 99): rules 2.3, the eb_ratio_t screen, a top-10% list; data stays 2.2
+        self.v31 = version in ("3.1", "3.2", "3.3", "3.4", "3.5")
+        self.v32 = version in ("3.2", "3.3", "3.4", "3.5")
+        self.v33 = version in ("3.3", "3.4", "3.5")
+        self.v34 = version in ("3.4", "3.5")                     # release 4 (issue 108): everything in 3.3 plus the read-only advisor tool advise_next_step                     # release 3 (issue 99): rules 2.3, the eb_ratio_t screen, a top-10% list; data stays 2.2
+        self.v35 = version == "3.5"                     # release 5 (issues 111 to 113): advice inside tool results (workflow v2.5 policy), binding rules, practice status each turn
+        self.advice_log, self.last_advice, self.overrides, self.rule_result, self.p25, self.p25_rows = [], {}, [], {}, None, {}
         self.dq, self.data_issues, self.held = None, [], set()
         if self.v32:                                    # version 3.2: the data-quality pre-flight runs once per load (issue 81)
             import data_quality
@@ -68,6 +73,10 @@ class Environment:
         self.rates = cs.peer_rates(self.claims, self.chronic)
         self.owner = guardrail.load_claim_owners(view_dir)
         self.rows = {r["provider_id"]: r for r in flagging.flag(view_dir, top_n=25)}
+        if self.v35:
+            import policy_25
+            self.p25 = policy_25.load()                 # the same file workflow v2.5 runs (src/policy_25.json), fitted on net dollars
+            self.p25_rows = {r["provider_id"]: r for r in flagging.flag(view_dir, method="eb_ratio_t", top_pct=10) if str(r.get("flagged")) == "True"}
         self.has_test = {}
         for rows in self.claims.values():
             for r in rows:
@@ -175,6 +184,10 @@ class Environment:
             cols += ["ratio_to_expected", "excess_99215", "low_complexity_share", "excess_usd"]
             extra = lambda r: [self.stats[r["provider_id"]][k] for k in ("ratio", "excess", "low", "usd")]
             self.screen_candidates |= {r["provider_id"] for r in sel if self.stats[r["provider_id"]]["ratio"] >= CANDIDATE_RATIO}
+        if self.v35:
+            cols = cols + ["ask_advice"]
+            extra_ = extra
+            extra = lambda r: extra_(r) + [self._p25_advice(r["provider_id"])["recommended"]]
         return {"method": method, "selected": len(sel),
                 "table": {"cols": cols,
                           "rows": [[r["provider_id"], int(r["n_claims"]), float(r["share_99215"]), float(r["expected_share"]),
@@ -218,17 +231,74 @@ class Environment:
         if provider_id not in self.requested and len(self.requested) >= self.records_budget:
             return {"error": f"records-request budget reached ({self.records_budget} providers)"}
         self.requested.add(provider_id)
+        if self.v35:
+            self._note_action(provider_id, "TARG" if sample.get("kind") == "targeted" else "ASK")
         out = self.office.send_request(provider_id, sample, deadline)
         self._absorb(provider_id)
-        return out
+        return self._with_advice(provider_id, out)
 
     def follow_up_records(self, provider_id, addressed_codes, deadline=provider_sim.DEFAULT_DEADLINE, claim_ids=None):
         out = self.office.follow_up(provider_id, addressed_codes, deadline, claim_ids)
         self._absorb(provider_id)
-        return out
+        return self._with_advice(provider_id, out)
 
     def close_records(self, provider_id, reason=""):
+        if self.v35:
+            self._note_action(provider_id, "STOP")
         return self.office.close_request(provider_id, reason)
+
+    # ---- release 5 (agent v3.5): the workflow v2.5 policy as advice inside tool results, and a log of whether it was followed ------------------------
+    def _p25_advice(self, pid):
+        """ASK or SKIP before any request; after a sample, STOP, TARG, AUD or BOTH from src/policy_25.json (the formulas workflow v2.5 obeys). Advice only."""
+        import escalation_policy as ep
+        import policy_25 as p25
+        row = self.p25_rows.get(pid)
+        if row is None:
+            return {"recommended": "SKIP", "meaning": "skip: outside the top 10 percent of the screen (eb_ratio_t)"}
+        st = self.office.state.get(pid)
+        exp, share = float(row["expected_share"]), float(row["share_99215"])
+        ratio = share / exp if exp else 0.0
+        if not st or not st["round"]:
+            ok = p25.ask(self.p25, p25.ask_vector(row))
+            return {"recommended": "ASK" if ok else "SKIP", "meaning": ("ask for records" if ok else "skip: the expected net dollars of asking are below zero") + f" (rank {row['rank']}, ratio {ratio:.1f})"}
+        x = ep.state_vector(list(st["usable"].values()), self.claims[pid], int(row["rank"]), ratio, st["round"])
+        b = p25.choose(self.p25, x)
+        meaning = {"STOP": "nothing more: the first sample is enough, or more asking is unlikely to pay",
+                   "TARG": "send a targeted request for about 15 charts of 99215 (and follow up on any deficiency)",
+                   "AUD": "request the audit trail for the notes already received",
+                   "BOTH": "send the targeted request, then request the audit trail"}[b]
+        return {"recommended": b, "meaning": meaning, "state": dict(zip(ep.STATE, [round(v, 3) for v in x]))}
+
+    def _with_advice(self, pid, out):
+        if not self.v35 or not isinstance(out, dict) or "error" in out:
+            return out
+        a = self._p25_advice(pid)
+        self.last_advice[pid] = a["recommended"]
+        return {**out, "advice": {**a, "note": "Advisory: the learned formula of workflow v2.5 (fitted offline on simulated data, net dollars). You decide, and the choice is logged beside the advice."}}
+
+    def _note_action(self, pid, action):
+        advised = self.last_advice.get(pid) or (self._p25_advice(pid)["recommended"] if action == "ASK" else None)
+        match = None if advised is None else (action == advised or (advised == "BOTH" and action in ("TARG", "AUD")))
+        self.advice_log.append({"provider": pid, "action": action, "advised": advised, "match": match})
+
+    def practice_status(self):
+        """One line per practice asked: what has come back, and the rounds and cost so far (shown every turn in version 3.5)."""
+        import escalation_policy as ep
+        lines, rounds_total = [], 0
+        for pid in sorted(self.requested):
+            st = self.office.state.get(pid) or {"round": 0, "usable": {}}
+            rounds_total += st["round"]
+            x = ep.state_vector(list(st["usable"].values()), self.claims[pid], int(self.p25_rows.get(pid, {}).get("rank", 0) or 0), 1.0, st["round"])
+            d = dict(zip(ep.STATE, x))
+            note = "no usable charts yet" if d["charts"] == 0 else f"{int(d['charts'])} charts, {int(d['docs99215'])} documented 99215 ({d['unsupp99215']:.0%} below billed), {int(d['notes'])} notes, late {d['late']:.0%}"
+            lines.append(f"  {pid}: {st['round']} rounds; {note}")
+        head = (f"Rounds sent so far: {rounds_total} (each costs about ${ROUND_COPY_USD:.0f} in copying fees, and a round to an honest practice also costs it about ${ROUND_BURDEN_USD:.0f}). "
+                "A silent office or a thin first sample is a reason to follow up or send one targeted request before closing.")
+        return head + ("\nPractices asked:\n" + "\n".join(lines) if lines else "")
+
+    def advice_summary(self):
+        known = [a for a in self.advice_log if a["match"] is not None]
+        return {"actions": len(self.advice_log), "with_advice": len(known), "followed": sum(a["match"] for a in known), "overrides": len(self.overrides)}
 
     def _model_summary(self, packet, reason):
         text, usd = self.model_call(__import__("case_summary").SYSTEM, cs.make_prompt(packet, reason))
@@ -258,6 +328,7 @@ class Environment:
                 lean, source = None, "undecided"
             if lean and pid not in self.summaries:
                 self.summaries[pid] = sr.assemble(packet, lean)
+            self.rule_result[pid] = (lean, source)
             item = {"provider": pid, "leaning": lean, "source": source, "reason": reason, "chart_rule": chart}
             ns = (packet.get("documentation_review") or {}).get("note_signals")
             if ns:
@@ -323,9 +394,11 @@ class Environment:
     def request_audit_trail(self, provider_id, claim_ids):
         if not self.v31:
             return {"error": "tool not available"}
+        if self.v35:
+            self._note_action(provider_id, "AUD")
         out = self.office.request_audit_trail(provider_id, claim_ids)
         self._absorb(provider_id)
-        return out
+        return self._with_advice(provider_id, out)
 
     def submit_findings(self, findings, set_aside=None):
         """findings: [{"provider_id", "leaning", "headline", "interpretation"}]. Stored as drafts; the run ends.
@@ -339,6 +412,20 @@ class Environment:
             if unreviewed:
                 return {"error": "run hybrid_review on every provider whose records arrived before submitting, so the deterministic rules are applied to all of them",
                         "missing": unreviewed[:20], "how": "call hybrid_review with these provider ids (up to 20 per call), then submit again"}
+        if self.v35:                                    # version 3.5 (issue 112): a rule-decided leaning is binding unless the finding states a reason naming a fact the rules cannot see
+            refused, logged = {}, []
+            for f in findings:
+                lean_src = self.rule_result.get(f["provider_id"])
+                if lean_src and lean_src[1] in ("summary_rule", "chart_rule") and lean_src[0] != f["leaning"]:
+                    ok, why = self._override_ok(f["provider_id"], f.get("override_reason", ""))
+                    if ok:
+                        logged.append({"provider": f["provider_id"], "rules": lean_src[0], "source": lean_src[1], "agent": f["leaning"], "reason": f["override_reason"]})
+                    else:
+                        refused[f["provider_id"]] = f"rules said {lean_src[0]} ({lean_src[1]}); {why}"
+            if refused:
+                return {"error": "a rule-decided leaning is binding unless the finding has an override_reason that names a fact the rules cannot see (a data-quality flag, a specific claim id "
+                                 "of this provider, or a note sign such as late signatures or paste-heavy notes). Use the rules' leaning or add the reason.", "refused": refused}
+            self.overrides += logged
         version = "2.1" if self.v31 else "2.0"
         built, problems = {}, {}
         if self.v32:
@@ -374,6 +461,18 @@ class Environment:
         self.findings.update(built)
         return {"accepted": len(findings), "status": "drafts for human review; nothing is sent or decided automatically"}
 
+    def _override_ok(self, pid, reason):
+        reason = str(reason or "")
+        if len(reason) < 30:
+            return False, "no override_reason of at least 30 characters"
+        low = reason.lower()
+        owned = {r["claim_id"] for r in self.claims.get(pid, [])}
+        flagged = any(i["hold_findings"] and (not i["provider_ids"] or pid in i["provider_ids"]) for i in self.data_issues) or bool((self.dq or {}).get("per_provider", {}).get(pid))
+        signs = ("late signature", "late-signature", "paste", "bulk", "audit trail", "problem list", "unsigned")
+        if any(c in reason for c in owned) or (flagged and ("data" in low or "flag" in low)) or any(w in low for w in signs):
+            return True, ""
+        return False, "the reason names no claim of this provider, data-quality flag or note sign"
+
     def _hold(self, pid):
         """Data-quality hold for one provider: flags from the pre-flight or from flag_data_issue (charts received lift the need for chart evidence)."""
         import data_quality
@@ -391,6 +490,8 @@ class Environment:
             return {"error": "tool not available"}
         if provider_id not in self.rows:
             return {"error": "unknown provider"}
+        if self.v35:
+            return {"provider": provider_id, **self._p25_advice(provider_id), "note": "Advisory only; the same formulas as workflow v2.5. The advice is also returned inside request_records, follow_up_records and request_audit_trail."}
         st = self.office.state.get(provider_id)
         import escalation_policy as ep
         score = self.scores32["eb_ratio_t"]
@@ -494,7 +595,8 @@ class Environment:
              "pattern_consistent_with_high_acuity_panel, inconclusive. Include every provider you looked at closely; only 'upcoding' ones go to recovery.",
              "input_schema": {"type": "object", "properties": {"findings": {"type": "array", "items": {"type": "object", "properties": {
                  "provider_id": {"type": "string"}, "leaning": {"type": "string"}, "headline": {"type": "string"},
-                 "interpretation": {"type": "string"}}, "required": ["provider_id", "leaning"]}},
+                 "interpretation": {"type": "string"},
+                 **({"override_reason": {"type": "string", "description": "needed only to differ from a rule-decided leaning: name the fact the rules cannot see"}} if self.v35 else {})}, "required": ["provider_id", "leaning"]}},
                  **({"set_aside": {"type": "array", "description": "screened providers you are leaving out, each with the reason", "items": {"type": "object", "properties": {
                      "provider_id": {"type": "string"}, "reason": {"type": "string"}}, "required": ["provider_id", "reason"]}}} if self.v31 else {})},
               "required": ["findings"]}}]
