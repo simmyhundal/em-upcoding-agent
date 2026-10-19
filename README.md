@@ -34,8 +34,12 @@ Ten fresh test seeds, 8 planted upcoders each, all four arms on the same data. *
 | Workflow v2.2 | release 3 seeds | 24 of 79 | 30% | 2 | 92% | 64 | 326 |
 | Workflow v2.3 | release 3 seeds | 37 of 79 | 47% | 1 | 97% | 150 | 583 |
 | Agent v3.3 | release 3 seeds | 34 of 79 | 43% | 1 | 97% | 79 | 177 |
+| Workflow v2.4 | release 4 seeds | 49 of 80 | 61% | 2 | 96% | 120 | 449 |
+| Agent v3.4 | release 4 seeds | 40 of 80 | 50% | 3 | 93% | 75 | 181 |
+| Workflow v2.5 | release 5 seeds | 37 of 79 | 47% | 3 | 92% | 81 | 462 |
+| Agent v3.5 | release 5 seeds | 36 of 79 | 46% | 1 | 97% | 60 | 166 |
 
-Harder data (honest coding noise, group billing, data defects), ten seeds in each set, 8 planted upcoders each. The release 2 comparison was an unplanned ten-seed look, so it carries no significance claim; on the later pre-registered ten seeds workflow v2.3 and agent v3.3 are not significantly different. Details: [release 2](docs/release2_results.md), [release 3](docs/release3_results.md).
+Harder data (honest coding noise, group billing, data defects), ten seeds in each set, 8 planted upcoders each. The release 2 comparison was an unplanned ten-seed look (no significance claim); in the pre-registered sets the workflow and the agent are not significantly different. Release 4 and 5 score best in net dollars rather than upcoders found (recall stays near 46 to 62%): [release 3](docs/release3_results.md), [release 4](docs/release4_results.md), [release 5](docs/release5_results.md).
 <!-- release23:end -->
 
 - The note checks are what helped: upcoders who clone their notes went from 3 to 10 of 40 found (workflow) and 1 to 8 of 40 (agent). The clone signals are planted by the data generator, so this is easier than real notes.
