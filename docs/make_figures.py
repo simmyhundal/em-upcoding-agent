@@ -289,7 +289,7 @@ def em_levels():
     box(30, 414, 300, 132, BLUE, "Note supports 99214", ["No time recorded. Problems high,", "data moderate, risk low. The second-",
         "highest element is moderate, so", "the visit justifies 99214."], d)
     box(430, 414, 190, 132, ORANGE, "Billed 99215", ["One level above what", "the note supports:", "upcoded."], d)
-    box(670, 414, 300, 132, GREEN, "Audit finds the gap", ["Second-highest is moderate, not high: data", "is 3 items (2 labs, 1 outside note) in one", "category; high needs two. So the note", "supports 99214 and 99215 was overbilled."], d)
+    box(670, 414, 300, 132, GREEN, "Audit finds the gap", ["Second-highest is moderate, not high: data", "is from one category (2 labs, 1 outside", "note); high needs at least two. So the", "note supports 99214, not 99215."], d)
     arrow(330, 480, 422, 480)
     arrow(620, 480, 662, 480)
     s.append("</svg>")
