@@ -1,0 +1,16 @@
+{
+ "1000000045": "Ratio 3.11 with a small excess; beyond the first 5%; not requested, to limit burden.",
+ "1000000075": "Ratio 3.11 with a small excess; not requested.",
+ "1000000078": "Ratio 3.18 with a small excess; not requested.",
+ "1000000062": "Advisor said SKIP; small excess.",
+ "1000000177": "Advisor said SKIP; small excess.",
+ "1000000053": "Advisor said SKIP.",
+ "1000000140": "Advisor said SKIP; ratio below 3.",
+ "1000000167": "Advisor said SKIP; ratio below 3.",
+ "1000000211": "Ratio below 3.",
+ "1000000192": "Ratio below 3; few low-complexity patients, consistent with a sicker panel.",
+ "1000000144": "Ratio below 3.",
+ "1000000037": "Ratio below 3.",
+ "1000000089": "Ratio below 3; high-acuity panel.",
+ "1000000103": "Ratio below 3; few low-complexity patients."
+}

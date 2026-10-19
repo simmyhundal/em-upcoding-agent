@@ -1,0 +1,131 @@
+{
+ "summary": {
+  "actions": 20,
+  "with_advice": 20,
+  "followed": 16,
+  "overrides": 0
+ },
+ "log": [
+  {
+   "provider": "1000000124",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000079",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000100",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000021",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000191",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000168",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000201",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000061",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000078",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000039",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000062",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000202",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000014",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000079",
+   "action": "TARG",
+   "advised": "TARG",
+   "match": true
+  },
+  {
+   "provider": "1000000061",
+   "action": "AUD",
+   "advised": "TARG",
+   "match": false
+  },
+  {
+   "provider": "1000000124",
+   "action": "AUD",
+   "advised": "TARG",
+   "match": false
+  },
+  {
+   "provider": "1000000168",
+   "action": "TARG",
+   "advised": "TARG",
+   "match": true
+  },
+  {
+   "provider": "1000000062",
+   "action": "TARG",
+   "advised": "TARG",
+   "match": true
+  },
+  {
+   "provider": "1000000191",
+   "action": "STOP",
+   "advised": "TARG",
+   "match": false
+  },
+  {
+   "provider": "1000000078",
+   "action": "STOP",
+   "advised": "TARG",
+   "match": false
+  }
+ ],
+ "overrides": []
+}

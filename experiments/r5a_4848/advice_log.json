@@ -1,0 +1,115 @@
+{
+ "summary": {
+  "actions": 16,
+  "with_advice": 16,
+  "followed": 12,
+  "overrides": 1
+ },
+ "log": [
+  {
+   "provider": "1000000083",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000041",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000067",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000049",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000204",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000024",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000069",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000036",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000056",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000166",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000137",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000083",
+   "action": "TARG",
+   "advised": "TARG",
+   "match": true
+  },
+  {
+   "provider": "1000000166",
+   "action": "AUD",
+   "advised": "STOP",
+   "match": false
+  },
+  {
+   "provider": "1000000041",
+   "action": "STOP",
+   "advised": "TARG",
+   "match": false
+  },
+  {
+   "provider": "1000000049",
+   "action": "STOP",
+   "advised": "TARG",
+   "match": false
+  },
+  {
+   "provider": "1000000024",
+   "action": "STOP",
+   "advised": "TARG",
+   "match": false
+  }
+ ],
+ "overrides": [
+  {
+   "provider": "1000000137",
+   "rules": "pattern_consistent_with_upcoding",
+   "source": "chart_rule",
+   "agent": "inconclusive",
+   "reason": "Note sign: a high duplicate-note rate in note_checks, with a low late-signature rate. The below-billed charts may reflect copy-forward documentation rather than deliberate upcoding, and the 99215 ratio is under the 3x threshold."
+  }
+ ]
+}
