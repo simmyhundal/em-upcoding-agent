@@ -90,6 +90,16 @@ Working habits (mirroring the workflow): submit_findings refuses until hybrid_re
 them; follow up or escalate only where the first sample leaves a question, and do not spend further rounds on a practice whose first sample is clean."""
 
 
+SYSTEM_35 = SYSTEM_34 + """
+
+Version 3.5 additions (release 5). The score is net dollars: the recoverable overpayment of the upcoders you call, less the copying and review costs of every round and the cost of
+calling an honest doctor. Advice now comes inside the tool results: request_records, follow_up_records and request_audit_trail each return an advice field (the learned formula of workflow v2.5:
+ASK or SKIP before a request; stop, targeted request, audit trail or both after a sample), and screen_providers rows carry an ask_advice column. It is advice: follow it unless you see
+something it cannot, and your choices are logged beside it. Rules are binding in one case: where hybrid_review calls a provider upcoding and the chart rule also supports it (the returned charts support a lower level than billed), submit_findings
+refuses a different leaning unless the finding has an override_reason naming a fact the rules cannot see (a data-quality flag, a claim id of that provider, a note sign). Other rule results are advice. Every turn shows each practice's status
+and the rounds sent. A silent office or a thin first sample is a reason to follow up or send one targeted request before closing, but a clean first sample is not."""
+
+
 def _cost(usage, price=(4.00, 20.00)):
     inp = getattr(usage, "input_tokens", 0) or 0
     out = getattr(usage, "output_tokens", 0) or 0
@@ -117,7 +127,7 @@ def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=M
             reason = "dollar cap"
             break
         turn += 1
-        resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_34 if getattr(env, 'v34', False) else SYSTEM_33 if getattr(env, 'v33', False) else SYSTEM_32 if getattr(env, 'v32', False) else SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
+        resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_35 if getattr(env, 'v35', False) else SYSTEM_34 if getattr(env, 'v34', False) else SYSTEM_33 if getattr(env, 'v33', False) else SYSTEM_32 if getattr(env, 'v32', False) else SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
                                       output_config={"effort": effort}, extra_body={"cache_control": {"type": "ephemeral"}})
         usd += _cost(resp.usage) * price_scale
         if getattr(env, "v32", False):
@@ -155,6 +165,8 @@ def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=M
         note = []
         if getattr(env, "v31", False) and env.screen_candidates:
             note.append({"type": "text", "text": env.budget_status()})
+        if getattr(env, "v35", False) and env.requested:
+            note.append({"type": "text", "text": env.practice_status()})
         if calls >= 0.8 * max_tool_calls or usd >= 0.8 * max_usd:
             note.append({"type": "text", "text": f"Budget notice: {calls}/{max_tool_calls} tool calls and ${usd:.2f}/${max_usd:.2f} used. "
                                                  "Wrap up and call submit_findings."})
@@ -177,6 +189,8 @@ def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=M
         env.office.write_transcript(os.path.join(out_dir, "office_transcript.jsonl"))
         if getattr(env, "v31", False):
             json.dump(env.set_aside, open(os.path.join(out_dir, "set_aside.json"), "w"), indent=1)
+        if getattr(env, "v35", False):
+            json.dump({"summary": env.advice_summary(), "log": env.advice_log, "overrides": env.overrides}, open(os.path.join(out_dir, "advice_log.json"), "w"), indent=1)
         if getattr(env, "v32", False):
             json.dump(env.dq, open(os.path.join(out_dir, "data_quality.json"), "w"), indent=1)
             json.dump(env.data_issues, open(os.path.join(out_dir, "data_issues.json"), "w"), indent=1)

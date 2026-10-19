@@ -1,0 +1,83 @@
+{
+ "summary": {
+  "actions": 12,
+  "with_advice": 12,
+  "followed": 10,
+  "overrides": 0
+ },
+ "log": [
+  {
+   "provider": "1000000203",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000070",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000170",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000082",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000038",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000163",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000010",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000059",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000134",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000186",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000059",
+   "action": "STOP",
+   "advised": "TARG",
+   "match": false
+  },
+  {
+   "provider": "1000000186",
+   "action": "STOP",
+   "advised": "TARG",
+   "match": false
+  }
+ ],
+ "overrides": []
+}

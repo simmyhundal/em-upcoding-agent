@@ -72,12 +72,13 @@ def test_office_workflow_flags_by_version():
     try:
         ow.build_view = lambda rid, src, screen, version="2.0": ("/tmp/view_x", Office(), "/tmp/flagged_x.csv")
         ow.ai.run = lambda *a, **k: seen.update({"k": k})
-        for v in ("2.0", "2.1", "2.2", "2.3", "2.4"):
+        for v in ("2.0", "2.1", "2.2", "2.3", "2.4", "2.5"):
             seen.clear()
             ow.run("r", "c", "threshold", "n", version=v)
             k = next(iter(seen.values()))
-            assert k["v22"] == (v in ("2.2", "2.3", "2.4")) and k["llm_judge"] == (v not in ("2.2", "2.3", "2.4")) and k["v21"] == (v != "2.0")
-            assert k["v23"] == (v in ("2.3", "2.4"))
+            assert k["v22"] == (v in ("2.2", "2.3", "2.4", "2.5")) and k["llm_judge"] == (v not in ("2.2", "2.3", "2.4", "2.5")) and k["v21"] == (v != "2.0")
+            assert k["v23"] == (v in ("2.3", "2.4", "2.5"))
+            assert k["no_model"] == (v == "2.5")                       # workflow 2.5 onward calls no API at all
     finally:
         ow.build_view, ow.ai.run = real_bv, real_run
 

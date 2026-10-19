@@ -1,0 +1,18 @@
+{
+ "run": "r5a_5454",
+ "version": "3.5",
+ "screen_run": "r5_5454",
+ "screen_tool": true,
+ "stop_reason": "submitted",
+ "tool_calls": 28,
+ "estimated_usd": 0.3871,
+ "providers_with_findings": 12,
+ "providers_called_upcoding": 5,
+ "upcoders_found": 5,
+ "honest_called_upcoding": 0,
+ "upcoders_total": 8,
+ "records_requests_to_honest": 5,
+ "records_requests_total": 12,
+ "rounds_on_honest": 8,
+ "citation_accuracy": 1.0
+}

@@ -62,7 +62,8 @@ def run_config(job):
         claims.setdefault(r["provider_id"], []).append(r)
     rows = [row for st in office.state.values() for row in st["usable"].values()]
     comp = dr.seed_result(called, key, claims, office.random_claim_ids, dr.level_of_rows(rows),
-                          {p: st["round"] for p, st in office.state.items() if st["round"] > 0 and p in key}, {p: len(st["usable"]) for p, st in office.state.items() if p in key})
+                          {p: st["round"] for p, st in office.state.items() if st["round"] > 0 and p in key}, {p: len(st["usable"]) for p, st in office.state.items() if p in key},
+                          {r["claim_id"]: r for r in rows})
     return {"set": pre, "seed": seed, "arm": cfg, **comp}
 
 

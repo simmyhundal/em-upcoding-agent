@@ -1,0 +1,113 @@
+{
+ "summary": {
+  "actions": 17,
+  "with_advice": 17,
+  "followed": 14,
+  "overrides": 0
+ },
+ "log": [
+  {
+   "provider": "1000000149",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000114",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000190",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000050",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000157",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000118",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000122",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000130",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000152",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000081",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000163",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000100",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000118",
+   "action": "AUD",
+   "advised": "TARG",
+   "match": false
+  },
+  {
+   "provider": "1000000050",
+   "action": "AUD",
+   "advised": "TARG",
+   "match": false
+  },
+  {
+   "provider": "1000000190",
+   "action": "AUD",
+   "advised": "AUD",
+   "match": true
+  },
+  {
+   "provider": "1000000157",
+   "action": "STOP",
+   "advised": "TARG",
+   "match": false
+  },
+  {
+   "provider": "1000000149",
+   "action": "TARG",
+   "advised": "TARG",
+   "match": true
+  }
+ ],
+ "overrides": []
+}

@@ -1,0 +1,125 @@
+{
+ "summary": {
+  "actions": 19,
+  "with_advice": 19,
+  "followed": 14,
+  "overrides": 0
+ },
+ "log": [
+  {
+   "provider": "1000000102",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000033",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000034",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000147",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000200",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000096",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000182",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000197",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000011",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000066",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000014",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000077",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000033",
+   "action": "TARG",
+   "advised": "TARG",
+   "match": true
+  },
+  {
+   "provider": "1000000034",
+   "action": "TARG",
+   "advised": "TARG",
+   "match": true
+  },
+  {
+   "provider": "1000000147",
+   "action": "AUD",
+   "advised": "TARG",
+   "match": false
+  },
+  {
+   "provider": "1000000182",
+   "action": "AUD",
+   "advised": "TARG",
+   "match": false
+  },
+  {
+   "provider": "1000000200",
+   "action": "STOP",
+   "advised": "TARG",
+   "match": false
+  },
+  {
+   "provider": "1000000066",
+   "action": "STOP",
+   "advised": "TARG",
+   "match": false
+  },
+  {
+   "provider": "1000000077",
+   "action": "STOP",
+   "advised": "TARG",
+   "match": false
+  }
+ ],
+ "overrides": []
+}

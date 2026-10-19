@@ -1,0 +1,103 @@
+{
+ "summary": {
+  "actions": 14,
+  "with_advice": 14,
+  "followed": 11,
+  "overrides": 1
+ },
+ "log": [
+  {
+   "provider": "1000000113",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000176",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000204",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000067",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000153",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000033",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000154",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000097",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000058",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000212",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000043",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000176",
+   "action": "AUD",
+   "advised": "TARG",
+   "match": false
+  },
+  {
+   "provider": "1000000043",
+   "action": "STOP",
+   "advised": "TARG",
+   "match": false
+  },
+  {
+   "provider": "1000000097",
+   "action": "STOP",
+   "advised": "TARG",
+   "match": false
+  }
+ ],
+ "overrides": [
+  {
+   "provider": "1000000058",
+   "rules": "pattern_consistent_with_upcoding",
+   "source": "chart_rule",
+   "agent": "inconclusive",
+   "reason": "Billed 99215 share is only 3.3x expected, and 5 below-billed charts out of 30 do not clearly beat the peer rate by more than chance; no note signs (0% late, no audit trail)."
+  }
+ ]
+}

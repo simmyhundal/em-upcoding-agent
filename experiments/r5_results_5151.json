@@ -1,0 +1,27 @@
+{
+ "seed": 5151,
+ "W23": {
+  "run": "r5w23_5151",
+  "upcoders_found": 4,
+  "upcoders": 8,
+  "honest_accused": 0,
+  "called": 4,
+  "cost_usd": 0.0163
+ },
+ "GL": {
+  "run": "r5gl_5151",
+  "upcoders_found": 4,
+  "upcoders": 8,
+  "honest_accused": 0,
+  "called": 4,
+  "cost_usd": 0.0184
+ },
+ "W25": {
+  "run": "r5w25_5151",
+  "upcoders_found": 4,
+  "upcoders": 8,
+  "honest_accused": 0,
+  "called": 4,
+  "cost_usd": 0.0174
+ }
+}
