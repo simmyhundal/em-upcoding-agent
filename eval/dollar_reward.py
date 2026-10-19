@@ -1,8 +1,9 @@
-"""Release 5 groundwork (issue 109): the reward in dollars. Release 4 uses the points reward instead. Free (stored runs and the simulated office).
+"""Release 5 (issue 109): the reward in dollars, the PRIMARY score from the start of release 5 (Simmy's decision); release 4 used points. Free (stored runs and the simulated office).
 
 Net dollars for one arm on one seed =
-    value      the overpayment the arm would demand: for each upcoder it calls, the point estimate extrapolated from the RANDOM charts the arm obtained (src/pi_estimate.py,
-               the same arithmetic as the agent's estimate_overpayment tool; a negative estimate counts as 0; a provider with no random charts adds 0),
+    value      the overpayment the arm would demand: for each upcoder it calls, the 90% LOWER BOUND of the overpayment extrapolated from the RANDOM charts the arm obtained (src/pi_estimate.py,
+               the same arithmetic as the agent's estimate_overpayment tool; Program Integrity Manual chapter 8 recommends the lower bound; a negative bound counts as 0; a provider with
+               no random charts adds 0). BOUND = "point" gives the release 4 groundwork's point estimate,
   - C_COPY     per request round to a practice (records the plan pays for),
   - C_BURDEN   per request round to an honest practice (staff time the practice spends),
   - C_REVIEW   per practice whose charts came back (a clinical review of the returned charts),
@@ -35,6 +36,7 @@ sys.path.insert(0, os.path.join(ROOT, "eval"))
 import eval61_recovery as rec  # noqa: E402
 import pi_estimate as pe  # noqa: E402
 
+BOUND = "ci_low"                      # "ci_low": the 90% lower bound (release 5); "point": the point estimate (release 4 groundwork)
 C_COPY, C_BURDEN, C_REVIEW, C_FALSE = 90.0, 43.84, 158.0, 2000.0
 CODES = rec.CODES
 
@@ -48,7 +50,8 @@ def point_estimate(pid, claim_rows, random_ids, level_of):
     plan = {"provider_id": pid, "frame_sizes": dict(Counter(r["cpt"] for r in claim_rows)), "sampled_claims": {c: by[c]["cpt"] for c in ids}}
     reviewed = {c: CODES[level_of[c]] for c in ids}
     amounts = {r["claim_id"]: (float(r["allowed_amount"]), float(r["paid_amount"])) for r in claim_rows if r.get("allowed_amount")}
-    return max(pe.estimate(plan, reviewed, rec.allowed(), 0.90, claim_amounts=amounts)["point_estimate"], 0.0)
+    res = pe.estimate(plan, reviewed, rec.allowed(), 0.90, claim_amounts=amounts)
+    return max(res["ci_low"] if BOUND == "ci_low" and res.get("ci_low") is not None else res["point_estimate"], 0.0)
 
 
 def level_of_rows(rows):
