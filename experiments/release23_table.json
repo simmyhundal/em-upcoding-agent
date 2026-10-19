@@ -43,5 +43,41 @@
   "accused": 1,
   "asked": 79,
   "requests": 177
+ },
+ {
+  "arm": "Workflow v2.4",
+  "seeds": "release 4 seeds",
+  "found": 49,
+  "upcoders": 80,
+  "accused": 2,
+  "asked": 120,
+  "requests": 449
+ },
+ {
+  "arm": "Agent v3.4",
+  "seeds": "release 4 seeds",
+  "found": 40,
+  "upcoders": 80,
+  "accused": 3,
+  "asked": 75,
+  "requests": 181
+ },
+ {
+  "arm": "Workflow v2.5",
+  "seeds": "release 5 seeds",
+  "found": 37,
+  "upcoders": 79,
+  "accused": 3,
+  "asked": 81,
+  "requests": 462
+ },
+ {
+  "arm": "Agent v3.5",
+  "seeds": "release 5 seeds",
+  "found": 36,
+  "upcoders": 79,
+  "accused": 1,
+  "asked": 60,
+  "requests": 166
  }
 ]

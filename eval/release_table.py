@@ -1,4 +1,4 @@
-"""The README's second results table: workflow v2.2 and v2.3 and agent v3.2 and v3.3 on data 2.2 (releases 2 and 3), rendered from experiments/release23_table.json.
+"""The README's second results table: workflow v2.2 to v2.5 and agent v3.2 to v3.5 on data 2.2 (releases 2 to 5), rendered from experiments/release23_table.json.
 
 The JSON is written by `python eval/release_table.py --compute [--key-root PATH]` from the saved run folders and the (gitignored) answer keys, and committed, the way
 experiments/results.csv is; the README block is rendered from the JSON so it cannot drift from it (tests/test_release_table.py).
@@ -12,9 +12,13 @@ sys.path.insert(0, os.path.join(ROOT, "eval"))
 PATH = os.path.join(ROOT, "experiments", "release23_table.json")
 R2 = [1515, 1616, 1717, 1818, 1919, 2020, 2121, 2222, 2323, 2424]
 R3 = [2525, 2626, 2727, 2828, 2929, 3030, 3131, 3232, 3333, 3434]
+R4 = [3535, 3636, 3737, 3838, 3939, 4040, 4141, 4242, 4343, 4444]
+R5 = [4545, 4646, 4747, 4848, 4949, 5050, 5151, 5252, 5353, 5454]
 # (row label, seed set, code run prefix, run prefix)
 ROWS = [("Workflow v2.2", "release 2 seeds", "r2", "r2w", R2), ("Agent v3.2", "release 2 seeds", "r2", "r2a", R2),
-        ("Workflow v2.2", "release 3 seeds", "r3", "r3w2", R3), ("Workflow v2.3", "release 3 seeds", "r3", "r3w", R3), ("Agent v3.3", "release 3 seeds", "r3", "r3a", R3)]
+        ("Workflow v2.2", "release 3 seeds", "r3", "r3w2", R3), ("Workflow v2.3", "release 3 seeds", "r3", "r3w", R3), ("Agent v3.3", "release 3 seeds", "r3", "r3a", R3),
+        ("Workflow v2.4", "release 4 seeds", "r4", "r4gl", R4), ("Agent v3.4", "release 4 seeds", "r4", "r4a", R4),
+        ("Workflow v2.5", "release 5 seeds", "r5", "r5w25", R5), ("Agent v3.5", "release 5 seeds", "r5", "r5a", R5)]
 
 
 def compute(key_root=ROOT):
@@ -50,9 +54,9 @@ def markdown():
     lines = ["| Arm | Seeds | Upcoders found | Recall | Honest practices accused | Precision | Honest practices asked for charts | Requests and follow-ups sent to practices |", "|---|---|---|---|---|---|---|---|"]
     for x in r:
         lines.append(f"| {x['arm']} | {x['seeds']} | {x['found']} of {x['upcoders']} | {pct(x['found'], x['upcoders'])} | {x['accused']} | {pct(x['found'], x['found'] + x['accused'])} | {x['asked']} | {x['requests']} |")
-    lines += ["", "Harder data (honest coding noise, group billing, data defects), ten seeds in each set, 8 planted upcoders each. The release 2 comparison was an unplanned ten-seed look, so it "
-              "carries no significance claim; on the later pre-registered ten seeds workflow v2.3 and agent v3.3 are not significantly different. "
-              "Details: [release 2](docs/release2_results.md), [release 3](docs/release3_results.md)."]
+    lines += ["", "Harder data (honest coding noise, group billing, data defects), ten seeds in each set, 8 planted upcoders each. The release 2 comparison was an unplanned ten-seed look (no significance claim); "
+              "in the pre-registered sets the workflow and the agent are not significantly different. Release 4 and 5 score best in net dollars rather than upcoders found (recall stays near 46 to 62%): "
+              "[release 3](docs/release3_results.md), [release 4](docs/release4_results.md), [release 5](docs/release5_results.md)."]
     return "\n".join(lines)
 
 
