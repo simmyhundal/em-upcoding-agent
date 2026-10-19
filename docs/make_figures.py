@@ -245,38 +245,53 @@ def progression():
 
 def em_levels():
     """How an office-visit level is really chosen and how it is checked later."""
-    W, H = 1000, 405
+    W, H = 1000, 560
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>',
          f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
          f'<text x="30" y="38" font-size="19" font-weight="bold" fill="{INK}">How an office-visit level is chosen, and checked later</text>',
          f'<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">'
          f'<path d="M0 0 L10 5 L0 10 z" fill="{MUTED}"/></marker></defs>']
 
-    def box(x, y, w, h, col, title, lines):
-        s.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="10" fill="#f9fafb" stroke="{col}" stroke-width="2.5"/>')
+    def box(x, y, w, h, col, title, lines, dash=''):
+        s.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="10" fill="#f9fafb" stroke="{col}" stroke-width="2.5"{dash}/>')
         s.append(f'<text x="{x + 16}" y="{y + 28}" font-size="14.5" font-weight="bold" fill="{INK}">{escape(title)}</text>')
         for j, line in enumerate(lines):
             s.append(f'<text x="{x + 16}" y="{y + 54 + j * 20}" font-size="12.5" fill="{MUTED}">{escape(line)}</text>')
 
     def arrow(x1, y1, x2, y2):
         s.append(f'<path d="M{x1} {y1} L{x2} {y2}" stroke="{MUTED}" stroke-width="2" marker-end="url(#a)"/>')
-    s.append(f'<text x="30" y="72" font-size="13" font-weight="bold" fill="{BLUE}">1. At the visit: the doctor picks one method</text>')
+
+    def line(x1, y1, x2, y2):
+        s.append(f'<path d="M{x1} {y1} L{x2} {y2}" stroke="{MUTED}" stroke-width="2"/>')
+    s.append(f'<text x="30" y="72" font-size="13" font-weight="bold" fill="{BLUE}">1. At the visit: two ways to support a level</text>')
     box(30, 84, 300, 150, BLUE, "Medical decision making", ["Three elements, two of three must match:",
         "- how serious the problems are", "- how much data was reviewed or ordered",
         "- risk of the treatment (e.g. prescriptions)"])
-    box(30, 248, 300, 110, BLUE, "Or: total time that day", ["About 10 / 20 / 30 / 40+ minutes of the",
+    s.append(f'<text x="180" y="259" font-size="14" font-style="italic" text-anchor="middle" fill="{MUTED}">or</text>')
+    box(30, 272, 300, 100, BLUE, "Total time that day", ["About 10 / 20 / 30 / 40+ minutes of the",
         "doctor's own time for 99212 to 99215.", "History and exam no longer set the level."])
-    arrow(330, 190, 392, 190)
-    s.append(f'<text x="400" y="72" font-size="13" font-weight="bold" fill="{ORANGE}">2. The code on the claim</text>')
-    box(400, 84, 200, 274, ORANGE, "Level billed", ["99212  straightforward", "99213  low", "99214  moderate", "99215  high",
+    line(330, 159, 350, 159)
+    line(330, 322, 350, 322)
+    line(350, 159, 350, 322)
+    arrow(350, 240, 422, 240)
+    s.append(f'<text x="356" y="228" font-size="12" font-weight="bold" fill="{INK}">higher</text>')
+    s.append(f'<text x="356" y="266" font-size="12" font-weight="bold" fill="{INK}">wins</text>')
+    s.append(f'<text x="430" y="72" font-size="13" font-weight="bold" fill="{ORANGE}">2. The code on the claim</text>')
+    box(430, 84, 190, 288, ORANGE, "Level billed", ["99212  straightforward", "99213  low", "99214  moderate", "99215  high",
         "", "99211 is a nurse visit", "with no decision-making", "requirement."])
-    arrow(600, 190, 662, 190)
+    arrow(620, 228, 662, 228)
     s.append(f'<text x="670" y="72" font-size="13" font-weight="bold" fill="{GREEN}">3. After payment: someone re-scores it</text>')
-    box(670, 84, 300, 274, GREEN, "Contractors and auditors", ["Pull the record for a sample of visits.",
+    box(670, 84, 300, 288, GREEN, "Contractors and auditors", ["Pull the record for a sample of visits.",
         "Coders and nurses re-score the note", "against the same rules.", "",
         "Typical finding: the note does not", "support the level (or supports a higher", "one). Big audits extrapolate the", "overpayment from the sample."])
-    s.append(f'<text x="30" y="386" font-size="12.5" fill="{MUTED}">Step 1 here: v1 data = documented MDM level plus minutes; v2.0 = three MDM elements (two of three) or minutes; '
-             f'v2.1+ adds a templated note.</text>')
+    d = ' stroke-dasharray="6 4"'
+    s.append(f'<text x="30" y="404" font-size="13" font-weight="bold" fill="{INK}">Example: one visit that is upcoded</text>')
+    box(30, 414, 300, 132, BLUE, "Note supports 99214", ["No time recorded. Problems high,", "data moderate, risk low. The second-",
+        "highest element is moderate, so", "the visit justifies 99214."], d)
+    box(430, 414, 190, 132, ORANGE, "Billed 99215", ["One level above what", "the note supports:", "upcoded."], d)
+    box(670, 414, 300, 132, GREEN, "Audit finds the gap", ["Second-highest element is moderate,", "not high. The note supports 99214,", "so 99215 was overbilled."], d)
+    arrow(330, 480, 422, 480)
+    arrow(620, 480, 662, 480)
     s.append("</svg>")
     write("em_levels.svg", "\n".join(s))
 
