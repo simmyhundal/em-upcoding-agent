@@ -62,6 +62,9 @@ def main():
     hon_saved = sum(r["role"] != "upcoder" and r["agent"] != UP and r["rules"] == UP for r in allrows)
     L += ["", f"Of these, {up_missed} are upcoders the rules called and the agent did not (binding would have added them); {hon_saved} are honest doctors the rules called upcoding and the agent did not "
           "(binding would have called them). Net effect of binding with no overrides: see the two counts.", "",
+          "Exact dollars (seed 4141, provider 1000000038, option 2, 90% lower bound, from its own 29 random charts): the one upcoder the rules would add is worth **$1,298**; the four honest "
+          "doctors cost $2,000 each ($8,000), so binding with no overrides changes net by **-$6,702** at the assumed charge ($+1,298 at $0; -$38,702 at $10,000). Rounds are unchanged. "
+          "(Computed with `eval/dollar_reward.point_estimate`; an earlier estimate of about $8k per upcoder was the release 4 average and was wrong for this provider.)", "",
           "Caveat: replayed records equal what the agent saw (the office is deterministic); the agent's actions might differ if it had seen binding rules."]
     open(os.path.join(ROOT, "docs", "release5_binding_replay.md"), "w").write("\n".join(L) + "\n")
     print("\n".join(L))
