@@ -38,5 +38,5 @@
 <text x="686" y="238" font-size="12.5" fill="#6b7280">support the level (or supports a higher</text>
 <text x="686" y="258" font-size="12.5" fill="#6b7280">one). Big audits extrapolate the</text>
 <text x="686" y="278" font-size="12.5" fill="#6b7280">overpayment from the sample.</text>
-<text x="30" y="386" font-size="12.5" fill="#6b7280">This project simplifies step 1 to a documented MDM level plus minutes. It does not model the two-of-three rule or real notes.</text>
+<text x="30" y="386" font-size="12.5" fill="#6b7280">Step 1 here: v1 data = documented MDM level plus minutes; v2.0 = three MDM elements (two of three) or minutes; v2.1+ adds a templated note.</text>
 </svg>

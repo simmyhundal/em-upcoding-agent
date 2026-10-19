@@ -275,10 +275,37 @@ def em_levels():
     box(670, 84, 300, 274, GREEN, "Contractors and auditors", ["Pull the record for a sample of visits.",
         "Coders and nurses re-score the note", "against the same rules.", "",
         "Typical finding: the note does not", "support the level (or supports a higher", "one). Big audits extrapolate the", "overpayment from the sample."])
-    s.append(f'<text x="30" y="386" font-size="12.5" fill="{MUTED}">This project simplifies step 1 to a documented MDM level plus minutes. '
-             f'It does not model the two-of-three rule or real notes.</text>')
+    s.append(f'<text x="30" y="386" font-size="12.5" fill="{MUTED}">Step 1 here: v1 data = documented MDM level plus minutes; v2.0 = three MDM elements (two of three) or minutes; '
+             f'v2.1+ adds a templated note.</text>')
     s.append("</svg>")
     write("em_levels.svg", "\n".join(s))
+
+
+def cms_mix():
+    """Visit mix 99211-99215: CMS GA Family Practice (observed) against the synthetic normal providers."""
+    codes = ["99211", "99212", "99213", "99214", "99215"]
+    cms = [0.007, 0.010, 0.287, 0.665, 0.031]
+    syn = [0.012, 0.012, 0.362, 0.570, 0.044]
+    W, H, x0, y0, ph = 640, 340, 70, 60, 220
+    s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>',
+         f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
+         f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">Share of office visits by level: CMS vs synthetic</text>']
+    for v in (0, 0.2, 0.4, 0.6):
+        y = y0 + ph - v / 0.7 * ph
+        s.append(f'<line x1="{x0}" y1="{y:.0f}" x2="{W - 30}" y2="{y:.0f}" stroke="#e5e7eb"/>')
+        s.append(f'<text x="{x0 - 8}" y="{y + 4:.0f}" font-size="11" text-anchor="end" fill="{MUTED}">{int(v * 100)}%</text>')
+    gw = (W - 30 - x0) / 5
+    for i, c in enumerate(codes):
+        for j, (vals, col) in enumerate(((cms, BLUE), (syn, ORANGE))):
+            h = vals[i] / 0.7 * ph
+            x = x0 + i * gw + 18 + j * 50
+            s.append(f'<rect x="{x:.0f}" y="{y0 + ph - h:.1f}" width="44" height="{h:.1f}" fill="{col}"/>')
+            s.append(f'<text x="{x + 22:.0f}" y="{y0 + ph - h - 5:.1f}" font-size="11" text-anchor="middle" fill="{INK}">{vals[i] * 100:.1f}%</text>')
+        s.append(f'<text x="{x0 + i * gw + gw / 2:.0f}" y="{y0 + ph + 20}" font-size="12.5" text-anchor="middle" fill="{INK}">{c}</text>')
+    s.append(f'<rect x="{x0}" y="{H - 38}" width="12" height="12" fill="{BLUE}"/><text x="{x0 + 18}" y="{H - 28}" font-size="12" fill="{MUTED}">CMS, GA Family Practice (observed)</text>')
+    s.append(f'<rect x="{x0 + 250}" y="{H - 38}" width="12" height="12" fill="{ORANGE}"/><text x="{x0 + 268}" y="{H - 28}" font-size="12" fill="{MUTED}">Synthetic, normal providers</text>')
+    s.append("</svg>")
+    write("cms_mix.svg", "\n".join(s))
 
 
 def results():
@@ -422,6 +449,7 @@ if __name__ == "__main__":
     agent_actions()
     progression()
     em_levels()
+    cms_mix()
     funnel()
     print("results:", results())
     case_card()
