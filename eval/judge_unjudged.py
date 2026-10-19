@@ -17,7 +17,7 @@ import judge_rules_32 as j32  # noqa: E402
 import judge_rules_33 as j33  # noqa: E402
 
 EXP = os.path.join(ROOT, "experiments")
-ARM_NAMES = {"r4w23": "W2.3", "r4g": "G", "r4l": "L", "r4gl": "GL", "r4a": "A3.4", "r5w23": "W2.3", "r5gl": "GL", "r5w25": "W2.5", "r5a": "A3.5", "d3a": "A3.3 smoke"}
+ARM_NAMES = {"r4w23": "W2.3", "r4g": "G", "r4l": "L", "r4gl": "GL", "r4a": "A3.4", "r5w23": "W2.3", "r5gl": "GL", "r5w25": "W2.5", "r5w25n": "W2.5 API-free", "r5a": "A3.5", "d3a": "A3.3 smoke"}
 
 
 def code_of(rid):
