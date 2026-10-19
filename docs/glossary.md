@@ -32,3 +32,11 @@
 | PI team | the payment integrity staff who review drafts | "people" |
 | Net dollars | the score since release 5: the overpayment a records sample supports for the upcoders found (90% lower bound) minus request and false-accusation costs | the release 1 to 4 point scores |
 
+## Results columns
+| Term | Meaning |
+|---|---|
+| Data model | The synthetic data a version was tested on. **Easy** (release 1, data 2.1): clean coding, documentation generated from the true visit level, clone signs planted in the notes. **Hard** (releases 2 to 5, data 2.2): adds honest coding noise (honest providers sometimes bill one level up), group and incident-to billing, truncated diagnoses, claims lag, corrections that change a level, and injected data defects |
+| Recall | Upcoders found out of those planted |
+| Precision | Upcoders found out of all providers called upcoding (found plus honest providers accused) |
+| Net $ per seed | The RL score: the overpayment a records sample supports for the upcoders found (90% lower bound) minus request and false-accusation costs, averaged over the ten seeds. Compare rows within one seed set only; each release has its own ten seeds |
+
