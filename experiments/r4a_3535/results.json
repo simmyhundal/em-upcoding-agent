@@ -1,0 +1,18 @@
+{
+ "run": "r4a_3535",
+ "version": "3.4",
+ "screen_run": "r4_3535",
+ "screen_tool": true,
+ "stop_reason": "submitted",
+ "tool_calls": 27,
+ "estimated_usd": 0.2091,
+ "providers_with_findings": 12,
+ "providers_called_upcoding": 4,
+ "upcoders_found": 4,
+ "honest_called_upcoding": 0,
+ "upcoders_total": 8,
+ "records_requests_to_honest": 7,
+ "records_requests_total": 12,
+ "rounds_on_honest": 9,
+ "citation_accuracy": 1.0
+}

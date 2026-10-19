@@ -1,0 +1,12 @@
+{
+ "1000000193": "Below 3x expected (2.89); records budget kept for higher-ranked providers",
+ "1000000138": "2.56x; modest excess, below the 3x threshold",
+ "1000000074": "2.63x; below the 3x threshold",
+ "1000000055": "2.74x; below the 3x threshold",
+ "1000000114": "2.4x and no low-complexity claims; consistent with a high-acuity panel",
+ "1000000159": "2.56x; small excess",
+ "1000000120": "2.52x; small excess",
+ "1000000080": "2.28x; small excess",
+ "1000000170": "2.42x; small excess",
+ "1000000047": "2.91x, but only 13% of the panel is low-complexity, so the high share is likely acuity"
+}

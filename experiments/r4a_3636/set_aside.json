@@ -1,0 +1,11 @@
+{
+ "1000000174": "Ratio 2.89x, under the 3x threshold; no records requested",
+ "1000000186": "Ratio 2.83x and only 16% of the panel is low complexity; no records requested",
+ "1000000177": "Ratio 2.64x, under the threshold",
+ "1000000141": "Ratio 2.61x, under the threshold",
+ "1000000128": "Ratio 2.51x, under the threshold",
+ "1000000210": "Ratio 2.52x, under the threshold",
+ "1000000211": "Ratio 2.17x, under the threshold",
+ "1000000002": "Ratio 2.91x, under the threshold, and a small excess",
+ "1000000071": "Ratio 2.06x and 0% of the panel is low complexity, consistent with a sick panel"
+}
