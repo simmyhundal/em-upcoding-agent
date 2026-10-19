@@ -1,4 +1,4 @@
-"""Release 4: the reward in dollars (issue 108). Free (stored runs and the simulated office).
+"""Release 5 groundwork (issue 109): the reward in dollars. Release 4 uses the points reward instead. Free (stored runs and the simulated office).
 
 Net dollars for one arm on one seed =
     value      the overpayment the arm would demand: for each upcoder it calls, the point estimate extrapolated from the RANDOM charts the arm obtained (src/pi_estimate.py,
