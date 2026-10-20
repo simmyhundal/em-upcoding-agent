@@ -19,6 +19,9 @@ Three things carry version numbers: the **data** (generator, schemas and the sim
 | 1 | 2.1 (adds the note package, `docs/data_v2_1.md`; office 2.1) | `v2.1` | `v3.1` | frozen and evaluated on ten fresh seeds (#61, [eval61.md](eval61.md)) |
 | 2 | 2.2 (realism and data defects, issues #74 to #80; [data_v2_2.md](data_v2_2.md)) | `v2.2` | `v3.2` | frozen once its evaluation is posted: ten fresh seeds, workflow ahead of agent ([eval61.md](eval61.md), [release2_results.md](release2_results.md)) |
 | 3 | **2.2 again** (data stays; Simmy's decision, so release 3 compares with release 2 on the same data) | `v2.3` | `v3.3` | built and tested once on ten fresh seeds ([release3_results.md](release3_results.md)): cloned-notes detection first ([#99](https://github.com/simmyhundal/em-upcoding-agent/issues/99), [replay_rules_23.md](replay_rules_23.md)) |
+| 4 | 2.2 again | `v2.4` | `v3.4` | tested once on ten fresh seeds ([release4_results.md](release4_results.md)) |
+| 5 | 2.2 again | `v2.5` | `v3.5` | tested once on ten fresh seeds ([release5_results.md](release5_results.md)); dollars are the primary score |
+| 6 (v4/v5 line) | **4.0** (provider upcoding rates and habits; see below) | `v4.0` | `v5.0` | planned (milestone "v4.0 and v5.0") |
 
 Exception, release 3: the data version stays 2.2, so the workflow and agent number moves (2.3, 3.3) and the data number does not; the shared-minor rule applies again when the data next changes. Data 1 pairs only with workflow `v1.0`. In `experiments/results.csv`, runs so far record the data version as `v1` or `v2` (meaning data 2.0); runs on data 2.1 and later should record the full number.
 
@@ -34,7 +37,7 @@ Judges are named after the release they belong to, like the other pieces. `j1`: 
 - Results from `v1.0` cannot be reproduced on current code (the prompt, packet format and checks changed); their run folders hold the outputs.
 
 ## Reserved seeds
-Used and retired: 202 and 303 (the Milestone 6 evaluation), 404 to 1313 and 1414 (the release 1 evaluation, #61). Seed 42 stays the development seed. The release 2 evaluation will name its fresh seeds on its issue, together with its decision rules, before any of them is generated; no seed above 1414 has been generated.
+Used and retired: 202 and 303 (the Milestone 6 evaluation), 404 to 1313 and 1414 (the release 1 evaluation, #61). Seed 42 stays the development seed. Releases 2 to 5 each named ten fresh seeds on their evaluation issue before generating them (1515 to 5454, in steps of 101); all are development data now. The next fresh seeds start at 5555. From the v4/v5 line on, fresh seeds no longer have to be named on an issue before they are generated (Simmy, 2026-10-20); each run records the seeds it used, nothing is tuned on a fresh seed, and a seed that anything was tuned on is never reported as held out.
 
 ## Known limits carried into v2.0
 - Synthetic data from one generator family; 8 upcoders per run.
@@ -118,3 +121,9 @@ Release 5 (started on branch `release5-dev`; dollars are the primary score from 
 |---|---|---|---|
 | Learned ask-or-skip and stop-or-escalate fitted on net dollars (#109) | built: `eval/workflow_policy_25.py`, `src/policy_25.py`, `src/policy_25.json` (fitted by `eval/export_policy_25.py` on 30 development seeds); chosen start by Simmy after [release5_train.md](release5_train.md) | built (`Environment(version="3.5")`, `SYSTEM_35`; not yet run on the model): the same `src/policy_25.json` as **advice inside the results** of `request_records`, `follow_up_records` and `request_audit_trail` plus an `ask_advice` column in the screen (#111); an upcoding call from the rules that the chart rule also supports is **binding** unless `override_reason` names a claim id, data-quality flag or note sign (#112); practice status and rounds sent shown every turn (#113); advice use and overrides logged in `advice_log.json` | the workflow obeys the formulas; the agent is advised and, where code can enforce an invariant, bound |
 
+## The v4/v5 line: data 4.0, workflow v4.x, agent v5.x
+Decided 2026-10-20 (Simmy): a significant shift in the data model and the score, so the majors move. Release Y on this line pairs **data 4.Y, workflow v4.Y and agent v5.Y** (the same shared-minor rule as data 2.Y, v2.Y and v3.Y). Milestone 15 was renamed from "v2.6 and v3.6" (never built) to "v4.0 and v5.0", and its issues #116, #117 and #118 moved with it.
+
+- **Data 4.0** (not built). Every provider has an upcoding rate. Exactly 8 upcoders per dataset, each with a rate from 15% to 40% and one habit: systematic (always bills 99214 for 99213-level visits), opportunistic (inflates only borderline visits) or template-driven (an EHR default to a higher level, no intent; still a target, and lighter actions for it are #123). Non-upcoders' rate is centred between -15% and +15%. The answer-key `role` stays binary (the planted 8) with the rate beside it. Opportunistic upcoding needs a continuous per-visit complexity from which the justified level is derived, reversing the order noted in issue 45. Data 2.x stays reproducible behind `--data-version`.
+- **Score** (terms proposed, not settled): dollars recovered minus staff-hours cost minus provider abrasion. Later score versions add an SIU hours cap, appeals and a recovery tool.
+- **Reference arms:** frozen v2.5 and v3.5 run unchanged on data 4.0 and are scored with the new score, which separates the data change from the method change; so v4.0 and v5.0 may already carry new features.
