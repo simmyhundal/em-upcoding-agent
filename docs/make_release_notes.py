@@ -71,7 +71,60 @@ def newer_notes():
     }
 
 
+def releases_4_5_notes():
+    """Notes for releases 4 and 5 (data 2.2): v2.4, v3.4, v2.5, v3.5. Numbers are read from experiments/release23_table.json and experiments/release5_results.json."""
+    import json
+    sys.path.insert(0, os.path.join(ROOT, "eval"))
+    import release_table
+    t = {(r["arm"], r["seeds"]): r for r in release_table.rows()}
+    r5 = json.load(open(os.path.join(ROOT, "experiments", "release5_results.json")))
+    n5 = len(r5["W2.3"]["per_seed"])
+    net5 = {k: sum(v["per_seed"]) / n5 for k, v in r5.items()}
+
+    def line(arm, seeds):
+        x = t[(arm, seeds)]
+        prec = 100 * x["found"] / (x["found"] + x["accused"])
+        return f"**{x['found']} of {x['upcoders']} upcoders found ({100 * x['found'] / x['upcoders']:.0f}% recall), {x['accused']} honest accused ({prec:.0f}% precision), ${x['net_per_seed']:,} net per seed**"
+    w4, a4, w5, a5 = line("Workflow v2.4", "release 4 seeds"), line("Agent v3.4", "release 4 seeds"), line("Workflow v2.5", "release 5 seeds"), line("Agent v3.5", "release 5 seeds")
+    return {
+        "v2.4": ("The workflow with a learned rule for when to stop asking and a ratio gate on the second tier, on data 2.2. Evaluated once on ten fresh seeds with a pre-registered rule (issue 108).", "workflow",
+                 ["**Learned stop-or-escalate.** After a provider's first sample (30 random charts and a follow-up), a fitted formula picks stop, a targeted request, the audit trail, or both (`src/policy_24.json`, fitted offline on 20 development seeds).",
+                  "**Ratio gate.** Beyond the first 5% of the list, a provider is asked only when its 99215 share is at least 2.5 times expected.",
+                  "**Default.** The variant with both (GL) was chosen by a rule fixed in advance; the variants with one of them (G, L) are kept for comparison."],
+                 f"Ten fresh seeds (3535 to 4444): {w4}. Against workflow v2.3 on the same seeds (46 of 80 found, 6 honest accused, $26,399 net per seed), GL sent about 11 fewer rounds per seed to honest providers; the difference in upcoders found was not significant (docs/release4_results.md). Release 4 was scored in points at the time; the dollar score was applied afterwards.",
+                 ["Still misses 39% of the upcoders; no version meets the 12.5% miss-rate target.", "The learned rule was fitted on development seeds and tested on ten fresh ones; the model still writes summaries where the rules are silent (not API-free until v2.5).",
+                  "Ten seeds, one data version, generated notes."]),
+        "v3.4": ("The agent with a read-only advisor tool and an enforced rule check, on data 2.2. Evaluated once on the release 4 fresh seeds (issue 108).", "agent",
+                 ["**Advisor tool `advise_next_step`.** Says ask or skip before a request and, after the first sample, what the workflow's learned rule would do next. Advice only.",
+                  "**Rules enforced.** `submit_findings` refuses until `hybrid_review` has run on every provider whose records arrived."],
+                 f"Ten fresh seeds (3535 to 4444): {a4}. Against workflow v2.4 (49 of 80 found), it found fewer upcoders and sent far fewer rounds to honest providers (108 against 282). **It never called the advisor tool** in ten runs (docs/release4_agent_results.md, docs/release4_misses.md).",
+                 ["The advice was not used, so v3.4 does not test whether the learned rule helps an agent.", "Agent cost about $0.25 a run (Opus 5.5, low effort); ten seeds."]),
+        "v2.5": ("The workflow with ask-or-skip and stop-or-escalate both learned on net dollars, deterministic and API-free, on data 2.2. Evaluated once on ten fresh seeds with a pre-registered rule (issue 109).", "workflow",
+                 ["**Net dollars are the score.** The overpayment a records sample supports (90% lower bound, cloned notes denied in full) minus $90 per round, $43.84 per round to an honest provider, $158 per provider reviewed and $2,000 per honest provider accused (`eval/dollar_reward.py`).",
+                  "**Learned ask-or-skip and stop-or-escalate** fitted on that score over 30 development seeds (`src/policy_25.json`).",
+                  "**No API calls.** Where the rules are silent the summary is code-written and inconclusive; on the ten test seeds the results are identical with and without the model."],
+                 f"Ten fresh seeds (4545 to 5454): {w5}. On the same seeds workflow v2.4 earned ${net5['GL']:,.0f} and v2.3 ${net5['W2.3']:,.0f}. Recall did not move: the gain is lower cost and fewer false accusations (docs/release5_results.md).",
+                 ["Recall stays under half; dollars rank versions at simulated scale and rest on the optimistic recovery model and an assumed $2,000 per false accusation.", "The policy was fitted on 30 development seeds; ten test seeds with about eight upcoders each."]),
+        "v3.5": ("The agent with the learned advice inside its tool results, on data 2.2. Evaluated once on the release 5 fresh seeds (issue 109).", "agent",
+                 ["**Advice inside tool results** (`request_records`, `follow_up_records`, `request_audit_trail`, and an `ask_advice` column in the screen), from the same policy file as workflow v2.5; use of the advice is logged.",
+                  "**A narrow binding rule.** An upcoding call by the rules that the chart rule also supports cannot be overridden without a stated reason naming a fact the rules cannot see.",
+                  "**Practice status every turn:** charts back, documented 99215 claims, rounds sent and their dollar cost."],
+                 f"Ten fresh seeds (4545 to 5454): {a5}, against {w5.split('**')[1]} for workflow v2.5; a paired gap of $270 per seed (range -$29,015 to +$17,537), **not a confirmed difference**. The agent followed the advice on 79% of 155 actions and overrode a binding call twice, correctly both times. Ten runs cost $2.74.",
+                 ["The agent's summaries score lower on the free rule judge (4.54 against 4.89 for the workflow): its own headlines quote figures the rationale does not state, and it repeats sentences. A wording issue, not weaker evidence; fixing it is issue 116.", "Recall under half; same caveats as v2.5."]),
+    }
+
+
 def main():
+    for v, (intro, kind, changes, headline, limits) in releases_4_5_notes().items():
+        n = "4" if v.endswith(".4") else "5"
+        lines = [f"# {v}", "", intro, "", f"![The flow this version builds on]({RAW}/{'workflow.svg' if kind == 'workflow' else 'agent.svg'})", "", "## What changed"]
+        lines += [f"{i}. {c}" for i, c in enumerate(changes, 1)]
+        lines += ["", "## Headline result", headline, "", f"Full tables: [docs/release{n}_results.md]({BLOB}/{v}/docs/release{n}_results.md) and [docs/release5_dollar_baseline.md]({BLOB}/{v}/docs/release5_dollar_baseline.md).",
+                  "", "## Known limits"] + [f"- {x}" for x in limits] + ["", f"More: [docs/versioning.md]({BLOB}/{v}/docs/versioning.md)", ""]
+        open(os.path.join(ROOT, "docs", "releases", f"{v}.md"), "w").write("\n".join(lines))
+        print("wrote", v)
+    if "--only-new" in sys.argv:
+        return
     for v, (intro, kind, changes, headline, limits) in newer_notes().items():
         lines = [f"# {v}", "", intro, "", f"![The flow this version builds on]({RAW}/how_it_works_{'v2.0' if kind == 'workflow' else 'v3.0'}.svg)", "", "## What changed"]
         lines += [f"{i}. {c.replace('{b}', BLOB)}" for i, c in enumerate(changes, 1)]
