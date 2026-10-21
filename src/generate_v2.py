@@ -84,6 +84,12 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
     data_version "2.1" also writes the note package (docs/data_v2_1.md); claims and the universe stay identical to 2.0 for the same seed.
     data_version "2.2" is 2.1 plus honest coding noise and an upcoder defined as above the honest baseline (docs/data_v2_2.md); keyword
     arguments override V22_DEFAULTS. With every noise parameter at zero a 2.2 build reproduces 2.1 claims and records exactly."""
+    if data_version == "4.0":                     # data 4.0 (issue 124) lives in generate_v4.py and uses its own random streams; nothing below runs for it
+        import generate_v4
+        n_up_ = n_upcoders if n_upcoders is not None else max(1, int(round(n_providers * upcoder_rate)))
+        n_hn_ = n_hard_neg if n_hard_neg is not None else max(1, int(round(n_providers * hard_neg_rate)))
+        return generate_v4.build(out_dir, answer_key_path, seed=seed, n_providers=n_providers, n_upcoders=n_up_, n_hard_neg=n_hn_, clone_share=clone_share,
+                                 clone_signal_strength=clone_signal_strength, **v22)
     v22_on = data_version == "2.2"
     unknown = set(v22) - set(V22_DEFAULTS) - {"defect_profile"}
     if unknown or (v22 and not v22_on):
@@ -400,7 +406,7 @@ if __name__ == "__main__":
     ap.add_argument("--hard-neg-rate", type=float, default=8 / 216)
     ap.add_argument("--clone-share", type=float, default=0.5, help="share of upcoders whose documentation is cloned to match billing")
     ap.add_argument("--answer-key", default=DEFAULT_KEY)
-    ap.add_argument("--data-version", default="2.0", choices=["2.0", "2.1", "2.2"], help="2.1 also writes the note package; 2.2 adds honest coding noise")
+    ap.add_argument("--data-version", default="2.0", choices=["2.0", "2.1", "2.2", "4.0"], help="2.1 also writes the note package; 2.2 adds honest coding noise; 4.0 provider upcoding rates and habits (generate_v4.py)")
     ap.add_argument("--clone-signal-strength", type=float, default=0.7, help="data 2.1: chance each clone signal appears on a cloned visit")
     g = ap.add_argument_group("data 2.2 (issue 74); defaults in V22_DEFAULTS")
     g.add_argument("--honest-miscode-rate", type=float, help="mean share of an honest provider's visits billed off the justified level")
