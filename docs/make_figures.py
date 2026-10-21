@@ -236,6 +236,50 @@ def score_waterfall():
     write("score_waterfall.svg", "\n".join(s))
 
 
+def mlr_headroom():
+    """Fully insured commercial premium and headroom above the ACA floors for the ten largest insurer groups without Kaiser (experiments/mlr_headroom_2024.csv, eval/mlr_headroom.py),
+    and UnitedHealth's members by funding arrangement (its FY2025 10-K): the risk-based part is what the table measures, the self-funded part is the extension."""
+    import csv
+    rows = list(csv.DictReader(open(os.path.join(ROOT, "experiments", "mlr_headroom_2024.csv"))))
+    P, H = {}, {}
+    for r in rows:
+        P[r["group"]] = P.get(r["group"], 0) + float(r["premium"])
+        H[r["group"]] = H.get(r["group"], 0) + float(r["headroom"])
+    names = {"UNITEDHEALTH GRP": "UnitedHealth", "Elevance Hlth Inc Grp": "Elevance", "HCSC GRP": "HCSC", "CVS Health Group": "CVS Health (Aetna)", "CENTENE CORP GRP": "Centene",
+             "Blue Cross and Blue Shield of Florida, Inc.": "Florida Blue", "Cigna Hlth Grp": "Cigna", "Blue Shield of California Group": "Blue Shield of California", "CAREFIRST INC GRP": "CareFirst", "HIGHMARK GRP": "Highmark"}
+    top = sorted((g for g in P if g != "KAISER FOUNDATION GRP"), key=lambda g: -P[g])[:10]
+    assert set(top) == set(names)
+    W, H_ = 1000, 560
+    s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H_}" width="{W}" height="{H_}" {FONT}>', f'<rect width="{W}" height="{H_}" fill="#ffffff"/>',
+         f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">Risk-based commercial: premium and headroom above the ACA floors, 2024</text>',
+         f'<text x="30" y="50" font-size="12.5" fill="{MUTED}">Ten largest insurer groups, Kaiser excluded (it bears the cost of care). Headroom = premium x (MLR - floor); floors 80% (individual, small group), 85% (large group).</text>',
+         f'<text x="200" y="84" font-size="12.5" font-weight="bold" fill="{INK}">Fully insured premium, $B</text>', f'<text x="620" y="84" font-size="12.5" font-weight="bold" fill="{INK}">Headroom, $B (share of premium)</text>']
+    x0, x1, sp, sh = 200, 620, 3.0, 30.0
+    for i, g in enumerate(top):
+        y = 96 + i * 34
+        s.append(f'<text x="{x0 - 10}" y="{y + 15}" text-anchor="end" font-size="12.5" fill="{INK}">{names[g]}</text>')
+        w = P[g] / 1e9 * sp
+        s.append(f'<rect x="{x0}" y="{y}" width="{w:.1f}" height="22" rx="3" fill="none" stroke="{MUTED}" stroke-width="2"/>')
+        s.append(f'<text x="{x0 + w + 6:.1f}" y="{y + 15}" font-size="12" fill="{MUTED}">{P[g] / 1e9:.1f}</text>')
+        wh = H[g] / 1e9 * sh
+        s.append(f'<rect x="{x1}" y="{y}" width="{wh:.1f}" height="22" rx="3" fill="none" stroke="{BLUE}" stroke-width="2.5"/>')
+        s.append(f'<text x="{x1 + wh + 6:.1f}" y="{y + 15}" font-size="12" fill="{MUTED}">{H[g] / 1e9:.1f} ({H[g] / P[g]:.0%})</text>')
+    tp, th = sum(P[g] for g in top) / 1e9, sum(H[g] for g in top) / 1e9
+    y = 96 + 10 * 34 + 14
+    s.append(f'<text x="30" y="{y}" font-size="13" font-weight="bold" fill="{INK}">The ten together: premium ${tp:.0f}B, headroom ${th:.1f}B; one MLR point is ${tp / 100:.1f}B. A ceiling for any cost lever, not a market size.</text>')
+    y += 34
+    s.append(f'<text x="30" y="{y}" font-size="13" font-weight="bold" fill="{INK}">The extension: self-funded members (UnitedHealth, December 2025, 10-K)</text>')
+    rb, fb = 8.165, 21.485
+    wtot = 700.0
+    s.append(f'<rect x="30" y="{y + 12}" width="{wtot * rb / (rb + fb):.1f}" height="26" rx="3" fill="none" stroke="{BLUE}" stroke-width="2.5"/>')
+    s.append(f'<rect x="{30 + wtot * rb / (rb + fb):.1f}" y="{y + 12}" width="{wtot * fb / (rb + fb):.1f}" height="26" rx="3" fill="none" stroke="{GREEN}" stroke-width="2.5" stroke-dasharray="6 4"/>')
+    s.append(f'<text x="38" y="{y + 30}" font-size="12" fill="{INK}">risk-based 8.2M</text>')
+    s.append(f'<text x="{30 + wtot * rb / (rb + fb) + 10:.1f}" y="{y + 30}" font-size="12" fill="{INK}">fee-based (self-funded) 21.5M: no premium, no MLR, not in the bars above</text>')
+    s.append(f'<text x="30" y="{y + 56}" font-size="12" fill="{MUTED}">Same payment integrity problem, different payer of the savings: the employer. Sizing needs claims dollars for these lives, which we do not have yet.</text>')
+    s.append("</svg>")
+    write("mlr_headroom.svg", "\n".join(s))
+
+
 def pipeline():
     for v in VERSIONS:
         how_it_works(v)
@@ -536,6 +580,7 @@ if __name__ == "__main__":
     agent_actions()
     workflow_v40()
     score_waterfall()
+    mlr_headroom()
     progression()
     em_levels()
     cms_mix()
