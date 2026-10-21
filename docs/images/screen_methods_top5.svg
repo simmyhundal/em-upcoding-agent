@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 506" width="760" height="506" font-family="Helvetica, Arial, sans-serif" role="img" aria-label="Share of upcoders each screen puts in the top 5% of providers, by data version">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="20" y="32" font-size="18" font-weight="bold" fill="#1f2937">Upcoders in the top 5% of providers, by screen and data version</text>
+<text x="20" y="54" font-size="12.5" fill="#6b7280">Blue: the screen chosen at that step. Each panel has its own seeds, so compare bars within a panel.</text>
+<text x="20" y="82" font-size="13.5" font-weight="bold" fill="#1f2937">Data 2.0 and 2.1: 14 datasets, 109 upcoders</text>
+<line x1="120.0" y1="94" x2="120.0" y2="190" stroke="#e5e7eb" stroke-width="1"/>
+<line x1="242.5" y1="94" x2="242.5" y2="190" stroke="#e5e7eb" stroke-width="1"/>
+<line x1="365.0" y1="94" x2="365.0" y2="190" stroke="#e5e7eb" stroke-width="1"/>
+<line x1="487.5" y1="94" x2="487.5" y2="190" stroke="#e5e7eb" stroke-width="1"/>
+<line x1="610.0" y1="94" x2="610.0" y2="190" stroke="#e5e7eb" stroke-width="1"/>
+<text x="112" y="107" text-anchor="end" font-size="12.5" fill="#1f2937">zscore</text>
+<path d="M120,94 h333.2 a4,4 0 0 1 4,4 v10 a4,4 0 0 1 -4,4 h-333.2 z" fill="#9ca3af"><title>zscore: 75 of 109 (69%)</title></path>
+<text x="463.2" y="107" font-size="12" fill="#6b7280">75 of 109 (69%)</text>
+<text x="112" y="133" text-anchor="end" font-size="12.5" fill="#1f2937">riskadj</text>
+<path d="M120,120 h328.7 a4,4 0 0 1 4,4 v10 a4,4 0 0 1 -4,4 h-328.7 z" fill="#9ca3af"><title>riskadj: 74 of 109 (68%)</title></path>
+<text x="458.7" y="133" font-size="12" fill="#6b7280">74 of 109 (68%)</text>
+<text x="112" y="159" text-anchor="end" font-size="12.5" fill="#1f2937">priority</text>
+<path d="M120,146 h346.6 a4,4 0 0 1 4,4 v10 a4,4 0 0 1 -4,4 h-346.6 z" fill="#9ca3af"><title>priority: 78 of 109 (72%)</title></path>
+<text x="476.6" y="159" font-size="12" fill="#6b7280">78 of 109 (72%)</text>
+<text x="112" y="185" text-anchor="end" font-size="12.5" fill="#1f2937">eb_ratio</text>
+<path d="M120,172 h355.6 a4,4 0 0 1 4,4 v10 a4,4 0 0 1 -4,4 h-355.6 z" fill="#2563eb"><title>eb_ratio: 80 of 109 (73%)</title></path>
+<text x="485.6" y="185" font-size="12" fill="#6b7280">80 of 109 (73%)</text>
+<text x="120.0" y="210" text-anchor="middle" font-size="11" fill="#6b7280">0%</text>
+<text x="365.0" y="210" text-anchor="middle" font-size="11" fill="#6b7280">50%</text>
+<text x="610.0" y="210" text-anchor="middle" font-size="11" fill="#6b7280">100%</text>
+<text x="20" y="242" font-size="13.5" font-weight="bold" fill="#1f2937">Data 2.2: 8 fresh release 2 seeds, 62 upcoders</text>
+<line x1="120.0" y1="254" x2="120.0" y2="350" stroke="#e5e7eb" stroke-width="1"/>
+<line x1="242.5" y1="254" x2="242.5" y2="350" stroke="#e5e7eb" stroke-width="1"/>
+<line x1="365.0" y1="254" x2="365.0" y2="350" stroke="#e5e7eb" stroke-width="1"/>
+<line x1="487.5" y1="254" x2="487.5" y2="350" stroke="#e5e7eb" stroke-width="1"/>
+<line x1="610.0" y1="254" x2="610.0" y2="350" stroke="#e5e7eb" stroke-width="1"/>
+<text x="112" y="267" text-anchor="end" font-size="12.5" fill="#1f2937">zscore</text>
+<path d="M120,254 h217.3 a4,4 0 0 1 4,4 v10 a4,4 0 0 1 -4,4 h-217.3 z" fill="#9ca3af"><title>zscore: 28 of 62 (45%)</title></path>
+<text x="347.3" y="267" font-size="12" fill="#6b7280">28 of 62 (45%)</text>
+<text x="112" y="293" text-anchor="end" font-size="12.5" fill="#1f2937">riskadj</text>
+<path d="M120,280 h233.1 a4,4 0 0 1 4,4 v10 a4,4 0 0 1 -4,4 h-233.1 z" fill="#9ca3af"><title>riskadj: 30 of 62 (48%)</title></path>
+<text x="363.1" y="293" font-size="12" fill="#6b7280">30 of 62 (48%)</text>
+<text x="112" y="319" text-anchor="end" font-size="12.5" fill="#1f2937">priority</text>
+<path d="M120,306 h256.8 a4,4 0 0 1 4,4 v10 a4,4 0 0 1 -4,4 h-256.8 z" fill="#9ca3af"><title>priority: 33 of 62 (53%)</title></path>
+<text x="386.8" y="319" font-size="12" fill="#6b7280">33 of 62 (53%)</text>
+<text x="112" y="345" text-anchor="end" font-size="12.5" fill="#1f2937">eb_ratio</text>
+<path d="M120,332 h264.7 a4,4 0 0 1 4,4 v10 a4,4 0 0 1 -4,4 h-264.7 z" fill="#2563eb"><title>eb_ratio: 34 of 62 (55%)</title></path>
+<text x="394.7" y="345" font-size="12" fill="#6b7280">34 of 62 (55%)</text>
+<text x="120.0" y="370" text-anchor="middle" font-size="11" fill="#6b7280">0%</text>
+<text x="365.0" y="370" text-anchor="middle" font-size="11" fill="#6b7280">50%</text>
+<text x="610.0" y="370" text-anchor="middle" font-size="11" fill="#6b7280">100%</text>
+<text x="20" y="402" font-size="13.5" font-weight="bold" fill="#1f2937">Data 2.2: 10 release 2 seeds, 78 upcoders (in sample)</text>
+<line x1="120.0" y1="414" x2="120.0" y2="458" stroke="#e5e7eb" stroke-width="1"/>
+<line x1="242.5" y1="414" x2="242.5" y2="458" stroke="#e5e7eb" stroke-width="1"/>
+<line x1="365.0" y1="414" x2="365.0" y2="458" stroke="#e5e7eb" stroke-width="1"/>
+<line x1="487.5" y1="414" x2="487.5" y2="458" stroke="#e5e7eb" stroke-width="1"/>
+<line x1="610.0" y1="414" x2="610.0" y2="458" stroke="#e5e7eb" stroke-width="1"/>
+<text x="112" y="427" text-anchor="end" font-size="12.5" fill="#1f2937">eb_ratio</text>
+<path d="M120,414 h272.4 a4,4 0 0 1 4,4 v10 a4,4 0 0 1 -4,4 h-272.4 z" fill="#9ca3af"><title>eb_ratio: 44 of 78 (56%)</title></path>
+<text x="402.4" y="427" font-size="12" fill="#6b7280">44 of 78 (56%)</text>
+<text x="112" y="453" text-anchor="end" font-size="12.5" fill="#1f2937">eb_ratio_t</text>
+<path d="M120,440 h291.3 a4,4 0 0 1 4,4 v10 a4,4 0 0 1 -4,4 h-291.3 z" fill="#2563eb"><title>eb_ratio_t: 47 of 78 (60%)</title></path>
+<text x="421.3" y="453" font-size="12" fill="#6b7280">47 of 78 (60%)</text>
+<text x="120.0" y="478" text-anchor="middle" font-size="11" fill="#6b7280">0%</text>
+<text x="365.0" y="478" text-anchor="middle" font-size="11" fill="#6b7280">50%</text>
+<text x="610.0" y="478" text-anchor="middle" font-size="11" fill="#6b7280">100%</text>
+</svg>
