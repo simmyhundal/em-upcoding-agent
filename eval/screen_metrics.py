@@ -140,6 +140,42 @@ def by_rate(res):
     return "\n".join(lines)
 
 
+V4_CACHE = os.path.join(ROOT, "experiments", "screen_metrics_v4.json")
+V4_SCREENS = ("eb_ratio_t", "eb_upper_c", "eb_upper_t")
+
+
+def v4_compute():
+    """The same metrics for the data 4.0 screens, per development seed (needs the answer keys; the result is cached in experiments/screen_metrics_v4.json)."""
+    sys.path.insert(0, os.path.join(ROOT, "eval"))
+    import screens_v4_eval as sv
+    scores = sv.load_scores(False)
+    out = {m: [] for m in V4_SCREENS}
+    for seed, sc in scores.items():
+        key = sv.key_of(seed)
+        ids = sorted(key)
+        labels = [1 if key[p]["role"] == "upcoder" else 0 for p in ids]
+        for m in V4_SCREENS:
+            v = [sc[m][p] for p in ids]
+            out[m].append({"seed": seed, "upcoders": sum(labels), "providers": len(ids), "auprc": average_precision(v, labels), "roc_auc": roc_auc(v, labels),
+                           "p_at_10": precision_at_k(v, labels, 10, ids), "p_at_22": precision_at_k(v, labels, 22, ids)})
+    json.dump(out, open(V4_CACHE, "w"), indent=1)
+    return out
+
+
+def v4_markdown():
+    try:
+        d = v4_compute()
+    except (ImportError, OSError, KeyError):
+        d = json.load(open(V4_CACHE))
+    n = len(d[V4_SCREENS[0]])
+    lines = [f"Mean over the {n} development seeds (216 providers, 8 upcoders each, a rate of 3.7%, so a random ranking scores about 0.037):", "",
+             "| Screen | AUPRC | ROC AUC | Precision at 10 | Precision at 22 (the top 10%) |", "|---|---|---|---|---|"]
+    for m in V4_SCREENS:
+        mean = lambda k: sum(x[k] for x in d[m]) / n
+        lines.append(f"| `{m}` | {mean('auprc'):.3f} | {mean('roc_auc'):.3f} | {mean('p_at_10'):.2f} | {mean('p_at_22'):.2f} |")
+    return "\n".join(lines)
+
+
 def report():
     res = table()
     return ("# Screen ranking metrics (issue 83)\n\n[Back to the README](../README.md)\n\n"
@@ -151,10 +187,18 @@ def report():
             "look excellent while most flags are wrong. **Precision at K** is the share of the K highest scores that are upcoders (K = 10 and "
             "25, the investigators' capacity). The workflow's and agent's final calls are yes or no, so they keep precision and recall.\n\n"
             "## By upcoder rate\n\n" + by_rate(res) + "\n\n## Per dataset (the 14 release-1 datasets)\n\n" + markdown(res) +
+            "\n\n## Data 4.0 (workflow v4.0 and agent v5.0)\n\n"
+            "The tables above score the risk-adjusted `z_adj` (`riskadj`, frozen) on the release 1 datasets. It is no longer the screen of either design. "
+            "Workflow v4.0 and agent v5.0 use `eb_upper_t` on data 4.0, where upcoders have habits (systematic, opportunistic, template-driven) and the frozen 99215 screens cannot see most of them. "
+            "The same metrics for the screens that matter there ([screen_methods.md](screen_methods.md), [screens_v4.md](screens_v4.md) for each habit and the dollar-weighted capture):\n\n"
+            + v4_markdown() +
+            "\n\nPrecision at 22 is capped at 8/22 = 0.36 (22 providers listed, 8 upcoders), and precision at 10 at 0.80. These are development seeds, the generator plants the test line `eb_upper_t` uses, "
+            "and the fresh-seed result is on the [v4.0 and v5.0 page](v4_v5_results.md).\n"
             "\n\n## How to read this\n\n"
             "- Precision at 25 is capped by the number of upcoders: with 8 upcoders in 216 doctors the best possible is 8/25 = 0.32, and "
             "with 3 upcoders it is 0.12. Precision at 10 is capped at 0.8 for 8 upcoders and 0.3 for 3. Read these against the cap, not "
             "against 1.0. Recall in the top 25 per screen method is in [screen_methods.md](screen_methods.md).\n"
+            "- The first two tables are release 1 data (2.0 and 2.1); the data 4.0 table is separate and not comparable with them.\n"
             "- These datasets are all development data now (release 1 evaluated on them), and the screen was never tuned on them, but "
             "they are not fresh seeds.\n"
             "- In this synthetic data the billed level depends on patient complexity by construction, which flatters risk adjustment, and "

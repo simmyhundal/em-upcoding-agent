@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 280" width="1000" height="280" font-family="Helvetica, Arial, sans-serif">
+<rect width="1000" height="280" fill="#ffffff"/>
+<text x="30" y="30" font-size="16" font-weight="bold" fill="#1f2937">What sets the score: agent v5.0, ten fresh seeds, dollars per seed</text>
+<rect x="140" y="74.0" width="110" height="42.9" rx="3" fill="none" stroke="#15803d" stroke-width="2.5"/>
+<text x="195" y="68.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#1f2937">+$385</text>
+<text x="195" y="242" text-anchor="middle" font-size="12.5" fill="#6b7280">Recovery</text>
+<rect x="330" y="74.0" width="110" height="127.6" rx="3" fill="none" stroke="#c2410c" stroke-width="2.5"/>
+<text x="385" y="68.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#1f2937">-$1,144</text>
+<text x="385" y="242" text-anchor="middle" font-size="12.5" fill="#6b7280">Staff cost</text>
+<rect x="520" y="201.6" width="110" height="2.4" rx="3" fill="none" stroke="#c2410c" stroke-width="2.5"/>
+<text x="575" y="195.6" text-anchor="middle" font-size="13" font-weight="bold" fill="#1f2937">-$22</text>
+<text x="575" y="242" text-anchor="middle" font-size="12.5" fill="#6b7280">Abrasion</text>
+<rect x="710" y="116.9" width="110" height="87.1" rx="3" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+<text x="765" y="110.9" text-anchor="middle" font-size="13" font-weight="bold" fill="#1f2937">-$781</text>
+<text x="765" y="242" text-anchor="middle" font-size="12.5" fill="#6b7280">Net score</text>
+<line x1="120" y1="116.9" x2="880" y2="116.9" stroke="#d1d5db" stroke-width="1"/>
+</svg>

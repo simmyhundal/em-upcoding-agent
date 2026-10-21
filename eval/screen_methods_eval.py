@@ -180,13 +180,17 @@ R2_TOP5 = {"zscore": 28, "riskadj": 30, "priority": 33, "eb_ratio": 34}     # do
 R2_UPCODERS = 62
 R3_TOP5 = {"eb_ratio": 44, "eb_ratio_t": 47}                                # docs/dev_release3.md and src/screen_methods.eb_ratio_t: ten release 2 seeds, 78 upcoders, in sample
 R3_UPCODERS = 78
+V4 = json.load(open(os.path.join(ROOT, "experiments", "screen_methods_v4.json")))   # data 4.0 (11 development seeds, 88 upcoders): written from eval/screens_v4_eval.py's scores; see docs/screens_v4.md
+V4_N = V4["eb_ratio_t"]["n"]["all"]
 
 METHOD_ROWS = [  # method, family, what it scores (one line), where it is used
     ("zscore", "z-score", "share of visits billed 99215 against all providers; no adjustment for how sick the patients are", "screen of v1 and v2.0; reference"),
     ("riskadj", "z-score, risk-adjusted", "observed against expected 99215 count, the expectation from each patient's chronic-condition count (logistic fit), rescaled by the typical spread", "screen of v2.1 and v3.1 (frozen); reference"),
     ("priority", "rank average", "average of the ranks by ratio to expected and by excess 99215 claims", "ordering in v3.1; release 2 candidate"),
     ("eb_ratio", "empirical Bayes", "`riskadj`'s observed over expected 99215 count, shrunk toward 1 for small panels (see below)", "screen of v2.2 and v3.2"),
-    ("eb_ratio_t", "empirical Bayes", "`eb_ratio` with one more input to the expected count: whether the claim has a lab or test line", "**current screen** (v2.3 to v2.5, v3.3 to v3.5)"),
+    ("eb_ratio_t", "empirical Bayes", "`eb_ratio` with one more input to the expected count: whether the claim has a lab or test line", "screen of v2.3 to v2.5 and v3.3 to v3.5 (frozen)"),
+    ("eb_upper_t", "empirical Bayes", "the same shrinkage on the share billed 99214 or 99215, with the lab or test line as an input, so 99213-to-99214 upgrades count (data 4.0)", "**current screen** (workflow v4.0, agent v5.0)"),
+    ("eb_upper_c", "empirical Bayes", "`eb_upper_t` without the test line (chronic-condition count only)", "candidate only; does not lean on the lab-line link"),
     ("eb_prob", "empirical Bayes", "probability that the true 99215 rate is more than 1.5 times expected", "candidate only"),
     ("eb_excess", "empirical Bayes", "shrunk extra 99215 claims: expected count x (shrunk ratio - 1)", "candidate only"),
     ("eb_upper", "empirical Bayes", "the same shrinkage on the share billed 99214 or 99215, so 99213-to-99214 upgrades count", "candidate only"),
@@ -240,6 +244,7 @@ def chart_svg(results):
         (f"Data 2.0 and 2.1: 14 datasets, {n1} upcoders", [(m, top_pct_found(results, m), n1) for m in ("zscore", "riskadj", "priority", "eb_ratio")], "eb_ratio"),
         (f"Data 2.2: 8 fresh release 2 seeds, {R2_UPCODERS} upcoders", [(m, R2_TOP5[m], R2_UPCODERS) for m in ("zscore", "riskadj", "priority", "eb_ratio")], "eb_ratio"),
         (f"Data 2.2: 10 release 2 seeds, {R3_UPCODERS} upcoders (in sample)", [(m, R3_TOP5[m], R3_UPCODERS) for m in ("eb_ratio", "eb_ratio_t")], "eb_ratio_t"),
+        (f"Data 4.0: 11 development seeds, {V4_N} upcoders (in sample)", [(m, V4[m]["top5"]["all"], V4_N) for m in ("eb_ratio_t", "eb_upper_c", "eb_upper_t")], "eb_upper_t"),
     ]
     W, left, right, bar_h, gap, x0 = 760, 120, 150, 18, 8, 0
     plot_w = W - left - right
@@ -279,6 +284,8 @@ def chart_rows(results):
         lines.append(f"| 2.2, 8 fresh release 2 seeds | `{m}` | {R2_TOP5[m]} of {R2_UPCODERS} |")
     for m in ("eb_ratio", "eb_ratio_t"):
         lines.append(f"| 2.2, 10 release 2 seeds (in sample) | `{m}` | {R3_TOP5[m]} of {R3_UPCODERS} |")
+    for m in ("eb_ratio_t", "eb_upper_c", "eb_upper_t"):
+        lines.append(f"| 4.0, 11 development seeds (in sample) | `{m}` | {V4[m]['top5']['all']} of {V4_N} |")
     return "\n".join(lines)
 
 
@@ -297,8 +304,26 @@ CAVEATS = """## Caveats (read before using any number here)
 - **Whole-distribution scores failed on this data** (`level_z`, `rich_level`, `eb_upper`, `eb_two`). Honest providers differ in coding style, which moves
   the mean billed level and the 99214-or-higher share as much as an upcoder's one-level upgrades. That says a simple level score is too noisy here, not that
   levels never help; data 4.0 plants 99213-to-99214 habits on purpose, so they are tested again there.
+- **Data 4.0 is easier for `eb_upper_t` by construction.** The generator draws a visit's lab line from the true complexity, so a screen that uses the test line has a planted input;
+  `hi_no_test` (visits billed 99214 or 99215 with no test line) finds 88 of 88 upcoders from that link alone, and the habits are the ones these screens look for.
+  `eb_upper_c` leaves the test line out and finds 70 of 88 in the top 10%. A systematic upcoder also carries a planted panel shift, so its gain is checked against honest providers
+  with a similar provider effect ([screens_v4.md](screens_v4.md)); `eb_upper_t` outscores them (about 1.00). The 11 seeds are development data: the screen's real test is the fresh seeds.
 - **`ensemble` includes the weak `level_z`**, so it is dragged down; it is reported because it was a named candidate.
 """
+
+
+def data40_section():
+    """Data 4.0 per habit, from experiments/screen_methods_v4.json (the full table, all screens and the matched-honest check are in docs/screens_v4.md)."""
+    habits = ("all", "systematic", "opportunistic", "template")
+    lines = [f"Upcoders in the top 10% of providers (22 of 216), by habit, 11 development seeds ({V4_N} upcoders):", "",
+             "| Screen | All | Systematic | Opportunistic | Template-driven | Honest in list | AUPRC |", "|---|---|---|---|---|---|---|"]
+    for m in ("eb_ratio_t", "eb_upper_c", "eb_upper_t"):
+        v = V4[m]
+        lines.append(f"| `{m}` | " + " | ".join(f"{v['top10'][h]} of {v['n'][h]}" for h in habits) + f" | {v['honest10']} | {v['auprc']:.3f} |")
+    lines += ["", "`eb_ratio_t` is the frozen screen of v2.3 to v2.5; it looks at 99215 only, and data 4.0's systematic habit moves 99213 to 99214. "
+              "[screens_v4.md](screens_v4.md) has every candidate screen, dollar-weighted capture and the check against honest providers with a similar provider effect; "
+              "[screens_v4_pipeline.md](screens_v4_pipeline.md) has the pipeline after the list."]
+    return "\n".join(lines)
 
 
 def data22_section():
@@ -360,18 +385,21 @@ def report(results, extra=CAVEATS):
         "| 2.0 | Plan-shaped tables; conditions derived from claims; half the upcoders clone notes | the 14 datasets below |",
         "| 2.1 | Adds the note package; claims are identical to 2.0 for a seed, so the screens score them the same | the 14 datasets below |",
         "| 2.2 | Honest coding noise in both directions; an upcoder must bill above the honest baseline by a margin; group billing and data defects | seed 42 below; fresh seeds on the release 2 and 3 pages |",
-        f"| 4.0 (being built, not yet on main) | Every provider has an upcoding rate; upcoders get a habit (systematic 99213-to-99214, borderline-only, EHR template); wider honest noise | not yet ([data 4.0]({i}124), [screens]({i}127)) |",
+        "| 4.0 | Every provider has an upcoding rate; upcoders get a habit (systematic 99213-to-99214, opportunistic borderline-only, EHR template); wider honest noise | 11 development seeds below; [screens_v4.md](screens_v4.md) |",
     ])
     return ("# Screen methods: which screen ranks upcoders highest\n\n[Back to the README](../README.md) · [glossary](glossary.md)\n\n"
             "## In short\n\n"
-            "- **Current screen: `eb_ratio_t`** (workflow v2.3 to v2.5, agent v3.3 to v3.5). It is `eb_ratio` with one more input to the expected 99215 count: "
-            f"whether the claim has a lab or test line. On the ten release 2 seeds it put {R3_TOP5['eb_ratio_t']} of {R3_UPCODERS} upcoders in the top 5% of providers "
-            f"against {R3_TOP5['eb_ratio']} for `eb_ratio` (in sample).\n"
+            "- **Current screen: `eb_upper_t`** (workflow v4.0, agent v5.0). It shrinks the share of visits billed 99214 or 99215 against what the patients and the test line predict, "
+            f"so upgrades into 99214 count. On the 11 data 4.0 development seeds it put {V4['eb_upper_t']['top10']['all']} of {V4_N} upcoders in the top 10% of providers against {V4['eb_ratio_t']['top10']['all']} "
+            f"for `eb_ratio_t`, which looks only at 99215 and cannot see the systematic habit ({V4['eb_ratio_t']['top10']['systematic']} of {V4['eb_ratio_t']['n']['systematic']} against {V4['eb_upper_t']['top10']['systematic']} of {V4['eb_upper_t']['n']['systematic']}). "
+            "The test line is a planted input (see the caveats), and these seeds are development data.\n"
+            f"- **Before that: `eb_ratio_t`** (workflow v2.3 to v2.5, agent v3.3 to v3.5), `eb_ratio` with the test line as one more input to the expected 99215 count: "
+            f"{R3_TOP5['eb_ratio_t']} of {R3_UPCODERS} upcoders in the top 5% on the ten release 2 seeds against {R3_TOP5['eb_ratio']} for `eb_ratio` (in sample).\n"
             f"- **How it got there.** On the 14 datasets of data 2.0 and 2.1, `eb_ratio` put {t['eb_ratio']['found']} of {n_up} upcoders in the top 25 against "
             f"{t['riskadj']['found']} for the risk-adjusted z-score (`riskadj`), and never fewer on any dataset. Release 2 confirmed it on 8 fresh data 2.2 seeds by a rule fixed in advance "
             f"({R2_TOP5['eb_ratio']} of {R2_UPCODERS} upcoders in the top 5% against {R2_TOP5['riskadj']}).\n"
             "- **Not solved.** No screen puts every upcoder in the top 25, and the gains are a few upcoders on synthetic data (see the caveats).\n"
-            f"- **Next.** Data 4.0 changes what upcoding looks like, so the screens are compared again there ([issue]({i}127)).\n\n"
+            f"- **Next.** Whether `eb_upper_t` holds on a second fresh set of seeds ([issue]({i}132)); the opportunistic habit is the weakest ({V4['eb_upper_t']['top10']['opportunistic']} of {V4['eb_upper_t']['n']['opportunistic']} in the top 10%) ([issue]({i}134)).\n\n"
             "Generated by `python eval/screen_methods_eval.py --write` (also writes the chart); methods in `src/screen_methods.py`, ranking metrics in "
             "`eval/screen_metrics.py`. Free: claims and patients only, no model; the answer key only scores.\n\n"
             "![Share of upcoders each screen puts in the top 5% of providers, by data version](images/screen_methods_top5.svg)\n\n"
@@ -388,12 +416,14 @@ def report(results, extra=CAVEATS):
             "## Results by data version\n\n"
             + details(f"Data 2.0 and 2.1: 14 datasets ({n_up} upcoders): `eb_ratio` {t['eb_ratio']['found']} in the top 25, `riskadj` {t['riskadj']['found']}", d1)
             + "\n" + data22_section() + "\n"
-            + details("Data 4.0: not yet", f"The screens are compared again once data 4.0 exists ([issue]({i}127)).") + "\n"
+            + details(f"Data 4.0: 11 development seeds ({V4_N} upcoders): `eb_upper_t` {V4['eb_upper_t']['top10']['all']} in the top 10%, `eb_ratio_t` {V4['eb_ratio_t']['top10']['all']}", data40_section()) + "\n"
             "## Decisions so far\n\n"
             "- **Release 2:** Simmy chose `eb_ratio` and `priority` as candidates for both designs, with `riskadj` (frozen) and `zscore` as comparisons; the fresh-seed check "
             "picked `eb_ratio` ([release2_plan.md](release2_plan.md), [release2_screen_choice.md](release2_screen_choice.md)). Wired in as `flagging.py --method` and the "
             "agent's `screen_providers` method.\n"
-            "- **Release 3:** `eb_ratio_t` adds the test-line input and becomes the screen of both designs ([dev_release3.md](dev_release3.md)).\n")
+            "- **Release 3:** `eb_ratio_t` adds the test-line input and becomes the screen of both designs ([dev_release3.md](dev_release3.md)).\n"
+            "- **Workflow v4.0 and agent v5.0:** `eb_upper_t` replaces `eb_ratio_t` in both designs, chosen on the 11 development seeds ([screens_v4.md](screens_v4.md), [screens_v4_pipeline.md](screens_v4_pipeline.md)). "
+            "The screen gets the right providers onto the list; rules 4.0 and the ask model decide what happens next, and the fresh-seed result shows the list is no longer the limit ([v4_v5_results.md](v4_v5_results.md)).\n")
 
 
 def write_chart(results):
