@@ -15,6 +15,7 @@ import os
 
 import escalation_policy as ep
 import policy_25 as p25
+import policy_40 as pol40
 import workflow_policy_23 as p23
 import workflow_policy_v21 as v21
 
@@ -22,13 +23,8 @@ import workflow_policy_v21 as v21
 # (src/policy_40_ask.json, fitted on development batches 1 to 4), no escalation, and a demand only when the payer's estimate of the recovery covers the staff cost of a demand.
 FROZEN_V40 = {"screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost"}}
 DEFAULTS = {"sample_cpts": None, "n": p23.RANDOM_N, "ask": "policy25", "escalate": "policy25", "ask_model": None}
-ASK_MODEL = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src", "policy_40_ask.json")
-
-
-def ask_linear(model, row):
-    x = p25.ask_vector(row)
-    z = [(v - m) / s for v, m, s in zip(x, model["mu"], model["sd"])]
-    return model["beta"][0] + sum(b * v for b, v in zip(model["beta"][1:], z)) > 0
+ASK_MODEL = pol40.ASK_MODEL
+ask_linear = pol40.ask_linear
 
 
 def run_policy_40(office, provider_ids, claims_by_provider, flagged_file, ratio, opts=None):

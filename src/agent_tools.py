@@ -51,11 +51,12 @@ class Environment:
         version "3.1" adds the note package (data v2.1): charts carry notes, a second request is allowed (random first, targeted after),
         and the note_checks and request_audit_trail tools exist. "3.2" is 3.1 plus the data-quality pre-flight, the read-only data_quality tool and
         flag_data_issue (issue 81). "3.0" is the frozen agent."""
-        self.v31 = version in ("3.1", "3.2", "3.3", "3.4", "3.5")
-        self.v32 = version in ("3.2", "3.3", "3.4", "3.5")
-        self.v33 = version in ("3.3", "3.4", "3.5")
-        self.v34 = version in ("3.4", "3.5")                     # release 4 (issue 108): everything in 3.3 plus the read-only advisor tool advise_next_step                     # release 3 (issue 99): rules 2.3, the eb_ratio_t screen, a top-10% list; data stays 2.2
-        self.v35 = version == "3.5"                     # release 5 (issues 111 to 113): advice inside tool results (workflow v2.5 policy), binding rules, practice status each turn
+        self.v31 = version in ("3.1", "3.2", "3.3", "3.4", "3.5", "5.0")
+        self.v32 = version in ("3.2", "3.3", "3.4", "3.5", "5.0")
+        self.v33 = version in ("3.3", "3.4", "3.5", "5.0")
+        self.v34 = version in ("3.4", "3.5", "5.0")                     # release 4 (issue 108): everything in 3.3 plus the read-only advisor tool advise_next_step                     # release 3 (issue 99): rules 2.3, the eb_ratio_t screen, a top-10% list; data stays 2.2
+        self.v50 = version == "5.0"                     # release 5.0 (issue 128): mirrors workflow v4.0: the eb_upper_t screen, rules 4.0, ask-or-skip advice refitted on score 4.0, no escalation advice, a demand floor, style repair
+        self.v35 = version in ("3.5", "5.0")                     # release 5 (issues 111 to 113): advice inside tool results (workflow v2.5 policy), binding rules, practice status each turn
         self.advice_log, self.last_advice, self.overrides, self.rule_result, self.p25, self.p25_rows = [], {}, [], {}, None, {}
         self.dq, self.data_issues, self.held = None, [], set()
         if self.v32:                                    # version 3.2: the data-quality pre-flight runs once per load (issue 81)
@@ -65,6 +66,9 @@ class Environment:
             self.scores32 = screen_methods.score_core(view_dir)       # eb_ratio and priority, the release 2 candidates (docs/screen_methods.md)
             if self.v33:
                 self.scores32 = {**self.scores32, "eb_ratio_t": screen_methods.score_t(view_dir)}      # version 3.3: eb_ratio with the test-line covariate (the workflow v2.3 screen)
+            if self.v50:
+                import screen_methods_v4
+                self.scores32 = {**self.scores32, "eb_upper_t": screen_methods_v4.score_v4(view_dir, only=["eb_upper_t"])["eb_upper_t"]}   # version 5.0: the share billed 99214 or above (workflow v4.0's screen)
         self.note_rows = {}
         self.screen_candidates, self.set_aside, self.tool_calls = set(), {}, []
         self.reviewed = set()                           # version 3.4: providers hybrid_review has been run on
@@ -76,7 +80,10 @@ class Environment:
         if self.v35:
             import policy_25
             self.p25 = policy_25.load()                 # the same file workflow v2.5 runs (src/policy_25.json), fitted on net dollars
-            self.p25_rows = {r["provider_id"]: r for r in flagging.flag(view_dir, method="eb_ratio_t", top_pct=10) if str(r.get("flagged")) == "True"}
+            self.p25_rows = {r["provider_id"]: r for r in flagging.flag(view_dir, method="eb_upper_t" if self.v50 else "eb_ratio_t", top_pct=10) if str(r.get("flagged")) == "True"}
+            if self.v50:
+                import policy_40
+                self.ask40 = policy_40.load_ask()               # workflow v4.0's ask-or-skip (src/policy_40_ask.json), shown as advice
         self.has_test = {}
         for rows in self.claims.values():
             for r in rows:
@@ -153,17 +160,17 @@ class Environment:
         key = {"zscore": ("z", True), "riskadj": ("z_adj", True), "combined": ("mean_rank", False)}.get(method)
         if self.v31 and method == "priority":
             key = ("priority", True)
-        if self.v32 and method == "eb_ratio" or self.v33 and method == "eb_ratio_t":
+        if self.v32 and method == "eb_ratio" or self.v33 and method == "eb_ratio_t" or self.v50 and method == "eb_upper_t":
             key = (method, True)
         if not key:
-            return {"error": "method must be zscore, riskadj or combined" + (" or priority" if self.v31 else "") + (" or eb_ratio" if self.v32 else "") + (" or eb_ratio_t" if self.v33 else "")}
+            return {"error": "method must be zscore, riskadj or combined" + (" or priority" if self.v31 else "") + (" or eb_ratio" if self.v32 else "") + (" or eb_ratio_t" if self.v33 else "") + (" or eb_upper_t" if self.v50 else "")}
         field, desc = key
         if top_pct is not None:
             if not self.v32:
                 return {"error": "top_pct is not available in this version"}
             top_n = flagging.top_n_from_pct(len(self.rows), float(top_pct))       # payers flag a percentile of the panel
         elig = [r for r in self.rows.values() if int(r["n_claims"]) >= min_claims]
-        if self.v32 and field in ("priority", "eb_ratio", "eb_ratio_t"):       # version 3.2: the same scores the workflow v2.2 uses, unrounded
+        if self.v32 and field in ("priority", "eb_ratio", "eb_ratio_t", "eb_upper_t"):       # version 3.2: the same scores the workflow v2.2 uses, unrounded
             sc = self.scores32[field]
             elig.sort(key=lambda r: (-sc[r["provider_id"]], r["provider_id"]))
         elif field == "priority":
@@ -258,6 +265,12 @@ class Environment:
         st = self.office.state.get(pid)
         exp, share = float(row["expected_share"]), float(row["share_99215"])
         ratio = share / exp if exp else 0.0
+        if self.v50:                                    # workflow v4.0: ask by the model refitted on score 4.0, then stop after the first sample
+            import policy_40
+            if not st or not st["round"]:
+                v = policy_40.predict(self.ask40, row)
+                return {"recommended": "ASK" if v > 0 else "SKIP", "meaning": ("ask for records" if v > 0 else "skip") + f": predicted net value of asking ${v:,.0f} (score 4.0; rank {row['rank']})"}
+            return {"recommended": "STOP", "meaning": "nothing more: the first sample and its follow-up decide; escalations did not pay under score 4.0 (workflow v4.0 stops here)"}
         if not st or not st["round"]:
             ok = p25.ask(self.p25, p25.ask_vector(row))
             return {"recommended": "ASK" if ok else "SKIP", "meaning": ("ask for records" if ok else "skip: the expected net dollars of asking are below zero") + f" (rank {row['rank']}, ratio {ratio:.1f})"}
@@ -315,8 +328,8 @@ class Environment:
             self.reviewed.add(pid)
             chart = self._chart_rule(pid)
             packet = self._packet(pid)
-            rule, reason = (sr.rule_leaning_23 if self.v33 else sr.rule_leaning_22 if self.v32 else sr.rule_leaning)(packet)       # 3.2: rules 2.2 as workflow v2.2; 3.3: rules 2.3
-            if chart["triggered"] and rule != sr.UPCODING:
+            rule, reason = (sr.rule_leaning_40 if self.v50 else sr.rule_leaning_23 if self.v33 else sr.rule_leaning_22 if self.v32 else sr.rule_leaning)(packet)       # 5.0: rules 4.0; 3.2: rules 2.2 as workflow v2.2; 3.3: rules 2.3
+            if chart["triggered"] and rule != sr.UPCODING and not self.v50:      # 5.0: the rules decide, as in workflow v4.0 (no separate chart-rule call)
                 lean, source, reason = sr.UPCODING, "chart_rule", f"{chart['below_billed']} of {chart['charts']} returned charts support a lower level than billed"
             elif rule:
                 lean, source = rule, "summary_rule"
@@ -440,6 +453,8 @@ class Environment:
         for f in findings:
             packet = self._packet(f["provider_id"])
             built[f["provider_id"]] = sr.assemble(packet, f["leaning"], f.get("headline"), f.get("interpretation"), version=version)
+            if self.v50:                                # issue 116: the two judged writing defects are repaired by code (the leaning is never changed)
+                built[f["provider_id"]] = summary_lint.style_repair(built[f["provider_id"]], packet, f.get("headline"), f.get("interpretation"), version=version)
             if self.v31:
                 lint = summary_lint.lint(built[f["provider_id"]], packet, summary_lint.evidence_from(self.office.transcript, self._audit_log(), f["provider_id"]), rules23=self.v33)
                 if lint["hard"]:
@@ -458,8 +473,27 @@ class Environment:
                 h = self._hold(pid_)
                 if h["affected"]:
                     s_["rationale"] = (s_["rationale"] + " " + h["caveat"]).strip()
+        if self.v50:                                    # workflow v4.0's demand floor: a demand goes out only when the payer's own estimate of the recovery covers the staff cost of a demand
+            self.withdrawn = {}
+            for pid_, s_ in built.items():
+                if s_["leaning"] == sr.UPCODING:
+                    lb, floor = self._demand_estimate(pid_)
+                    if lb < floor:
+                        self.withdrawn[pid_] = round(lb, 2)
+                        built[pid_] = {**s_, "leaning": sr.INCONCLUSIVE, "headline": f"{pid_}: estimated recovery below the cost of a demand",
+                                       "rationale": s_["rationale"] + f" No demand is sent: the estimated recovery (lower bound ${lb:,.0f}) is below the staff cost of a demand (${floor:,.0f})."}
         self.findings.update(built)
-        return {"accepted": len(findings), "status": "drafts for human review; nothing is sent or decided automatically"}
+        return {"accepted": len(findings), **({"withdrawn_below_the_demand_floor": self.withdrawn} if self.v50 and self.withdrawn else {}), "status": "drafts for human review; nothing is sent or decided automatically"}
+
+    def _demand_estimate(self, pid):
+        """(lower bound of the recovery the payer could demand from this provider's random sample, the staff cost of a demand): workflow v4.0's demand floor (eval/score_40.py prices)."""
+        import os as _os
+        import sys as _sys
+        _sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "eval"))
+        import score_40 as s4
+        level = {c: v[0] for c, v in self.docs.items()}
+        rec = s4.recovery(self.claims.get(pid, []), self.office.random_claim_ids(pid), level, s4.PARAMS)
+        return rec["value"], s4.staff_cost(0, 0, 0, 1, 0, s4.PARAMS)[0]
 
     def _override_ok(self, pid, reason):
         reason = str(reason or "")
@@ -561,7 +595,7 @@ class Environment:
                           "Rank every provider by a statistical score and pick a cutoff. method zscore|riskadj|combined; select top_n or min_score "
                           "(riskadj/zscore); optional max_flagged and min_claims. Returns a ranked table, the score distribution and how many "
                           "providers sit at or above several cutoffs. Free and deterministic; call it as often as you like.",
-                          "input_schema": {"type": "object", "properties": {"method": {"type": "string", "enum": ["zscore", "riskadj", "combined"] + (["priority"] if self.v31 else []) + (["eb_ratio"] if self.v32 else []) + (["eb_ratio_t"] if self.v33 else [])},
+                          "input_schema": {"type": "object", "properties": {"method": {"type": "string", "enum": ["zscore", "riskadj", "combined"] + (["priority"] if self.v31 else []) + (["eb_ratio"] if self.v32 else []) + (["eb_ratio_t"] if self.v33 else []) + (["eb_upper_t"] if self.v50 else [])},
                                            "top_n": {"type": "integer"}, "min_score": {"type": "number"}, "max_flagged": {"type": "integer"},
                                            "min_claims": {"type": "integer"},
                                            **({"top_pct": {"type": "number", "description": "select the top PCT percent of providers instead of top_n (payers flag a percentile, for example 5)"}} if self.v32 else {})}}})

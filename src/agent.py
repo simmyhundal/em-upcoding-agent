@@ -100,6 +100,22 @@ refuses a different leaning unless the finding has an override_reason naming a f
 and the rounds sent. A silent office or a thin first sample is a reason to follow up or send one targeted request before closing, but a clean first sample is not."""
 
 
+SYSTEM_50 = SYSTEM_35 + """
+
+Version 5.0 additions (the v4/v5 line, score 4.0). You are now scored by score 4.0 per run: dollars recovered (the 90% lower bound of the overpayment extrapolated from a provider's random sample,
+for each provider you send a demand to, whatever its role) minus staff-hours cost (about $13 to triage a listed provider, $30 admin plus $90 copying per request round, $8.60 coder review per chart, and about
+$280 of investigator and nurse time per demand) minus provider abrasion (a provider that did not upcode, charged $44 per round and $2,000 if it receives a demand). Asking nobody scores zero, so a request
+has to pay for itself.
+
+The screen eb_upper_t is the default: the shrunk share of a provider's visits billed 99214 or 99215 against what its patients and test lines predict (it sees the habits the 99215 share misses: always billing
+99214 for 99213-level visits, templates, borderline inflation). Start from its top 10% (about 22 providers). screen_providers rows carry ask_advice and request_records returns advice: ASK or SKIP is a
+model refitted on this score (most listed providers lose money when asked), and after the first sample the advice is STOP, because every escalation tested (targeted requests, audit trails) cost more than it recovered.
+Ask only providers the advice says to ask, send one random sample of about 30 charts with one follow-up on any deficiency, run hybrid_review, and stop. Rules 4.0 read the chart test across 99214 and 99215 pooled.
+
+Two things are done by code. A demand goes out only when the estimated recovery covers its staff cost: an upcoding finding below that is withdrawn to inconclusive and the tool result says so. And code repairs
+the two writing defects the rule judge deducts for (a headline figure the rationale never states, a repeated sentence) without changing your leaning."""
+
+
 def _cost(usage, price=(4.00, 20.00)):
     inp = getattr(usage, "input_tokens", 0) or 0
     out = getattr(usage, "output_tokens", 0) or 0
@@ -127,7 +143,7 @@ def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=M
             reason = "dollar cap"
             break
         turn += 1
-        resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_35 if getattr(env, 'v35', False) else SYSTEM_34 if getattr(env, 'v34', False) else SYSTEM_33 if getattr(env, 'v33', False) else SYSTEM_32 if getattr(env, 'v32', False) else SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
+        resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_50 if getattr(env, 'v50', False) else SYSTEM_35 if getattr(env, 'v35', False) else SYSTEM_34 if getattr(env, 'v34', False) else SYSTEM_33 if getattr(env, 'v33', False) else SYSTEM_32 if getattr(env, 'v32', False) else SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
                                       output_config={"effort": effort}, extra_body={"cache_control": {"type": "ephemeral"}})
         usd += _cost(resp.usage) * price_scale
         if getattr(env, "v32", False):
