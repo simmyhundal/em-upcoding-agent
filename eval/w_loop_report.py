@@ -50,6 +50,18 @@ def main():
     for n, label in REJECTED:
         L.append(f"| {n} | {label} | rejected |")
     L += ["", "Rejected means no improvement over the version it was tested against (details and numbers in the issue's comments). Per-version options: `eval/w_loop.py`; the frozen workflow v4.0 is `workflow_policy_40.FROZEN_V40`."]
+    fr = os.path.join(ROOT, "experiments", "v4_fresh_results.json")
+    if os.path.exists(fr):
+        res = json.load(open(fr))
+        L += ["", "## Fresh seeds (5555 to 6464, never tuned on; eval/run_v4_fresh.py)", "", "| Arm | Score 4.0 per seed | Found of 80 | Honest called | Recovered | Staff-hours cost | Rounds |", "|---|---|---|---|---|---|---|"]
+        for label, d in res.items():
+            L.append(f"| {label} | {st.mean(v['score'] for v in d.values()):,.0f} | {sum(v['found'] for v in d.values())} | {sum(v['honest_called'] for v in d.values())} | "
+                     f"{st.mean(v['recovered'] for v in d.values()):,.0f} | {st.mean(v['staff_cost'] for v in d.values()):,.0f} | {sum(v['rounds'] for v in d.values())} |")
+        if "W4.0" in res and "W2.5 (frozen)" in res:
+            seeds = sorted(res["W4.0"], key=int)
+            diffs = [res["W4.0"][x]["score"] - res["W2.5 (frozen)"][x]["score"] for x in seeds]
+            L += ["", f"Workflow v4.0 beats the frozen v2.5 by ${st.mean(diffs):,.0f} per seed on {sum(d > 0 for d in diffs)} of {len(diffs)} fresh seeds (exact one-sided p = {wl.perm_p(diffs):.3f}). "
+                  "**It did not stay above zero** as it did on the development pool (+$549 per seed): about 10 upcoders were expected from the out-of-sample batches and 3 were found; ten seeds cannot separate noise from a generalization gap of a model fitted on 40 seeds (issue 132)."]
     open(os.path.join(ROOT, "docs", "w_loop_v4.md"), "w").write("\n".join(L) + "\n")
     print("\n".join(L))
 
