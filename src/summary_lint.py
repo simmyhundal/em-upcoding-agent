@@ -69,7 +69,39 @@ def unreliable_estimate_quoted(summary, evidence):
     return bool(re.search(r"\$\s?\d|valid for extrapolation|confidence interval|\bCI\b", text))
 
 
-def lint(summary, packet, evidence="", rules23=False):
+def _norm(sentence):
+    return re.sub(r"\s+", " ", re.sub(r"[\d,.]+%?", "#", sentence.lower())).strip()
+
+
+def style_defects(summary):
+    """The two writing defects the rule judge deducts for in agent-written text (issue 116): a headline figure the rationale never states, and a repeated sentence.
+    Same tests as eval/judge_rules_32.py, so a summary with none of them cannot lose points on these two checks. Returns a list of messages."""
+    out = []
+    head_nums = [lit for _, _, lit in summary_numbers.numbers_in(summary["headline"])]
+    body = summary["rationale"].replace(",", "")
+    missing = [x for x in head_nums if x.replace(",", "") not in body]
+    if missing:
+        out.append(f"headline figures the rationale never states: {', '.join(missing)}")
+    sents = [_norm(x) for x in re.split(r"(?<=[.!?])\s+", summary["rationale"]) if len(x) > 25]
+    if len(sents) != len(set(sents)):
+        out.append("a sentence is repeated")
+    return out
+
+
+def style_repair(summary, packet, headline, interpretation, version="2.1"):
+    """Fix the style defects with code and keep the leaning: a headline that fails is replaced by the code-written one; an interpretation that makes the rationale repeat itself is dropped."""
+    leaning = summary["leaning"]
+    fixed = sr.assemble(packet, leaning, headline, interpretation, version=version)
+    defects = style_defects(fixed)
+    if any(d.startswith("a sentence") for d in defects):
+        fixed = sr.assemble(packet, leaning, headline, None, version=version)
+        defects = style_defects(fixed)
+    if any(d.startswith("headline") for d in defects):
+        fixed = {**fixed, "headline": sr.assemble(packet, leaning, None, None, version=version)["headline"]}
+    return fixed
+
+
+def lint(summary, packet, evidence="", rules23=False, style=False):
     """Return {'hard': [messages], 'soft': [messages], 'unverified_numbers': [...]}."""
     hard, soft = [], []
     chk = summary_numbers.verify(summary, packet, evidence)
@@ -85,7 +117,9 @@ def lint(summary, packet, evidence="", rules23=False):
     if unreliable_estimate_quoted(summary, evidence):
         hard.append("quotes an overpayment estimate the estimate tool marked unreliable (too few reviewed charts in its stratum)")
     sents = [re.sub(r"\s+", " ", re.sub(r"[\d,.]+%?", "#", s.lower())).strip() for s in re.split(r"(?<=[.!?])\s+", summary["rationale"]) if len(s) > 25]
-    if len(sents) != len(set(sents)):
+    if style:                                  # agent v5.0 (issue 116): the two judged writing defects are refused, not just noted
+        hard += style_defects(summary)
+    elif len(sents) != len(set(sents)):
         soft.append("a sentence is repeated")
     return {"hard": hard, "soft": soft, "unverified_numbers": chk["unverified"]}
 
