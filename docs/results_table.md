@@ -30,3 +30,11 @@ Rebuild the file from the saved run outputs and the answer keys (gitignored) wit
 | `notes` | Free text about the run. |
 
 Adding a run: add it to `experiments/runs.json` (dataset, source, notes, pointers to its outputs), run `python eval/scoreboard.py --write`, then `python docs/update_readme.py`.
+
+## Where net dollars live (issue 139)
+
+`results.csv` has no net-dollar or score column: its dollar columns are the upcoders' true overpayment (`overpaid_usd`) and the part of it a stage called (`reached_usd`), which are not recovered money. The scores are computed by their own scripts:
+the release 5 score and score 4.0 for releases 2 to 5 from the stored run folders (`eval/score_40_check.py`, `experiments/score_40_check.json`), the release 1 rows' release 5 score from `experiments/release5_dollar_results.json`, and score 4.0 on data 4.0 from `experiments/v4_fresh_results.json`.
+The README table reads all of them; every dollar figure in it is per seed (the pooled total over ten seeds divided by ten). Release 4 was scored in points, not dollars (`release4_results.md`).
+The README's release 5 score for the rows of releases 2 and 3 is the recomputed value on the stored runs (workflow v2.2: $3,857 and $6,765; workflow v2.3: $7,132), the same runs that give the recall and precision beside it.
+The published baseline (`release5_dollar_baseline.md`) re-ran those arms from screen lists and reports $368, $4,362 and $4,923; the cause of the difference was not traced.
