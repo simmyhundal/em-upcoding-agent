@@ -401,7 +401,7 @@ def build(out_dir, answer_key_path=g2.DEFAULT_KEY, seed=42, n_providers=216, n_u
                                             "true_overpay_net": round(P["live_over"], 2), "true_overpay_gross": round(P["live_over_gross"], 2),
                                             "above_margin": bool(P["role"] == "upcoder"), "above_p95": bool(P["up_rate"] > p95), "planted_below_line": False,
                                             "corrections": P["n_corrections"], "corrections_up": P["n_corr_up"], "corrections_down": P["n_corr_down"],
-                                            "panel_acuity_shift": round(P["shift"], 2), "uses_template": bool(ng.prov.get(P["npi"], {}).get("template"))}
+                                            "panel_acuity_shift": round(P["shift"], 2), "provider_effect": round(P["eta"] + P["shift"], 4), "top_shift": round(P["top_shift"], 4), "uses_template": bool(ng.prov.get(P["npi"], {}).get("template"))}
                                    for P in provs},
                    "justified_cpt_by_claim": truth}, f)
     return prov_rows

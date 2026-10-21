@@ -76,6 +76,9 @@ From release 5 the primary score is **net dollars** (the RL score; formula and p
 ## Score 4.0 on the stored runs of releases 2 to 5 (issue 126)
 A free re-scoring of every stored arm run with score 4.0 (dollars recovered minus staff-hours cost minus provider abrasion; [parameters](score_40.md)), beside release 5's score: [score_40_check.md](score_40_check.md). It says plainly whether the score reorders the arms and by how much each assumption moves the order.
 
+## Indicators and screens on data 4.0 (issue 127)
+The frozen 99215-share screen lists 18 of 88 data 4.0 upcoders in its top 10%; a whole-distribution indicator at the 99214 boundary lists 81, split by habit and checked against honest providers with a similar provider effect: [screens_v4.md](screens_v4.md). Under today's frozen rules a better list barely changes the score ([screens_v4_pipeline.md](screens_v4_pipeline.md)).
+
 ## Where things stand
 Through release 5 (workflow v2.5 and agent v3.5, tagged): a synthetic data generator with harder data (2.2), the screens (`eb_ratio_t` is current), a simulated provider office with records requests, a workflow that obeys learned ask-or-skip and stop-or-escalate formulas, an agent that gets the same formulas as advice, citation and number checks, a deterministic rule judge for summaries, and fresh-seed evaluations scored in net dollars. Next: the v4/v5 line (data 4.0 with provider upcoding rates and habits, score 4.0 in dollars recovered minus staff-hours cost minus provider abrasion, workflow v4.0 and agent v5.0); see [v4_v5_plan.md](v4_v5_plan.md).
 
