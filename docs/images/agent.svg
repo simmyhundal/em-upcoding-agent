@@ -4,8 +4,8 @@
 <rect x="30" y="30" width="290" height="96" rx="10" fill="#f9fafb" stroke="#2563eb" stroke-width="2.5"/>
 <text x="46" y="58" font-size="14.5" font-weight="bold" fill="#1f2937">Screen</text>
 <text x="46" y="82" font-size="12.5" fill="#6b7280">Rank providers by risk-adjusted score,</text>
-<text x="46" y="99" font-size="12.5" fill="#6b7280">priority or eb_ratio_t (99215 share vs</text>
-<text x="46" y="116" font-size="12.5" fill="#6b7280">expected), any cutoff.</text>
+<text x="46" y="99" font-size="12.5" fill="#6b7280">priority, eb_ratio_t or eb_upper_t</text>
+<text x="46" y="116" font-size="12.5" fill="#6b7280">(share billed 99214 or 99215 vs</text>
 <rect x="355" y="30" width="290" height="96" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
 <text x="371" y="58" font-size="14.5" font-weight="bold" fill="#1f2937">Look closer</text>
 <text x="371" y="82" font-size="12.5" fill="#6b7280">Evidence card and peer comparison for</text>

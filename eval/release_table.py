@@ -79,41 +79,84 @@ def rows():
     return json.load(open(PATH))
 
 
+V4_PATH = os.path.join(ROOT, "experiments", "v4_fresh_results.json")
+V4_ARMS = [("W2.5 (frozen)", "Workflow v2.5"), ("W4.0", "Workflow v4.0"), ("A5.0", "Agent v5.0")]
+
+
+def v4_rows():
+    """Workflow v2.5 (frozen), workflow v4.0 and agent v5.0 on the ten fresh data 4.0 seeds (5555 to 6464), scored by score 4.0 (docs/score_40.md), from experiments/v4_fresh_results.json."""
+    d = json.load(open(V4_PATH))
+    out = []
+    for key, label in V4_ARMS:
+        v = list(d[key].values())
+        out.append({"arm": label, "seeds": "data 4.0 seeds", "found": sum(x["found"] for x in v), "upcoders": sum(x["upcoders"] for x in v),
+                    "accused": sum(x["honest_called"] for x in v), "net_per_seed": round(sum(x["score"] for x in v) / len(v))})
+    return out
+
+
 def markdown():
     r = rows()
     from scoreboard import pct
     gl = "docs/glossary.md#results-columns"
     hov = lambda text, tip: f'[{text}]({gl} "{tip}")'
-    lines = ["| Version | " + hov("Data model", "Easy: release 1, data 2.1, clean coding and planted clone signs. Hard: releases 2 to 5, data 2.2, adds honest coding noise, group and incident-to billing, truncated diagnoses, claims lag, level-changing corrections and injected data defects.")
+    lines = ["| Version | " + hov("Data model", "Easy: release 1, clean coding and planted clone signs. Hard: releases 2 to 5, adds coding noise, group billing, lagged claims and data defects. Data 4.0: every provider has a true upcoding rate and 8 have a habit.")
              + " | " + hov("Upcoders found (recall)", "Upcoders found out of those planted.") + " | " + hov("Calls that were upcoders (precision)", "Upcoders found out of all providers called upcoding.")
-             + " | " + hov("Net $ per seed (RL score)", "Overpayment a records sample supports for the upcoders found (90% lower bound) minus request and false-accusation costs. Compare rows within one seed set only.") + " |", "|---|---|---|---|---|"]
+             + " | " + hov("Net $ per seed (RL score)", "Overpayment a records sample supports (90% lower bound) minus costs. Compare rows within one seed set only. The last three rows use score 4.0, which also charges staff time.") + " |", "|---|---|---|---|---|"]
     names = [x["arm"] for x in r]
     for x in r:
         model = "Easy" if x["seeds"] == "release 1 seeds" else "Hard"
         label = f"{x['arm']} ({x['seeds'].replace(' seeds', '')})" if names.count(x["arm"]) > 1 else x["arm"]       # the same version in two releases' seed sets
         lines.append(f"| {label} | {model} | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | ${x['net_per_seed']:,} |")
-    lines += ["", "Hover over a column title for its definition (the same text is in the [glossary](docs/glossary.md#results-columns)). Each release has its own ten seeds, so compare rows within one release only: "
-              "[1](docs/eval61.md), [2](docs/release2_results.md), [3](docs/release3_results.md), [4](docs/release4_results.md), [5](docs/release5_results.md); [every run](docs/results.md)."]
+    lines += ["| **Score 4.0 on data 4.0 (fresh seeds)** | | | | |"]
+    for x in v4_rows():
+        label = f"{x['arm']} (frozen, for reference)" if x["arm"] == "Workflow v2.5" else x["arm"]
+        lines.append(f"| {label} | Data 4.0 | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | -${-x['net_per_seed']:,} |")
+    lines += ["", "Hover over a column title for its definition ([glossary](docs/glossary.md#results-columns)). Compare rows within one seed set only: "
+              "releases [1](docs/eval61.md), [2](docs/release2_results.md), [3](docs/release3_results.md), [4](docs/release4_results.md), [5](docs/release5_results.md), [v4.0 and v5.0](docs/v4_v5_results.md); [every run](docs/results.md)."]
     return "\n".join(lines)
 
 
+def score_parts(arm):
+    """Totals over the ten fresh seeds for one arm of experiments/v4_fresh_results.json, with the staff cost split by activity (src/recovery_40.py prices)."""
+    sys.path.insert(0, os.path.join(ROOT, "src"))
+    import recovery_40 as r
+    p = r.params()
+    m = p["MINUTES"]
+    v = list(json.load(open(V4_PATH))[arm].values())
+    S = lambda f: sum(x[f] for x in v)
+    charts = S("charts") * m["coder_per_chart"] / 60 * r.hourly("coder", p)
+    admin = S("rounds") * (m["admin_per_round"] / 60 * r.hourly("admin", p) + p["C_COPY"])
+    demand = S("demands") * (m["investigator_per_demand"] / 60 * r.hourly("investigator", p) + m["nurse_per_demand"] / 60 * r.hourly("nurse", p))
+    return {"n": len(v), "recovery": S("recovered"), "staff": S("staff_cost"), "abrasion": S("abrasion"), "score": S("score"), "found": S("found"), "upcoders": S("upcoders"),
+            "demands": S("demands"), "rounds": S("rounds"), "charts_n": S("charts"), "charts": charts, "admin": admin, "demand": demand, "triage": S("staff_cost") - charts - admin - demand}
+
+
+def score_text(arm="A5.0"):
+    """The README's three bullets under the score chart: what is behind each term, dollars per seed, from experiments/v4_fresh_results.json."""
+    w = score_parts(arm)
+    n = w["n"]
+    f = lambda x: f"${x / n:,.0f}"
+    return (f"- **Recovery +{f(w['recovery'])}:** {w['found']} of {w['upcoders']} upcoders found in all ten seeds, {w['demands']} demands, about ${w['recovery'] / max(w['demands'], 1):,.0f} recovered per demand.\n"
+            f"- **Staff cost -{f(w['staff'])}:** chart review {f(w['charts'])}, requests and copy fees {f(w['admin'])}, demand work {f(w['demand'])}, triage and model dollars {f(w['triage'])}.\n"
+            f"- **Abrasion -{f(w['abrasion'])}:** the cost to providers of requests and demands, weighted down for providers that really upcode; no honest provider was demanded from.")
+
+
 def tldr():
-    """The README's TL;DR, rendered from experiments/release5_results.json (release 5 fresh test, ten seeds)."""
+    """The README's TL;DR, rendered from experiments/v4_fresh_results.json (ten fresh data 4.0 seeds, score 4.0) and experiments/release5_results.json (release 5)."""
+    w25, w40, a50 = v4_rows()
     d = json.load(open(os.path.join(ROOT, "experiments", "release5_results.json")))
-    n = len(d["A3.5"]["per_seed"])
-    net = {k: sum(v["per_seed"]) / n for k, v in d.items()}
-    return (f"A fixed workflow and an AI agent both screen providers, request charts and draft cases for PI teams. On ten fresh seeds ({d['A3.5']['upcoders']} planted upcoders), the latest agent (v3.5) and workflow (v2.5) "
-            f"each earn about ${net['A3.5'] / 1000:.0f}k net per seed and are not reliably different; the release 3 workflow earned ${net['W2.3'] / 1000:.0f}k on the same seeds. "
-            f"The gain is lower cost (fewer requests and fewer false accusations), not more catches: each still finds under half of the upcoders ({d['W2.5']['found']} and {d['A3.5']['found']} of {d['A3.5']['upcoders']}), "
-            "far from the 12.5% miss-rate target.")
+    net = {k: sum(v["per_seed"]) / len(v["per_seed"]) for k, v in d.items()}
+    return (f"A fixed workflow and an AI agent both screen providers, request charts and draft cases for PI teams. On the old data (release 5), both earned about ${net['A3.5'] / 1000:.0f}k net per seed and found under half of the upcoders. "
+            f"Data 4.0 and score 4.0 are harder and honest about staff time: on ten fresh seeds, the old workflow loses ${-w25['net_per_seed']:,} per seed, while the new workflow (v4.0) loses ${-w40['net_per_seed']:,} "
+            f"and the new agent (v5.0) ${-a50['net_per_seed']:,}. Each finds {w40['found']} of {w40['upcoders']} upcoders and accuses no honest provider. "
+            "Both are far better than before and still not above zero.")
 
 
 def headline_cells():
-    """Short per-version results for the progression slide: {"v2.5": text, "v3.5": text}."""
-    d = {(x["arm"], x["seeds"]): x for x in rows()}
-    w, a = d[("Workflow v2.5", "release 5 seeds")], d[("Agent v3.5", "release 5 seeds")]
-    return {"v2.5": f"Harder data, release 5: {w['found']} of {w['upcoders']} upcoders found, {w['accused']} honest accused, ${w['net_per_seed'] / 1000:.1f}k net per seed.",
-            "v3.5": f"Same seeds: {a['found']} of {a['upcoders']} found, {a['accused']} honest accused, ${a['net_per_seed'] / 1000:.1f}k net; not reliably different."}
+    """Short per-version results for the progression slide: {"v4.0": text, "v5.0": text}."""
+    w25, w40, a50 = v4_rows()
+    return {"v4.0": f"Data 4.0, ten fresh seeds: {w40['found']} of {w40['upcoders']} found, {w40['accused']} honest accused, -${-w40['net_per_seed']:,} per seed (v2.5: -${-w25['net_per_seed']:,}).",
+            "v5.0": f"Agent, same data 4.0 seeds: {a50['found']} of {a50['upcoders']} found, {a50['accused']} honest accused, -${-a50['net_per_seed']:,} per seed."}
 
 
 if __name__ == "__main__":

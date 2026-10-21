@@ -108,7 +108,7 @@ def how_it_works(version):
 
 
 AGENT_ACTIONS = [
-    ("Screen", "Rank providers by risk-adjusted score, priority or eb_ratio_t (99215 share vs expected), any cutoff.", BLUE),
+    ("Screen", "Rank providers by risk-adjusted score, priority, eb_ratio_t or eb_upper_t (share billed 99214 or 99215 vs expected), any cutoff.", BLUE),
     ("Look closer", "Evidence card and peer comparison for one provider: billing mix, complexity, sample claims.", GREEN),
     ("Request charts", "Ask a provider for a random sample first, then a targeted one if needed.", GREEN),
     ("Follow up", "Fix deficiencies (unsigned, missing results), or ask for the EHR audit trail.", GREEN),
@@ -167,31 +167,32 @@ def agent_actions():
     write("agent.svg", "\n".join(s))
 
 
-def workflow_v25():
-    """The fixed workflow (v2.5) under the agent figure in the README: code sets the order; the learned formulas decide whom to ask and when to stop."""
+def workflow_v40():
+    """The fixed workflow (v4.0) under the agent figure in the README: code sets the order; a learned formula decides whom to ask, and a demand needs a recovery worth its staff cost."""
     W, H = 1000, 400
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>', f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
          f'<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="{MUTED}"/></marker>'
          f'<marker id="b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="{ORANGE}"/></marker></defs>',
-         f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">The fixed workflow (v2.5): code sets the order of the steps</text>']
-    steps = [("Screen", "eb_ratio_t: billed 99215 share against expected, shrunk for small panels. Top 10% of providers.", BLUE),
-             ("Ask or skip", "A learned formula (fitted on net dollars) decides whom to ask for charts.", GREEN),
+         f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">The fixed workflow (v4.0): code sets the order of the steps</text>']
+    steps = [("Screen", "eb_upper_t: share billed 99214 or 99215 against expected, shrunk for small panels. Top 10% of providers.", BLUE),
+             ("Ask or skip", "A learned formula (fitted on score 4.0) decides whom to ask for charts.", GREEN),
              ("Request charts", "30 random charts, then one follow-up on any deficiency.", GREEN),
-             ("Stop or escalate", "A learned formula picks: stop, a targeted request, the audit trail, or both.", GREEN),
-             ("Rules decide", "Chart rule and summary rules (2.3) set the leaning; where silent: inconclusive, no model is called.", GREEN),
-             ("Checks", "Citations and numbers must match the evidence; data-quality holds apply.", GREEN),
+             ("Stop", "No second request: the first sample and its follow-up decide.", GREEN),
+             ("Rules decide", "Chart rule and summary rules (4.0) set the leaning; where silent: inconclusive. No model is called.", GREEN),
+             ("Demand floor", "Demand only if the payer's estimated recovery covers the staff cost of a demand.", GREEN),
+             ("Checks", "Citations and numbers must match the evidence.", GREEN),
              ("PI teams review", "Drafts only. Nothing is sent or decided automatically.", PEOPLE)]
     bw, bh, gap = 205, 118, 28
-    pos = [(30 + i * (bw + gap), 112) for i in range(4)] + [(30 + i * (bw + gap), 262) for i in range(3)]
+    pos = [(30 + i * (bw + gap), 112) for i in range(4)] + [(30 + i * (bw + gap), 262) for i in range(4)]
     for (n, body, col), (x, y) in zip(steps, pos):
         s.append(f'<rect x="{x}" y="{y}" width="{bw}" height="{bh}" rx="10" fill="#f9fafb" stroke="{col}" stroke-width="2.5"/>')
         s.append(f'<text x="{x + 14}" y="{y + 28}" font-size="14.5" font-weight="bold" fill="{INK}">{escape(n)}</text>')
         for j, line in enumerate(textwrap.wrap(body, 30)[:5]):
             s.append(f'<text x="{x + 14}" y="{y + 50 + j * 16}" font-size="12" fill="{MUTED}">{escape(line)}</text>')
-    for i in (0, 1, 2, 4, 5):                            # left to right within a row
+    for i in (0, 1, 2, 4, 5, 6):                         # left to right within a row
         x, y = pos[i]
         s.append(f'<path d="M{x + bw} {y + bh / 2} L{x + bw + gap} {y + bh / 2}" stroke="{MUTED}" stroke-width="1.5" marker-end="url(#a)" fill="none"/>')
-    x3, y3 = pos[3]                                      # down from Stop or escalate to Rules decide
+    x3, y3 = pos[3]                                      # down from Stop to Rules decide
     s.append(f'<path d="M{x3 + bw / 2} {y3 + bh} V{y3 + bh + 22} H{pos[4][0] + bw / 2} V{pos[4][1]}" stroke="{MUTED}" stroke-width="1.5" marker-end="url(#a)" fill="none"/>')
     cx = pos[2][0]                                       # providers answer: requests go out and answers come back (both ways)
     s.append(f'<rect x="{cx}" y="50" width="{bw * 2 + gap}" height="34" rx="8" fill="none" stroke="{GREEN}" stroke-width="2" stroke-dasharray="6 4"/>')
@@ -201,6 +202,38 @@ def workflow_v25():
         s.append(f'<path d="M{x} 84 V{pos[i][1] - 2}" stroke="{ORANGE}" stroke-width="2.5" fill="none" marker-start="url(#b)" marker-end="url(#b)"/>')
     s.append("</svg>")
     write("workflow.svg", "\n".join(s))
+
+
+def score_waterfall():
+    """How score 4.0 is built for agent v5.0 on the ten fresh seeds, dollars per seed: recovery, staff cost, abrasion, net score. The explanation is text in the README (release_table.score_text)."""
+    import release_table
+    w = release_table.score_parts("A5.0")
+    n = w["n"]
+    per = lambda x: x / n
+    W, H = 1000, 280
+    s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>', f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
+         f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">What sets the score: agent v5.0, ten fresh seeds, dollars per seed</text>']
+    top, bottom = 50, 220
+    bars = [("Recovery", per(w["recovery"]), GREEN), ("Staff cost", -per(w["staff"]), ORANGE), ("Abrasion", -per(w["abrasion"]), ORANGE), ("Net score", per(w["score"]), BLUE)]
+    low = per(w["score"])
+    sc = (bottom - top - 40) / (per(w["recovery"]) - low)
+    y0 = top + 24 + per(w["recovery"]) * sc                  # the zero line
+    cur = 0.0
+    X = [140, 330, 520, 710]
+    for (name, v, col), x in zip(bars, X):
+        if name == "Net score":
+            a0, a1 = 0, v
+        else:
+            a0, a1 = cur, cur + v
+            cur = a1
+        ya, yb = y0 - a0 * sc, y0 - a1 * sc
+        s.append(f'<rect x="{x}" y="{min(ya, yb):.1f}" width="110" height="{max(abs(yb - ya), 1.5):.1f}" rx="3" fill="none" stroke="{col}" stroke-width="2.5"/>')
+        label = f"+${v:,.0f}" if v > 0 else f"-${-v:,.0f}"
+        s.append(f'<text x="{x + 55}" y="{min(ya, yb) - 6:.1f}" text-anchor="middle" font-size="13" font-weight="bold" fill="{INK}">{label}</text>')
+        s.append(f'<text x="{x + 55}" y="{bottom + 22}" text-anchor="middle" font-size="12.5" fill="{MUTED}">{name}</text>')
+    s.append(f'<line x1="120" y1="{y0:.1f}" x2="880" y2="{y0:.1f}" stroke="{LINE}" stroke-width="1"/>')
+    s.append("</svg>")
+    write("score_waterfall.svg", "\n".join(s))
 
 
 def pipeline():
@@ -248,15 +281,15 @@ def progression_cells(rows=None):
 def progression():
     """One slide: how it works over time, as a table with icons and headline eval results."""
     cells = progression_cells()
-    ev = {"v1.x": cells["v1.0"], "v2.x": cells["v2.0"] + " " + cells["v2.5"], "v3.x": cells["v3.0"] + " " + cells["v3.5"]}
+    ev = {"v1.x": cells["v1.0"], "v2.x": cells["v2.0"] + " " + cells["v4.0"], "v3.x": cells["v3.0"] + " " + cells["v5.0"]}
     cols = [("data", "Claims"), ("screen", "Screen"), ("records", "Charts"), ("write", "Summaries"), ("decide", "Who decides"),
             ("eval", "Headline results")]
     rows = [("v1.x", "Fixed workflow", ["Provider, patient and claim tables with a stored condition count.", "Top 25 by statistics. Fixed.",
                                       "A sample handed to the AI up front.", "The AI writes it all: facts, citations, next steps.", "Code, in a fixed order."]),
-            ("v2.x", "Fixed workflow", ["Plan-shaped claims; conditions derived from them. Harder data from v2.2.", "eb_ratio_t, top 10% of providers (v2.0: suspicion 5 or higher).",
-                                      "Learned ask-or-skip, 30 random charts, one follow-up, then a learned stop or escalate.", "Code writes the facts and decides; no model from v2.5.",
-                                      "Code, with formulas fitted on net dollars."]),
-            ("v3.x", "Agent", ["Same as v2.x.", "A tool the agent runs with any cutoff, eb_ratio_t included.", "The agent chooses whom to ask, what sample, and whether to follow up; advice arrives in the tool results.",
+            ("v2.x", "Fixed workflow", ["Plan-shaped claims; conditions derived from them. Harder data from v2.2; data 4.0 (habits) from v4.0.", "eb_ratio_t, top 10% of providers (v2.0: suspicion 5 or higher); eb_upper_t from v4.0.",
+                                      "Learned ask-or-skip, 30 random charts, one follow-up; v4.0 stops there.", "Code writes the facts and decides; no model from v2.5.",
+                                      "Code, with formulas fitted on net dollars; v4.0 adds a demand floor."]),
+            ("v3.x", "Agent", ["Same as v2.x.", "A tool the agent runs with any cutoff, eb_upper_t from v5.0.", "The agent chooses whom to ask, what sample, and whether to follow up; advice arrives in the tool results.",
                               "The agent submits findings; code adds facts and checks.", "The agent, within caps; an upcoding call the chart rule supports is binding."])]
     W, H = 1380, 410
     x0, cw, rh, y0 = 150, 170, 118, 56
@@ -501,7 +534,8 @@ if __name__ == "__main__":
     os.makedirs(os.path.join(ROOT, "docs", "images"), exist_ok=True)
     pipeline()
     agent_actions()
-    workflow_v25()
+    workflow_v40()
+    score_waterfall()
     progression()
     em_levels()
     cms_mix()

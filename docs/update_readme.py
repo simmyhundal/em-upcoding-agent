@@ -59,6 +59,7 @@ def results_doc():
 
 def build(text, with_roadmap=True):
     text = replace_block(text, "tldr", release_table.tldr())
+    text = replace_block(text, "score", release_table.score_text())
     text = replace_block(text, "release23", release_table.markdown())      # releases 1 to 5, from experiments/release23_table.json
     return text
 

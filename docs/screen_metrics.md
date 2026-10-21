@@ -34,9 +34,25 @@ Positives are planted upcoders; hard-negative and normal providers are negatives
 | e1414_r1 | 1414 | 600 | 6 | 1.0% | 0.334 | 33.4x | 0.972 | 0.20 | 0.16 |
 | e1414_r2 | 1414 | 600 | 12 | 2.0% | 0.414 | 20.7x | 0.975 | 0.50 | 0.32 |
 
+## Data 4.0 (workflow v4.0 and agent v5.0)
+
+The tables above score the risk-adjusted `z_adj` (`riskadj`, frozen) on the release 1 datasets. It is no longer the screen of either design. Workflow v4.0 and agent v5.0 use `eb_upper_t` on data 4.0, where upcoders have habits (systematic, opportunistic, template-driven) and the frozen 99215 screens cannot see most of them. The same metrics for the screens that matter there ([screen_methods.md](screen_methods.md), [screens_v4.md](screens_v4.md) for each habit and the dollar-weighted capture):
+
+Mean over the 11 development seeds (216 providers, 8 upcoders each, a rate of 3.7%, so a random ranking scores about 0.037):
+
+| Screen | AUPRC | ROC AUC | Precision at 10 | Precision at 22 (the top 10%) |
+|---|---|---|---|---|
+| `eb_ratio_t` | 0.114 | 0.516 | 0.11 | 0.07 |
+| `eb_upper_c` | 0.719 | 0.925 | 0.54 | 0.29 |
+| `eb_upper_t` | 0.882 | 0.978 | 0.68 | 0.33 |
+
+Precision at 22 is capped at 8/22 = 0.36 (22 providers listed, 8 upcoders), and precision at 10 at 0.80. These are development seeds, the generator plants the test line `eb_upper_t` uses, and the fresh-seed result is on the [v4.0 and v5.0 page](v4_v5_results.md).
+
+
 ## How to read this
 
 - Precision at 25 is capped by the number of upcoders: with 8 upcoders in 216 doctors the best possible is 8/25 = 0.32, and with 3 upcoders it is 0.12. Precision at 10 is capped at 0.8 for 8 upcoders and 0.3 for 3. Read these against the cap, not against 1.0. Recall in the top 25 per screen method is in [screen_methods.md](screen_methods.md).
+- The first two tables are release 1 data (2.0 and 2.1); the data 4.0 table is separate and not comparable with them.
 - These datasets are all development data now (release 1 evaluated on them), and the screen was never tuned on them, but they are not fresh seeds.
 - In this synthetic data the billed level depends on patient complexity by construction, which flatters risk adjustment, and honest providers bill exactly the justified level (data 2.0 and 2.1), so every score here is easier than real claims. Issue 74 (data 2.2) adds honest coding noise.
 - One draw per dataset, 3 to 12 upcoders each: a difference of one doctor moves precision at 10 by 0.1. The low-rate rows (600 doctors) are single datasets.

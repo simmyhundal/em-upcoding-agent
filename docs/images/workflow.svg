@@ -1,47 +1,52 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" width="1000" height="400" font-family="Helvetica, Arial, sans-serif">
 <rect width="1000" height="400" fill="#ffffff"/>
 <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#6b7280"/></marker><marker id="b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#c2410c"/></marker></defs>
-<text x="30" y="30" font-size="16" font-weight="bold" fill="#1f2937">The fixed workflow (v2.5): code sets the order of the steps</text>
+<text x="30" y="30" font-size="16" font-weight="bold" fill="#1f2937">The fixed workflow (v4.0): code sets the order of the steps</text>
 <rect x="30" y="112" width="205" height="118" rx="10" fill="#f9fafb" stroke="#2563eb" stroke-width="2.5"/>
 <text x="44" y="140" font-size="14.5" font-weight="bold" fill="#1f2937">Screen</text>
-<text x="44" y="162" font-size="12" fill="#6b7280">eb_ratio_t: billed 99215 share</text>
-<text x="44" y="178" font-size="12" fill="#6b7280">against expected, shrunk for</text>
-<text x="44" y="194" font-size="12" fill="#6b7280">small panels. Top 10% of</text>
-<text x="44" y="210" font-size="12" fill="#6b7280">providers.</text>
+<text x="44" y="162" font-size="12" fill="#6b7280">eb_upper_t: share billed 99214</text>
+<text x="44" y="178" font-size="12" fill="#6b7280">or 99215 against expected,</text>
+<text x="44" y="194" font-size="12" fill="#6b7280">shrunk for small panels. Top</text>
+<text x="44" y="210" font-size="12" fill="#6b7280">10% of providers.</text>
 <rect x="263" y="112" width="205" height="118" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
 <text x="277" y="140" font-size="14.5" font-weight="bold" fill="#1f2937">Ask or skip</text>
 <text x="277" y="162" font-size="12" fill="#6b7280">A learned formula (fitted on</text>
-<text x="277" y="178" font-size="12" fill="#6b7280">net dollars) decides whom to</text>
-<text x="277" y="194" font-size="12" fill="#6b7280">ask for charts.</text>
+<text x="277" y="178" font-size="12" fill="#6b7280">score 4.0) decides whom to ask</text>
+<text x="277" y="194" font-size="12" fill="#6b7280">for charts.</text>
 <rect x="496" y="112" width="205" height="118" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
 <text x="510" y="140" font-size="14.5" font-weight="bold" fill="#1f2937">Request charts</text>
 <text x="510" y="162" font-size="12" fill="#6b7280">30 random charts, then one</text>
 <text x="510" y="178" font-size="12" fill="#6b7280">follow-up on any deficiency.</text>
 <rect x="729" y="112" width="205" height="118" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
-<text x="743" y="140" font-size="14.5" font-weight="bold" fill="#1f2937">Stop or escalate</text>
-<text x="743" y="162" font-size="12" fill="#6b7280">A learned formula picks: stop,</text>
-<text x="743" y="178" font-size="12" fill="#6b7280">a targeted request, the audit</text>
-<text x="743" y="194" font-size="12" fill="#6b7280">trail, or both.</text>
+<text x="743" y="140" font-size="14.5" font-weight="bold" fill="#1f2937">Stop</text>
+<text x="743" y="162" font-size="12" fill="#6b7280">No second request: the first</text>
+<text x="743" y="178" font-size="12" fill="#6b7280">sample and its follow-up</text>
+<text x="743" y="194" font-size="12" fill="#6b7280">decide.</text>
 <rect x="30" y="262" width="205" height="118" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
 <text x="44" y="290" font-size="14.5" font-weight="bold" fill="#1f2937">Rules decide</text>
 <text x="44" y="312" font-size="12" fill="#6b7280">Chart rule and summary rules</text>
-<text x="44" y="328" font-size="12" fill="#6b7280">(2.3) set the leaning; where</text>
-<text x="44" y="344" font-size="12" fill="#6b7280">silent: inconclusive, no model</text>
+<text x="44" y="328" font-size="12" fill="#6b7280">(4.0) set the leaning; where</text>
+<text x="44" y="344" font-size="12" fill="#6b7280">silent: inconclusive. No model</text>
 <text x="44" y="360" font-size="12" fill="#6b7280">is called.</text>
 <rect x="263" y="262" width="205" height="118" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
-<text x="277" y="290" font-size="14.5" font-weight="bold" fill="#1f2937">Checks</text>
-<text x="277" y="312" font-size="12" fill="#6b7280">Citations and numbers must</text>
-<text x="277" y="328" font-size="12" fill="#6b7280">match the evidence; data-</text>
-<text x="277" y="344" font-size="12" fill="#6b7280">quality holds apply.</text>
-<rect x="496" y="262" width="205" height="118" rx="10" fill="#f9fafb" stroke="#7c3aed" stroke-width="2.5"/>
-<text x="510" y="290" font-size="14.5" font-weight="bold" fill="#1f2937">PI teams review</text>
-<text x="510" y="312" font-size="12" fill="#6b7280">Drafts only. Nothing is sent</text>
-<text x="510" y="328" font-size="12" fill="#6b7280">or decided automatically.</text>
+<text x="277" y="290" font-size="14.5" font-weight="bold" fill="#1f2937">Demand floor</text>
+<text x="277" y="312" font-size="12" fill="#6b7280">Demand only if the payer's</text>
+<text x="277" y="328" font-size="12" fill="#6b7280">estimated recovery covers the</text>
+<text x="277" y="344" font-size="12" fill="#6b7280">staff cost of a demand.</text>
+<rect x="496" y="262" width="205" height="118" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
+<text x="510" y="290" font-size="14.5" font-weight="bold" fill="#1f2937">Checks</text>
+<text x="510" y="312" font-size="12" fill="#6b7280">Citations and numbers must</text>
+<text x="510" y="328" font-size="12" fill="#6b7280">match the evidence.</text>
+<rect x="729" y="262" width="205" height="118" rx="10" fill="#f9fafb" stroke="#7c3aed" stroke-width="2.5"/>
+<text x="743" y="290" font-size="14.5" font-weight="bold" fill="#1f2937">PI teams review</text>
+<text x="743" y="312" font-size="12" fill="#6b7280">Drafts only. Nothing is sent</text>
+<text x="743" y="328" font-size="12" fill="#6b7280">or decided automatically.</text>
 <path d="M235 171.0 L263 171.0" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)" fill="none"/>
 <path d="M468 171.0 L496 171.0" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)" fill="none"/>
 <path d="M701 171.0 L729 171.0" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)" fill="none"/>
 <path d="M235 321.0 L263 321.0" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)" fill="none"/>
 <path d="M468 321.0 L496 321.0" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)" fill="none"/>
+<path d="M701 321.0 L729 321.0" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)" fill="none"/>
 <path d="M831.5 230 V252 H132.5 V262" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)" fill="none"/>
 <rect x="496" y="50" width="438" height="34" rx="8" fill="none" stroke="#15803d" stroke-width="2" stroke-dasharray="6 4"/>
 <text x="510" y="72" font-size="12.5" font-weight="bold" fill="#1f2937">Simulated providers answer every request and follow-up</text>
