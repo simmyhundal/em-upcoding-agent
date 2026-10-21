@@ -53,9 +53,7 @@ Per seed: **score = dollars recovered - staff-hours cost - provider abrasion.**
 
 1. **Dollars recovered.**
    - **Who:** any provider an arm sends a demand to, whatever its `role`. A non-upcoder whose charts show a 10% overpayment is recovered from in proportion to the estimate, as payers do; intent does not matter for an overpayment.
-   - **How much:** the smaller of two amounts:
-     - the 90% lower bound of the overpayment extrapolated from the provider's random sample, on the level-difference basis;
-     - the provider's true overpayment dollars. A demand above that would be overturned.
+   - **How much:** the 90% lower bound of the overpayment extrapolated from the provider's random sample, on the level-difference basis. It is **not capped at the true overpayment**: a payer has no answer key and follows the same rule for every provider (Simmy, 2026-10-20). Going after non-upcoders is penalized by provider abrasion instead. Overturned demands come later, with appeals in [#129](https://github.com/simmyhundal/em-upcoding-agent/issues/129).
    - **When extrapolation applies:** only when the sample shows a sustained or high error rate, or after documented education has failed to correct the billing. Medicare allows extrapolation only in those cases (Social Security Act section 1893(f)(3)). The error-rate threshold is a stated parameter; the education path waits for the lighter actions in #123. Below it, only the sampled claims' overpayment is recovered.
    - **Full denial:** a sampled claim is denied in full only for a documentation failure that cannot be cured, such as a missing signature with no attestation. Template text alone never triggers it, because under release 5's option 2 it would deny no-intent offices in full.
    - To verify: whether underpayments found in the sample are netted (CMS Program Integrity Manual, chapter 8).
