@@ -197,6 +197,51 @@ def doc_peer_rates(claims, docs, only=None):
     return {c: (bad[c] / tot[c] if tot[c] else None) for c in tot}
 
 
+MIN_FLOOR = [0, 10, 20, 30, 40]       # minutes at which each level is supported (src/records.py)
+
+
+def cutoff_counts(rows, docs, note_rows):
+    """Rules 4.1 (data 4.0 habits): over the returned charts billed 99214 or 99215, how many carry documented minutes 0 to 2 over the billed level's floor (time padding), and how many carry
+    a risk element at the billed level while the problems and data elements stay below it (risk inflation). {"time": (charts with minutes, padded), "risk": (charts with the elements, inflated)}."""
+    t_n = t_k = r_n = r_k = 0
+    for r in rows:
+        if r["cpt"] not in ("99214", "99215") or r["claim_id"] not in docs:
+            continue
+        lvl = BILLED_LEVEL[r["cpt"]]
+        mins = docs[r["claim_id"]][1]
+        if mins is not None:
+            t_n += 1
+            t_k += 0 <= mins - MIN_FLOOR[lvl] <= 2
+        nr = (note_rows or {}).get(r["claim_id"])
+        if nr and nr.get("documented_risk_level", "") != "":
+            r_n += 1
+            r_k += int(nr["documented_risk_level"]) >= lvl and int(nr["documented_problems_level"]) < lvl and int(nr["documented_data_level"]) < lvl
+    return {"time": (t_n, t_k), "risk": (r_n, r_k)}
+
+
+def load_doc_elements(data_dir):
+    """claim_id -> returned-chart row for EVERY returned chart (the control sample's charts carry the MDM element levels but no note columns)."""
+    path = os.path.join(data_dir, "documentation.csv")
+    out = {}
+    if os.path.exists(path):
+        with open(path) as f:
+            for r in csv.DictReader(f):
+                out[r["claim_id"]] = r
+    return out
+
+
+def peer_cutoff_rates(claims, docs, note_rows, only=None):
+    """The same two shares over the control sample (providers whose records stand in for prior reviews): the peer rates the provider is tested against."""
+    tot = {"time": [0, 0], "risk": [0, 0]}
+    for pid, rows in claims.items():
+        if only is not None and pid not in only:
+            continue
+        for k, (n, x) in cutoff_counts(rows, docs, note_rows).items():
+            tot[k][0] += n
+            tot[k][1] += x
+    return {k: (v[1] / v[0] if v[0] else None) for k, v in tot.items()}
+
+
 def doc_section(rows, docs, rng, peer_doc, facts=None, note_rows=None):
     got = [r for r in rows if r["claim_id"] in docs]
     table = []
@@ -235,7 +280,7 @@ def doc_section(rows, docs, rng, peer_doc, facts=None, note_rows=None):
             "examples_99215_documentation_supports": [card(r) for r in sample_claims(rng, sup, DOC_SUPPORTED_SAMPLE, lambda r: 0)]}
 
 
-def build_packet(pid, flag_row, chronic, age, conditions, claims, peer_rate, docs=None, peer_doc=None, facts=None, note_rows=None):
+def build_packet(pid, flag_row, chronic, age, conditions, claims, peer_rate, docs=None, peer_doc=None, facts=None, note_rows=None, cutoff_peer=None, elements=None):
     rows = claims[pid]
     mix = Counter(r["cpt"] for r in rows)
     by_bucket = defaultdict(lambda: [0, 0])
@@ -278,6 +323,7 @@ def build_packet(pid, flag_row, chronic, age, conditions, claims, peer_rate, doc
         "99215_claims_on_high_complexity_patients_4_plus_conditions": high,
         "comparison_claims_other_than_99215_random_sample": comparison,
         **({"documentation_review": doc_section(rows, docs, rng, peer_doc or {}, facts, note_rows)} if docs else {}),
+        **({"cutoff_signs": {k: {"n": n, "k": x, "peer": cutoff_peer.get(k)} for k, (n, x) in cutoff_counts(rows, docs, elements).items()}} if (docs and cutoff_peer) else {}),
     }
 
 
@@ -316,6 +362,8 @@ def run(data_dir, flagged_csv, out_path, limit=None, dry_run=False, llm=None, ba
     peer_doc = doc_peer_rates(claims, docs, control_providers(data_dir)) if docs else None
     facts = load_doc_facts(data_dir)
     note_rows = load_note_rows(data_dir)
+    elements = load_doc_elements(data_dir) if rules == "4.1" else None
+    cutoff_peer = peer_cutoff_rates(claims, docs, elements, control_providers(data_dir)) if (docs and rules == "4.1") else None      # rules 4.1 only: frozen packets keep their keys
     with open(flagged_csv) as f:
         flagged = [r for r in csv.DictReader(f) if r["flagged"] == "True"]
     if limit:
@@ -323,8 +371,8 @@ def run(data_dir, flagged_csv, out_path, limit=None, dry_run=False, llm=None, ba
     packets, plan = {}, []
     for fr in flagged:
         pid = fr["provider_id"]
-        packets[pid] = build_packet(pid, fr, chronic, age, conditions, claims, rates, docs, peer_doc, facts, note_rows)
-        lean, reason = {"2.3": sr.rule_leaning_23, "2.2": sr.rule_leaning_22}.get(rules, sr.rule_leaning)(packets[pid])
+        packets[pid] = build_packet(pid, fr, chronic, age, conditions, claims, rates, docs, peer_doc, facts, note_rows, cutoff_peer, elements)
+        lean, reason = {"4.1": sr.rule_leaning_41, "4.0": sr.rule_leaning_40, "2.3": sr.rule_leaning_23, "2.2": sr.rule_leaning_22}.get(rules, sr.rule_leaning)(packets[pid])
         if no_model and lean is None:
             lean, reason = sr.INCONCLUSIVE, "the rules are silent on this provider and no model is used; left for a person to read"
         plan.append((pid, lean, reason, (lean is None or llm_all) and not no_model))
@@ -354,9 +402,9 @@ def run(data_dir, flagged_csv, out_path, limit=None, dry_run=False, llm=None, ba
             rec = {"provider_id": pid, "model": MODEL, "summary": summary, "citations_checked": False,
                    "source": "llm", "rule_leaning": lean, "rule_reason": reason}
             if lint:
-                found = summary_lint.lint(summary, packets[pid], rules23=rules == "2.3")
+                found = summary_lint.lint(summary, packets[pid], rules23=rules in ("2.3", "4.0", "4.1"), rules41=rules == "4.1")
                 if found["hard"]:
-                    rec.update({"summary": summary_lint.repair(summary, packets[pid], rules23=rules == "2.3"), "lint_repaired": True, "lint_problems": found["hard"], "source": "llm+repair"})
+                    rec.update({"summary": summary_lint.repair(summary, packets[pid], rules23=rules in ("2.3", "4.0", "4.1"), rules41=rules == "4.1"), "lint_repaired": True, "lint_problems": found["hard"], "source": "llm+repair"})
             out.append(rec)
         else:
             out.append({"provider_id": pid, "model": "rules", "summary": sr.assemble(packets[pid], lean, version=version),
@@ -392,6 +440,8 @@ if __name__ == "__main__":
     ap.add_argument("--sync", action="store_true", help="one request at a time instead of the Batch API")
     ap.add_argument("--v21", action="store_true", help="version 2.1 summaries: conditional next steps and the lint-and-repair check")
     ap.add_argument("--v22", action="store_true", help="workflow v2.2: the 2.1 summaries with rules 2.2 (more cases decided by rule; implies --v21)")
+    ap.add_argument("--v41", action="store_true", help="workflow v4.0 with rules 4.1: rules 4.0 plus the time-padding and risk-inflation signs of data 4.0 (implies --v40)")
+    ap.add_argument("--v40", action="store_true", help="workflow v4.0: the 2.3 summaries with rules 4.0 (the chart test pooled over 99214 and 99215; implies --v23)")
     ap.add_argument("--v23", action="store_true", help="workflow v2.3: the 2.2 summaries with rules 2.3 (cloned-notes signs decide by rule; implies --v22)")
     ap.add_argument("--no-model", action="store_true", help="never call the model: where the rules are silent the summary is code-written and inconclusive (deterministic; workflow v2.5 onward)")
     ap.add_argument("--cache-dir", help="response cache folder (default: llm_cache next to the output)")
@@ -401,8 +451,8 @@ if __name__ == "__main__":
     res = run(a.data_dir, a.flagged_csv, a.out_jsonl, a.limit, a.dry_run, batch=not a.sync, llm_all=a.llm_all,
               cache_dir=a.cache_dir or os.path.join(base, "llm_cache"),
               usage_path=a.usage_jsonl or os.path.join(base, "usage_writer.jsonl"), estimate=a.estimate,
-              version="2.1" if (a.v21 or a.v22 or a.v23) else "2.0", lint=a.v21 or a.v22 or a.v23,
-              rules="2.3" if a.v23 else "2.2" if a.v22 else "2.0", no_model=a.no_model)
+              version="2.1" if (a.v21 or a.v22 or a.v23 or a.v40 or a.v41) else "2.0", lint=a.v21 or a.v22 or a.v23 or a.v40 or a.v41,
+              rules="4.1" if a.v41 else "4.0" if a.v40 else "2.3" if a.v23 else "2.2" if a.v22 else "2.0", no_model=a.no_model)
     if not a.estimate:
         calls = sum(1 for r in res if r.get("source") == "llm" or r.get("will_call_llm"))
         print(f"{len(res)} {'packets' if a.dry_run else 'summaries'} ({calls} via the model) -> {a.out_jsonl}")

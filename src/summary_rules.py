@@ -188,6 +188,55 @@ def rule_leaning_23(packet):
 
 
 
+# Rules 4.0 (workflow v4.0, issue 131; data 4.0): the habits of data 4.0 sit at the 99214 boundary as much as at 99215, so the chart test is read across the 99214 and 99215 claims pooled.
+# Where rules 2.3 say inconclusive and at least POOL_MIN_40 pooled documented claims came back, the provider is called when the pooled unsupported share is at least POOL_UP_40
+# and beats the pooled peer rate by more than chance (the same one-sided exact binomial level as rules 2.3). Everything rules 2.3 decide is left as it was.
+POOL_MIN_40, POOL_UP_40, ALPHA_40 = 10, 0.25, 0.05
+
+
+def _chart_test_40(packet):
+    d = packet.get("documentation_review") or {}
+    rows = [r for r in d.get("by_billed_level", []) if r["billed_cpt"] in ("99214", "99215")]
+    n = sum(r["documented_claims"] for r in rows)
+    if not n:
+        return 0, 0, PEER_FALLBACK, 1.0
+    x = sum(r["documentation_does_not_support_billed_level"] for r in rows)
+    peer = sum(r["documented_claims"] * (PEER_FALLBACK if r.get("all_provider_unsupported_rate") is None else r["all_provider_unsupported_rate"]) for r in rows) / n
+    return n, x, peer, _binom_sf(x, n, peer)
+
+
+def rule_leaning_40(packet):
+    lean, reason = rule_leaning_23(packet)
+    if lean not in (INCONCLUSIVE, None):
+        return lean, reason
+    n, x, peer, p = _chart_test_40(packet)
+    if n >= POOL_MIN_40 and x / n >= POOL_UP_40 and p <= ALPHA_40:
+        return UPCODING, (f"{x} of {n} documented 99214 and 99215 claims are below the billed level, beating the pooled peer rate of {peer:.0%} by more than chance "
+                          f"(one-sided p = {p:.3f}, rules 4.0)")
+    return lean, reason
+
+
+# Rules 4.1 (workflow v4.0 option, issue 131): the opportunistic habit of data 4.0 pads the documented time just over the billed level's cutoff and inflates the risk element, so the chart
+# supports the bill and the 99214 and 99215 chart test stays silent. Each sign is the share of the provider's returned 99214 and 99215 charts showing it, tested against the control-sample peer
+# rate with the same one-sided exact binomial level and a margin of SIGN_MARGIN_41 over the peer rate (the packet carries the counts under `cutoff_signs`, only for rules 4.1).
+SIGN_MIN_41, SIGN_MARGIN_41 = 8, 0.25
+
+
+def rule_leaning_41(packet):
+    lean, reason = rule_leaning_40(packet)
+    if lean not in (INCONCLUSIVE, None):
+        return lean, reason
+    signs = packet.get("cutoff_signs") or {}
+    for key, what in (("time", "documented time 0 to 2 minutes over the billed level's cutoff"), ("risk", "a risk element at the billed level with the problems and data elements below it")):
+        c = signs.get(key)
+        if not c or c.get("peer") is None or c["n"] < SIGN_MIN_41:
+            continue
+        p = _binom_sf(c["k"], c["n"], c["peer"])
+        if c["k"] / c["n"] >= c["peer"] + SIGN_MARGIN_41 and p <= ALPHA_40:
+            return UPCODING, f"{c['k']} of {c['n']} returned 99214 and 99215 charts show {what}, against a peer rate of {c['peer']:.0%} (one-sided p = {p:.3f}, rules 4.1)"
+    return lean, reason
+
+
 def _pooled(packet, d):
     rows = [r for r in d["by_billed_level"] if r["billed_cpt"] in ("99214", "99215")]
     n = sum(r["documented_claims"] for r in rows)

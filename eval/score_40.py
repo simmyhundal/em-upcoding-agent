@@ -208,6 +208,25 @@ def seed_result(called, listed_n, key, claims_by_provider, justified, random_ids
             "bands": bands, "modes": dict(Counter(v["mode"] for v in rec_by.values())), "rounds": sum(rounds_of.values()), "charts": sum(charts_of.values())}
 
 
+def per_provider(rid, code, p=None, inputs=None):
+    """Score 4.0 split by provider for one stored run (issue 131): {provider_id: {value, staff, abrasion, net, called, role, rounds, charts, true_overpay, net_rate}} for every provider the run listed,
+    asked or called. The triage of a listed provider is counted in its staff cost (every summary the run wrote); the run's API dollars are not split."""
+    p = p or PARAMS
+    claims, key, truth = context(code)
+    i = inputs or run_inputs(rid, code)
+    out = {}
+    for pid in set(i["rounds"]) | i["called"]:
+        called = pid in i["called"]
+        rec_v = recovery(claims.get(pid, []), i["random"].get(pid, set()), i["level"], p)["value"] if called else 0.0
+        rounds, charts = i["rounds"].get(pid, 0), i["charts"].get(pid, 0)
+        staff = staff_cost(0, rounds, charts, 1 if called else 0, 0.0, p)[0]
+        r = truth[pid]["net_rate"]
+        abr = abrasion_weight(r, p) * (rounds * p["C_BURDEN"] + (p["C_DEMAND_ABRASION"] if called else 0.0))
+        out[pid] = {"value": rec_v, "staff": staff, "abrasion": abr, "net": rec_v - staff - abr, "called": called, "role": key["providers"][pid]["role"], "rounds": rounds, "charts": charts,
+                    "true_overpay": max(truth[pid]["net_overpay"], 0.0), "net_rate": r, "habit": key["providers"][pid].get("habit")}
+    return out
+
+
 def add(parts):
     """Sum components over seeds."""
     out = {}
