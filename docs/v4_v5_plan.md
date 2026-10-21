@@ -14,8 +14,8 @@ So the majors move, keeping the shared minor: release Y on this line is **data 4
 ## Order of work
 | Step | Issue | Depends on |
 |---|---|---|
-| 1. Free check: score 4.0 on stored release 2 to 5 runs (data 2.2 answer keys) | [#126](https://github.com/simmyhundal/em-upcoding-agent/issues/126) | score 4.0 spec (it is built here first) |
-| 2. Score 4.0 module | [#125](https://github.com/simmyhundal/em-upcoding-agent/issues/125) | none |
+| 1. Score 4.0 module | [#125](https://github.com/simmyhundal/em-upcoding-agent/issues/125) | none |
+| 2. Free check: score 4.0 on stored release 2 to 5 runs (data 2.2 answer keys) | [#126](https://github.com/simmyhundal/em-upcoding-agent/issues/126) | 1 |
 | 3. Data 4.0 generator | [#124](https://github.com/simmyhundal/em-upcoding-agent/issues/124) | none |
 | 4. Indicators and screens on data 4.0 | [#127](https://github.com/simmyhundal/em-upcoding-agent/issues/127) | 2, 3 |
 | 5. Agent text (code-checked headline and rationale) | [#116](https://github.com/simmyhundal/em-upcoding-agent/issues/116) | none (replays stored findings) |
@@ -23,11 +23,11 @@ So the majors move, keeping the shared minor: release Y on this line is **data 4
 | 7. Ceiling test, redone on data 4.0 | [#117](https://github.com/simmyhundal/em-upcoding-agent/issues/117) | 2, 3 |
 | 8. Reference arms, build v4.0 and v5.0, fresh-seed evaluation | [#128](https://github.com/simmyhundal/em-upcoding-agent/issues/128) | all of the above |
 
-Steps 1 to 3, 5 and 6 can run in parallel. Later: SIU hours cap, appeals and an expected-recovery tool ([#129](https://github.com/simmyhundal/em-upcoding-agent/issues/129)); lighter actions for no-intent upcoding ([#123](https://github.com/simmyhundal/em-upcoding-agent/issues/123)). Both are in M7.
+Step 3 runs in parallel with steps 1 and 2; steps 5 and 6 need neither and can run any time. Later: SIU hours cap, appeals and an expected-recovery tool ([#129](https://github.com/simmyhundal/em-upcoding-agent/issues/129)); lighter actions for no-intent upcoding ([#123](https://github.com/simmyhundal/em-upcoding-agent/issues/123)). Both are in M7.
 
 ## Data 4.0 (decided)
 - **True net upcoding rate for every provider:** the share of visits billed above the justified level minus the share billed below.
-- **Upcoders: exactly 8 per dataset.** Each has honest noise plus a habit rate from 15% to 40%. Data 2.2's 8 to 12% "subtle" band is dropped. Each upcoder has one habit:
+- **Upcoders: exactly 8 per dataset.** Each upcoder's net rate is drawn from 15% to 40%, and its habit produces that rate. Data 2.2's 8 to 12% "subtle" band is dropped. So 15% net is the line between the two groups, and the abrasion weight below uses it. Each upcoder has one habit:
   - **Systematic:** always bills 99214 for 99213-level visits.
   - **Opportunistic:** inflates only borderline visits, whose complexity sits just under the next level's cutoff.
   - **Template-driven:** an EHR default sets a higher level, with no intent. It is still a target. The template text repeats across patients without being copied from one patient's note.
@@ -56,7 +56,7 @@ Per seed: **score = dollars recovered - staff-hours cost - provider abrasion.**
    - **How much:** the smaller of two amounts:
      - the 90% lower bound of the overpayment extrapolated from the provider's random sample, on the level-difference basis;
      - the provider's true overpayment dollars. A demand above that would be overturned.
-   - **When extrapolation applies:** only when the sample shows a sustained or high error rate. Medicare allows extrapolation only then (Social Security Act section 1893(f)(3)). The threshold is a stated parameter. Below it, only the sampled claims' overpayment is recovered.
+   - **When extrapolation applies:** only when the sample shows a sustained or high error rate, or after documented education has failed to correct the billing. Medicare allows extrapolation only in those cases (Social Security Act section 1893(f)(3)). The error-rate threshold is a stated parameter; the education path waits for the lighter actions in #123. Below it, only the sampled claims' overpayment is recovered.
    - **Full denial:** a sampled claim is denied in full only for a documentation failure that cannot be cured, such as a missing signature with no attestation. Template text alone never triggers it, because under release 5's option 2 it would deny no-intent offices in full.
    - To verify: whether underpayments found in the sample are netted (CMS Program Integrity Manual, chapter 8).
 2. **Staff-hours cost.**
