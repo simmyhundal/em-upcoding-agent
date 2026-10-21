@@ -179,11 +179,11 @@ def staff_cost(listed, rounds, charts, demands, api_usd, p):
 
 
 # ---- one seed -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-def seed_result(called, listed_n, key, claims_by_provider, justified, random_ids_of, level_of, rounds_of, charts_of, api_usd, p=None, uncurable_of=None):
+def seed_result(called, listed_n, key, claims_by_provider, justified, random_ids_of, level_of, rounds_of, charts_of, api_usd, p=None, uncurable_of=None, truth=None):
     """Components of score 4.0 for one seed. called: provider ids sent a demand; key: answer-key providers (role); justified: {claim_id: justified cpt}."""
     p = p or PARAMS
     allowed = rec.allowed()
-    truth = {pid: provider_truth(rows, justified, allowed) for pid, rows in claims_by_provider.items()}
+    truth = truth or {pid: provider_truth(rows, justified, allowed) for pid, rows in claims_by_provider.items()}
     rec_by = {pid: recovery(claims_by_provider.get(pid, []), random_ids_of(pid), level_of, p, (uncurable_of or (lambda _: ()))(pid)) for pid in called}
     recovered = sum(v["value"] for v in rec_by.values())
     non_up = [pid for pid in called if key[pid]["role"] != "upcoder"]
@@ -220,30 +220,48 @@ def load_key(code):
     return json.load(open(os.path.join(ROOT, "eval", "answer_key", f"ground_truth_v2_{code}.json")))
 
 
-def from_run(rid, code, p=None, key=None):
-    """Score 4.0 components for a stored run folder (workflow or agent) on its data-2.2 answer key. Definitions (docs/score_40.md):
-    demand = called upcoding in case_summaries_checked.jsonl; listed = providers with a checked summary; rounds and charts from the office transcript (as release 5);
-    API dollars = the run's recorded model spend (writer, judge, agent)."""
-    p = p or PARAMS
-    k = key or load_key(code)
+_CTX = {}
+
+
+def context(code):
+    """Claims by provider, the answer key and each provider's truth for one dataset (cached: truth does not depend on the arm or the parameters)."""
+    if code not in _CTX:
+        _CTX.clear()
+        data = os.path.join(ROOT, "data", f"synthetic_v2_{code}")
+        claims = {}
+        for r in csv.DictReader(open(os.path.join(data, "view", "claims.csv"))):
+            claims.setdefault(r["provider_id"], []).append(r)
+        k = load_key(code)
+        allowed = rec.allowed()
+        _CTX[code] = (claims, k, {pid: provider_truth(rows, k["justified_cpt_by_claim"], allowed) for pid, rows in claims.items()})
+    return _CTX[code]
+
+
+def run_inputs(rid, code):
+    """What a stored run folder holds that scoring needs: demands, listed count, random ids, supported levels, rounds, distinct charts, API dollars."""
     data = os.path.join(ROOT, "data", f"synthetic_v2_{code}")
-    claims = {}
-    for r in csv.DictReader(open(os.path.join(data, "view", "claims.csv"))):
-        claims.setdefault(r["provider_id"], []).append(r)
     docs = list(csv.DictReader(open(os.path.join(data, f"view_{rid}", "documentation.csv"))))
-    level = dr.level_of_rows(docs)
     summaries = [json.loads(x) for x in open(os.path.join(ROOT, "experiments", rid, "case_summaries_checked.jsonl")) if x.strip()]
     called = {x["provider_id"] for x in summaries if x["summary"]["leaning"] == "pattern_consistent_with_upcoding"}
-    rnd = rec.random_ids(rid)
     rounds, seen = Counter(), {}
     for line in open(os.path.join(ROOT, "experiments", rid, "office_transcript.jsonl")):
         e = json.loads(line)
         if e.get("action") in ("send_request", "follow_up", "audit_trail") and "error" not in e:
             rounds[e["provider_id"]] += 1
-            seen.setdefault(e["provider_id"], set()).update(e.get("usable_claim_ids", []))
-    charts = {pid: len(ids) for pid, ids in seen.items()}                    # distinct charts received (a follow-up can list the same chart again)
+            seen.setdefault(e["provider_id"], set()).update(e.get("usable_claim_ids", []))      # a follow-up can list the same chart again
     import run_release2 as r2
-    return seed_result(called, len(summaries), k["providers"], claims, k["justified_cpt_by_claim"], lambda pid: rnd.get(pid, set()), level, dict(rounds), dict(charts), r2.cost(rid), p)
+    return {"called": called, "listed": len(summaries), "random": rec.random_ids(rid), "level": dr.level_of_rows(docs), "rounds": dict(rounds),
+            "charts": {pid: len(ids) for pid, ids in seen.items()}, "api": r2.cost(rid)}
+
+
+def from_run(rid, code, p=None, inputs=None):
+    """Score 4.0 components for a stored run folder (workflow or agent) on its data-2.2 answer key. Definitions (docs/score_40.md):
+    demand = called upcoding in case_summaries_checked.jsonl; listed = providers with a checked summary; rounds from the office transcript, charts = distinct charts received;
+    API dollars = the run's recorded model spend (writer, judge, agent)."""
+    claims, k, truth = context(code)
+    i = inputs or run_inputs(rid, code)
+    return seed_result(i["called"], i["listed"], k["providers"], claims, k["justified_cpt_by_claim"], lambda pid: i["random"].get(pid, set()), i["level"], i["rounds"], i["charts"], i["api"],
+                       p or PARAMS, truth=truth)
 
 
 if __name__ == "__main__":
