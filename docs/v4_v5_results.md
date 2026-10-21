@@ -31,15 +31,15 @@ Per seed (net dollars):
 
 **Agent v5.0** (net -$781 per seed):
 
-- **Recovery +$385:** 3 of 80 upcoders found in all ten seeds, 3 demands, about $1,282 recovered per demand.
+- **Recovery +$385:** $3,847 over ten seeds (all dollars here are per seed unless stated): 3 of 80 upcoders found, 3 demands, about $1,282 per demand.
 - **Staff cost -$1,144:** chart review $547, requests and copy fees $475, demand work $83, triage and model dollars $39.
-- **Abrasion -$22:** the cost to providers of requests and demands, weighted down for providers that really upcode; no honest provider was demanded from.
+- **Abrasion -$22:** the cost to providers of requests and demands; no honest provider was demanded from.
 
 **Workflow v4.0** (net -$1,161 per seed):
 
-- **Recovery +$379:** 3 of 80 upcoders found in all ten seeds, 3 demands, about $1,264 recovered per demand.
+- **Recovery +$379:** $3,792 over ten seeds (all dollars here are per seed unless stated): 3 of 80 upcoders found, 3 demands, about $1,264 per demand.
 - **Staff cost -$1,534:** chart review $530, requests and copy fees $633, demand work $83, triage and model dollars $289.
-- **Abrasion -$6:** the cost to providers of requests and demands, weighted down for providers that really upcode; no honest provider was demanded from.
+- **Abrasion -$6:** the cost to providers of requests and demands; no honest provider was demanded from.
 
 ## What to take from it
 

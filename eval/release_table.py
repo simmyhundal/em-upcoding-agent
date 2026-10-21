@@ -94,24 +94,46 @@ def v4_rows():
     return out
 
 
+CHECK_PATH = os.path.join(ROOT, "experiments", "score_40_check.json")
+CHECK_KEY = {("Workflow v2.2", "release 2 seeds"): ("r2", "W2.2"), ("Agent v3.2", "release 2 seeds"): ("r2", "A3.2"), ("Workflow v2.2", "release 3 seeds"): ("r3", "W2.2"),
+             ("Workflow v2.3", "release 3 seeds"): ("r3", "W2.3"), ("Agent v3.3", "release 3 seeds"): ("r3", "A3.3"), ("Workflow v2.4", "release 4 seeds"): ("r4", "GL"),
+             ("Agent v3.4", "release 4 seeds"): ("r4", "A3.4"), ("Workflow v2.5", "release 5 seeds"): ("r5", "W2.5"), ("Agent v3.5", "release 5 seeds"): ("r5", "A3.5")}
+
+
+def stored_scores(arm, seeds_label):
+    """(release 5 score, score 4.0), dollars per seed, recomputed from the stored run folders of releases 2 to 5 (experiments/score_40_check.json, eval/score_40_check.py), so a row's
+    recall, precision and both scores all come from the same runs. None for rows without such a check."""
+    key = CHECK_KEY.get((arm, seeds_label))
+    if not key:
+        return None
+    rs = [r for r in json.load(open(CHECK_PATH)) if "base" in r and (r["set"], r["arm"]) == key]
+    return sum(r["r5_net"] for r in rs) / len(rs), sum(r["base"]["score"] for r in rs) / len(rs)
+
+
+def dollars(x):
+    return "n/a" if x is None else f"-${-round(x):,}" if round(x) < 0 else f"${round(x):,}"
+
+
 def markdown():
     r = rows()
     from scoreboard import pct
     gl = "docs/glossary.md#results-columns"
     hov = lambda text, tip: f'[{text}]({gl} "{tip}")'
-    lines = ["| Version | " + hov("Data model", "Easy: release 1, clean coding and planted clone signs. Hard: releases 2 to 5, adds coding noise, group billing, lagged claims and data defects. Data 4.0: every provider has a true upcoding rate and 8 have a habit.")
-             + " | " + hov("Upcoders found (recall)", "Upcoders found out of those planted.") + " | " + hov("Calls that were upcoders (precision)", "Upcoders found out of all providers called upcoding.")
-             + " | " + hov("Net $ per seed (RL score)", "Overpayment a records sample supports (90% lower bound) minus costs. Compare rows within one seed set only. The last three rows use score 4.0, which also charges staff time.") + " |", "|---|---|---|---|---|"]
+    lines = ["| Version | " + hov("Data model", "Easy: release 1. Hard: releases 2 to 5, with coding noise, group billing and data defects. Data 4.0: provider upcoding rates and habits.")
+             + " | " + hov("Upcoders found (recall)", "Planted upcoders found.") + " | " + hov("Calls that were upcoders (precision)", "Calls that were upcoders.")
+             + " | " + hov("Net $ per seed, release 5 score", "Overpayment a sample supports (90% lower bound) minus costs. Release 1 rows apply it after the fact.")
+             + " | " + hov("Score 4.0 per seed", "Recovery minus staff-hours cost minus abrasion.") + " |", "|---|---|---|---|---|---|"]
     names = [x["arm"] for x in r]
     for x in r:
         model = "Easy" if x["seeds"] == "release 1 seeds" else "Hard"
         label = f"{x['arm']} ({x['seeds'].replace(' seeds', '')})" if names.count(x["arm"]) > 1 else x["arm"]       # the same version in two releases' seed sets
-        lines.append(f"| {label} | {model} | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | ${x['net_per_seed']:,} |")
-    lines += ["| **Score 4.0 on data 4.0 (fresh seeds)** | | | | |"]
+        sc = stored_scores(x["arm"], x["seeds"])
+        r5, s4 = (sc if sc else (x["net_per_seed"], None))
+        lines.append(f"| {label} | {model} | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | {dollars(r5)} | {dollars(s4)} |")
     for x in v4_rows():
         label = f"{x['arm']} (frozen, for reference)" if x["arm"] == "Workflow v2.5" else x["arm"]
-        lines.append(f"| {label} | Data 4.0 | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | -${-x['net_per_seed']:,} |")
-    lines += ["", "Hover over a column title for its definition ([glossary](docs/glossary.md#results-columns)). Compare rows within one seed set only: "
+        lines.append(f"| {label} | Data 4.0 | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | n/a | {dollars(x['net_per_seed'])} |")
+    lines += ["", "Hover over a column title for its definition ([glossary](docs/glossary.md#results-columns)); dollars are per seed. Compare rows within one seed set: "
               "releases [1](docs/eval61.md), [2](docs/release2_results.md), [3](docs/release3_results.md), [4](docs/release4_results.md), [5](docs/release5_results.md), [v4.0 and v5.0](docs/v4_v5_results.md); [every run](docs/results.md)."]
     return "\n".join(lines)
 
@@ -136,9 +158,9 @@ def score_text(arm="A5.0"):
     w = score_parts(arm)
     n = w["n"]
     f = lambda x: f"${x / n:,.0f}"
-    return (f"- **Recovery +{f(w['recovery'])}:** {w['found']} of {w['upcoders']} upcoders found in all ten seeds, {w['demands']} demands, about ${w['recovery'] / max(w['demands'], 1):,.0f} recovered per demand.\n"
+    return (f"- **Recovery +{f(w['recovery'])}:** ${w['recovery']:,.0f} over ten seeds (all dollars here are per seed unless stated): {w['found']} of {w['upcoders']} upcoders found, {w['demands']} demands, about ${w['recovery'] / max(w['demands'], 1):,.0f} per demand.\n"
             f"- **Staff cost -{f(w['staff'])}:** chart review {f(w['charts'])}, requests and copy fees {f(w['admin'])}, demand work {f(w['demand'])}, triage and model dollars {f(w['triage'])}.\n"
-            f"- **Abrasion -{f(w['abrasion'])}:** the cost to providers of requests and demands, weighted down for providers that really upcode; no honest provider was demanded from.")
+            f"- **Abrasion -{f(w['abrasion'])}:** the cost to providers of requests and demands; no honest provider was demanded from.")
 
 
 def tldr():

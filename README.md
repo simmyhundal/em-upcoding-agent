@@ -27,9 +27,9 @@ Abrasion   = $43.84 per request round + $2,000 per demand, weighted by how hones
 ![Score 4.0 for agent v5.0 on ten fresh seeds, dollars per seed: recovery, staff cost and abrasion down to the net score](docs/images/score_waterfall.svg)
 
 <!-- score:start -->
-- **Recovery +$385:** 3 of 80 upcoders found in all ten seeds, 3 demands, about $1,282 recovered per demand.
+- **Recovery +$385:** $3,847 over ten seeds (all dollars here are per seed unless stated): 3 of 80 upcoders found, 3 demands, about $1,282 per demand.
 - **Staff cost -$1,144:** chart review $547, requests and copy fees $475, demand work $83, triage and model dollars $39.
-- **Abrasion -$22:** the cost to providers of requests and demands, weighted down for providers that really upcode; no honest provider was demanded from.
+- **Abrasion -$22:** the cost to providers of requests and demands; no honest provider was demanded from.
 <!-- score:end -->
 
 ## Results TL;DR
@@ -38,27 +38,26 @@ A fixed workflow and an AI agent both screen providers, request charts and draft
 <!-- tldr:end -->
 
 <!-- release23:start -->
-| Version | [Data model](docs/glossary.md#results-columns "Easy: release 1, clean coding and planted clone signs. Hard: releases 2 to 5, adds coding noise, group billing, lagged claims and data defects. Data 4.0: every provider has a true upcoding rate and 8 have a habit.") | [Upcoders found (recall)](docs/glossary.md#results-columns "Upcoders found out of those planted.") | [Calls that were upcoders (precision)](docs/glossary.md#results-columns "Upcoders found out of all providers called upcoding.") | [Net $ per seed (RL score)](docs/glossary.md#results-columns "Overpayment a records sample supports (90% lower bound) minus costs. Compare rows within one seed set only. The last three rows use score 4.0, which also charges staff time.") |
-|---|---|---|---|---|
-| Workflow v2.0 | Easy | 24% | 86% | $988 |
-| Workflow v2.1 | Easy | 40% | 100% | $14,984 |
-| Agent v3.0 | Easy | 22% | 100% | $2,299 |
-| Agent v3.1 | Easy | 34% | 100% | $13,931 |
-| Workflow v2.2 (release 2) | Hard | 27% | 91% | $368 |
-| Agent v3.2 | Hard | 15% | 92% | $1,325 |
-| Workflow v2.2 (release 3) | Hard | 30% | 92% | $4,362 |
-| Workflow v2.3 | Hard | 47% | 97% | $4,923 |
-| Agent v3.3 | Hard | 43% | 97% | $12,666 |
-| Workflow v2.4 | Hard | 61% | 96% | $32,245 |
-| Agent v3.4 | Hard | 50% | 93% | $26,505 |
-| Workflow v2.5 | Hard | 47% | 92% | $31,888 |
-| Agent v3.5 | Hard | 46% | 97% | $32,159 |
-| **Score 4.0 on data 4.0 (fresh seeds)** | | | | |
-| Workflow v2.5 (frozen, for reference) | Data 4.0 | 1% | 25% | -$11,185 |
-| Workflow v4.0 | Data 4.0 | 4% | 100% | -$1,161 |
-| Agent v5.0 | Data 4.0 | 4% | 100% | -$781 |
+| Version | [Data model](docs/glossary.md#results-columns "Easy: release 1. Hard: releases 2 to 5, with coding noise, group billing and data defects. Data 4.0: provider upcoding rates and habits.") | [Upcoders found (recall)](docs/glossary.md#results-columns "Planted upcoders found.") | [Calls that were upcoders (precision)](docs/glossary.md#results-columns "Calls that were upcoders.") | [Net $ per seed, release 5 score](docs/glossary.md#results-columns "Overpayment a sample supports (90% lower bound) minus costs. Release 1 rows apply it after the fact.") | [Score 4.0 per seed](docs/glossary.md#results-columns "Recovery minus staff-hours cost minus abrasion.") |
+|---|---|---|---|---|---|
+| Workflow v2.0 | Easy | 24% | 86% | $988 | n/a |
+| Workflow v2.1 | Easy | 40% | 100% | $14,984 | n/a |
+| Agent v3.0 | Easy | 22% | 100% | $2,299 | n/a |
+| Agent v3.1 | Easy | 34% | 100% | $13,931 | n/a |
+| Workflow v2.2 (release 2) | Hard | 27% | 91% | $3,857 | -$7,825 |
+| Agent v3.2 | Hard | 15% | 92% | $1,325 | -$3,506 |
+| Workflow v2.2 (release 3) | Hard | 30% | 92% | $6,765 | -$6,729 |
+| Workflow v2.3 | Hard | 47% | 97% | $7,132 | -$13,916 |
+| Agent v3.3 | Hard | 43% | 97% | $12,666 | -$4,641 |
+| Workflow v2.4 | Hard | 61% | 96% | $32,245 | -$8,487 |
+| Agent v3.4 | Hard | 50% | 93% | $26,505 | -$3,891 |
+| Workflow v2.5 | Hard | 47% | 92% | $31,888 | -$7,268 |
+| Agent v3.5 | Hard | 46% | 97% | $32,159 | -$1,657 |
+| Workflow v2.5 (frozen, for reference) | Data 4.0 | 1% | 25% | n/a | -$11,185 |
+| Workflow v4.0 | Data 4.0 | 4% | 100% | n/a | -$1,161 |
+| Agent v5.0 | Data 4.0 | 4% | 100% | n/a | -$781 |
 
-Hover over a column title for its definition ([glossary](docs/glossary.md#results-columns)). Compare rows within one seed set only: releases [1](docs/eval61.md), [2](docs/release2_results.md), [3](docs/release3_results.md), [4](docs/release4_results.md), [5](docs/release5_results.md), [v4.0 and v5.0](docs/v4_v5_results.md); [every run](docs/results.md).
+Hover over a column title for its definition ([glossary](docs/glossary.md#results-columns)); dollars are per seed. Compare rows within one seed set: releases [1](docs/eval61.md), [2](docs/release2_results.md), [3](docs/release3_results.md), [4](docs/release4_results.md), [5](docs/release5_results.md), [v4.0 and v5.0](docs/v4_v5_results.md); [every run](docs/results.md).
 <!-- release23:end -->
 
 ## How it works
