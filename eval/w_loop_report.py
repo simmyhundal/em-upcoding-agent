@@ -45,8 +45,8 @@ def main():
         c[(name, ref)] = wl.compare(name, ref, seeds)
     L += ["", "## The result", "", "- " + wl.line(c[("H8", "R0")], "H8 (workflow v4.0)", "R0 (frozen v2.5)") + ".", "- " + wl.line(c[("H8", "H6")], "H8", "H6") + " (batches 5 to 10, out of sample for H8's model).", "",
           "## Hypotheses tried (twelve, so Bonferroni alpha 0.0042)", "", "| Version | Change | Outcome |", "|---|---|---|", "| R0u | frozen v2.5 with the eb_upper_t list | confirmed: +\\$8.9k per seed over R0, 20 of 20 seeds |",
-          "| H1 | R0u + rules 4.0 | more found (66 vs 35 over 40 seeds), score gain not confirmed on unseen batches (p = 0.125 and 0.047) |", "| H4 | H1 without escalation | confirmed on the unseen batch 3 (+\\$1.0k, 10 of 10) |",
-          "| H6 | H4 + demand floor | confirmed on the unseen batch 4 (+\\$263, 8 of 10, p = 0.0039) |", "| **H8** | H6 + ask-or-skip refitted on score 4.0 | **confirmed on the unseen batches 5 and 6 (+\\$679, 16 of 20, p = 0.0006)** |"]
+          "| H1 | R0u + rules 4.0 | more found (66 vs 35 over 40 seeds), score gain not confirmed on unseen batches (p = 0.125 and 0.047); **rules 4.0 are in the frozen arm without per-batch confirmation** |", "| H4 | H1 without escalation | confirmed on the unseen batch 3 (+\\$1.0k, 10 of 10) |",
+          "| H6 | H4 + demand floor | confirmed on the unseen batch 4 (+\\$263, 8 of 10, p = 0.0039) |", "| **H8** | H6 + ask-or-skip refitted on score 4.0 | **missed the protocol's per-batch rule on batch 5** (+\\$810, 8 of 10, p = 0.0078 against alpha 0.0056); batch 6 alone p = 0.024; **passed only when pooled with batch 6** (+\\$679, 16 of 20, p = 0.0006), a step the protocol did not specify; not above zero on the fresh seeds |"]
     for n, label in REJECTED:
         L.append(f"| {n} | {label} | rejected |")
     L += ["", "Rejected means no improvement over the version it was tested against (details and numbers in the issue's comments). Per-version options: `eval/w_loop.py`; the frozen workflow v4.0 is `workflow_policy_40.FROZEN_V40`."]

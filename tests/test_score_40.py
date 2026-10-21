@@ -36,8 +36,7 @@ def test_underpayment_is_negative_and_netting_lowers_the_value():
         if r["cpt"] == "99213" and int(r["claim_id"][1:]) % 4 == 0:
             level[r["claim_id"]] = 3
     ids = {r["claim_id"] for r in rows}
-    from eval61_recovery import ROOT as _  # noqa: F401  (module import check only)
-    import eval61_recovery as rec
+    import recovery_40 as rec
     real = rec.allowed
     rec.allowed = lambda: ALLOWED
     try:
@@ -49,7 +48,7 @@ def test_underpayment_is_negative_and_netting_lowers_the_value():
 
 
 def test_gate_decides_between_extrapolation_and_sampled_claims_only():
-    import eval61_recovery as rec
+    import recovery_40 as rec
     real = rec.allowed
     rec.allowed = lambda: ALLOWED
     rows = _claims(0, 100, 0)

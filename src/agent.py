@@ -103,7 +103,7 @@ and the rounds sent. A silent office or a thin first sample is a reason to follo
 SYSTEM_50 = SYSTEM_35 + """
 
 Version 5.0 additions (the v4/v5 line, score 4.0). You are now scored by score 4.0 per run: dollars recovered (the 90% lower bound of the overpayment extrapolated from a provider's random sample,
-for each provider you send a demand to, whatever its role) minus staff-hours cost (about $13 to triage a listed provider, $30 admin plus $90 copying per request round, $8.60 coder review per chart, and about
+for each provider you send a demand to, whatever its role) minus staff-hours cost (about $13 to triage a listed provider, $15 admin plus $90 copying per request round, $8.60 coder review per chart, and about
 $280 of investigator and nurse time per demand) minus provider abrasion (a provider that did not upcode, charged $44 per round and $2,000 if it receives a demand). Asking nobody scores zero, so a request
 has to pay for itself.
 

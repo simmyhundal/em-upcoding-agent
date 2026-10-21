@@ -111,9 +111,9 @@ def run(rid, src, screen, note, version="2.0", tier1_n=None, policy24=None, no_m
 
 def apply_demand_floor(rid, src, view, office, floor):
     """Workflow v4.0 option `demand_floor` (issue 131): a provider the rules call upcoding is demanded from only when the payer's own estimate of the recovery (the 90% lower bound from the
-    provider's random sample, score_40.recovery: no answer key) is at least `floor` dollars ("cost" = the staff cost of a demand); below it the call is withdrawn: leaning inconclusive."""
+    provider's random sample, recovery_40.recovery: no answer key) is at least `floor` dollars ("cost" = the staff cost of a demand); below it the call is withdrawn: leaning inconclusive."""
     import dollar_reward as dr
-    import score_40 as s4
+    import recovery_40 as s4
     import summary_rules as sr
     if isinstance(floor, str) and floor.startswith("cost"):             # "cost" = the staff cost of a demand; "cost2" = twice that
         floor = s4.staff_cost(0, 0, 0, 1, 0, s4.PARAMS)[0] * (float(floor[4:]) if floor[4:] else 1.0)

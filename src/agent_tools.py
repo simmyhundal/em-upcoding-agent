@@ -486,14 +486,11 @@ class Environment:
         return {"accepted": len(findings), **({"withdrawn_below_the_demand_floor": self.withdrawn} if self.v50 and self.withdrawn else {}), "status": "drafts for human review; nothing is sent or decided automatically"}
 
     def _demand_estimate(self, pid):
-        """(lower bound of the recovery the payer could demand from this provider's random sample, the staff cost of a demand): workflow v4.0's demand floor (eval/score_40.py prices)."""
-        import os as _os
-        import sys as _sys
-        _sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "eval"))
-        import score_40 as s4
+        """(lower bound of the recovery the payer could demand from this provider's random sample, the staff cost of a demand): workflow v4.0's demand floor (src/recovery_40.py prices)."""
+        import recovery_40 as r40
         level = {c: v[0] for c, v in self.docs.items()}
-        rec = s4.recovery(self.claims.get(pid, []), self.office.random_claim_ids(pid), level, s4.PARAMS)
-        return rec["value"], s4.staff_cost(0, 0, 0, 1, 0, s4.PARAMS)[0]
+        rec = r40.recovery(self.claims.get(pid, []), self.office.random_claim_ids(pid), level, r40.PARAMS)
+        return rec["value"], r40.staff_cost(0, 0, 0, 1, 0, r40.PARAMS)[0]
 
     def _override_ok(self, pid, reason):
         reason = str(reason or "")
