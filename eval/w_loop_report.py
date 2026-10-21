@@ -57,6 +57,11 @@ def main():
         for label, d in res.items():
             L.append(f"| {label} | {st.mean(v['score'] for v in d.values()):,.0f} | {sum(v['found'] for v in d.values())} | {sum(v['honest_called'] for v in d.values())} | "
                      f"{st.mean(v['recovered'] for v in d.values()):,.0f} | {st.mean(v['staff_cost'] for v in d.values()):,.0f} | {sum(v['rounds'] for v in d.values())} |")
+        if "A5.0" in res and "W4.0" in res:
+            seeds = sorted(res["A5.0"], key=int)
+            for ref in ("W4.0", "W2.5 (frozen)"):
+                diffs = [res["A5.0"][x]["score"] - res[ref][x]["score"] for x in seeds]
+                L += ["", f"Agent v5.0 minus {ref}: ${st.mean(diffs):,.0f} per seed (sd ${st.stdev(diffs):,.0f}), better on {sum(d > 0 for d in diffs)} of {len(diffs)} fresh seeds (exact one-sided p = {wl.perm_p(diffs):.3f})."]
         if "W4.0" in res and "W2.5 (frozen)" in res:
             seeds = sorted(res["W4.0"], key=int)
             diffs = [res["W4.0"][x]["score"] - res["W2.5 (frozen)"][x]["score"] for x in seeds]

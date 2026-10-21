@@ -54,5 +54,10 @@ Rejected means no improvement over the version it was tested against (details an
 |---|---|---|---|---|---|---|
 | W2.5 (frozen) | -11,185 | 1 | 3 | 4 | 9,324 | 478 |
 | W4.0 | -1,161 | 3 | 0 | 379 | 1,534 | 60 |
+| A5.0 | -781 | 3 | 0 | 385 | 1,144 | 45 |
+
+Agent v5.0 minus W4.0: $380 per seed (sd $116), better on 10 of 10 fresh seeds (exact one-sided p = 0.001).
+
+Agent v5.0 minus W2.5 (frozen): $10,403 per seed (sd $2,498), better on 10 of 10 fresh seeds (exact one-sided p = 0.001).
 
 Workflow v4.0 beats the frozen v2.5 by $10,023 per seed on 10 of 10 fresh seeds (exact one-sided p = 0.001). **It did not stay above zero** as it did on the development pool (+$549 per seed): about 10 upcoders were expected from the out-of-sample batches and 3 were found; ten seeds cannot separate noise from a generalization gap of a model fitted on 40 seeds (issue 132).

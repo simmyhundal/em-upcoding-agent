@@ -1,0 +1,11 @@
+{
+ "run": "fra50_5959",
+ "upcoders_found": 0,
+ "upcoders": 8,
+ "honest_accused": 0,
+ "called": 0,
+ "cost_usd": 0.0892,
+ "effort": "low",
+ "model": "claude-opus-5-5",
+ "version": "5.0"
+}
