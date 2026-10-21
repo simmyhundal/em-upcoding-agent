@@ -205,14 +205,14 @@ def workflow_v40():
 
 
 def score_waterfall():
-    """How score 4.0 is built for agent v5.0 on the ten fresh seeds, dollars per seed: recovery, staff cost, abrasion, net score. The explanation is text in the README (release_table.score_text)."""
+    """How score 4.0 is built for agent v5.0 on the ten fresh seeds, dollars summed over the seeds: recovery, staff cost, abrasion, net score. The explanation is text in the README (release_table.score_text)."""
     import release_table
     w = release_table.score_parts("A5.0")
     n = w["n"]
-    per = lambda x: x / n
+    per = lambda x: x
     W, H = 1000, 280
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>', f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
-         f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">What sets the score: agent v5.0, ten fresh seeds, dollars per seed</text>']
+         f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">What sets the score: agent v5.0, ten fresh seeds, dollars summed over the seeds</text>']
     top, bottom = 50, 220
     bars = [("Recovery", per(w["recovery"]), GREEN), ("Staff cost", -per(w["staff"]), ORANGE), ("Abrasion", -per(w["abrasion"]), ORANGE), ("Net score", per(w["score"]), BLUE)]
     low = per(w["score"])

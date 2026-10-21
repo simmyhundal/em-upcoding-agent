@@ -4,13 +4,13 @@
 
 Ten fresh seeds (5555 to 6464) of data 4.0, scored by score 4.0 ([score_40.md](score_40.md)): dollars recovered, minus staff-hours cost, minus provider abrasion. Asking nobody scores 0. Rendered from `experiments/v4_fresh_results.json`; the seeds were never used to tune anything, and were generated after workflow v4.0 was frozen.
 
-| Version | Net $ per seed | Upcoders found | Honest providers accused | Request rounds per seed | Seeds above 0 |
+| Version | Net $, ten seeds in all | Upcoders found | Honest providers accused | Request rounds per seed | Seeds above 0 |
 |---|---|---|---|---|---|
-| Workflow v2.5 (frozen) | -$11,185 | 1 of 80 | 3 | 47.8 | 0 of 10 |
-| Workflow v4.0 | -$1,161 | 3 of 80 | 0 | 6.0 | 1 of 10 |
-| Agent v5.0 | -$781 | 3 of 80 | 0 | 4.5 | 1 of 10 |
+| Workflow v2.5 (frozen) | -$111,847 | 1 of 80 | 3 | 47.8 | 0 of 10 |
+| Workflow v4.0 | -$11,612 | 3 of 80 | 0 | 6.0 | 1 of 10 |
+| Agent v5.0 | -$7,812 | 3 of 80 | 0 | 4.5 | 1 of 10 |
 
-Per seed (net dollars):
+Net dollars per seed:
 
 | Seed | Workflow v2.5 | Workflow v4.0 | Agent v5.0 |
 |---|---|---|---|
@@ -25,21 +25,23 @@ Per seed (net dollars):
 | 6363 | -$7,736 | -$969 | -$601 |
 | 6464 | -$11,255 | -$762 | -$500 |
 
-## What is behind each term (dollars per seed, ten fresh seeds)
+## What is behind each term (dollars summed over the ten fresh seeds)
 
 ![Score waterfall](images/score_waterfall.svg)
 
-**Agent v5.0** (net -$781 per seed):
+**Agent v5.0:**
 
-- **Recovery +$385:** $3,847 over ten seeds (all dollars here are per seed unless stated): 3 of 80 upcoders found, 3 demands, about $1,282 per demand.
-- **Staff cost -$1,144:** chart review $547, requests and copy fees $475, demand work $83, triage and model dollars $39.
-- **Abrasion -$22:** the cost to providers of requests and demands; no honest provider was demanded from.
+- **Recovery +$3,847:** 3 of 80 upcoders found, 3 demands, about $1,282 recovered per demand.
+- **Staff cost -$11,440:** chart review $5,473 (636 charts), requests and copy fees $4,746 (45 rounds), demand work $827, triage and model dollars $395.
+- **Abrasion -$218:** the cost to providers of requests and demands; no honest provider was demanded from.
+- **Net score -$7,812** over ten seeds.
 
-**Workflow v4.0** (net -$1,161 per seed):
+**Workflow v4.0:**
 
-- **Recovery +$379:** $3,792 over ten seeds (all dollars here are per seed unless stated): 3 of 80 upcoders found, 3 demands, about $1,264 per demand.
-- **Staff cost -$1,534:** chart review $530, requests and copy fees $633, demand work $83, triage and model dollars $289.
-- **Abrasion -$6:** the cost to providers of requests and demands; no honest provider was demanded from.
+- **Recovery +$3,792:** 3 of 80 upcoders found, 3 demands, about $1,264 recovered per demand.
+- **Staff cost -$15,343:** chart review $5,301 (616 charts), requests and copy fees $6,327 (60 rounds), demand work $827, triage and model dollars $2,887.
+- **Abrasion -$61:** the cost to providers of requests and demands; no honest provider was demanded from.
+- **Net score -$11,612** over ten seeds.
 
 ## What to take from it
 
