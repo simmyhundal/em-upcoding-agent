@@ -13,7 +13,7 @@ def test_readme_is_short_and_shows_the_agent_figure_and_score_waterfall():
     assert len(text) < 7000, "the README is capped at 7,000 characters"
     for img in ("docs/images/agent.svg", "docs/images/score_waterfall.svg"):
         assert img in text and os.path.exists(os.path.join(ROOT, img))
-    assert "Evaluation and Management" in text and "TL;DR" in text and "(Milestone" not in text
+    assert "Evaluation and Management" in text and "## Results" in text and "(Milestone" not in text
 
 
 def test_agent_figure_lists_the_actions_in_the_code():

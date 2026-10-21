@@ -55,7 +55,7 @@
 <text x="1000" y="198" font-size="12" fill="#1f2937">Two reserved seeds: 6 of 16 upcoders found, 0 honest</text>
 <text x="1000" y="214" font-size="12" fill="#1f2937">accused; 17 honest providers asked for charts. Data</text>
 <text x="1000" y="230" font-size="12" fill="#1f2937">4.0, ten fresh seeds: 3 of 80 found, 0 honest</text>
-<text x="1000" y="246" font-size="12" fill="#1f2937">accused, -$1,161 per seed (v2.5: -$11,185).</text>
+<text x="1000" y="246" font-size="12" fill="#1f2937">accused, -$11,612 in all (v2.5: -$111,847).</text>
 <rect x="20" y="292" width="1340" height="110" rx="10" fill="#f9fafb" stroke="#d1d5db"/>
 <text x="34" y="322" font-size="18" font-weight="bold" fill="#1f2937">v3.x</text>
 <text x="34" y="344" font-size="12.5" fill="#6b7280">Agent</text>
@@ -78,5 +78,5 @@
 <text x="1000" y="316" font-size="12" fill="#1f2937">Same two seeds: 4 of 16 upcoders found, 0 honest</text>
 <text x="1000" y="332" font-size="12" fill="#1f2937">accused; 9 honest providers asked for charts. Agent,</text>
 <text x="1000" y="348" font-size="12" fill="#1f2937">same data 4.0 seeds: 3 of 80 found, 0 honest</text>
-<text x="1000" y="364" font-size="12" fill="#1f2937">accused, -$781 per seed.</text>
+<text x="1000" y="364" font-size="12" fill="#1f2937">accused, -$7,812 in all.</text>
 </svg>
