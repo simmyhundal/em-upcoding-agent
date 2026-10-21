@@ -1,0 +1,41 @@
+# Data 4.0: provider upcoding rates and habits
+
+[Back to the README](../README.md) · [the v4/v5 plan](v4_v5_plan.md) · [statistics of the development seeds](data_v4_0_stats.md) · code: `src/generate_v4.py` (issue #124)
+
+Data 4.0 is the data model of the v4/v5 line. A provider is no longer "upcoder or not": every provider has a true **net upcoding rate** (the share of its live visits billed above the justified level minus the share billed below), and each upcoder has one **habit**. Use it with `generate_v2.py --data-version 4.0` (or `generate_v2.build(..., data_version="4.0")`); the code lives in its own module with its own random streams, so **data 2.x reproduces exactly** (`tests/test_generator_regression.py` compares hashes of what the generator writes for seed 42 at 2.0, 2.1 and 2.2 and for release seed 4545, taken before data 4.0 touched anything). The tables, the records universe and the note package have the same layout as data 2.2, so the frozen workflow v2.5 and agent v3.5 run on it unchanged.
+
+## What the data contains
+| Part | Data 4.0 |
+|---|---|
+| Upcoders | exactly 8 per dataset; binary `role` in the answer key; net rate drawn from 17% to 38% (the 15 to 40% band, less a 2-point buffer so denials and noise keep realized rates inside it) |
+| Habits | **systematic** (3), **opportunistic** (3), **template-driven** (2); the shares are assumptions (no published breakdown of upcoding by mechanism was found) |
+| Non-upcoders | each has a mean net rate drawn from N(0, 5%) clipped to -15% to +15%, with gross miscoding of at least |mean| + 2 points (noise in both directions); hard negatives (honest high-acuity panels) are kept |
+| Cloned notes | 1 of the 8 upcoders (12.5%, within the 10 to 20% asked for), never a template-driven one; the data 2.1 clone signals apply |
+| Complexity | each visit has a continuous complexity: the ordered-logit latent of data 1 and 2 (`beta x chronic conditions + provider effect + logistic noise`), so the calibrated code mix is unchanged; the justified level is derived from it by the same thresholds |
+| Chart | the three MDM elements and the documented time are noisy readings of the visit's complexity (logit noise 0.9 and 1.1), so a borderline visit can read either side of a cutoff: this is the **reviewer disagreement** |
+| Patients | guest visits at 25% (data 2.2: 10%), so 35% of members are seen by two or more providers |
+| Date range | one calendar year (2024), so drift is measured within the year |
+| Kept from data 2.2 | group billing under an organizational NPI, blank rendering NPIs on single-clinician claims, level-changing corrections (honest providers only), control totals; defects and diagnosis truncation are off by default |
+
+## The three habits
+- **Systematic.** Always bills 99214 for a 99213-level visit. The rate follows the panel's case mix, so the provider's panel acuity (its legitimate coding-style effect, shifted by the generator) is set so the share of 99213-level visits equals its target rate. Measured on data 2.2, only 53% of panels have a 99213-level share between 15% and 40% (median 37%, 5th to 95th percentile 13% to 60%), so the shift was needed for the rest; across the development seeds the mean absolute shift is 0.76 against a provider-effect spread of 0.62 (**easier by construction**: systematic upcoders have atypical panels). The chart supports the true level, so a review shows the upcoding on 76% of its upcoded visits.
+- **Opportunistic.** Inflates only borderline visits: those whose complexity sits closest below the next level's cutoff, chosen per provider to hit its rate (a fixed distance would not do: the cutoffs are 0.7, 3.5 and 4.2 logit units apart). When time is recorded, 80% of upcoded visits carry minutes 0 to 2 over the billed level's floor (time padding), and 70% carry the risk element at the billed level ("prescription drug management"). These make **the chart support the billed level** on 70% of upcoded visits (the review shows it on 30%).
+- **Template-driven.** An EHR default bills 99214 on a share of visits at a lower level (no intent; still a target). Notes use a fixed template (shared boilerplate across patients, patient-specific details that match the claim, ordinary timestamps, no paste events, one `template_id`); the chart supports the true level, so a review shows the upcoding on 81% of its upcoded visits. Honest providers also use templates (10%), so template text alone is not a giveaway. The frozen arms' text-duplication sign is expected to call template offices cloners: that is a finding about them, not a bug.
+
+Selection of the habit's visits skews later in the year for opportunistic and template-driven providers (weights 0.4 to 1.6 by date): across the development seeds 56% to 58% of their upcoded visits fall in the second half against 51% of their visits. The drift is mild (**one year is a short range for a trend**); systematic providers are constant by definition.
+
+## Answer key
+`role` stays binary (the planted 8). Beside it: `habit`, `target_net_rate`, `mean_net_rate`, `net_rate` and the live up and down rates (`true_upcode_rate` and `downcode_rate` keep their data 2.2 names and are now the realized rates on the accepted visits the view keeps), `true_overpay_net` and `true_overpay_gross` in dollars (the allowed-amount difference times the 80% the plan paid, the same pricing as score 4.0), `panel_acuity_shift`, `clones_notes`, `uses_template`, and the justified level of every claim. `justified_cpt_by_claim` and the key never reach the view or anything an office returns; `tests/test_data_v4.py` checks the view's columns and that its contents carry no habit or role.
+
+## Other choices to know
+- Upcoders are exempt from level-changing corrections, so an upcoder's net rate on the live claims is its target (within sampling noise of its coding noise, 4% gross): across the development seeds realized rates are inside 15% to 40%. Honest providers keep the corrections.
+- Realized rates of small honest panels can leave the +-15% band by sampling noise (development seeds: -17% to +23%). The score's abrasion weight uses the realized rate, so a small honest provider that happened to look like an upcoder carries no abrasion.
+- Reviewer-determined level per claim is not stored: it follows from the records universe by the two-of-three and time rule (`records.mdm_level`, `records.level_from_minutes`). On the development seeds **12% of correctly billed visits read higher than billed and 4% lower** (data 2.2: about 14% higher). With netting on, score 4.0 counts the 12% as underpayments, so this rate drives recovery directly.
+
+## What is easier by construction
+We plant the habits that new screens will look for, and every habit has a parameter that makes it detectable (a net rate floor, a borderline definition, a template id, padded minutes). The documents are generated from the true complexity. Habit shares and every parameter above are assumptions with no published source.
+
+## Frozen arms on data 4.0 (development seeds)
+- The `eb_ratio_t` screen (the 99215 share against expected, the frozen workflow's and agent's list) puts **19 of the 88 upcoders** of the 11 development seeds in its top 10%: 12 of 27 opportunistic (5 of 6 cloners), 1 of 28 systematic, 1 of 22 template-driven. Honest noise of up to +-15% and habits that do not move the 99215 share are what the new screens (#127) must handle.
+- Workflow v2.5 on development seed 42 (`d4w25_42`, free, no model): 1 of 8 upcoders found, 0 honest providers accused, score 4.0 about -$9.9k (recovered $98, staff-hours cost $8.8k, abrasion $1.2k). One seed: a smoke test, not a result. Agent v3.5 constructs on data 4.0 and its screen tool runs (no agent run: that needs an estimate and approval).
+- The development seeds are `d4_42` and `d4_1515` to `d4_2424` (step 101), built by `eval/make_d4_dev.py`; fresh seeds (5555 and above) are never built for development.
