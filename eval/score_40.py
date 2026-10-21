@@ -191,6 +191,12 @@ def seed_result(called, listed_n, key, claims_by_provider, justified, random_ids
     abrasion = sum(abrasion_weight(truth[pid]["net_rate"], p) * (rounds_of.get(pid, 0) * p["C_BURDEN"] + (p["C_DEMAND_ABRASION"] if pid in called else 0.0))
                    for pid in set(rounds_of) | set(called) if pid in truth)
     pos = {pid: max(t["net_overpay"], 0.0) for pid, t in truth.items()}
+    over = {"up": [0, 0.0], "non": [0, 0.0]}                      # demands whose estimate is ABOVE the provider's true overpayment: count and dollars above (the uncapped cases)
+    for pid in called:
+        if pid in pos and rec_by[pid]["value"] > pos[pid] + 1e-9:
+            o = over["up" if key[pid]["role"] == "upcoder" else "non"]
+            o[0] += 1
+            o[1] += rec_by[pid]["value"] - pos[pid]
     bands = {name: sum(1 for pid in called if lo <= truth[pid]["net_rate"] < hi) for name, lo, hi in BANDS}
     return {"recovered": recovered, "staff_cost": cost, "staff_parts": parts, "abrasion": abrasion, "score": recovered - cost - abrasion,
             "found": sum(key[pid]["role"] == "upcoder" for pid in called), "upcoders": sum(v["role"] == "upcoder" for v in key.values()), "demands": len(called),
@@ -198,6 +204,7 @@ def seed_result(called, listed_n, key, claims_by_provider, justified, random_ids
             "abrasion_from_non_upcoders": sum(abrasion_weight(truth[pid]["net_rate"], p) * (rounds_of.get(pid, 0) * p["C_BURDEN"] + p["C_DEMAND_ABRASION"]) for pid in non_up if pid in truth),
             "estimate_over_truth": sum(rec_by[pid]["value"] - max(truth[pid]["net_overpay"], 0.0) for pid in called if pid in truth),
             "true_overpay_called": sum(pos[pid] for pid in called if pid in pos), "true_overpay_all": sum(pos.values()),
+            "over_n_up": over["up"][0], "over_d_up": over["up"][1], "over_n_non": over["non"][0], "over_d_non": over["non"][1],
             "bands": bands, "modes": dict(Counter(v["mode"] for v in rec_by.values())), "rounds": sum(rounds_of.values()), "charts": sum(charts_of.values())}
 
 
@@ -205,7 +212,7 @@ def add(parts):
     """Sum components over seeds."""
     out = {}
     for k in ("recovered", "staff_cost", "abrasion", "score", "found", "upcoders", "demands", "honest_called", "recovered_from_non_upcoders", "abrasion_from_non_upcoders",
-              "estimate_over_truth", "true_overpay_called", "true_overpay_all", "rounds", "charts"):
+              "estimate_over_truth", "true_overpay_called", "true_overpay_all", "rounds", "charts", "over_n_up", "over_d_up", "over_n_non", "over_d_non"):
         out[k] = sum(x[k] for x in parts)
     out["bands"] = {b: sum(x["bands"][b] for x in parts) for b, _, _ in BANDS}
     return out

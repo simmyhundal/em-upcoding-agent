@@ -23,19 +23,19 @@ Release 5's net recomputed on the stored runs here, against the published baseli
 
 ## Release 2 (seeds 1515 to 2424)
 
-| Arm | Release 5 net | **Score 4.0** | Recovered | Staff-hours cost | Abrasion | Break-even scale | Upcoders found | Demands | Honest called |
-|---|---|---|---|---|---|---|---|---|---|
-| W2.2 | $3,857 | **-$7,825** | $981 | $7,216 | $1,590 | 9.0x | 21 of 78 | 23 | 2 |
-| A3.2 | $1,325 | **-$3,506** | $707 | $3,692 | $521 | 6.0x | 12 of 78 | 13 | 1 |
+| Arm | Release 5 net | **Score 4.0** | Recovered | Staff-hours cost | of which chart review | Abrasion | Break-even scale | Upcoders found | Demands | Honest called |
+|---|---|---|---|---|---|---|---|---|---|---|
+| W2.2 | $3,857 | **-$7,825** | $981 | $7,216 | $2,779 | $1,590 | 9.0x | 21 of 78 | 23 | 2 |
+| A3.2 | $1,325 | **-$3,506** | $707 | $3,692 | $1,851 | $521 | 6.0x | 12 of 78 | 13 | 1 |
 
 Order by release 5 net: W2.2, A3.2. Order by score 4.0: A3.2, W2.2. **Pairs whose order flips:** W2.2 and A3.2.
 
 Non-upcoders and truth (per seed): 
 
-| Arm | Recovered from non-upcoders | Abrasion from non-upcoders | Estimates above true overpayment | Dollar-weighted recall | Demands by true net rate: <0 / 0-5% / 5-15% / 15%+ |
-|---|---|---|---|---|---|
-| W2.2 | $4 | $435 | -$7,335 | 14% | 2 / 0 / 3 / 18 |
-| A3.2 | $0 | $204 | -$3,812 | 8% | 1 / 0 / 0 / 12 |
+| Arm | Recovered from non-upcoders | Abrasion from non-upcoders | Demands with the estimate above the true overpayment: upcoders (dollars above) | same, non-upcoders (dollars above) | Estimates minus truth, all demands, netted | Dollar-weighted recall | Demands by true net rate: <0 / 0-5% / 5-15% / 15%+ |
+|---|---|---|---|---|---|---|---|
+| W2.2 | $4 | $435 | 0 ($0) | 1 ($4) | -$7,335 | 14% | 2 / 0 / 3 / 18 |
+| A3.2 | $0 | $204 | 0 ($0) | 0 ($0) | -$3,812 | 8% | 1 / 0 / 0 / 12 |
 
 Recovered from non-upcoders per seed, by recovery rule: base: W2.2 $4, A3.2 $0; no netting: W2.2 $664, A3.2 $660; no gate, no netting (release 5 recovery basis): W2.2 $660, A3.2 $660.
 
@@ -57,21 +57,21 @@ Score 4.0 per seed under each sensitivity:
 
 ## Release 3 (seeds 2525 to 3434)
 
-| Arm | Release 5 net | **Score 4.0** | Recovered | Staff-hours cost | Abrasion | Break-even scale | Upcoders found | Demands | Honest called |
-|---|---|---|---|---|---|---|---|---|---|
-| W2.2 | $6,765 | **-$6,729** | $2,009 | $7,394 | $1,343 | 4.3x | 24 of 79 | 26 | 2 |
-| W2.3 | $7,132 | **-$13,916** | $1,451 | $13,262 | $2,106 | 10.6x | 37 of 79 | 38 | 1 |
-| A3.3 | $12,666 | **-$4,641** | $1,747 | $5,647 | $741 | 3.7x | 34 of 79 | 35 | 1 |
+| Arm | Release 5 net | **Score 4.0** | Recovered | Staff-hours cost | of which chart review | Abrasion | Break-even scale | Upcoders found | Demands | Honest called |
+|---|---|---|---|---|---|---|---|---|---|---|
+| W2.2 | $6,765 | **-$6,729** | $2,009 | $7,394 | $2,853 | $1,343 | 4.3x | 24 of 79 | 26 | 2 |
+| W2.3 | $7,132 | **-$13,916** | $1,451 | $13,262 | $5,260 | $2,106 | 10.6x | 37 of 79 | 38 | 1 |
+| A3.3 | $12,666 | **-$4,641** | $1,747 | $5,647 | $2,555 | $741 | 3.7x | 34 of 79 | 35 | 1 |
 
 Order by release 5 net: A3.3, W2.3, W2.2. Order by score 4.0: A3.3, W2.2, W2.3. **Pairs whose order flips:** W2.2 and W2.3.
 
 Non-upcoders and truth (per seed): 
 
-| Arm | Recovered from non-upcoders | Abrasion from non-upcoders | Estimates above true overpayment | Dollar-weighted recall | Demands by true net rate: <0 / 0-5% / 5-15% / 15%+ |
-|---|---|---|---|---|---|
-| W2.2 | $0 | $435 | -$7,555 | 19% | 2 / 0 / 2 / 22 |
-| W2.3 | $0 | $213 | -$10,388 | 23% | 1 / 0 / 2 / 35 |
-| A3.3 | $0 | $204 | -$11,485 | 26% | 1 / 0 / 2 / 32 |
+| Arm | Recovered from non-upcoders | Abrasion from non-upcoders | Demands with the estimate above the true overpayment: upcoders (dollars above) | same, non-upcoders (dollars above) | Estimates minus truth, all demands, netted | Dollar-weighted recall | Demands by true net rate: <0 / 0-5% / 5-15% / 15%+ |
+|---|---|---|---|---|---|---|---|
+| W2.2 | $0 | $435 | 0 ($0) | 0 ($0) | -$7,555 | 19% | 2 / 0 / 2 / 22 |
+| W2.3 | $0 | $213 | 0 ($0) | 0 ($0) | -$10,388 | 23% | 1 / 0 / 2 / 35 |
+| A3.3 | $0 | $204 | 0 ($0) | 0 ($0) | -$11,485 | 26% | 1 / 0 / 2 / 32 |
 
 Recovered from non-upcoders per seed, by recovery rule: base: W2.2 $0, W2.3 $0, A3.3 $0; no netting: W2.2 $150, W2.3 $4, A3.3 $4; no gate, no netting (release 5 recovery basis): W2.2 $146, W2.3 $0, A3.3 $0.
 
@@ -93,25 +93,25 @@ Score 4.0 per seed under each sensitivity:
 
 ## Release 4 (seeds 3535 to 4444)
 
-| Arm | Release 5 net | **Score 4.0** | Recovered | Staff-hours cost | Abrasion | Break-even scale | Upcoders found | Demands | Honest called |
-|---|---|---|---|---|---|---|---|---|---|
-| W2.3 | $26,399 | **-$13,591** | $3,605 | $14,131 | $3,065 | 4.8x | 46 of 80 | 52 | 6 |
-| G | $28,170 | **-$11,381** | $3,605 | $12,412 | $2,574 | 4.2x | 46 of 80 | 51 | 5 |
-| L | $31,019 | **-$10,327** | $4,469 | $12,829 | $1,967 | 3.3x | 50 of 80 | 52 | 2 |
-| GL | $32,245 | **-$8,487** | $4,469 | $11,275 | $1,681 | 2.9x | 49 of 80 | 51 | 2 |
-| A3.4 | $26,505 | **-$3,891** | $3,389 | $6,108 | $1,172 | 2.1x | 40 of 80 | 43 | 3 |
+| Arm | Release 5 net | **Score 4.0** | Recovered | Staff-hours cost | of which chart review | Abrasion | Break-even scale | Upcoders found | Demands | Honest called |
+|---|---|---|---|---|---|---|---|---|---|---|
+| W2.3 | $26,399 | **-$13,591** | $3,605 | $14,131 | $5,459 | $3,065 | 4.8x | 46 of 80 | 52 | 6 |
+| G | $28,170 | **-$11,381** | $3,605 | $12,412 | $4,706 | $2,574 | 4.2x | 46 of 80 | 51 | 5 |
+| L | $31,019 | **-$10,327** | $4,469 | $12,829 | $5,159 | $1,967 | 3.3x | 50 of 80 | 52 | 2 |
+| GL | $32,245 | **-$8,487** | $4,469 | $11,275 | $4,445 | $1,681 | 2.9x | 49 of 80 | 51 | 2 |
+| A3.4 | $26,505 | **-$3,891** | $3,389 | $6,108 | $2,662 | $1,172 | 2.1x | 40 of 80 | 43 | 3 |
 
 Order by release 5 net: GL, L, G, A3.4, W2.3. Order by score 4.0: A3.4, GL, L, G, W2.3. **Pairs whose order flips:** G and A3.4; L and A3.4; GL and A3.4.
 
 Non-upcoders and truth (per seed): 
 
-| Arm | Recovered from non-upcoders | Abrasion from non-upcoders | Estimates above true overpayment | Dollar-weighted recall | Demands by true net rate: <0 / 0-5% / 5-15% / 15%+ |
-|---|---|---|---|---|---|
-| W2.3 | $0 | $1,215 | -$20,610 | 39% | 2 / 4 / 4 / 42 |
-| G | $0 | $1,025 | -$20,567 | 38% | 2 / 3 / 4 / 42 |
-| L | $0 | $385 | -$21,500 | 41% | 1 / 1 / 4 / 46 |
-| GL | $0 | $385 | -$21,204 | 41% | 1 / 1 / 4 / 45 |
-| A3.4 | $0 | $581 | -$19,259 | 36% | 1 / 2 / 3 / 37 |
+| Arm | Recovered from non-upcoders | Abrasion from non-upcoders | Demands with the estimate above the true overpayment: upcoders (dollars above) | same, non-upcoders (dollars above) | Estimates minus truth, all demands, netted | Dollar-weighted recall | Demands by true net rate: <0 / 0-5% / 5-15% / 15%+ |
+|---|---|---|---|---|---|---|---|
+| W2.3 | $0 | $1,215 | 0 ($0) | 0 ($0) | -$20,610 | 39% | 2 / 4 / 4 / 42 |
+| G | $0 | $1,025 | 0 ($0) | 0 ($0) | -$20,567 | 38% | 2 / 3 / 4 / 42 |
+| L | $0 | $385 | 0 ($0) | 0 ($0) | -$21,500 | 41% | 1 / 1 / 4 / 46 |
+| GL | $0 | $385 | 0 ($0) | 0 ($0) | -$21,204 | 41% | 1 / 1 / 4 / 45 |
+| A3.4 | $0 | $581 | 0 ($0) | 0 ($0) | -$19,259 | 36% | 1 / 2 / 3 / 37 |
 
 Recovered from non-upcoders per seed, by recovery rule: base: W2.3 $0, G $0, L $0, GL $0, A3.4 $0; no netting: W2.3 $172, G $100, L $17, GL $17, A3.4 $20; no gate, no netting (release 5 recovery basis): W2.3 $245, G $173, L $59, GL $59, A3.4 $96.
 
@@ -133,23 +133,23 @@ Score 4.0 per seed under each sensitivity:
 
 ## Release 5 (seeds 4545 to 5454)
 
-| Arm | Release 5 net | **Score 4.0** | Recovered | Staff-hours cost | Abrasion | Break-even scale | Upcoders found | Demands | Honest called |
-|---|---|---|---|---|---|---|---|---|---|
-| W2.3 | $24,086 | **-$12,560** | $4,434 | $13,745 | $3,249 | 3.8x | 37 of 79 | 42 | 5 |
-| GL | $29,569 | **-$7,851** | $4,806 | $10,882 | $1,775 | 2.6x | 36 of 79 | 38 | 2 |
-| W2.5 | $31,888 | **-$7,268** | $4,936 | $10,296 | $1,908 | 2.5x | 37 of 79 | 40 | 3 |
-| A3.5 | $32,159 | **-$1,657** | $4,423 | $5,449 | $632 | 1.4x | 36 of 79 | 37 | 1 |
+| Arm | Release 5 net | **Score 4.0** | Recovered | Staff-hours cost | of which chart review | Abrasion | Break-even scale | Upcoders found | Demands | Honest called |
+|---|---|---|---|---|---|---|---|---|---|---|
+| W2.3 | $24,086 | **-$12,560** | $4,434 | $13,745 | $5,349 | $3,249 | 3.8x | 37 of 79 | 42 | 5 |
+| GL | $29,569 | **-$7,851** | $4,806 | $10,882 | $4,220 | $1,775 | 2.6x | 36 of 79 | 38 | 2 |
+| W2.5 | $31,888 | **-$7,268** | $4,936 | $10,296 | $3,916 | $1,908 | 2.5x | 37 of 79 | 40 | 3 |
+| A3.5 | $32,159 | **-$1,657** | $4,423 | $5,449 | $2,402 | $632 | 1.4x | 36 of 79 | 37 | 1 |
 
 Order by release 5 net: A3.5, W2.5, GL, W2.3. Order by score 4.0: A3.5, W2.5, GL, W2.3. No pair flips.
 
 Non-upcoders and truth (per seed): 
 
-| Arm | Recovered from non-upcoders | Abrasion from non-upcoders | Estimates above true overpayment | Dollar-weighted recall | Demands by true net rate: <0 / 0-5% / 5-15% / 15%+ |
-|---|---|---|---|---|---|
-| W2.3 | $6 | $1,061 | -$15,774 | 34% | 3 / 2 / 8 / 29 |
-| GL | $6 | $423 | -$16,397 | 35% | 1 / 1 / 5 / 31 |
-| W2.5 | $6 | $627 | -$17,766 | 38% | 2 / 1 / 5 / 32 |
-| A3.5 | $0 | $201 | -$17,813 | 37% | 0 / 1 / 3 / 33 |
+| Arm | Recovered from non-upcoders | Abrasion from non-upcoders | Demands with the estimate above the true overpayment: upcoders (dollars above) | same, non-upcoders (dollars above) | Estimates minus truth, all demands, netted | Dollar-weighted recall | Demands by true net rate: <0 / 0-5% / 5-15% / 15%+ |
+|---|---|---|---|---|---|---|---|
+| W2.3 | $6 | $1,061 | 0 ($0) | 0 ($0) | -$15,774 | 34% | 3 / 2 / 8 / 29 |
+| GL | $6 | $423 | 0 ($0) | 0 ($0) | -$16,397 | 35% | 1 / 1 / 5 / 31 |
+| W2.5 | $6 | $627 | 0 ($0) | 0 ($0) | -$17,766 | 38% | 2 / 1 / 5 / 32 |
+| A3.5 | $0 | $201 | 0 ($0) | 0 ($0) | -$17,813 | 37% | 0 / 1 / 3 / 33 |
 
 Recovered from non-upcoders per seed, by recovery rule: base: W2.3 $6, GL $6, W2.5 $6, A3.5 $0; no netting: W2.3 $238, GL $20, W2.5 $26, A3.5 $7; no gate, no netting (release 5 recovery basis): W2.3 $670, GL $458, W2.5 $458, A3.5 $0.
 
@@ -176,7 +176,20 @@ Score 4.0 per seed under each sensitivity:
 - **Release 4:** release 5 order GL > L > G > A3.4 > W2.3; score 4.0 order A3.4 > GL > L > G > W2.3; flips: G/A3.4, L/A3.4, GL/A3.4.
 - **Release 5:** release 5 order A3.5 > W2.5 > GL > W2.3; score 4.0 order A3.5 > W2.5 > GL > W2.3; unchanged.
 
-**Level.** Under the base assumptions 14 of 14 arm-sets score below zero, and asking nobody scores 0. Recovery on the level-difference basis averages $892 per upcoder found, while staff-hours cost is 3.0 times what is recovered. The simulated provider has about 240 claims a year, so the recoverable amount is small beside fixed labor: read the scores as a **ranking** and the break-even scale column as how many times larger recoveries would have to be. Release 5's option 2 (denying cloned notes in full) is what made its arms positive; the level-difference basis, netting and the extrapolation gate remove most of that.
+**Level.** Under the base assumptions 14 of 14 arm-sets score below zero, and asking nobody scores 0. Two things cause it. (1) Recovery: on the level-difference basis it averages $892 per upcoder found; the extrapolation gate and netting cut it further (the 'no gate, no netting' variant is the release 5 recovery basis). (2) The new staff-hours term: it is 3.0 times what is recovered, and chart review is 40% of it (the variant with every recovery rule off stays negative for most arms). The simulated provider has about 240 claims a year, so the recoverable amount is small beside fixed labor: read the scores as a **ranking** and the break-even scale column as how many times larger recoveries would have to be. Release 5's option 2 (denying cloned notes in full) is what made its arms positive.
+
+## How a returned chart reads against the truth (why netting matters)
+
+Distinct charts returned to any arm, by whether the claim was billed correctly, above or below the true level, and how the chart reads (the supported level by the time-or-decision-making rule, as the arms' estimates use it). Netting counts a chart that reads **higher** than billed as an underpayment, so it partly measures this documentation noise in data 2.2 (a correctly billed claim whose time statement is one level up reads as underpaid).
+
+| Release | Billed correctly: chart reads higher | as billed | lower | Billed above the true level: chart reads higher | as billed | lower |
+|---|---|---|---|---|---|---|
+| Release 2 | 14% | 83% | 3% | 0% | 42% | 57% |
+| Release 3 | 14% | 83% | 3% | 0% | 37% | 62% |
+| Release 4 | 14% | 83% | 3% | 0% | 47% | 52% |
+| Release 5 | 13% | 83% | 3% | 0% | 38% | 62% |
+
+Data 4.0's reviewer-disagreement design must report this rate as a parameter: with netting on it drives recovery directly.
 
 
 Yes, in Release 2, Release 3, Release 4; see the pairs above and the sensitivity table (the order within a release moves with the assumptions).
