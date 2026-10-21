@@ -22,7 +22,8 @@ import baseline_riskadj as ra
 import baseline_zscore as bz
 
 
-SCREEN_METHODS = ("riskadj", "eb_ratio", "priority", "eb_ratio_t")
+V4_METHODS = ("eb_upper_c", "eb_upper_t", "pay_resid", "excess_usd", "rich_level_t", "same_patient", "drift", "hi_no_test")      # data 4.0 candidates (issue 127): src/screen_methods_v4.py
+SCREEN_METHODS = ("riskadj", "eb_ratio", "priority", "eb_ratio_t") + V4_METHODS
 
 
 def top_n_from_pct(n_providers, pct):
@@ -93,7 +94,11 @@ def _flag_by_method(data_dir, method, top_n, min_suspicion, max_flagged, min_cla
         raise ValueError("a suspicion threshold is defined only for the riskadj score; use top_n with eb_ratio or priority")
     import screen_methods as sm
     rows = flag(data_dir, top_n)
-    score = sm.score_t(data_dir) if method == "eb_ratio_t" else sm.score_core(data_dir)[method]
+    if method in V4_METHODS:
+        import screen_methods_v4 as sv4
+        score = sv4.score_v4(data_dir, only=[method])[method]
+    else:
+        score = sm.score_t(data_dir) if method == "eb_ratio_t" else sm.score_core(data_dir)[method]
     rows.sort(key=lambda r: (-score[r["provider_id"]], r["provider_id"]))
     eligible = [r for r in rows if r["n_claims"] >= min_claims][:int(max_flagged or top_n)]
     chosen = {r["provider_id"] for r in eligible}

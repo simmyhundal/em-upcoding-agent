@@ -11,6 +11,7 @@ Usage:
 """
 import argparse
 import csv
+import json
 import os
 import shutil
 import sys
@@ -25,6 +26,7 @@ import run_office_baseline as rob  # noqa: E402
 import workflow_policy_23 as wp23  # noqa: E402
 import workflow_policy_24 as wp24  # noqa: E402
 import workflow_policy_25 as wp25  # noqa: E402
+import workflow_policy_40 as wp40  # noqa: E402
 import workflow_policy_v21 as wp  # noqa: E402
 
 RUNS = [("261013_12_api", "261013_4_code", "threshold", "reserved seed 202; screen suspicion >= 5; fixed office policy"),
@@ -33,7 +35,7 @@ RUNS = [("261013_12_api", "261013_4_code", "threshold", "reserved seed 202; scre
         ("261013_15_api", "261013_5_code", "top25", "reserved seed 303; screen top 25; fixed office policy")]
 
 
-def build_view(rid, src, screen, version="2.0", tier1_n=None, policy24=None):
+def build_view(rid, src, screen, version="2.0", tier1_n=None, policy24=None, w40=None):
     """version "2.1": office 2.1 and the fixed v2.1 policy (eval/workflow_policy_v21.py) on data 2.1; the notes go into documentation.csv.
     version "2.2": the same, with the screen named by `screen` (eb_ratio or priority: experiments/<src>/flagged_<screen>.csv, top 25) and the data-quality pre-flight."""
     data = os.path.join(ROOT, "data", f"synthetic_v2_{src}")
@@ -46,12 +48,18 @@ def build_view(rid, src, screen, version="2.0", tier1_n=None, policy24=None):
             os.symlink(os.path.join(base, name), dst)
     flagged_file = os.path.join(ROOT, "experiments", src, {"threshold": "flagged_threshold.csv", "top25": "flagged.csv"}.get(screen, f"flagged_{screen}.csv"))
     flagged = [r["provider_id"] for r in csv.DictReader(open(flagged_file)) if r["flagged"] == "True"]
-    if version in ("2.1", "2.2", "2.3", "2.4", "2.5"):        # 2.2: the same office and policy as 2.1; the screen is eb_ratio or priority (top 25)
+    if version in ("2.1", "2.2", "2.3", "2.4", "2.5", "4.0"):        # 2.2: the same office and policy as 2.1; the screen is eb_ratio or priority (top 25)
         office = provider_sim.Office(data, base, seed=1, version="2.1")
         by_provider = {}
         for r in csv.DictReader(open(os.path.join(base, "claims.csv"))):
             by_provider.setdefault(r["provider_id"], []).append(r)
-        if version == "2.5":                           # 2.5 (issue 109): learned ask-or-skip and learned escalation, fitted on net dollars
+        if version == "4.0":                           # 4.0 (issue 131): policy options in w40, rules 4.0, API-free
+            ratio = {}
+            for r in csv.DictReader(open(flagged_file)):
+                exp = float(r["expected_share"])
+                ratio[r["provider_id"]] = float(r["share_99215"]) / exp if exp else 0.0
+            wp40.run_policy_40(office, flagged, by_provider, flagged_file, ratio, w40)
+        elif version == "2.5":                           # 2.5 (issue 109): learned ask-or-skip and learned escalation, fitted on net dollars
             ratio = {}
             for r in csv.DictReader(open(flagged_file)):
                 exp = float(r["expected_share"])
@@ -88,14 +96,47 @@ def build_view(rid, src, screen, version="2.0", tier1_n=None, policy24=None):
     return view, office, flagged_file
 
 
-def run(rid, src, screen, note, version="2.0", tier1_n=None, policy24=None, no_model=None):
+def run(rid, src, screen, note, version="2.0", tier1_n=None, policy24=None, no_model=None, w40=None):
     """no_model None: on for workflow 2.5 only (older versions keep their frozen behavior); pass True to run an older arm API-free on future tests."""
-    view, office, flagged_file = build_view(rid, src, screen, version, **({} if tier1_n is None else {"tier1_n": tier1_n}), **({} if policy24 is None else {"policy24": policy24}))
+    view, office, flagged_file = build_view(rid, src, screen, version, **({} if tier1_n is None else {"tier1_n": tier1_n}), **({} if policy24 is None else {"policy24": policy24}), **({} if w40 is None else {"w40": w40}))
     name = os.path.basename(view)
     # 2.2: rules 2.2 decide more summaries without the model, and no LLM usefulness judge (the rule judge runs after; issues 91 and 93)
-    ai.run(rid, src, note, view_name=name, flagged_name=os.path.basename(flagged_file), v21=version in ("2.1", "2.2", "2.3", "2.4", "2.5"), preflight=version in ("2.2", "2.3", "2.4", "2.5"),
-           v22=version in ("2.2", "2.3", "2.4", "2.5"), v23=version in ("2.3", "2.4", "2.5"), llm_judge=version not in ("2.2", "2.3", "2.4", "2.5"), no_model=(version == "2.5") if no_model is None else no_model)       # 2.5 onward: no API call at all
+    ai.run(rid, src, note, view_name=name, flagged_name=os.path.basename(flagged_file), v21=version in ("2.1", "2.2", "2.3", "2.4", "2.5", "4.0"), preflight=version in ("2.2", "2.3", "2.4", "2.5", "4.0"),
+           v22=version in ("2.2", "2.3", "2.4", "2.5", "4.0"), v23=version in ("2.3", "2.4", "2.5", "4.0"), llm_judge=version not in ("2.2", "2.3", "2.4", "2.5", "4.0"),
+           no_model=(version in ("2.5", "4.0")) if no_model is None else no_model, rules40=version == "4.0", rules41=version == "4.0" and (w40 or {}).get("rules") == "4.1")       # 2.5 onward: no API call at all
     office.write_transcript(os.path.join(ROOT, "experiments", rid, "office_transcript.jsonl"))
+    if version == "4.0" and (w40 or {}).get("demand_floor") is not None:
+        apply_demand_floor(rid, src, view, office, w40["demand_floor"])
+
+
+def apply_demand_floor(rid, src, view, office, floor):
+    """Workflow v4.0 option `demand_floor` (issue 131): a provider the rules call upcoding is demanded from only when the payer's own estimate of the recovery (the 90% lower bound from the
+    provider's random sample, recovery_40.recovery: no answer key) is at least `floor` dollars ("cost" = the staff cost of a demand); below it the call is withdrawn: leaning inconclusive."""
+    import dollar_reward as dr
+    import recovery_40 as s4
+    import summary_rules as sr
+    if isinstance(floor, str) and floor.startswith("cost"):             # "cost" = the staff cost of a demand; "cost2" = twice that
+        floor = s4.staff_cost(0, 0, 0, 1, 0, s4.PARAMS)[0] * (float(floor[4:]) if floor[4:] else 1.0)
+    claims = {}
+    for r in csv.DictReader(open(os.path.join(view, "claims.csv"))):
+        claims.setdefault(r["provider_id"], []).append(r)
+    level = dr.level_of_rows(list(csv.DictReader(open(os.path.join(view, "documentation.csv")))))
+    path = os.path.join(ROOT, "experiments", rid, "case_summaries_checked.jsonl")
+    recs = [json.loads(x) for x in open(path) if x.strip()]
+    dropped = {}
+    for r in recs:
+        if r["summary"]["leaning"] != sr.UPCODING:
+            continue
+        pid = r["provider_id"]
+        lb = s4.recovery(claims.get(pid, []), office.random_claim_ids(pid), level, s4.PARAMS)["value"]
+        if lb < floor:
+            dropped[pid] = round(lb, 2)
+            r["summary"] = {**r["summary"], "leaning": sr.INCONCLUSIVE, "headline": f"{pid}: estimated recovery below the cost of a demand",
+                            "rationale": r["summary"]["rationale"] + f" No demand is sent: the estimated recovery (lower bound ${lb:,.0f}) is below the staff cost of a demand (${floor:,.0f})."}
+            r["demand_floor"] = True
+    with open(path, "w") as f:
+        f.writelines(json.dumps(r) + "\n" for r in recs)
+    json.dump({"floor": floor, "withdrawn": dropped}, open(os.path.join(ROOT, "experiments", rid, "demand_floor.json"), "w"))
 
 
 if __name__ == "__main__":

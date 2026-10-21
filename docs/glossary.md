@@ -10,6 +10,10 @@
 | E/M visit | An ordinary office visit (evaluation and management) that a doctor bills by complexity |
 | CPT 99211 to 99215 | Five billing codes for established-patient office visits; a higher number means a more complex, higher-paying visit; 99215 is the top |
 | Upcoding | Billing a higher visit code than the visit justified |
+| Upcoding rate | From data 4.0: the share of a provider's visits billed above the justified level minus the share billed below; upcoders' net rate is 15% to 40%, everyone else centred between -15% and +15% |
+| Habit | From data 4.0: how an upcoder upcodes: systematic (99214 for every 99213-level visit), opportunistic (borderline visits only) or template-driven (an EHR default, no intent) |
+| Staff-hours cost | From score 4.0: the payer's staff time on a case (triage, requests, chart review, demand) at loaded wages, plus copy fees and model costs |
+| Provider abrasion | From score 4.0: the cost a review puts on a provider, larger the less the provider truly overbilled |
 | Medical decision-making (MDM) | The doctor's documented reasoning that supports a visit's level |
 | Medicare | US government health insurance; its public billing statistics shape the synthetic data |
 | Payment integrity | The team that checks claims were paid correctly and recovers overpayments |

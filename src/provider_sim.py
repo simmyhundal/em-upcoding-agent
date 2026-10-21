@@ -118,7 +118,7 @@ class Office:
 
     # ---- plan-side actions ----------------------------------------------
     def send_request(self, pid, sample, deadline=DEFAULT_DEADLINE):
-        """sample: {"kind": "random", "n": N} | {"kind": "targeted", "cpt": "99215", "n": N} | {"kind": "targeted", "claim_ids": [...]}.
+        """sample: {"kind": "random", "n": N[, "cpts": ["99214", "99215"]]} | {"kind": "targeted", "cpt": "99215", "n": N} | {"kind": "targeted", "claim_ids": [...]}.
         Version 2.1 allows a further request after the first (new charts only; random first, targeted after), within the same caps."""
         st = self._st(pid)
         if st["round"] > 0 and not self.v21:
@@ -135,7 +135,8 @@ class Office:
             ids = [c for c in sample["claim_ids"] if any(r["claim_id"] == c for r in rows) and c not in taken][:200]
             kind = "targeted"
         else:
-            pool = [r["claim_id"] for r in rows if sample.get("cpt") in (None, r["cpt"]) and r["claim_id"] not in taken]
+            frame = sample.get("cpts")                 # a random sample drawn within a frame of billed codes (a stratified audit universe, e.g. the 99214 and 99215 claims); default none
+            pool = [r["claim_id"] for r in rows if sample.get("cpt") in (None, r["cpt"]) and (not frame or r["cpt"] in frame) and r["claim_id"] not in taken]
             if sample.get("cpt"):
                 kind = "targeted"
             ids = rng.sample(pool, min(int(sample.get("n", 30)), len(pool)))

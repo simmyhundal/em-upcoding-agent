@@ -1,0 +1,122 @@
+{
+"3420": {
+"score": -757.8230769230769,
+"recovered": 0,
+"staff_cost": 757.8230769230769,
+"abrasion": 0.0,
+"found": 0,
+"upcoders": 8,
+"demands": 0,
+"honest_called": 0,
+"rounds": 2,
+"charts": 30
+},
+"3441": {
+"score": -2611.4333600449863,
+"recovered": 644.7459668780905,
+"staff_cost": 3256.1793269230766,
+"abrasion": 0.0,
+"found": 1,
+"upcoders": 8,
+"demands": 1,
+"honest_called": 0,
+"rounds": 11,
+"charts": 178
+},
+"3462": {
+"score": -652.3658653846153,
+"recovered": 0,
+"staff_cost": 652.3658653846153,
+"abrasion": 0.0,
+"found": 0,
+"upcoders": 8,
+"demands": 0,
+"honest_called": 0,
+"rounds": 1,
+"charts": 30
+},
+"3483": {
+"score": 4459.035851533878,
+"recovered": 5483.91229384157,
+"staff_cost": 1024.8764423076923,
+"abrasion": 0.0,
+"found": 1,
+"upcoders": 8,
+"demands": 1,
+"honest_called": 0,
+"rounds": 2,
+"charts": 29
+},
+"3504": {
+"score": 4648.843972198113,
+"recovered": 7137.368010659651,
+"staff_cost": 2488.524038461538,
+"abrasion": 0.0,
+"found": 3,
+"upcoders": 8,
+"demands": 3,
+"honest_called": 0,
+"rounds": 6,
+"charts": 86
+},
+"3525": {
+"score": 120.60584664389148,
+"recovered": 1365.0020004900452,
+"staff_cost": 1244.3961538461538,
+"abrasion": 0.0,
+"found": 1,
+"upcoders": 8,
+"demands": 1,
+"honest_called": 0,
+"rounds": 4,
+"charts": 30
+},
+"3546": {
+"score": 5479.251646861906,
+"recovered": 7928.847319938829,
+"staff_cost": 2449.595673076923,
+"abrasion": 0.0,
+"found": 2,
+"upcoders": 8,
+"demands": 2,
+"honest_called": 0,
+"rounds": 8,
+"charts": 89
+},
+"3567": {
+"score": -501.8076542244344,
+"recovered": 1306.3197496217194,
+"staff_cost": 1808.1274038461538,
+"abrasion": 0.0,
+"found": 1,
+"upcoders": 8,
+"demands": 1,
+"honest_called": 0,
+"rounds": 6,
+"charts": 71
+},
+"3588": {
+"score": -968.7375,
+"recovered": 0,
+"staff_cost": 968.7375,
+"abrasion": 0.0,
+"found": 0,
+"upcoders": 8,
+"demands": 0,
+"honest_called": 0,
+"rounds": 4,
+"charts": 30
+},
+"3609": {
+"score": -968.7375,
+"recovered": 0,
+"staff_cost": 968.7375,
+"abrasion": 0.0,
+"found": 0,
+"upcoders": 8,
+"demands": 0,
+"honest_called": 0,
+"rounds": 4,
+"charts": 30
+}
+}
