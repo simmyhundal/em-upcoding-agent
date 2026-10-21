@@ -44,7 +44,7 @@
 <line x1="125.5" y1="378.0" x2="125.5" y2="341.3" stroke="#7a7a7a"/>
 <line x1="112.9" y1="378.0" x2="138.1" y2="378.0" stroke="#7a7a7a"/>
 <line x1="112.9" y1="341.3" x2="138.1" y2="341.3" stroke="#7a7a7a"/>
-<rect x="87.8" y="360.5" width="75.5" height="14.2" fill="#d9dde3" stroke="#7a7a7a"/>
+<rect x="87.8" y="360.1" width="75.5" height="14.6" fill="#d9dde3" stroke="#7a7a7a"/>
 <line x1="87.8" y1="368.8" x2="163.2" y2="368.8" stroke="#333" stroke-width="2"/>
 <circle cx="125.5" cy="325.4" r="2.2" fill="none" stroke="#7a7a7a"/>
 <circle cx="125.5" cy="321.0" r="2.2" fill="none" stroke="#7a7a7a"/>
@@ -82,12 +82,12 @@
 <line x1="334.9" y1="378.0" x2="360.1" y2="378.0" stroke="#7a7a7a"/>
 <line x1="334.9" y1="314.6" x2="360.1" y2="314.6" stroke="#7a7a7a"/>
 <rect x="309.8" y="345.4" width="75.5" height="23.4" fill="#d9dde3" stroke="#7a7a7a"/>
-<line x1="309.8" y1="359.3" x2="385.2" y2="359.3" stroke="#333" stroke-width="2"/>
+<line x1="309.8" y1="359.0" x2="385.2" y2="359.0" stroke="#333" stroke-width="2"/>
 <circle cx="347.5" cy="307.5" r="2.2" fill="none" stroke="#7a7a7a"/>
 <circle cx="347.5" cy="282.9" r="2.2" fill="none" stroke="#7a7a7a"/>
 <circle cx="347.5" cy="281.5" r="2.2" fill="none" stroke="#7a7a7a"/>
 <circle cx="347.5" cy="280.2" r="2.2" fill="none" stroke="#7a7a7a"/>
-<circle cx="347.5" cy="266.4" r="2.2" fill="none" stroke="#7a7a7a"/>
+<circle cx="347.5" cy="273.8" r="2.2" fill="none" stroke="#7a7a7a"/>
 <circle cx="347.5" cy="246.6" r="2.2" fill="none" stroke="#7a7a7a"/>
 <line x1="347.5" y1="330.1" x2="347.5" y2="252.2" stroke="#c2410c" stroke-width="2"/>
 <line x1="341.5" y1="330.1" x2="353.5" y2="330.1" stroke="#c2410c" stroke-width="2"/>

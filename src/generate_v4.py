@@ -31,7 +31,7 @@ import notes_v21
 CODES = g1.CODES
 V40_DEFAULTS = {
     "habit_shares": {"systematic": 3 / 8, "opportunistic": 3 / 8, "template": 2 / 8},   # ASSUMPTION: no published breakdown of upcoding by mechanism was found
-    "upcoder_rate_range": (0.17, 0.38),         # net rate of an upcoder (the 15 to 40% band less a 2-point buffer)
+    "upcoder_rate_range": (0.18, 0.37),         # net rate of an upcoder (the 15 to 40% band less a 3-point buffer: realized rates stay within 2.5 points of the draw)
     "upcoder_noise": 0.04,                       # gross honest miscode rate of an upcoder's other visits (symmetric)
     "nonupcoder_mean_sd": 0.05, "nonupcoder_mean_max": 0.15,   # mean net rate of a non-upcoder ~ N(0, sd) clipped to +-max
     "honest_miscode_rate": 0.08, "honest_miscode_spread": 0.4, "honest_miscode_max": 0.25, "honest_miscode_floor": 0.02,

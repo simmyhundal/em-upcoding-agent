@@ -102,6 +102,20 @@ def test_each_habit_leaves_its_signature():
     assert k["members_seen_by_two_or_more_providers"] > 0.25                          # patients shared across providers
 
 
+def test_default_clone_share_is_one_cloner_in_eight_and_2x_default_is_unchanged():
+    tmp = tempfile.mkdtemp()
+    try:
+        key = os.path.join(tmp, "key", "key.json")
+        generate_v2.build(os.path.join(tmp, "d4"), key, seed=7, n_providers=80, n_upcoders=8, n_hard_neg=4, data_version="4.0")      # no clone_share given
+        k = json.load(open(key))
+        assert sum(v["clones_notes"] for v in k["providers"].values()) == 1 and k["clone_share"] == 0.125
+        generate_v2.build(os.path.join(tmp, "d22"), os.path.join(tmp, "key", "k22.json"), seed=7, n_providers=80, n_upcoders=8, n_hard_neg=4, data_version="2.2")
+        k22 = json.load(open(os.path.join(tmp, "key", "k22.json")))
+        assert k22["clone_share"] == 0.5 and sum(v["clones_notes"] for v in k22["providers"].values()) == 4           # data 2.x unchanged
+    finally:
+        shutil.rmtree(tmp)
+
+
 def test_data_2x_is_untouched():
     import test_generator_regression as t
     t.test_data_2x_reproduces()

@@ -41,28 +41,28 @@
    "detail": "Diagnosis codes per claim look uncapped: every month reaches the extract's full width or has no pile-up at a lower maximum.",
    "numbers": {
     "distribution": {
-     "1": 0.4591,
-     "2": 0.2565,
-     "3": 0.1543,
-     "4": 0.0758,
+     "1": 0.4598,
+     "2": 0.2554,
+     "3": 0.1552,
+     "4": 0.0751,
      "5": 0.0396,
-     "6": 0.0147
+     "6": 0.0149
     },
     "by_month": {
      "2024-01": {
       "claims": 9151,
       "max_codes": 6,
-      "share_at_max": 0.012
+      "share_at_max": 0.013
      },
      "2024-02": {
       "claims": 8407,
       "max_codes": 6,
-      "share_at_max": 0.013
+      "share_at_max": 0.014
      },
      "2024-03": {
       "claims": 8514,
       "max_codes": 6,
-      "share_at_max": 0.016
+      "share_at_max": 0.015
      },
      "2024-04": {
       "claims": 9341,
@@ -72,7 +72,7 @@
      "2024-05": {
       "claims": 10071,
       "max_codes": 6,
-      "share_at_max": 0.012
+      "share_at_max": 0.013
      },
      "2024-06": {
       "claims": 9023,
@@ -87,22 +87,22 @@
      "2024-08": {
       "claims": 9501,
       "max_codes": 6,
-      "share_at_max": 0.016
+      "share_at_max": 0.015
      },
      "2024-09": {
       "claims": 8881,
       "max_codes": 6,
-      "share_at_max": 0.015
+      "share_at_max": 0.016
      },
      "2024-10": {
       "claims": 9542,
       "max_codes": 6,
-      "share_at_max": 0.016
+      "share_at_max": 0.017
      },
      "2024-11": {
       "claims": 8614,
       "max_codes": 6,
-      "share_at_max": 0.014
+      "share_at_max": 0.015
      },
      "2024-12": {
       "claims": 8686,
@@ -139,10 +139,10 @@
    "id": "duplicates",
    "title": "Duplicate claims",
    "status": "ok",
-   "detail": "29 paid claims (0.0%) repeat another claim's member, date, biller, diagnoses and E/M line under a new claim id.",
+   "detail": "34 paid claims (0.0%) repeat another claim's member, date, biller, diagnoses and E/M line under a new claim id.",
    "numbers": {
-    "duplicate_claims": 29,
-    "rate": 0.00028,
+    "duplicate_claims": 34,
+    "rate": 0.00033,
     "pairs": [
      [
       "C0005293",
@@ -169,16 +169,36 @@
       "C0014802"
      ],
      [
+      "C0018427",
+      "C0018136"
+     ],
+     [
+      "C0026815",
+      "C0026113"
+     ],
+     [
+      "C0028264",
+      "C0027816"
+     ],
+     [
       "C0028953",
       "C0028680"
      ],
      [
-      "C0033837",
-      "C0033147"
+      "C0029634",
+      "C0029195"
      ],
      [
-      "C0034004",
-      "C0032420"
+      "C0029750",
+      "C0029559"
+     ],
+     [
+      "C0033653",
+      "C0032940"
+     ],
+     [
+      "C0033837",
+      "C0033147"
      ],
      [
       "C0035463",

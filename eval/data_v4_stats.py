@@ -30,6 +30,7 @@ def main():
     listed = Counter()
     n_up = Counter()
     shared, nonmeans, realized_non = [], [], []
+    noisy = []                                     # non-upcoders whose realized net rate is at or above the 15% upcoder floor: (rate, claims, in the top-10% list)
     seeds = [s for s in md.SEEDS if os.path.isdir(os.path.join(ROOT, "data", f"synthetic_v2_d4_{s}", "view"))]
     for s in seeds:
         code = f"d4_{s}"
@@ -53,6 +54,8 @@ def main():
             else:
                 nonmeans.append(v["mean_net_rate"])
                 realized_non.append(t["net_rate"])
+                if t["net_rate"] >= 0.15:
+                    noisy.append((t["net_rate"], t["claims"], pid in top))
             for r in rows:
                 b, j = LV[r["cpt"]], LV[J[r["claim_id"]]]
                 grp = ("correctly billed" if b == j else ("downcoded" if b < j else ("honest noise, upcoded" if v["role"] != "upcoder" else v["habit"] + (" (cloner)" if v["clones_notes"] else "") + ", upcoded")))
@@ -76,10 +79,12 @@ def main():
          "## Upcoders", "", "| Habit | Upcoders | Net rate: min / mean / max | In the eb_ratio_t top 10% list |", "|---|---|---|---|"]
     for h in sorted(rates):
         r = rates[h]
-        L.append(f"| {h} | {n_up[h]} | {min(r):.0%} / {sum(r) / len(r):.0%} / {max(r):.0%} | {listed[h]} of {n_up[h]} |")
+        L.append(f"| {h} | {n_up[h]} | {min(r):.1%} / {sum(r) / len(r):.1%} / {max(r):.1%} | {listed[h]} of {n_up[h]} |")
     tot_listed, tot_up = sum(listed.values()), sum(n_up.values())
     L += ["", f"The frozen screen (`eb_ratio_t`, a 99215-share ratio) lists {tot_listed} of {tot_up} upcoders in its top 10%: most habits do not move the 99215 share, which is the point of issue #127.", "",
           f"Non-upcoders: drawn mean net rate from {min(nonmeans):.0%} to {max(nonmeans):.0%}; realized on live claims from {min(realized_non):.0%} to {max(realized_non):.0%}. "
+          f"Of {len(nonmeans):,} non-upcoders, {len(noisy)} have a realized net rate at or above the 15% upcoder floor by sampling noise (rates {', '.join(f'{x[0]:.1%}' for x in sorted(noisy))}; panels of {', '.join(str(x[1]) for x in sorted(noisy))} claims); "
+          f"{sum(x[2] for x in noisy)} of them sit in the `eb_ratio_t` top-10% list. The binary label calls them honest and the score's abrasion weight gives them none, so they count as false calls in precision but carry no abrasion. "
           f"Members seen by two or more providers: {sum(shared) / len(shared):.0%} (data 2.2: about 10% of visits were guest visits).", "",
           "## What a returned chart shows", "", "How the chart reads (the supported level by the decision-making or time rule, as the arms read it) against the billed level, over every visit of the development seeds.", "",
           "| Visits | Count | Chart shows the upcoding (reads lower than billed) | Reads as billed | Reads higher than billed |", "|---|---|---|---|---|"]

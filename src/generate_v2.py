@@ -79,7 +79,7 @@ def _beta_rate(nrng, mean, cv, cap):
 
 
 def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcoder_rate=8 / 216, hard_neg_rate=8 / 216,
-          clone_share=0.5, n_upcoders=None, n_hard_neg=None, data_version="2.0", clone_signal_strength=0.7, **v22):
+          clone_share=None, n_upcoders=None, n_hard_neg=None, data_version="2.0", clone_signal_strength=0.7, **v22):
     """Write plan tables and the records universe to out_dir; the answer key goes outside it.
     data_version "2.1" also writes the note package (docs/data_v2_1.md); claims and the universe stay identical to 2.0 for the same seed.
     data_version "2.2" is 2.1 plus honest coding noise and an upcoder defined as above the honest baseline (docs/data_v2_2.md); keyword
@@ -88,8 +88,12 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
         import generate_v4
         n_up_ = n_upcoders if n_upcoders is not None else max(1, int(round(n_providers * upcoder_rate)))
         n_hn_ = n_hard_neg if n_hard_neg is not None else max(1, int(round(n_providers * hard_neg_rate)))
-        return generate_v4.build(out_dir, answer_key_path, seed=seed, n_providers=n_providers, n_upcoders=n_up_, n_hard_neg=n_hn_, clone_share=clone_share,
+        if clone_share is not None:               # left unset, data 4.0 uses its own default (1 cloner in 8, not data 2.x's 0.5)
+            v22 = {**v22, "clone_share": clone_share}
+        return generate_v4.build(out_dir, answer_key_path, seed=seed, n_providers=n_providers, n_upcoders=n_up_, n_hard_neg=n_hn_,
                                  clone_signal_strength=clone_signal_strength, **v22)
+    if clone_share is None:
+        clone_share = 0.5                         # the data 2.x default, unchanged
     v22_on = data_version == "2.2"
     unknown = set(v22) - set(V22_DEFAULTS) - {"defect_profile"}
     if unknown or (v22 and not v22_on):
@@ -404,7 +408,7 @@ if __name__ == "__main__":
     ap.add_argument("--providers", type=int, default=216)
     ap.add_argument("--upcoder-rate", type=float, default=8 / 216)
     ap.add_argument("--hard-neg-rate", type=float, default=8 / 216)
-    ap.add_argument("--clone-share", type=float, default=0.5, help="share of upcoders whose documentation is cloned to match billing")
+    ap.add_argument("--clone-share", type=float, default=None, help="share of upcoders whose documentation is cloned to match billing (data 2.x default 0.5; data 4.0 default 0.125)")
     ap.add_argument("--answer-key", default=DEFAULT_KEY)
     ap.add_argument("--data-version", default="2.0", choices=["2.0", "2.1", "2.2", "4.0"], help="2.1 also writes the note package; 2.2 adds honest coding noise; 4.0 provider upcoding rates and habits (generate_v4.py)")
     ap.add_argument("--clone-signal-strength", type=float, default=0.7, help="data 2.1: chance each clone signal appears on a cloned visit")

@@ -1,6 +1,6 @@
 # d4_42
 
-v2 data (4.0), code only (no AI step). data 4.0 development seed 42.
+v2 data (4.0), code only (no AI step). data 4.0 development seed 42 (issue 124): 216 providers, 8 planted upcoders with habits, 8 hard negatives, 1 cloner.
 
 - Screen: `flagged.csv` (top 25 by combined rank) and `flagged_threshold.csv` (suspicion at or above 5, at most 25); 5 providers flagged by the threshold.
 - Records request for those providers plus a 30-provider control sample: 94 of 150 requested charts for the flagged providers came back in time (`documentation.csv`, `records_requests.csv`).
