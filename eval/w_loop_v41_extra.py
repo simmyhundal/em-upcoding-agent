@@ -36,3 +36,21 @@ if __name__ == "__main__":
     for tag, b in (("B1-4", range(1, 5)), ("B5-6", range(5, 7))):
         seeds = sum([pool.BATCHES[i - 1] for i in b], [])
         print(tag, probe_stats(name, seeds), "withdrawn by floor", withdrawn(name, seeds))
+
+
+def extension_stats(name, seeds):
+    """H16: providers extended, blocked, still called after the second sample, demanded (called and not withdrawn by the floor), and the floor's withdrawals."""
+    ext = blocked = called = demanded = 0
+    for s in seeds:
+        d = os.path.join(ROOT, "experiments", f"wl{name.lower()}_{s}")
+        log = json.load(open(os.path.join(d, "extension_log.json"))) if os.path.exists(os.path.join(d, "extension_log.json")) else {}
+        lean = {}
+        for x in open(os.path.join(d, "case_summaries_checked.jsonl")):
+            r = json.loads(x)
+            lean[r["provider_id"]] = r["summary"]["leaning"]
+        wd = json.load(open(os.path.join(d, "demand_floor.json")))["withdrawn"] if os.path.exists(os.path.join(d, "demand_floor.json")) else {}
+        for pid, v in log.items():
+            ext += 1
+            blocked += v["blocked"]
+            demanded += lean.get(pid) == "pattern_consistent_with_upcoding"
+    return {"extended": ext, "blocked": blocked, "demanded_after_extension": demanded}

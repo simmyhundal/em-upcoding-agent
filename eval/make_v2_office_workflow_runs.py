@@ -78,7 +78,13 @@ def build_view(rid, src, screen, version="2.0", tier1_n=None, policy24=None, w40
     else:
         office = provider_sim.Office(data, base, seed=1)
         rob.run_policy(office, flagged)
-    # control sample = earlier reviews of providers outside the flagged list
+    write_view(view, base, office, flagged)
+    return view, office, flagged_file
+
+
+def write_view(view, base, office, flagged):
+    """Write the view's documentation.csv and records_requests.csv from the office's current state (called again after a second pass of requests).
+    The control sample = earlier reviews of providers outside the flagged list."""
     req = list(csv.DictReader(open(os.path.join(base, "records_requests.csv"))))
     control = {r["provider_id"] for r in req if r["kind"] == "control"} - set(flagged)
     owner = {r["claim_id"]: r["provider_id"] for r in csv.DictReader(open(os.path.join(base, "claims.csv")))}
@@ -93,22 +99,61 @@ def build_view(rid, src, screen, version="2.0", tier1_n=None, policy24=None, w40
         for p in flagged:
             st = office._st(p)
             w.writerow([p, "flagged", len(st["requested"]), len(st["usable"]), 0, 0])
-    return view, office, flagged_file
 
 
 def run(rid, src, screen, note, version="2.0", tier1_n=None, policy24=None, no_model=None, w40=None):
     """no_model None: on for workflow 2.5 only (older versions keep their frozen behavior); pass True to run an older arm API-free on future tests."""
     view, office, flagged_file = build_view(rid, src, screen, version, **({} if tier1_n is None else {"tier1_n": tier1_n}), **({} if policy24 is None else {"policy24": policy24}), **({} if w40 is None else {"w40": w40}))
     name = os.path.basename(view)
-    # 2.2: rules 2.2 decide more summaries without the model, and no LLM usefulness judge (the rule judge runs after; issues 91 and 93)
-    ai.run(rid, src, note, view_name=name, flagged_name=os.path.basename(flagged_file), v21=version in ("2.1", "2.2", "2.3", "2.4", "2.5", "4.0"), preflight=version in ("2.2", "2.3", "2.4", "2.5", "4.0"),
-           v22=version in ("2.2", "2.3", "2.4", "2.5", "4.0"), v23=version in ("2.3", "2.4", "2.5", "4.0"), llm_judge=version not in ("2.2", "2.3", "2.4", "2.5", "4.0"),
-           no_model=(version in ("2.5", "4.0")) if no_model is None else no_model, rules40=version == "4.0", rules41=version == "4.0" and (w40 or {}).get("rules") == "4.1")       # 2.5 onward: no API call at all
+
+    def summaries():
+        # 2.2: rules 2.2 decide more summaries without the model, and no LLM usefulness judge (the rule judge runs after; issues 91 and 93)
+        ai.run(rid, src, note, view_name=name, flagged_name=os.path.basename(flagged_file), v21=version in ("2.1", "2.2", "2.3", "2.4", "2.5", "4.0"), preflight=version in ("2.2", "2.3", "2.4", "2.5", "4.0"),
+               v22=version in ("2.2", "2.3", "2.4", "2.5", "4.0"), v23=version in ("2.3", "2.4", "2.5", "4.0"), llm_judge=version not in ("2.2", "2.3", "2.4", "2.5", "4.0"),
+               no_model=(version in ("2.5", "4.0")) if no_model is None else no_model, rules40=version == "4.0", rules41=version == "4.0" and (w40 or {}).get("rules") == "4.1",       # 2.5 onward: no API call at all
+               rules40_opts=(w40 or {}).get("rules40_opts"))
+    summaries()
+    if version == "4.0" and (w40 or {}).get("extend"):
+        if extend_near_misses(rid, src, view, office, flagged_file, w40["extend"]):
+            summaries()
     office.write_transcript(os.path.join(ROOT, "experiments", rid, "office_transcript.jsonl"))
     if getattr(office, "probe_log", None):
         json.dump(office.probe_log, open(os.path.join(ROOT, "experiments", rid, "probe_log.json"), "w"))
     if version == "4.0" and (w40 or {}).get("demand_floor") is not None:
         apply_demand_floor(rid, src, view, office, w40["demand_floor"])
+
+
+def extend_near_misses(rid, src, view, office, flagged_file, opts):
+    """Workflow v4.1 option `extend` (H16): a provider the rules call upcoding whose payer-visible point estimate of the recovery is at least c times the cost of a demand but whose 90% lower bound
+    is below it gets a second RANDOM request of `more` charts; the view is rewritten and the summaries are rebuilt by the caller. Returns the list of providers extended. No answer key."""
+    import dollar_reward as dr
+    import recovery_40 as s4
+    import summary_rules as sr
+    import workflow_policy_v21 as v21
+    cost = s4.staff_cost(0, 0, 0, 1, 0, s4.PARAMS)[0]
+    base = os.path.join(ROOT, "data", f"synthetic_v2_{src}", "view")
+    claims = {}
+    for r in csv.DictReader(open(os.path.join(base, "claims.csv"))):
+        claims.setdefault(r["provider_id"], []).append(r)
+    level = dr.level_of_rows(list(csv.DictReader(open(os.path.join(view, "documentation.csv")))))
+    recs = [json.loads(x) for x in open(os.path.join(ROOT, "experiments", rid, "case_summaries_checked.jsonl")) if x.strip()]
+    log, done = {}, []
+    for r in recs:
+        if r["summary"]["leaning"] != sr.UPCODING:
+            continue
+        pid = r["provider_id"]
+        e = s4.recovery(claims.get(pid, []), office.random_claim_ids(pid), level, s4.PARAMS)
+        if e["mode"] == "extrapolated" and e["point"] >= opts["c"] * cost and e["value"] < cost:
+            resp = v21._follow(office, pid, office.send_request(pid, {"kind": "random", "n": opts["more"]}, deadline=30))
+            log[pid] = {"point": round(e["point"], 2), "lower_bound": round(e["value"], 2), "blocked": "error" in resp}
+            if "error" not in resp:
+                done.append(pid)
+            office.close_request(pid, "workflow v4.1 near-miss extension")
+    if done:
+        flagged = [r["provider_id"] for r in csv.DictReader(open(flagged_file)) if r["flagged"] == "True"]
+        write_view(view, base, office, flagged)
+    json.dump(log, open(os.path.join(ROOT, "experiments", rid, "extension_log.json"), "w"))
+    return done
 
 
 def apply_demand_floor(rid, src, view, office, floor):

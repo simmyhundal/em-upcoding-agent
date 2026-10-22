@@ -49,6 +49,10 @@ VERSIONS = {
     # workflow v4.1 hypotheses on top of H8 (issue 132; docs/w_loop_v41.md): H15 probe then extend (10 charts, then 20 more when at least k documented 99214 and 99215 charts are unsupported)
     **{f"H15k{k}": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "n": 10, "probe": {"k": k, "more": 20}}} for k in (2, 3, 4)},
     "H15": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "n": 10, "probe": {"k": 3, "more": 20}}},   # H15 at the k chosen on batches 1 to 4
+    # H16 near-miss extension: after the rules call, a second random request of 30 charts for providers whose estimate is at least c times the demand cost but whose lower bound is below it
+    **{f"H16c{c}": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "extend": {"c": c, "more": 30}}} for c in (1, 1.5, 2)},
+    "H8chk": {"version": "4.0", **wp40.FROZEN_V40},                                                                         # H8 rerun after the v4.1 refactors: must reproduce H8 exactly
+    "H16": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "extend": {"c": 2, "more": 30}}},   # H16 at the c chosen on batches 1 to 4 (all three c gave the same result; ties go to the setting closest to H8)
     "H3": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "policy25", "escalate": "stop", "sample_cpts": HI}},       # H2 without escalation (the first sample decides)
 }
 
