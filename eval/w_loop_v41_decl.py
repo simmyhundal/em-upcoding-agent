@@ -46,3 +46,19 @@ DECL["H20"] = {"title": "H20: ask only the first K listed providers (decision la
                        "first-sample size n in {10, 20, 30, 45, 60, 90} random charts (H20n<n>). Each parameter is chosen by leave-one-batch-out over batches 1 to 4: for each held-out batch, the setting with the best mean on the "
                        "other three is taken and its realized score on the held-out batch recorded (ties to the smaller); the final setting is the one with the best mean over all 40 seeds (ties to the smaller). "
                        "Choosing two parameters on 40 seeds gives selection bias in sample; the out-of-sample test on batches 5 and 6 decides."}
+
+
+# H20c: written and committed BEFORE any H20c run (the corrected H20). It counts as the ninth hypothesis tried (H13 to H20 and H20c), so the Bonferroni bar is alpha = 0.05 / 9 = 0.0056 per look.
+H20C_RULE = ("Same choice rule as H15 to H20 (leave-one-batch-out on batches 1 to 4, real runs, ties to the smaller; then one run on batches 5 and 6 against H8). H20c is the ninth hypothesis tried (H13 to H20 and H20c), so the "
+             "Bonferroni bar is alpha = 0.05 / 9 = 0.0056 per look, applied to both the out-of-sample and the in-sample p.")
+DECL["H20c"] = {"title": "H20c: H20 corrected, list only K providers (decision layer)",
+                "reason": "H20 asked only the first K of the 22 listed providers but still wrote a checked summary for all 22, and score 4.0 charges triage (15 minutes of analyst time, about $13) for every provider with a checked summary "
+                          "(docs/score_40.md; `listed` in eval/score_40.py run_inputs). So H20 paid about $289 of triage per seed for providers it never looked at. A top-K rule needs only K providers reviewed. "
+                          "(The D7 profile of top-k values, which promised +$954 per seed for K = 1, also left triage out; the real H20 run scored +$649 on batches 5 and 6.)",
+                "change": "The same change as H20 (ask the first K providers by rank, a first sample of n random charts, everything else H8's: eb_upper_t ranking, rules 4.0, demand floor, no escalation), but the list is only the top K of the "
+                          "eb_upper_t screen (a flagged file whose first K rows stay flagged, same ranking and order), so only K providers are summarized and triaged. The baseline of unflagged providers' reviews still leaves out the whole 22, "
+                          "so H20c differs from H20 only in which providers are listed and triaged.",
+                "grid": "Two sweeps on batches 1 to 4 only, real workflow runs: (a) K in {1, 2, 3, 4, 5, 6, 8} with n = 30 (H20c_k<K>_n30); (b) with the K chosen in (a), n in {10, 20, 30, 45, 60, 90} random charts (H20c_k<K>_n<n>). "
+                        "Each chosen by leave-one-batch-out over batches 1 to 4 (the held-out batch's realized mean score, ties to the smaller), the final setting the best mean over the 40 seeds (ties to the smaller). "
+                        "Then (K, n) is run once on batches 5 and 6 against H8 and against zero. Sanity check before the sweeps, on seeds 1515, 1616 and 1717: H20c and H20 at the same (K, n) must ask the same providers and the same charts, "
+                        "and differ in score by the triage saved (about $13 per provider not listed)."}
