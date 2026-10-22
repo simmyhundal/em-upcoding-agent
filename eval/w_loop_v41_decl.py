@@ -62,3 +62,16 @@ DECL["H20c"] = {"title": "H20c: H20 corrected, list only K providers (decision l
                         "Each chosen by leave-one-batch-out over batches 1 to 4 (the held-out batch's realized mean score, ties to the smaller), the final setting the best mean over the 40 seeds (ties to the smaller). "
                         "Then (K, n) is run once on batches 5 and 6 against H8 and against zero. Sanity check before the sweeps, on seeds 1515, 1616 and 1717: H20c and H20 at the same (K, n) must ask the same providers and the same charts, "
                         "and differ in score by the triage saved (about $13 per provider not listed)."}
+
+
+# H23: written and committed BEFORE any H23 run. It is the eleventh hypothesis tried (H13 to H20, H20c, H22, H23), so the Bonferroni bar is alpha = 0.05 / 11 = 0.0045 per look; also reported against 0.05.
+DECL["H23"] = {"title": "H23: H22 with a shorter list (decision layer)",
+               "reason": "Score 4.0 charges triage (about $13.125, 15 minutes) for every provider with a checked summary, so a list of 22 costs about $289 per seed whatever is asked; H8 and H22 ask only about 3 providers per seed. "
+                         "H20c showed that a list of 1 loses recovery. The question is how short the list can be before it drops upcoders the ask model would have asked.",
+               "change": "H22 (eb_upper_t list, ask-or-skip ridge model src/policy_40_ask.json, 30 random charts, no escalation, demand floor, rules40_opts min 5 / up 0.10 / alpha 0.20, extend c = 2 / more = 30) with the list "
+                         "size N in place of 22 (`list_k` = N: the same ranking, only the first N rows stay flagged). One change only. The ask model's features (rank, screen score, ...) are read from the provider's own row, which keeps its "
+                         "rank and score in the shorter file, so the model asks exactly the providers it asked in H22 among the first N; it was fitted on 22-provider lists.",
+               "grid": "N in {4, 6, 8, 11, 15, 22}, 22 being H22 itself (H23_n<N>; H22 is registered in eval/w_loop.py with the spec of eval/w_loop_h22.py). Real workflow runs on batches 1 to 4 only. Leave-one-batch-out: for each held-out batch "
+                         "the N with the best mean on the other three is taken and its realized mean on the held-out batch recorded; ties go to the LARGER list (closest to H22); the final N is the best mean over the 40 seeds (ties to the larger). "
+                         "That N is then run once on batches 5 and 6 and once on batches 7 to 10 (both out of sample), each against H22 and H8 with the paired one-sided permutation test, wins/losses/ties, found, rounds, honest called, "
+                         "recovered, staff cost, triage per seed. The part of any gain that is triage saved (about $13.125 per provider no longer listed) is stated apart from the part due to asking or recall."}
