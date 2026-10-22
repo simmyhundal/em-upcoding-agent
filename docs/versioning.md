@@ -21,7 +21,7 @@ Three things carry version numbers: the **data** (generator, schemas and the sim
 | 3 | **2.2 again** (data stays; Simmy's decision, so release 3 compares with release 2 on the same data) | `v2.3` | `v3.3` | built and tested once on ten fresh seeds ([release3_results.md](release3_results.md)): cloned-notes detection first ([#99](https://github.com/simmyhundal/em-upcoding-agent/issues/99), [replay_rules_23.md](replay_rules_23.md)) |
 | 4 | 2.2 again | `v2.4` | `v3.4` | tested once on ten fresh seeds ([release4_results.md](release4_results.md)) |
 | 5 | 2.2 again | `v2.5` | `v3.5` | tested once on ten fresh seeds ([release5_results.md](release5_results.md)); dollars are the primary score |
-| 6 (v4/v5 line) | **4.0** (provider upcoding rates and habits; see below) | `v4.0` | `v5.0` | planned (milestone "v4.0 and v5.0") |
+| 6 (v4/v5 line) | **4.0** (provider upcoding rates and habits; see below) | `v4.0` | `v5.0` | built, frozen and tested once on ten fresh seeds ([v4_v5_results.md](v4_v5_results.md)); not above zero |
 
 Exception, release 3: the data version stays 2.2, so the workflow and agent number moves (2.3, 3.3) and the data number does not; the shared-minor rule applies again when the data next changes. Data 1 pairs only with workflow `v1.0`. In `experiments/results.csv`, runs so far record the data version as `v1` or `v2` (meaning data 2.0); runs on data 2.1 and later should record the full number.
 
