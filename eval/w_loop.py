@@ -66,6 +66,9 @@ VERSIONS = {
     # H20c (the corrected H20): the same ask-the-first-K rule, but the list itself has K providers (`list_k`), so only K are summarized and triaged. H20_k<K>_n<n> is H20 at the same (K, n) for the paired comparison.
     **{f"H20c_k{k}_n{n}": {"version": "4.0", "screen": "eb_upper_t", "list_k": k, "w40": {"ask": "all", "escalate": "stop", "demand_floor": "cost", "n": n}} for k in (1, 2, 3, 4, 5, 6, 8) for n in (10, 20, 30, 45, 60, 90)},
     **{f"H20_k{k}_n{n}": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": k, "escalate": "stop", "demand_floor": "cost", "n": n}} for k in (1, 2, 3, 4, 5, 6, 8) for n in (10, 20, 30, 45, 60, 90)},
+    # H22 = H16 + H17 (spec of eval/w_loop_h22.py, unchanged; cache H22.json and run folders wlh22_<seed> are reused) and H23 = H22 with the list size N (`list_k`); H23_n22 is H22 itself.
+    "H22": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "rules40_opts": {"min": 5, "up": 0.10, "alpha": 0.20}, "extend": {"c": 2, "more": 30}}},
+    **{f"H23_n{n}": {"version": "4.0", "screen": "eb_upper_t", "list_k": n, "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "rules40_opts": {"min": 5, "up": 0.10, "alpha": 0.20}, "extend": {"c": 2, "more": 30}}} for n in (4, 6, 8, 11, 15)},
     "H3": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "policy25", "escalate": "stop", "sample_cpts": HI}},       # H2 without escalation (the first sample decides)
 }
 
