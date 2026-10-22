@@ -63,8 +63,31 @@ VERSIONS = {
     **{f"H20k{k}": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": k, "escalate": "stop", "demand_floor": "cost"}} for k in (1, 2, 3, 4, 5, 6, 8)},
     **{f"H20n{n}": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": 1, "escalate": "stop", "demand_floor": "cost", "n": n}} for n in (10, 20, 30, 45, 60, 90)},   # H20 sweep b at K = 1 (chosen in sweep a)
     "H20": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": 1, "escalate": "stop", "demand_floor": "cost", "n": 30}},   # H20 at (K, n) = (1, 30), chosen on batches 1 to 4
+    # H20c (the corrected H20): the same ask-the-first-K rule, but the list itself has K providers (`list_k`), so only K are summarized and triaged. H20_k<K>_n<n> is H20 at the same (K, n) for the paired comparison.
+    **{f"H20c_k{k}_n{n}": {"version": "4.0", "screen": "eb_upper_t", "list_k": k, "w40": {"ask": "all", "escalate": "stop", "demand_floor": "cost", "n": n}} for k in (1, 2, 3, 4, 5, 6, 8) for n in (10, 20, 30, 45, 60, 90)},
+    **{f"H20_k{k}_n{n}": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": k, "escalate": "stop", "demand_floor": "cost", "n": n}} for k in (1, 2, 3, 4, 5, 6, 8) for n in (10, 20, 30, 45, 60, 90)},
     "H3": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "policy25", "escalate": "stop", "sample_cpts": HI}},       # H2 without escalation (the first sample decides)
 }
+
+
+def write_flagged_topk(code, name, k):
+    """A flagged file whose list is only the first K providers of the `name` list (same ranking: rows keep their order, only the first K stay flagged). Returns the screen name `<name>_top<K>`."""
+    import csv
+    new = f"{name}_top{k}"
+    path = os.path.join(ROOT, "experiments", code, f"flagged_{new}.csv")
+    if not os.path.exists(path):
+        rows = list(csv.DictReader(open(os.path.join(ROOT, "experiments", code, f"flagged_{name}.csv"))))
+        left = k
+        for r in rows:
+            if r["flagged"] == "True" and left > 0:
+                left -= 1
+            else:
+                r["flagged"] = "False"
+        with open(path, "w", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=list(rows[0]))
+            w.writeheader()
+            w.writerows(rows)
+    return new
 
 
 def _run(job):
@@ -72,6 +95,8 @@ def _run(job):
     spec = VERSIONS[name]
     code = f"d4_{seed}"
     scr = dev.write_flagged(code, spec["screen"], 10)
+    if spec.get("list_k"):
+        scr = write_flagged_topk(code, scr, spec["list_k"])
     rid = f"wl{name.lower()}_{seed}"
     if not r2.done(rid, "case_summaries_checked.jsonl"):
         kw = {"w40": spec["w40"]} if spec["version"] == "4.0" else {}

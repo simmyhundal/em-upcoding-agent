@@ -13,6 +13,7 @@ import argparse
 import csv
 import json
 import os
+import re
 import shutil
 import sys
 
@@ -78,15 +79,23 @@ def build_view(rid, src, screen, version="2.0", tier1_n=None, policy24=None, w40
     else:
         office = provider_sim.Office(data, base, seed=1)
         rob.run_policy(office, flagged)
-    write_view(view, base, office, flagged)
+    write_view(view, base, office, flagged, exclude=_full_list(src, screen, flagged))
     return view, office, flagged_file
 
 
-def write_view(view, base, office, flagged):
+def _full_list(src, screen, flagged):
+    """H20c (workflow v4.1 loop): a screen named `<list>_top<K>` lists only the first K providers of `<list>`; the control baseline still leaves out the whole `<list>`, so the baseline equals H20's. None otherwise."""
+    m = re.match(r"^(.*)_top\d+$", screen)
+    if not m:
+        return None
+    return set(flagged) | {r["provider_id"] for r in csv.DictReader(open(os.path.join(ROOT, "experiments", src, f"flagged_{m.group(1)}.csv"))) if r["flagged"] == "True"}
+
+
+def write_view(view, base, office, flagged, exclude=None):
     """Write the view's documentation.csv and records_requests.csv from the office's current state (called again after a second pass of requests).
     The control sample = earlier reviews of providers outside the flagged list."""
     req = list(csv.DictReader(open(os.path.join(base, "records_requests.csv"))))
-    control = {r["provider_id"] for r in req if r["kind"] == "control"} - set(flagged)
+    control = {r["provider_id"] for r in req if r["kind"] == "control"} - set(flagged) - set(exclude or ())
     owner = {r["claim_id"]: r["provider_id"] for r in csv.DictReader(open(os.path.join(base, "claims.csv")))}
     docs = [r for r in csv.DictReader(open(os.path.join(base, "documentation.csv"))) if owner.get(r["claim_id"]) in control]
     docs += office.documentation_rows()
