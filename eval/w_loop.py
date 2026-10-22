@@ -59,6 +59,10 @@ VERSIONS = {
     "H17": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "rules40_opts": {"min": 5, "up": 0.10, "alpha": 0.20}}},   # H17 at L3, chosen on batches 1 to 4
     "D7p": {"version": "4.0", "screen": "pay_resid", "w40": {"ask": "all", "escalate": "stop", "demand_floor": "cost", "rules": "4.1"}},          # diagnostic for H18: the D7 recipe on the pay_resid list
     "H18": {"version": "4.0", "screen": "pay_resid", "w40": {"ask": "linear", "ask_model": os.path.join(ROOT, "experiments", "w_loop", "ask_model_pay_resid_b1to4.json"), "escalate": "stop", "demand_floor": "cost"}},   # H8 on the pay_resid list with the ask model refitted on its own ask-everyone run (batches 1 to 4)
+    # H20 ask only the first K listed providers by rank (sweep a: K with 30 charts; sweep b, in H20n*: the first-sample size n at the chosen K, set below once sweep a is done)
+    **{f"H20k{k}": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": k, "escalate": "stop", "demand_floor": "cost"}} for k in (1, 2, 3, 4, 5, 6, 8)},
+    **{f"H20n{n}": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": 1, "escalate": "stop", "demand_floor": "cost", "n": n}} for n in (10, 20, 30, 45, 60, 90)},   # H20 sweep b at K = 1 (chosen in sweep a)
+    "H20": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": 1, "escalate": "stop", "demand_floor": "cost", "n": 30}},   # H20 at (K, n) = (1, 30), chosen on batches 1 to 4
     "H3": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "policy25", "escalate": "stop", "sample_cpts": HI}},       # H2 without escalation (the first sample decides)
 }
 

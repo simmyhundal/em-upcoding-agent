@@ -1,7 +1,8 @@
 """Pre-declared reason, grid and choice rule for hypotheses H15 to H19 of the workflow v4.1 loop (issue 132). Committed BEFORE each hypothesis was run; docs/w_loop_v41.md quotes it."""
 
 CHOICE_RULE = ("Any parameter is chosen on batches 1 to 4 only, by the highest mean score 4.0 per seed over those 40 seeds (ties go to the setting closest to H8); the chosen setting is then run once on "
-               "batches 5 and 6 (out of sample) and never adjusted after seeing them. Bonferroni: seven hypotheses are tried (H13 to H19), so alpha = 0.05 / 7 = 0.0071 per look.")
+               "batches 5 and 6 (out of sample) and never adjusted after seeing them. Bonferroni: eight hypotheses are tried (H13 to H20), so alpha = 0.05 / 8 = 0.00625 per look. "
+               "(The first five were run under a bar of 0.05 / 7 = 0.0071; H20 was added afterwards. No result below clears either.)")
 
 DECL = {
     "H15": {"title": "H15: probe then extend (cost side)",
@@ -35,3 +36,13 @@ DECL = {
                       "The cross-validated R-squared (leave one batch out) on batches 1 to 4 is reported first.",
             "grid": "none (lambda, features and margin declared in advance)"},
 }
+
+DECL["H20"] = {"title": "H20: ask only the first K listed providers (decision layer)",
+               "reason": "In the ask-everyone run (wld7, 60 seeds, batches 1 to 6, demand floor on) the mean net value per seed of asking only the top k listed providers by rank is +$954 (k=1), +$942 (2), +$754 (3), +$629 (4), +$399 (5), +$218 (6), "
+                         "-$574 (8), -$1,900 (11), -$6,916 (22); workflow v4.0 averages about +$729 on the same six batches. The first two or three providers earn the money and deeper asking loses it. "
+                         "(The screen's top 2 were true upcoders in 200 of 200 development seeds; the true net overpayment of the top 2 averages $14,807 per seed, so the limit is proof, not detection.)",
+               "change": "The ask-or-skip model is replaced by: ask the first K listed providers by rank (the integer `ask` option). Everything else is H8's.",
+               "grid": "Two separate sweeps on batches 1 to 4 only, real workflow runs (not the D7 profile). (a) K in {1, 2, 3, 4, 5, 6, 8} with the first sample at 30 charts (H20k<K>). (b) With the K chosen in (a), "
+                       "first-sample size n in {10, 20, 30, 45, 60, 90} random charts (H20n<n>). Each parameter is chosen by leave-one-batch-out over batches 1 to 4: for each held-out batch, the setting with the best mean on the "
+                       "other three is taken and its realized score on the held-out batch recorded (ties to the smaller); the final setting is the one with the best mean over all 40 seeds (ties to the smaller). "
+                       "Choosing two parameters on 40 seeds gives selection bias in sample; the out-of-sample test on batches 5 and 6 decides."}
