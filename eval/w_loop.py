@@ -57,6 +57,8 @@ VERSIONS = {
     **{f"H17{t}": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "rules40_opts": {"min": m, "up": u, "alpha": a}}}
        for t, (m, u, a) in {"L1": (8, 0.20, 0.05), "L2": (6, 0.15, 0.10), "L3": (5, 0.10, 0.20)}.items()},
     "H17": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "rules40_opts": {"min": 5, "up": 0.10, "alpha": 0.20}}},   # H17 at L3, chosen on batches 1 to 4
+    "D7p": {"version": "4.0", "screen": "pay_resid", "w40": {"ask": "all", "escalate": "stop", "demand_floor": "cost", "rules": "4.1"}},          # diagnostic for H18: the D7 recipe on the pay_resid list
+    "H18": {"version": "4.0", "screen": "pay_resid", "w40": {"ask": "linear", "ask_model": os.path.join(ROOT, "experiments", "w_loop", "ask_model_pay_resid_b1to4.json"), "escalate": "stop", "demand_floor": "cost"}},   # H8 on the pay_resid list with the ask model refitted on its own ask-everyone run (batches 1 to 4)
     "H3": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "policy25", "escalate": "stop", "sample_cpts": HI}},       # H2 without escalation (the first sample decides)
 }
 

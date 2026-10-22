@@ -18,20 +18,20 @@ import score_40 as s4  # noqa: E402
 LAM = 3.0
 
 
-def table(batches):
+def table(batches, screen="eb_upper_t", prefix="wld7"):
     rows = []
     for b in batches:
         for seed in pool.BATCHES[b - 1]:
             code = f"d4_{seed}"
-            flags = {r["provider_id"]: r for r in csv.DictReader(open(os.path.join(ROOT, "experiments", code, "flagged_eb_upper_t_10.csv"))) if r["flagged"] == "True"}
-            pp = s4.per_provider(f"wld7_{seed}", code)
+            flags = {r["provider_id"]: r for r in csv.DictReader(open(os.path.join(ROOT, "experiments", code, f"flagged_{screen}_10.csv"))) if r["flagged"] == "True"}
+            pp = s4.per_provider(f"{prefix}_{seed}", code)
             for pid, fr in flags.items():
                 rows.append({"seed": seed, "x": p25.ask_vector(fr), "net": pp[pid]["net"] if pid in pp else 0.0})
     return rows
 
 
-def fit(batches):
-    rows = table(batches)
+def fit(batches, screen="eb_upper_t", prefix="wld7"):
+    rows = table(batches, screen, prefix)
     X, y = np.array([r["x"] for r in rows]), np.array([r["net"] for r in rows])
     mu, sd = X.mean(0), X.std(0) + 1e-9
     Z = np.column_stack([np.ones(len(X)), (X - mu) / sd])
@@ -41,6 +41,10 @@ def fit(batches):
 
 
 if __name__ == "__main__":
-    out = fit([int(b) for b in sys.argv[2:]])
+    args = sys.argv[2:]
+    screen = args[args.index("--screen") + 1] if "--screen" in args else "eb_upper_t"        # workflow v4.1 (H18): another list and its own ask-everyone run
+    prefix = args[args.index("--prefix") + 1] if "--prefix" in args else "wld7"
+    out = fit([int(b) for b in args if b.isdigit()], screen, prefix)
+    out["screen"] = screen
     json.dump(out, open(sys.argv[1], "w"), indent=1)
     print("wrote", sys.argv[1], "fitted on", out["providers"], "providers from", len(out["fit_on_seeds"]), "seeds")
