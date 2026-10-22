@@ -154,6 +154,66 @@ def more_sections():
     return L
 
 
+def h20c_section():
+    """H20c (the corrected H20), appended after the H15 to H20 text, which is left as generated."""
+    import recovery_40 as r40
+    import score_40 as s4
+    N = "H20c_k1_n30"
+    triage1 = r40.staff_cost(1, 0, 0, 0, 0, s4.PARAMS)[1]["triage"]
+    L = ["", "# Hypothesis H20c: H20 corrected (list only K providers)", "", "Added after H20. " + decl.H20C_RULE + " The grid and the reason were declared in `eval/w_loop_v41_decl.py` and committed before any H20c run.", ""]
+    L += head("H20c")
+    kd = json.load(open(os.path.join(wl.CACHE_DIR, "H20c_k_select_n30.json")))
+    L += ["", "Sweep (a): K with n = 30 charts (H20c_k<K>_n30), score 4.0 per seed by batch:", "", "| K | B1 | B2 | B3 | B4 | mean B1 to 4 | H20 at the same K (mean) |", "|---|---|---|---|---|---|---|"]
+    for k in (1, 2, 3, 4, 5, 6, 8):
+        d = load(f"H20c_k{k}_n30")
+        bm = [st.mean(d[str(x)]["score"] for x in pool.BATCHES[b]) for b in range(4)]
+        h = load(f"H20k{k}")
+        L.append(f"| {k} | " + " | ".join(f"{x:,.0f}" for x in bm) + f" | {st.mean(bm):,.0f} | {st.mean(h[str(x)]['score'] for x in B14):,.0f} |")
+    L += ["", "Leave-one-batch-out for K: held-out batches 1 to 4 each chose K = 1 (realized " + ", ".join(f"{f['realized']:,.0f}" for f in kd["folds"]) + f"; mean {kd['lobo_mean']:,.0f}). Chosen K = {kd['chosen']}, the edge of the grid, as in H20."]
+    nd = json.load(open(os.path.join(wl.CACHE_DIR, "H20c_k1_n_select.json")))
+    L += ["", "Sweep (b): first-sample size n at K = 1 (H20c_k1_n<n>):", "", "| n | B1 | B2 | B3 | B4 | mean B1 to 4 |", "|---|---|---|---|---|---|"]
+    for n in (10, 20, 30, 45, 60, 90):
+        d = load(f"H20c_k1_n{n}")
+        bm = [st.mean(d[str(x)]["score"] for x in pool.BATCHES[b]) for b in range(4)]
+        L.append(f"| {n} | " + " | ".join(f"{x:,.0f}" for x in bm) + f" | {st.mean(bm):,.0f} |")
+    L += ["", "Leave-one-batch-out for n: held-out folds chose " + ", ".join(f"n = {f['chosen']} (realized {f['realized']:,.0f})" for f in nd["folds"]) + f"; mean {nd['lobo_mean']:,.0f}. Chosen n = {nd['chosen']}. Chosen (K, n) = (1, 30), the sweep (a) run at K = 1."]
+    L += ["", "**Sanity check (before the sweeps, seeds 1515, 1616, 1717, K = 3, n = 30).** H20c and H20 asked the same providers with the same requests and received the same charts (identical office transcripts); H20c wrote 3 summaries and H20 wrote 22. "
+          "The score differs by exactly 19 providers x $13.125 of triage = $249.38 on each seed. Over all 40 development seeds at K = 1 the difference H20c minus H20 is +$276 on every seed (sd 0), which is 21 providers x $13.125.", ""]
+    for seeds, tag in ((B14, "batches 1 to 4 (in sample: K and n chosen here, the ask model of H8 fitted here)"), (B56, "batches 5 and 6 (out of sample, run once)")):
+        c = wl.compare(N, "H8", seeds)
+        L.append("- " + wl.line(c, N, "H8") + f" ({tag}). Clears alpha = 0.0056 (0.05 / 9): {'yes' if c['p'] <= 0.05 / 9 else 'no'}.")
+    d = load(N)
+    z = wl.perm_p([d[str(x)]["score"] for x in B56])
+    L.append(f"- Against zero on batches 5 and 6: mean {st.mean(d[str(x)]['score'] for x in B56):,.0f} per seed, one-sided p = {z:.3f} (H8 itself: {wl.perm_p([load('H8')[str(x)]['score'] for x in B56]):.3f}). Clears 0.0056: {'yes' if z <= 0.05 / 9 else 'no'}.")
+    for seeds, tag in ((B14, "batches 1 to 4"), (B56, "batches 5 and 6")):
+        L.append("- " + wl.line(wl.compare(N, "H20", seeds), N, "H20 (same K, n)") + f" ({tag}). Identical asks, charts and found; the difference is the triage of the providers no longer listed.")
+    # components with triage
+    L += ["", "Per seed means (components of score 4.0; triage is the listed providers' share of staff cost):", "", "| Seeds | Version | Score | Listed | Triage | Asks | Rounds | Found | Honest called | Recovered | Staff cost |", "|---|---|---|---|---|---|---|---|---|---|---|"]
+
+    def listed(name, seeds):
+        return st.mean(sum(1 for x in open(os.path.join(ROOT, "experiments", f"wl{name.lower()}_{s}", "case_summaries_checked.jsonl")) if x.strip()) for s in seeds)
+    for lab, seeds in (("Batches 1 to 4", B14), ("Batches 5 and 6", B56)):
+        for n, shown in (("H8", "H8"), ("H20", "H20 (K = 1, n = 30)"), (N, "H20c (K = 1, n = 30)")):
+            dd = load(n)
+            g = lambda k: st.mean(dd[str(x)][k] for x in seeds)
+            lst = listed(n, seeds)
+            L.append(f"| {lab} | {shown} | {g('score'):,.0f} | {lst:.0f} | {lst * triage1:,.0f} | {asks_per_seed(n, seeds):.2f} | {g('rounds'):.1f} | {g('found'):.2f} | {g('honest_called'):.2f} | {g('recovered'):,.0f} | {g('staff_cost'):,.0f} |")
+    c56 = wl.compare(N, "H8", B56)
+    saved = 21 * triage1
+    L += ["", "**What is triage and what is asking.** A one-provider list saves 21 providers x $13.125 = $%s of triage per seed against H8's 22 (and against H20). H20c beats H8 by $%s per seed out of sample, so the asking itself contributes %+d: "
+          "the asking policy alone (one provider per seed, %.2f upcoders found per seed against H8's %.2f) is worth about $70 less than H8's. All of H20c's gain over H8 (and all of its gain over H20) is staff cost that is not spent because the list is shorter, "
+          "which is true by construction of the score (score 4.0 charges triage for every provider with a checked summary), not a better decision. The same triage saving is not available to H8 without changing its list to a shorter one, which is what H20c is."
+          % (f"{saved:,.0f}", f"{c56['mean_diff']:,.0f}", round(c56["mean_diff"] - saved), st.mean(load(N)[str(x)]["found"] for x in B56), st.mean(load("H8")[str(x)]["found"] for x in B56)), ""]
+    a56 = c56
+    a14 = wl.compare(N, "H8", B14)
+    L += ["**Verdict: rejected as an improvement of the asking; the score gain over H8 is triage saved by construction, and it is not distinguishable from noise.** "
+          f"Out of sample the gain over H8 is {a56['mean_diff']:+,.0f} per seed (sd {a56['sd_diff']:,.0f}, better on {a56['wins']} of 20, one-sided p = {a56['p']:.3f}) and in sample {a14['mean_diff']:+,.0f} (p = {a14['p']:.3f}); neither clears the Bonferroni bar of alpha = 0.05 / 9 = 0.0056 "
+          "(nine hypotheses tried: H13 to H20 and H20c), and both are smaller than the batch noise of about +/-$1,450. The gain over H20 is exactly the triage saved ($276 per seed, p ~ 0 only because the difference is a constant by construction, not evidence about asking). "
+          "H20c does not change workflow v4.0. Caveats: a one-provider list finds 0.28 to 0.45 of the 8 upcoders per seed, so it forgoes the dollars H8 recovers on the deeper list, and it is a high-variance policy (one provider per seed); the screen's score and rank are the payer's, so nothing here uses the answer key; "
+          "nothing here was run on fresh seeds. A different question, not tested here, is whether the other hypotheses (H15 to H19) would look different once triage is charged only for the providers a policy reviews; they all list 22."]
+    return L
+
+
 def main():
     cv = json.load(open(os.path.join(wl.CACHE_DIR, "ask_margin_cv.json")))
     d8 = json.load(open(os.path.join(wl.CACHE_DIR, "H8.json")))
@@ -200,6 +260,7 @@ def main():
           "- Against doing nothing: both H8 and H14 are above zero on the pooled batches 5 and 6 (H8 +$719, H14 +$707 per seed), but this comes from batch 5 (H8 +$1,483, H14 +$1,459); batch 6 is -$46 for both. Per-batch swings of +/-$1,450 mean this is not a reliable lead over zero, and on ten fresh seeds H8 scored -$1,161. This is an inference from six batches, not a test of H14.",
           "- What this leaves: the loss is in the staff cost of asking that the ask model cannot tell apart by a small margin; the ask model's predictions are too weak to separate good asks from bad ones at the edge. Nothing here changes workflow v4.0."]
     L += more_sections()
+    L += h20c_section()
     open(os.path.join(ROOT, "docs", "w_loop_v41.md"), "w").write("\n".join(L) + "\n")
     print("wrote docs/w_loop_v41.md")
 

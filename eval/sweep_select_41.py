@@ -10,10 +10,10 @@ sys.path.insert(0, os.path.join(ROOT, "eval"))
 import dev_pool_v4 as pool  # noqa: E402
 
 
-def select(prefix, values):
+def select(prefix, values, suffix=""):
     tab = {}
     for v in values:
-        d = json.load(open(os.path.join(ROOT, "experiments", "w_loop", f"{prefix}{v}.json")))
+        d = json.load(open(os.path.join(ROOT, "experiments", "w_loop", f"{prefix}{v}{suffix}.json")))
         tab[v] = [st.mean(d[str(s)]["score"] for s in pool.BATCHES[b]) for b in range(4)]
     mean = {v: st.mean(x) for v, x in tab.items()}
     best = lambda cand: min(cand, key=lambda v: (-cand[v], float(v)))
@@ -26,6 +26,7 @@ def select(prefix, values):
 
 
 if __name__ == "__main__":
-    r = select(sys.argv[1], sys.argv[2].split(","))
-    json.dump(r, open(os.path.join(ROOT, "experiments", "w_loop", f"{sys.argv[1]}_select.json"), "w"), indent=1)
+    suffix = sys.argv[3] if len(sys.argv) > 3 else ""
+    r = select(sys.argv[1], sys.argv[2].split(","), suffix)
+    json.dump(r, open(os.path.join(ROOT, "experiments", "w_loop", f"{sys.argv[1]}_select{suffix}.json"), "w"), indent=1)
     print(json.dumps({k: v for k, v in r.items() if k != "batch_means"}, indent=1))

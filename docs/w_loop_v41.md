@@ -288,3 +288,66 @@ Bar: Bonferroni alpha = 0.05 / 8 = 0.00625 per look (0.0071 for the first five w
 | H20 | K = 1, n = 30 | -69 | 0.601 | -61 | 0.599 | no | rejected |
 
 None of the six clears the bar, and none changes workflow v4.0. All are about as large as the batch-to-batch swing (+/-$1,450). Nothing here was run on fresh seeds.
+
+# Hypothesis H20c: H20 corrected (list only K providers)
+
+Added after H20. Same choice rule as H15 to H20 (leave-one-batch-out on batches 1 to 4, real runs, ties to the smaller; then one run on batches 5 and 6 against H8). H20c is the ninth hypothesis tried (H13 to H20 and H20c), so the Bonferroni bar is alpha = 0.05 / 9 = 0.0056 per look, applied to both the out-of-sample and the in-sample p. The grid and the reason were declared in `eval/w_loop_v41_decl.py` and committed before any H20c run.
+
+## H20c: H20 corrected, list only K providers (decision layer)
+
+**Reason (declared before running).** H20 asked only the first K of the 22 listed providers but still wrote a checked summary for all 22, and score 4.0 charges triage (15 minutes of analyst time, about $13) for every provider with a checked summary (docs/score_40.md; `listed` in eval/score_40.py run_inputs). So H20 paid about $289 of triage per seed for providers it never looked at. A top-K rule needs only K providers reviewed. (The D7 profile of top-k values, which promised +$954 per seed for K = 1, also left triage out; the real H20 run scored +$649 on batches 5 and 6.)
+
+**Change.** The same change as H20 (ask the first K providers by rank, a first sample of n random charts, everything else H8's: eb_upper_t ranking, rules 4.0, demand floor, no escalation), but the list is only the top K of the eb_upper_t screen (a flagged file whose first K rows stay flagged, same ranking and order), so only K providers are summarized and triaged. The baseline of unflagged providers' reviews still leaves out the whole 22, so H20c differs from H20 only in which providers are listed and triaged.
+
+**Grid and choice (declared before running).** Two sweeps on batches 1 to 4 only, real workflow runs: (a) K in {1, 2, 3, 4, 5, 6, 8} with n = 30 (H20c_k<K>_n30); (b) with the K chosen in (a), n in {10, 20, 30, 45, 60, 90} random charts (H20c_k<K>_n<n>). Each chosen by leave-one-batch-out over batches 1 to 4 (the held-out batch's realized mean score, ties to the smaller), the final setting the best mean over the 40 seeds (ties to the smaller). Then (K, n) is run once on batches 5 and 6 against H8 and against zero. Sanity check before the sweeps, on seeds 1515, 1616 and 1717: H20c and H20 at the same (K, n) must ask the same providers and the same charts, and differ in score by the triage saved (about $13 per provider not listed).
+
+
+Sweep (a): K with n = 30 charts (H20c_k<K>_n30), score 4.0 per seed by batch:
+
+| K | B1 | B2 | B3 | B4 | mean B1 to 4 | H20 at the same K (mean) |
+|---|---|---|---|---|---|---|
+| 1 | -448 | 3,577 | -109 | 777 | 949 | 674 |
+| 2 | -848 | 3,421 | -236 | 894 | 808 | 545 |
+| 3 | -1,087 | 3,296 | -630 | 1,144 | 681 | 431 |
+| 4 | -1,129 | 3,575 | -1,067 | 904 | 571 | 334 |
+| 5 | -1,083 | 3,136 | -1,517 | 576 | 278 | 55 |
+| 6 | -1,459 | 2,965 | -1,941 | 616 | 45 | -165 |
+| 8 | -2,222 | 2,101 | -2,829 | -308 | -814 | -998 |
+
+Leave-one-batch-out for K: held-out batches 1 to 4 each chose K = 1 (realized -448, 3,577, -109, 777; mean 949). Chosen K = 1, the edge of the grid, as in H20.
+
+Sweep (b): first-sample size n at K = 1 (H20c_k1_n<n>):
+
+| n | B1 | B2 | B3 | B4 | mean B1 to 4 |
+|---|---|---|---|---|---|
+| 10 | -165 | -244 | 527 | -248 | -33 |
+| 20 | -373 | 1,954 | 379 | 586 | 637 |
+| 30 | -448 | 3,577 | -109 | 777 | 949 |
+| 45 | -450 | 2,147 | -214 | 952 | 609 |
+| 60 | -415 | 1,391 | -288 | 1,338 | 506 |
+| 90 | -628 | 288 | -325 | 1,015 | 88 |
+
+Leave-one-batch-out for n: held-out folds chose n = 30 (realized -448), n = 60 (realized 1,391), n = 30 (realized -109), n = 30 (realized 777); mean 403. Chosen n = 30. Chosen (K, n) = (1, 30), the sweep (a) run at K = 1.
+
+**Sanity check (before the sweeps, seeds 1515, 1616, 1717, K = 3, n = 30).** H20c and H20 asked the same providers with the same requests and received the same charts (identical office transcripts); H20c wrote 3 summaries and H20 wrote 22. The score differs by exactly 19 providers x $13.125 of triage = $249.38 on each seed. Over all 40 development seeds at K = 1 the difference H20c minus H20 is +$276 on every seed (sd 0), which is 21 providers x $13.125.
+
+- H20c_k1_n30 vs H8 on 40 seeds: score 4.0 per seed 949 vs 735 (difference +214, sd 1,546, better on 28 of 40, one-sided p = 0.2025); found 11 vs 34, honest called 0 vs 0, rounds 76 vs 230; above zero: True (batches 1 to 4 (in sample: K and n chosen here, the ask model of H8 fitted here)). Clears alpha = 0.0056 (0.05 / 9): no.
+- H20c_k1_n30 vs H8 on 20 seeds: score 4.0 per seed 925 vs 719 (difference +206, sd 1,180, better on 14 of 20, one-sided p = 0.2275); found 9 vs 17, honest called 0 vs 0, rounds 40 vs 118; above zero: True (batches 5 and 6 (out of sample, run once)). Clears alpha = 0.0056 (0.05 / 9): no.
+- Against zero on batches 5 and 6: mean 925 per seed, one-sided p = 0.116 (H8 itself: 0.185). Clears 0.0056: no.
+- H20c_k1_n30 vs H20 (same K, n) on 40 seeds: score 4.0 per seed 949 vs 674 (difference +276, sd 0, better on 40 of 40, one-sided p = 0.0000); found 11 vs 11, honest called 0 vs 0, rounds 76 vs 76; above zero: True (batches 1 to 4). Identical asks, charts and found; the difference is the triage of the providers no longer listed.
+- H20c_k1_n30 vs H20 (same K, n) on 20 seeds: score 4.0 per seed 925 vs 649 (difference +276, sd 0, better on 20 of 20, one-sided p = 0.0000); found 9 vs 9, honest called 0 vs 0, rounds 40 vs 40; above zero: True (batches 5 and 6). Identical asks, charts and found; the difference is the triage of the providers no longer listed.
+
+Per seed means (components of score 4.0; triage is the listed providers' share of staff cost):
+
+| Seeds | Version | Score | Listed | Triage | Asks | Rounds | Found | Honest called | Recovered | Staff cost |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Batches 1 to 4 | H8 | 735 | 22 | 289 | 2.95 | 5.8 | 0.85 | 0.00 | 2,467 | 1,731 |
+| Batches 1 to 4 | H20 (K = 1, n = 30) | 674 | 22 | 289 | 1.00 | 1.9 | 0.28 | 0.00 | 1,450 | 776 |
+| Batches 1 to 4 | H20c (K = 1, n = 30) | 949 | 1 | 13 | 1.00 | 1.9 | 0.28 | 0.00 | 1,450 | 500 |
+| Batches 5 and 6 | H8 | 719 | 22 | 289 | 3.05 | 5.9 | 0.85 | 0.00 | 2,440 | 1,722 |
+| Batches 5 and 6 | H20 (K = 1, n = 30) | 649 | 22 | 289 | 1.00 | 2.0 | 0.45 | 0.00 | 1,503 | 854 |
+| Batches 5 and 6 | H20c (K = 1, n = 30) | 925 | 1 | 13 | 1.00 | 2.0 | 0.45 | 0.00 | 1,503 | 578 |
+
+**What is triage and what is asking.** A one-provider list saves 21 providers x $13.125 = $276 of triage per seed against H8's 22 (and against H20). H20c beats H8 by $206 per seed out of sample, so the asking itself contributes -69: the asking policy alone (one provider per seed, 0.45 upcoders found per seed against H8's 0.85) is worth about $70 less than H8's. All of H20c's gain over H8 (and all of its gain over H20) is staff cost that is not spent because the list is shorter, which is true by construction of the score (score 4.0 charges triage for every provider with a checked summary), not a better decision. The same triage saving is not available to H8 without changing its list to a shorter one, which is what H20c is.
+
+**Verdict: rejected as an improvement of the asking; the score gain over H8 is triage saved by construction, and it is not distinguishable from noise.** Out of sample the gain over H8 is +206 per seed (sd 1,180, better on 14 of 20, one-sided p = 0.228) and in sample +214 (p = 0.203); neither clears the Bonferroni bar of alpha = 0.05 / 9 = 0.0056 (nine hypotheses tried: H13 to H20 and H20c), and both are smaller than the batch noise of about +/-$1,450. The gain over H20 is exactly the triage saved ($276 per seed, p ~ 0 only because the difference is a constant by construction, not evidence about asking). H20c does not change workflow v4.0. Caveats: a one-provider list finds 0.28 to 0.45 of the 8 upcoders per seed, so it forgoes the dollars H8 recovers on the deeper list, and it is a high-variance policy (one provider per seed); the screen's score and rank are the payer's, so nothing here uses the answer key; nothing here was run on fresh seeds. A different question, not tested here, is whether the other hypotheses (H15 to H19) would look different once triage is charged only for the providers a policy reviews; they all list 22.
