@@ -44,3 +44,5 @@
 | Precision | Upcoders found out of all providers called upcoding (found plus honest providers accused) |
 | Net $ per seed | The RL score: the overpayment a records sample supports for the upcoders found (90% lower bound) minus request and false-accusation costs, averaged over the ten seeds. Compare rows within one seed set only; each release has its own ten seeds |
 
+## Abbreviations
+Versions are written short in notes, issues and tables: **S4.0, S4.1** are score versions (score 4.0, score 4.1); **D2.2, D4.0** are data versions (data 2.2, data 4.0); **W2.5, W4.0** are workflow versions and **A3.5, A5.0** agent versions (workflow v4.0, agent v5.0); **H8** is a hypothesis of the workflow's development loop (H8 is workflow v4.0). In the README and release notes the long form stays.
