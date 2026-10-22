@@ -62,3 +62,229 @@ Per seed means, H14 against H8 (components of score 4.0):
 - The bar: with H13 and H14 tried, the Bonferroni alpha is 0.025 per look. H14's out-of-sample p is 0.62 and its in-sample p 0.076; neither clears 0.025.
 - Against doing nothing: both H8 and H14 are above zero on the pooled batches 5 and 6 (H8 +$719, H14 +$707 per seed), but this comes from batch 5 (H8 +$1,483, H14 +$1,459); batch 6 is -$46 for both. Per-batch swings of +/-$1,450 mean this is not a reliable lead over zero, and on ten fresh seeds H8 scored -$1,161. This is an inference from six batches, not a test of H14.
 - What this leaves: the loss is in the staff cost of asking that the ask model cannot tell apart by a small margin; the ask model's predictions are too weak to separate good asks from bad ones at the edge. Nothing here changes workflow v4.0.
+
+# Hypotheses H15 to H20
+
+Added after H13 and H14, one change each on top of H8, same pool and paired comparison. Any parameter is chosen on batches 1 to 4 only, by the highest mean score 4.0 per seed over those 40 seeds (ties go to the setting closest to H8); the chosen setting is then run once on batches 5 and 6 (out of sample) and never adjusted after seeing them. Bonferroni: eight hypotheses are tried (H13 to H20), so alpha = 0.05 / 8 = 0.00625 per look. (The first five were run under a bar of 0.05 / 7 = 0.0071; H20 was added afterwards. No result below clears either.) H8 on batches 1 to 4 is 735 per seed and on batches 5 and 6 is 719 (H8's ask model was fitted on batches 1 to 4, so batches 5 and 6 are out of sample for every version here, except that the H8 batch means are themselves a draw of +/-$1,450). The grid and the choice rule for each hypothesis are in `eval/w_loop_v41_decl.py`, committed before the runs. Verdicts are my reading; the numbers are generated.
+
+## H15: probe then extend (cost side)
+
+**Reason (declared before running).** 296 listed providers were asked but only 77 were demanded from (74% of asked providers ended with no demand), and each asked provider is sent 30 charts, so most chart-review and request cost is spent on providers who turn out clean. H10 (a flat 20-chart sample) was rejected, but a flat cut also thins the sample of the real upcoders.
+
+**Change.** The first request is 10 random charts. If at least k of the returned documented 99214 and 99215 charts are unsupported by the chart test's own reading (documented level or minutes below the billed level, as the rules count them), a second RANDOM request of 20 more charts is sent (office 2.1 allows a further request with new charts); otherwise the request is closed. The estimate and the rules use all random charts.
+
+**Grid and choice (declared before running).** k in {2, 3, 4} (H15k2, H15k3, H15k4)
+
+
+| k | B1 | B2 | B3 | B4 | mean B1 to 4 |
+|---|---|---|---|---|---|
+| 2 | -941 | -719 | -1,183 | 622 | -555 |
+| 3 | -877 | -525 | -1,007 | 222 | -547 |
+| 4 | -694 | -765 | -928 | -626 | -753 |
+
+Chosen k = 3 (best mean on batches 1 to 4: -547); the other two were -555 and -753, all far below H8's 735.
+
+- H15 vs H8 on 40 seeds: score 4.0 per seed -547 vs 735 (difference -1,282, sd 4,065, better on 18 of 40, one-sided p = 0.9912); found 21 vs 34, honest called 0 vs 0, rounds 286 vs 230; above zero: False (batches 1 to 4 (in sample: parameter chosen, and the ask model fitted, here)). Clears alpha = 0.00625: no.
+- H15 vs H8 on 20 seeds: score 4.0 per seed 902 vs 719 (difference +183, sd 3,735, better on 10 of 20, one-sided p = 0.4185); found 14 vs 17, honest called 0 vs 0, rounds 157 vs 118; above zero: True (batches 5 and 6 (out of sample, run once)). Clears alpha = 0.00625: no.
+- Against zero on batches 5 and 6: mean 902 per seed, one-sided p = 0.170 (H8 itself: 0.185); not distinguishable from zero.
+
+What the probe did: on batches 1 to 4, 118 providers were asked, 37 (31%) were extended to 30 charts, none was blocked by the round or day cap, and the first 10 charts held 7.5 documented 99214 or 99215 charts on average. Rules 4.0 need at least 10 pooled 99214 and 99215 charts (POOL_MIN_40), so a provider who is not extended can be called only if all 10 charts are 99214 or 99215 and 10 happen to be documented; in practice the probe decides the call. By construction, the estimate then rests on a sample whose size depends on its own first results (not a fixed-design random sample), so the lower bound is not exactly 90%.
+
+Per seed means (components of score 4.0):
+
+| Seeds | Version | Score | Asks | Rounds | Found | Honest called | Recovered | Staff cost |
+|---|---|---|---|---|---|---|---|---|
+| Batches 1 to 4 | H8 | 735 | 2.95 | 5.8 | 0.85 | 0.00 | 2,467 | 1,731 |
+| Batches 1 to 4 | H15 | -547 | 2.95 | 7.2 | 0.53 | 0.00 | 984 | 1,530 |
+| Batches 5 and 6 | H8 | 719 | 3.05 | 5.9 | 0.85 | 0.00 | 2,440 | 1,722 |
+| Batches 5 and 6 | H15 | 902 | 3.05 | 7.8 | 0.70 | 0.00 | 2,618 | 1,716 |
+
+**Verdict: rejected.** On batches 1 to 4 it loses $1,282 per seed against H8 (found 21 against 34 upcoders): (an inference) the probe misses real upcoders, who are caught by a 10-chart look less often than by a 30-chart look, and the extra requests add rounds (7.2 against 5.8 per seed) because the follow-up and the second request each count. The positive difference on batches 5 and 6 (+$183, p = 0.42, better on 10 of 20) is noise around a rule that lost on the 40 seeds it was chosen on; it is not evidence for the hypothesis.
+
+## H16: near-miss extension (recovery side)
+
+**Reason (declared before running).** The demand floor withdrew 65 of the 142 rules-called providers because the 90% lower bound of the recovery estimate fell below the cost of a demand. The bound is the total minus t times a standard error that shrinks with the sample, so for a provider whose point estimate clears the cost but whose bound does not, 30 more random charts could tighten the bound enough to turn the call into a demand. H11 (45 charts for everyone) was rejected because it pays for providers who do not need it.
+
+**Change.** After the first 30 charts and the rules call, for rules-called providers whose point estimate (recovery_40.recovery) is at least c times the cost of a demand but whose lower bound is below it, a second random request of 30 charts is sent and the rules and the estimate are recomputed before the floor decides.
+
+**Grid and choice (declared before running).** c in {1, 1.5, 2} (H16c1, H16c1.5, H16c2)
+
+
+| c | B1 | B2 | B3 | B4 | mean B1 to 4 |
+|---|---|---|---|---|---|
+| 1 | -415 | 3,763 | -208 | 1,023 | 1,041 |
+| 1.5 | -415 | 3,763 | -208 | 1,023 | 1,041 |
+| 2 | -415 | 3,763 | -208 | 1,023 | 1,041 |
+
+All three c give the same result: every provider whose lower bound was below the cost of a demand but whose point estimate was above it had a point estimate of at least $1,027, which is 3.7 times the $276 cost of a demand, so c between 1 and 2 selects the same 14 providers. By the pre-declared tie rule (closest to H8) c = 2 is chosen.
+
+- H16 vs H8 on 40 seeds: score 4.0 per seed 1,041 vs 735 (difference +306, sd 1,143, better on 8 of 40, one-sided p = 0.0267); found 43 vs 34, honest called 0 vs 0, rounds 257 vs 230; above zero: True (batches 1 to 4 (in sample: parameter chosen, and the ask model fitted, here)). Clears alpha = 0.00625: no.
+- H16 vs H8 on 20 seeds: score 4.0 per seed 976 vs 719 (difference +257, sd 985, better on 4 of 20, one-sided p = 0.2265); found 23 vs 17, honest called 0 vs 0, rounds 136 vs 118; above zero: True (batches 5 and 6 (out of sample, run once)). Clears alpha = 0.00625: no.
+- Against zero on batches 5 and 6: mean 976 per seed, one-sided p = 0.113 (H8 itself: 0.185); not distinguishable from zero.
+
+What the extension did: 14 providers were extended on batches 1 to 4 and 9 of them were demanded from after the second sample (the rest stayed below the floor); on batches 5 and 6, 9 and 6. The floor withdrew 13 calls on batches 1 to 4 (H8: 23) and 7 on batches 5 and 6 (H8: 13). No second request was blocked.
+
+Per seed means (components of score 4.0):
+
+| Seeds | Version | Score | Asks | Rounds | Found | Honest called | Recovered | Staff cost |
+|---|---|---|---|---|---|---|---|---|
+| Batches 1 to 4 | H8 | 735 | 2.95 | 5.8 | 0.85 | 0.00 | 2,467 | 1,731 |
+| Batches 1 to 4 | H16 | 1,041 | 2.95 | 6.4 | 1.07 | 0.00 | 2,989 | 1,947 |
+| Batches 5 and 6 | H8 | 719 | 3.05 | 5.9 | 0.85 | 0.00 | 2,440 | 1,722 |
+| Batches 5 and 6 | H16 | 976 | 3.05 | 6.8 | 1.15 | 0.00 | 2,983 | 2,007 |
+
+**Verdict: not supported at the bar; the most plausible lead of the six, but a small one.** The mechanism worked as designed (found 23 against 17 on batches 5 and 6; recovery +$543 per seed for +$285 of staff cost), the out-of-sample gain is +$257 per seed, but it comes from a few seeds (better on 4 of 20 and 8 of 40, the rest equal or worse) and p = 0.23 out of sample and 0.027 in sample, neither below 0.00625. A difference this size on 20 seeds is below the batch noise. It would need a new test on fresh seeds before being adopted.
+
+## H17: let the money decide (decision layer)
+
+**Reason (declared before running).** 236 upcoders had usable charts but the rules called only 142, and across the 100 development seeds workflow v4.0 called zero honest providers: the rules' chart test may be stricter than needed because the demand floor is already a money gate (an honest provider's lower bound is about zero, below the floor, so a wrong call is withdrawn).
+
+**Change.** The pooled 99214 and 99215 chart test of rules 4.0 is loosened through a version option (POOL_MIN_40, POOL_UP_40, ALPHA_40 as arguments; the module defaults and agent v5.0 are unchanged); the demand floor stays.
+
+**Grid and choice (declared before running).** (minimum documented charts, minimum unsupported share, alpha): L1 = (8, 0.20, 0.05), L2 = (6, 0.15, 0.10), L3 = (5, 0.10, 0.20); H8 is (10, 0.25, 0.05)
+
+
+| setting | B1 | B2 | B3 | B4 | mean B1 to 4 |
+|---|---|---|---|---|---|
+| L1 | -850 | 3,763 | -793 | 1,147 | 817 |
+| L2 | -715 | 3,763 | -676 | 1,147 | 880 |
+| L3 | -642 | 3,763 | -676 | 1,147 | 898 |
+
+L1 = (8 charts, 20%, alpha 0.05), L2 = (6, 15%, 0.10), L3 = (5, 10%, 0.20); H8 = (10, 25%, 0.05). Chosen L3 (best mean on batches 1 to 4: 898); the more the test is loosened, the better it did on these 40 seeds, so L3 is the end of the declared grid and the trend may continue beyond it (not tested).
+
+- H17 vs H8 on 40 seeds: score 4.0 per seed 898 vs 735 (difference +163, sd 473, better on 7 of 40, one-sided p = 0.0149); found 40 vs 34, honest called 0 vs 0, rounds 230 vs 230; above zero: True (batches 1 to 4 (in sample: parameter chosen, and the ask model fitted, here)). Clears alpha = 0.00625: no.
+- H17 vs H8 on 20 seeds: score 4.0 per seed 1,010 vs 719 (difference +291, sd 819, better on 3 of 20, one-sided p = 0.1249); found 20 vs 17, honest called 0 vs 0, rounds 118 vs 118; above zero: True (batches 5 and 6 (out of sample, run once)). Clears alpha = 0.00625: no.
+- Against zero on batches 5 and 6: mean 1,010 per seed, one-sided p = 0.140 (H8 itself: 0.185); not distinguishable from zero.
+
+Per seed means (components of score 4.0):
+
+| Seeds | Version | Score | Asks | Rounds | Found | Honest called | Recovered | Staff cost |
+|---|---|---|---|---|---|---|---|---|
+| Batches 1 to 4 | H8 | 735 | 2.95 | 5.8 | 0.85 | 0.00 | 2,467 | 1,731 |
+| Batches 1 to 4 | H17 | 898 | 2.95 | 5.8 | 1.00 | 0.00 | 2,671 | 1,772 |
+| Batches 5 and 6 | H8 | 719 | 3.05 | 5.9 | 0.85 | 0.00 | 2,440 | 1,722 |
+| Batches 5 and 6 | H17 | 1,010 | 3.05 | 5.9 | 1.00 | 0.00 | 2,773 | 1,763 |
+
+No honest provider was called under any setting on these seeds (honest called 0 in all rows) and the abrasion component did not change: the demand floor withdraws the weak calls, as the hypothesis expected. Rounds are identical to H8 by construction, since the rules act after the requests.
+
+**Verdict: not supported at the bar.** +$291 per seed out of sample (p = 0.12; better on only 3 of 20 seeds, the rest equal or worse) and +$163 in sample (p = 0.015). The gain is real in direction on both and has no visible cost on honest providers here, but it rests on a handful of seeds where one more provider was demanded from. It is a lead for a fresh-seed test, not a result.
+
+## H18: a dollar-weighted list (screen)
+
+**Reason (declared before running).** docs/screens_v4_pipeline.md scored the pay_resid list best under the frozen pipeline on 11 development seeds (-$13,674 per seed against -$15,156 for eb_upper_t; recall differences small); it ranks by shrunk excess allowed dollars, so it favours providers whose recoveries are larger, and no alternative list has been run through the final v4.0 pipeline on the 100-seed pool.
+
+**Change.** The top 10% by pay_resid is listed instead of eb_upper_t. The ask model is refitted on that list's own ask-everyone run (same recipe as D7: rules 4.1, floor, no escalation) on batches 1 to 4, ridge lambda 3.
+
+**Grid and choice (declared before running).** none (one list, one refit)
+
+Diagnostic run `D7p` (ask-everyone on the pay_resid list, batches 1 to 4) gave a per-seed score of -7,376 when every listed provider is asked (D7 on eb_upper_t is stored in `wld7_*`). The ask model refitted on it is `experiments/w_loop/ask_model_pay_resid_b1to4.json` (same six features, lambda 3). The features suit the new list (the file has the same columns), so no change to them was needed; whether they predict well on it is shown by the result.
+
+- H18 vs H8 on 40 seeds: score 4.0 per seed 687 vs 735 (difference -47, sd 601, better on 13 of 40, one-sided p = 0.6884); found 40 vs 34, honest called 0 vs 0, rounds 268 vs 230; above zero: True (batches 1 to 4 (in sample: parameter chosen, and the ask model fitted, here)). Clears alpha = 0.00625: no.
+- H18 vs H8 on 20 seeds: score 4.0 per seed 437 vs 719 (difference -282, sd 661, better on 4 of 20, one-sided p = 0.9615); found 16 vs 17, honest called 0 vs 0, rounds 132 vs 118; above zero: True (batches 5 and 6 (out of sample, run once)). Clears alpha = 0.00625: no.
+- Against zero on batches 5 and 6: mean 437 per seed, one-sided p = 0.290 (H8 itself: 0.185); not distinguishable from zero.
+
+Per seed means (components of score 4.0):
+
+| Seeds | Version | Score | Asks | Rounds | Found | Honest called | Recovered | Staff cost |
+|---|---|---|---|---|---|---|---|---|
+| Batches 1 to 4 | H8 | 735 | 2.95 | 5.8 | 0.85 | 0.00 | 2,467 | 1,731 |
+| Batches 1 to 4 | H18 | 687 | 3.42 | 6.7 | 1.00 | 0.00 | 2,638 | 1,948 |
+| Batches 5 and 6 | H8 | 719 | 3.05 | 5.9 | 0.85 | 0.00 | 2,440 | 1,722 |
+| Batches 5 and 6 | H18 | 437 | 3.40 | 6.6 | 0.80 | 0.00 | 2,282 | 1,845 |
+
+**Verdict: rejected.** -$282 per seed out of sample (p = 0.96) and -$47 in sample (p = 0.69). The list finds more upcoders in sample (found 40 against 34 on batches 1 to 4), but the extra providers it lists cost more asks (3.4 against 3.05 per seed out of sample) and rounds than they return; the earlier screen comparison on 11 seeds under the frozen pipeline did not carry over to the final v4.0 pipeline.
+
+## H19: a seed-level gate (portfolio)
+
+**Reason (declared before running).** Batch means swing from -$977 to +$3,763 and 5 of 10 batches were negative, so most of the variance is between seeds. If a seed's value can be predicted from what the payer sees before asking, a gate that skips the whole seed when the predicted H8 score is below a margin would move the result toward zero in bad seeds. H14 changed the margin per provider; this changes it per run.
+
+**Change.** A ridge (lambda 10, fixed) on three pre-declared pre-ask features, fitted on the 40 seeds of batches 1 to 4 to H8's score 4.0 per seed: (1) the mean screen score of the 22 listed providers, (2) the gap between the mean screen score of ranks 1 to 5 and of ranks 6 to 22, (3) the log of the total allowed dollars on the listed providers' claims. A seed is skipped (score 0, nothing asked) when the predicted score is below 0. The cross-validated R-squared (leave one batch out) on batches 1 to 4 is reported first.
+
+**Grid and choice (declared before running).** none (lambda, features and margin declared in advance)
+
+**First, can the seed score be predicted?** Cross-validated (leave one batch out) R-squared on batches 1 to 4: -0.28 against the pooled mean of the 40 seeds and -0.12 against each fold's own training mean. **Both are below zero, so the model predicts worse than a constant: the gate is not supported.** With 40 points and three features this is what a weak signal looks like. The gate is reported anyway, as asked.
+
+Standardized coefficients (intercept, mean score, top-5 gap, log dollars): 735, -496, 1,828, -43. The gate skips 15 of 40 seeds on batches 1 to 4 (in sample) and 6 of 20 on batches 5 and 6; the correlation between predicted and actual H8 score on batches 5 and 6 is 0.35. The seeds skipped on batches 5 and 6 averaged -382 under H8, the kept ones 1,190.
+
+- H19 vs H8 on 40 seeds: score 4.0 per seed 903 vs 735 (difference +168, sd 664, better on 13 of 40, one-sided p = 0.0598); found 30 vs 34, honest called 0 vs 0, rounds 178 vs 230; above zero: True (batches 1 to 4 (in sample: parameter chosen, and the ask model fitted, here)). Clears alpha = 0.00625: no.
+- H19 vs H8 on 20 seeds: score 4.0 per seed 833 vs 719 (difference +115, sd 288, better on 4 of 20, one-sided p = 0.0650); found 14 vs 17, honest called 0 vs 0, rounds 104 vs 118; above zero: True (batches 5 and 6 (out of sample, run once)). Clears alpha = 0.00625: no.
+- Against zero on batches 5 and 6: mean 833 per seed, one-sided p = 0.151 (H8 itself: 0.185); not distinguishable from zero.
+
+Per seed means (components of score 4.0):
+
+| Seeds | Version | Score | Asks | Rounds | Found | Honest called | Recovered | Staff cost |
+|---|---|---|---|---|---|---|---|---|
+| Batches 1 to 4 | H8 | 735 | 2.95 | 5.8 | 0.85 | 0.00 | 2,467 | 1,731 |
+| Batches 1 to 4 | H19 | 903 | n/a | 4.5 | 0.75 | 0.00 | 2,226 | 1,322 |
+| Batches 5 and 6 | H8 | 719 | 3.05 | 5.9 | 0.85 | 0.00 | 2,440 | 1,722 |
+| Batches 5 and 6 | H19 | 833 | n/a | 5.2 | 0.70 | 0.00 | 2,276 | 1,443 |
+
+(Asks are not reported for H19: gated seeds ask nobody and the run folders are H8's.)
+
+**Verdict: not supported.** The out-of-fold R-squared is negative, so the gate has no basis. On the 20 out-of-sample seeds it adds +$115 per seed (p = 0.065, better on 4 of 20) by skipping 6 seeds that happened to be losing; with a model that fails cross-validation this is a chance draw, and the in-sample +$168 on batches 1 to 4 is by construction (the model was fitted to those scores).
+
+## H20: ask only the first K listed providers (decision layer)
+
+**Reason (declared before running).** In the ask-everyone run (wld7, 60 seeds, batches 1 to 6, demand floor on) the mean net value per seed of asking only the top k listed providers by rank is +$954 (k=1), +$942 (2), +$754 (3), +$629 (4), +$399 (5), +$218 (6), -$574 (8), -$1,900 (11), -$6,916 (22); workflow v4.0 averages about +$729 on the same six batches. The first two or three providers earn the money and deeper asking loses it. (The screen's top 2 were true upcoders in 200 of 200 development seeds; the true net overpayment of the top 2 averages $14,807 per seed, so the limit is proof, not detection.)
+
+**Change.** The ask-or-skip model is replaced by: ask the first K listed providers by rank (the integer `ask` option). Everything else is H8's.
+
+**Grid and choice (declared before running).** Two separate sweeps on batches 1 to 4 only, real workflow runs (not the D7 profile). (a) K in {1, 2, 3, 4, 5, 6, 8} with the first sample at 30 charts (H20k<K>). (b) With the K chosen in (a), first-sample size n in {10, 20, 30, 45, 60, 90} random charts (H20n<n>). Each parameter is chosen by leave-one-batch-out over batches 1 to 4: for each held-out batch, the setting with the best mean on the other three is taken and its realized score on the held-out batch recorded (ties to the smaller); the final setting is the one with the best mean over all 40 seeds (ties to the smaller). Choosing two parameters on 40 seeds gives selection bias in sample; the out-of-sample test on batches 5 and 6 decides.
+
+
+Sweep (a): K with 30 charts.
+
+| K | B1 | B2 | B3 | B4 | mean B1 to 4 |
+|---|---|---|---|---|---|
+| 1 | -723 | 3,302 | -385 | 501 | 674 |
+| 2 | -1,111 | 3,159 | -498 | 631 | 545 |
+| 3 | -1,337 | 3,046 | -880 | 895 | 431 |
+| 4 | -1,365 | 3,339 | -1,303 | 668 | 334 |
+| 5 | -1,306 | 2,913 | -1,740 | 353 | 55 |
+| 6 | -1,669 | 2,755 | -2,151 | 406 | -165 |
+| 8 | -2,406 | 1,918 | -3,013 | -491 | -998 |
+
+Leave-one-batch-out for K: held-out batches 1 to 4 each chose K = 1 (realized -723, 3,302, -385, 501; mean 674). Chosen K = 1.
+
+Sweep (b): first-sample size n at K = 1.
+
+| n at K=1 | B1 | B2 | B3 | B4 | mean B1 to 4 |
+|---|---|---|---|---|---|
+| 10 | -441 | -519 | 252 | -523 | -308 |
+| 20 | -649 | 1,679 | 103 | 311 | 361 |
+| 30 | -723 | 3,302 | -385 | 501 | 674 |
+| 45 | -725 | 1,871 | -489 | 677 | 333 |
+| 60 | -691 | 1,116 | -563 | 1,062 | 231 |
+| 90 | -903 | 13 | -601 | 740 | -188 |
+
+Leave-one-batch-out for n: held-out folds chose n = 30 (realized -723), n = 60 (realized 1,116), n = 30 (realized -385), n = 30 (realized 501); mean 127. Chosen n = 30. Chosen (K, n) = (1, 30), which is the sweep (a) run K = 1.
+
+- H20 vs H8 on 40 seeds: score 4.0 per seed 674 vs 735 (difference -61, sd 1,546, better on 19 of 40, one-sided p = 0.5988); found 11 vs 34, honest called 0 vs 0, rounds 76 vs 230; above zero: True (batches 1 to 4 (in sample: parameter chosen, and the ask model fitted, here)). Clears alpha = 0.00625: no.
+- H20 vs H8 on 20 seeds: score 4.0 per seed 649 vs 719 (difference -69, sd 1,180, better on 8 of 20, one-sided p = 0.6013); found 9 vs 17, honest called 0 vs 0, rounds 40 vs 118; above zero: True (batches 5 and 6 (out of sample, run once)). Clears alpha = 0.00625: no.
+- Against zero on batches 5 and 6: mean 649 per seed, one-sided p = 0.154 (H8 itself: 0.185); not distinguishable from zero.
+
+Per seed means (components of score 4.0):
+
+| Seeds | Version | Score | Asks | Rounds | Found | Honest called | Recovered | Staff cost |
+|---|---|---|---|---|---|---|---|---|
+| Batches 1 to 4 | H8 | 735 | 2.95 | 5.8 | 0.85 | 0.00 | 2,467 | 1,731 |
+| Batches 1 to 4 | H20 | 674 | 1.00 | 1.9 | 0.28 | 0.00 | 1,450 | 776 |
+| Batches 5 and 6 | H8 | 719 | 3.05 | 5.9 | 0.85 | 0.00 | 2,440 | 1,722 |
+| Batches 5 and 6 | H20 | 649 | 1.00 | 2.0 | 0.45 | 0.00 | 1,503 | 854 |
+
+**Verdict: rejected.** Asking only the top-ranked provider reduces asks from 3.05 to 1.0 per seed and rounds from 5.9 to 2.0, and cuts staff cost, but it also cuts recovery (found 0.45 against 0.85 upcoders per seed), so the net is -$69 per seed out of sample (p = 0.60) and -$61 in sample, equal to H8 within noise. The real run for K = 1 gives +$674 on batches 1 to 4, below the D7 profile's +$954 on batches 1 to 6 (different seed set, and D7 runs rules 4.1). The sweep is monotone in K, so the choice sits at the edge of the grid (smaller K is not a policy); selecting two parameters on 40 seeds adds some selection bias in sample, which the out-of-sample result does not show. Asking one provider is also a high-variance policy (one provider per seed).
+
+## Summary of H15 to H20
+
+Bar: Bonferroni alpha = 0.05 / 8 = 0.00625 per look (0.0071 for the first five when run), applied to both the out-of-sample and the in-sample p.
+
+| Hypothesis | Chosen | Batches 5 and 6 vs H8 | p | Batches 1 to 4 vs H8 | p | Clears the bar | Verdict |
+|---|---|---|---|---|---|---|---|
+| H15 | k = 3 | +183 | 0.418 | -1,282 | 0.991 | no | rejected |
+| H16 | c = 2 | +257 | 0.226 | +306 | 0.027 | no | lead, not supported |
+| H17 | L3 | +291 | 0.125 | +163 | 0.015 | no | lead, not supported |
+| H18 | pay_resid list | -282 | 0.962 | -47 | 0.688 | no | rejected |
+| H19 | gate at 0 | +115 | 0.065 | +168 | 0.060 | no | not supported (negative CV R-squared) |
+| H20 | K = 1, n = 30 | -69 | 0.601 | -61 | 0.599 | no | rejected |
+
+None of the six clears the bar, and none changes workflow v4.0. All are about as large as the batch-to-batch swing (+/-$1,450). Nothing here was run on fresh seeds.
