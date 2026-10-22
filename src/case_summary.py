@@ -350,7 +350,7 @@ def peer_rates(claims, chronic):
 
 
 def run(data_dir, flagged_csv, out_path, limit=None, dry_run=False, llm=None, batch=False, llm_all=False,
-        cache_dir=None, usage_path=None, estimate=False, assume_output_tokens=1000, log=print, version="2.0", lint=False, rules="2.0", no_model=False):
+        cache_dir=None, usage_path=None, estimate=False, assume_output_tokens=1000, log=print, version="2.0", lint=False, rules="2.0", no_model=False, rules40_opts=None):
     """version "2.1": next steps depend on the records state and name claims and counts (issue 63). lint=True: a model-written summary that fails a
     hard check (unsupported figure or leaning, contradiction, accusatory wording) is replaced by the code-written one (summary_lint.repair).
     rules "2.2" (workflow v2.2, issue 91): summary_rules.rule_leaning_22 decides more ambiguous cases by rule, so fewer need the model.
@@ -372,7 +372,7 @@ def run(data_dir, flagged_csv, out_path, limit=None, dry_run=False, llm=None, ba
     for fr in flagged:
         pid = fr["provider_id"]
         packets[pid] = build_packet(pid, fr, chronic, age, conditions, claims, rates, docs, peer_doc, facts, note_rows, cutoff_peer, elements)
-        lean, reason = {"4.1": sr.rule_leaning_41, "4.0": sr.rule_leaning_40, "2.3": sr.rule_leaning_23, "2.2": sr.rule_leaning_22}.get(rules, sr.rule_leaning)(packets[pid])
+        lean, reason = {"4.1": sr.rule_leaning_41, "4.0": (lambda pk: sr.rule_leaning_40(pk, rules40_opts)), "2.3": sr.rule_leaning_23, "2.2": sr.rule_leaning_22}.get(rules, sr.rule_leaning)(packets[pid])
         if no_model and lean is None:
             lean, reason = sr.INCONCLUSIVE, "the rules are silent on this provider and no model is used; left for a person to read"
         plan.append((pid, lean, reason, (lean is None or llm_all) and not no_model))
@@ -402,9 +402,9 @@ def run(data_dir, flagged_csv, out_path, limit=None, dry_run=False, llm=None, ba
             rec = {"provider_id": pid, "model": MODEL, "summary": summary, "citations_checked": False,
                    "source": "llm", "rule_leaning": lean, "rule_reason": reason}
             if lint:
-                found = summary_lint.lint(summary, packets[pid], rules23=rules in ("2.3", "4.0", "4.1"), rules41=rules == "4.1")
+                found = summary_lint.lint(summary, packets[pid], rules23=rules in ("2.3", "4.0", "4.1"), rules41=rules == "4.1", rules40_opts=rules40_opts)
                 if found["hard"]:
-                    rec.update({"summary": summary_lint.repair(summary, packets[pid], rules23=rules in ("2.3", "4.0", "4.1"), rules41=rules == "4.1"), "lint_repaired": True, "lint_problems": found["hard"], "source": "llm+repair"})
+                    rec.update({"summary": summary_lint.repair(summary, packets[pid], rules23=rules in ("2.3", "4.0", "4.1"), rules41=rules == "4.1", rules40_opts=rules40_opts), "lint_repaired": True, "lint_problems": found["hard"], "source": "llm+repair"})
             out.append(rec)
         else:
             out.append({"provider_id": pid, "model": "rules", "summary": sr.assemble(packets[pid], lean, version=version),
@@ -443,6 +443,7 @@ if __name__ == "__main__":
     ap.add_argument("--v41", action="store_true", help="workflow v4.0 with rules 4.1: rules 4.0 plus the time-padding and risk-inflation signs of data 4.0 (implies --v40)")
     ap.add_argument("--v40", action="store_true", help="workflow v4.0: the 2.3 summaries with rules 4.0 (the chart test pooled over 99214 and 99215; implies --v23)")
     ap.add_argument("--v23", action="store_true", help="workflow v2.3: the 2.2 summaries with rules 2.3 (cloned-notes signs decide by rule; implies --v22)")
+    ap.add_argument("--rules40-opts", help="JSON dict with optional keys min, up, alpha: loosened rules 4.0 chart test (workflow v4.1, H17); default none = rules 4.0 as frozen")
     ap.add_argument("--no-model", action="store_true", help="never call the model: where the rules are silent the summary is code-written and inconclusive (deterministic; workflow v2.5 onward)")
     ap.add_argument("--cache-dir", help="response cache folder (default: llm_cache next to the output)")
     ap.add_argument("--usage-jsonl", help="where to write token usage and estimated cost (default: next to the output)")
@@ -452,7 +453,7 @@ if __name__ == "__main__":
               cache_dir=a.cache_dir or os.path.join(base, "llm_cache"),
               usage_path=a.usage_jsonl or os.path.join(base, "usage_writer.jsonl"), estimate=a.estimate,
               version="2.1" if (a.v21 or a.v22 or a.v23 or a.v40 or a.v41) else "2.0", lint=a.v21 or a.v22 or a.v23 or a.v40 or a.v41,
-              rules="4.1" if a.v41 else "4.0" if a.v40 else "2.3" if a.v23 else "2.2" if a.v22 else "2.0", no_model=a.no_model)
+              rules="4.1" if a.v41 else "4.0" if a.v40 else "2.3" if a.v23 else "2.2" if a.v22 else "2.0", no_model=a.no_model, rules40_opts=json.loads(a.rules40_opts) if a.rules40_opts else None)
     if not a.estimate:
         calls = sum(1 for r in res if r.get("source") == "llm" or r.get("will_call_llm"))
         print(f"{len(res)} {'packets' if a.dry_run else 'summaries'} ({calls} via the model) -> {a.out_jsonl}")

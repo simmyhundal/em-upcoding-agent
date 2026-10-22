@@ -46,6 +46,23 @@ VERSIONS = {
     "H12": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "ask_model": os.path.join(ROOT, "experiments", "w_loop", "ask_model_b1to6.json"), "escalate": "stop", "demand_floor": "cost"}},   # H8 with the ask model refitted on batches 1 to 6
     "H13": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "ask_model": os.path.join(ROOT, "experiments", "w_loop", "ask_model41_b1to4.json"), "escalate": "stop", "demand_floor": "cost"}},   # H8 with the ask model on features built from the eb_upper_t screen (workflow v4.1 candidate, issue 132); fitted on batches 1 to 4
     "H14": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "ask_model": os.path.join(ROOT, "experiments", "w_loop", "ask_model_margin.json"), "escalate": "stop", "demand_floor": "cost"}},   # H8 asking only when the predicted value exceeds a margin of $50 (stop-loss at the ask step, workflow v4.1 candidate, issue 132); margin chosen by leave-one-batch-out CV on batches 1 to 4
+    # workflow v4.1 hypotheses on top of H8 (issue 132; docs/w_loop_v41.md): H15 probe then extend (10 charts, then 20 more when at least k documented 99214 and 99215 charts are unsupported)
+    **{f"H15k{k}": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "n": 10, "probe": {"k": k, "more": 20}}} for k in (2, 3, 4)},
+    "H15": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "n": 10, "probe": {"k": 3, "more": 20}}},   # H15 at the k chosen on batches 1 to 4
+    # H16 near-miss extension: after the rules call, a second random request of 30 charts for providers whose estimate is at least c times the demand cost but whose lower bound is below it
+    **{f"H16c{c}": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "extend": {"c": c, "more": 30}}} for c in (1, 1.5, 2)},
+    "H8chk": {"version": "4.0", **wp40.FROZEN_V40},                                                                         # H8 rerun after the v4.1 refactors: must reproduce H8 exactly
+    "H16": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "extend": {"c": 2, "more": 30}}},   # H16 at the c chosen on batches 1 to 4 (all three c gave the same result; ties go to the setting closest to H8)
+    # H17 let the money decide: a loosened pooled chart test of rules 4.0 (min documented charts, min unsupported share, alpha), the demand floor kept. H8 is (10, 0.25, 0.05).
+    **{f"H17{t}": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "rules40_opts": {"min": m, "up": u, "alpha": a}}}
+       for t, (m, u, a) in {"L1": (8, 0.20, 0.05), "L2": (6, 0.15, 0.10), "L3": (5, 0.10, 0.20)}.items()},
+    "H17": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "rules40_opts": {"min": 5, "up": 0.10, "alpha": 0.20}}},   # H17 at L3, chosen on batches 1 to 4
+    "D7p": {"version": "4.0", "screen": "pay_resid", "w40": {"ask": "all", "escalate": "stop", "demand_floor": "cost", "rules": "4.1"}},          # diagnostic for H18: the D7 recipe on the pay_resid list
+    "H18": {"version": "4.0", "screen": "pay_resid", "w40": {"ask": "linear", "ask_model": os.path.join(ROOT, "experiments", "w_loop", "ask_model_pay_resid_b1to4.json"), "escalate": "stop", "demand_floor": "cost"}},   # H8 on the pay_resid list with the ask model refitted on its own ask-everyone run (batches 1 to 4)
+    # H20 ask only the first K listed providers by rank (sweep a: K with 30 charts; sweep b, in H20n*: the first-sample size n at the chosen K, set below once sweep a is done)
+    **{f"H20k{k}": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": k, "escalate": "stop", "demand_floor": "cost"}} for k in (1, 2, 3, 4, 5, 6, 8)},
+    **{f"H20n{n}": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": 1, "escalate": "stop", "demand_floor": "cost", "n": n}} for n in (10, 20, 30, 45, 60, 90)},   # H20 sweep b at K = 1 (chosen in sweep a)
+    "H20": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": 1, "escalate": "stop", "demand_floor": "cost", "n": 30}},   # H20 at (K, n) = (1, 30), chosen on batches 1 to 4
     "H3": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "policy25", "escalate": "stop", "sample_cpts": HI}},       # H2 without escalation (the first sample decides)
 }
 

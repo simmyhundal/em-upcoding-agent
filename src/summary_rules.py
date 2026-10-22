@@ -205,12 +205,15 @@ def _chart_test_40(packet):
     return n, x, peer, _binom_sf(x, n, peer)
 
 
-def rule_leaning_40(packet):
+def rule_leaning_40(packet, opts=None):
+    """opts (workflow v4.1, H17): None for rules 4.0 as frozen, or a dict with optional keys `min`, `up`, `alpha` that replace POOL_MIN_40, POOL_UP_40 and ALPHA_40 for this call (the module defaults are not changed)."""
     lean, reason = rule_leaning_23(packet)
     if lean not in (INCONCLUSIVE, None):
         return lean, reason
+    o = opts or {}
+    n_min, up, alpha = o.get("min", POOL_MIN_40), o.get("up", POOL_UP_40), o.get("alpha", ALPHA_40)
     n, x, peer, p = _chart_test_40(packet)
-    if n >= POOL_MIN_40 and x / n >= POOL_UP_40 and p <= ALPHA_40:
+    if n >= n_min and x / n >= up and p <= alpha:
         return UPCODING, (f"{x} of {n} documented 99214 and 99215 claims are below the billed level, beating the pooled peer rate of {peer:.0%} by more than chance "
                           f"(one-sided p = {p:.3f}, rules 4.0)")
     return lean, reason
