@@ -45,6 +45,7 @@ VERSIONS = {
     "H11": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "n": 45}},      # H8 with a first sample of 45 charts
     "H12": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "ask_model": os.path.join(ROOT, "experiments", "w_loop", "ask_model_b1to6.json"), "escalate": "stop", "demand_floor": "cost"}},   # H8 with the ask model refitted on batches 1 to 6
     "H13": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "ask_model": os.path.join(ROOT, "experiments", "w_loop", "ask_model41_b1to4.json"), "escalate": "stop", "demand_floor": "cost"}},   # H8 with the ask model on features built from the eb_upper_t screen (workflow v4.1 candidate, issue 132); fitted on batches 1 to 4
+    "H14": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "ask_model": os.path.join(ROOT, "experiments", "w_loop", "ask_model_margin.json"), "escalate": "stop", "demand_floor": "cost"}},   # H8 asking only when the predicted value exceeds a margin of $50 (stop-loss at the ask step, workflow v4.1 candidate, issue 132); margin chosen by leave-one-batch-out CV on batches 1 to 4
     "H3": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "policy25", "escalate": "stop", "sample_cpts": HI}},       # H2 without escalation (the first sample decides)
 }
 
