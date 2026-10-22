@@ -38,7 +38,7 @@ def run_policy_40(office, provider_ids, claims_by_provider, flagged_file, ratio,
             if not p25.ask(policy, p25.ask_vector(rows[pid])):
                 continue
         elif o["ask"] == "linear":
-            if not ask_linear(model, rows[pid]):
+            if not ask_linear(model, rows[pid], claims_by_provider.get(pid, [])):
                 continue
         elif isinstance(o["ask"], int) and rank >= o["ask"]:
             continue
