@@ -105,6 +105,8 @@ def run(rid, src, screen, note, version="2.0", tier1_n=None, policy24=None, no_m
            v22=version in ("2.2", "2.3", "2.4", "2.5", "4.0"), v23=version in ("2.3", "2.4", "2.5", "4.0"), llm_judge=version not in ("2.2", "2.3", "2.4", "2.5", "4.0"),
            no_model=(version in ("2.5", "4.0")) if no_model is None else no_model, rules40=version == "4.0", rules41=version == "4.0" and (w40 or {}).get("rules") == "4.1")       # 2.5 onward: no API call at all
     office.write_transcript(os.path.join(ROOT, "experiments", rid, "office_transcript.jsonl"))
+    if getattr(office, "probe_log", None):
+        json.dump(office.probe_log, open(os.path.join(ROOT, "experiments", rid, "probe_log.json"), "w"))
     if version == "4.0" and (w40 or {}).get("demand_floor") is not None:
         apply_demand_floor(rid, src, view, office, w40["demand_floor"])
 

@@ -46,6 +46,9 @@ VERSIONS = {
     "H12": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "ask_model": os.path.join(ROOT, "experiments", "w_loop", "ask_model_b1to6.json"), "escalate": "stop", "demand_floor": "cost"}},   # H8 with the ask model refitted on batches 1 to 6
     "H13": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "ask_model": os.path.join(ROOT, "experiments", "w_loop", "ask_model41_b1to4.json"), "escalate": "stop", "demand_floor": "cost"}},   # H8 with the ask model on features built from the eb_upper_t screen (workflow v4.1 candidate, issue 132); fitted on batches 1 to 4
     "H14": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "ask_model": os.path.join(ROOT, "experiments", "w_loop", "ask_model_margin.json"), "escalate": "stop", "demand_floor": "cost"}},   # H8 asking only when the predicted value exceeds a margin of $50 (stop-loss at the ask step, workflow v4.1 candidate, issue 132); margin chosen by leave-one-batch-out CV on batches 1 to 4
+    # workflow v4.1 hypotheses on top of H8 (issue 132; docs/w_loop_v41.md): H15 probe then extend (10 charts, then 20 more when at least k documented 99214 and 99215 charts are unsupported)
+    **{f"H15k{k}": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "n": 10, "probe": {"k": k, "more": 20}}} for k in (2, 3, 4)},
+    "H15": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "n": 10, "probe": {"k": 3, "more": 20}}},   # H15 at the k chosen on batches 1 to 4
     "H3": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "policy25", "escalate": "stop", "sample_cpts": HI}},       # H2 without escalation (the first sample decides)
 }
 
