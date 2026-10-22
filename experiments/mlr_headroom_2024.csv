@@ -1,0 +1,418 @@
+group,market,premium,numerator,mlr,floor,headroom,below_floor
+KAISER FOUNDATION GRP,individual,7382407041,7670960333,1.0391,0.8,1765034700,0
+KAISER FOUNDATION GRP,small_group,6182463110,6058833771,0.98,0.8,1113795914,932631
+KAISER FOUNDATION GRP,large_group,49956812971,46054899939,0.9219,0.85,3591951441,342527
+UNITEDHEALTH GRP,individual,10951875866,9003867395,0.8221,0.8,397117786,154751084
+UNITEDHEALTH GRP,small_group,12107549585,10087737563,0.8332,0.8,445962049,44264154
+UNITEDHEALTH GRP,large_group,26420102647,23356445887,0.884,0.85,989240389,89881752
+Elevance Hlth Inc Grp,individual,8460456087,7271191270,0.8594,0.8,534114203,31287802
+Elevance Hlth Inc Grp,small_group,8874316139,7353869189,0.8287,0.8,285617529,31201252
+Elevance Hlth Inc Grp,large_group,30908191836,27752949829,0.8979,0.85,1490031111,9044342
+HCSC GRP,individual,12561836603,11163451495,0.8887,0.8,1113982213,0
+HCSC GRP,small_group,8732404209,7895124578,0.9041,0.8,909201211,0
+HCSC GRP,large_group,23010861834,21700285951,0.943,0.85,2141053393,0
+CVS Health Group,individual,11383507516,10441995745,0.9173,0.8,1335189732,0
+CVS Health Group,small_group,801640474,717035826,0.8945,0.8,82333929,6610482
+CVS Health Group,large_group,16124384238,14783458537,0.9168,0.85,1086976029,9244095
+CENTENE CORP GRP,individual,24289856727,19443215116,0.8005,0.8,500008379,488678644
+CENTENE CORP GRP,small_group,768656381,697545281,0.9075,0.8,82620176,0
+CENTENE CORP GRP,large_group,2352668432,2129515729,0.9051,0.85,159902465,30154904
+"Blue Cross and Blue Shield of Florida, Inc.",individual,11574134903,10257876102,0.8863,0.8,998568180,0
+"Blue Cross and Blue Shield of Florida, Inc.",small_group,1939193109,1723721652,0.8889,0.8,172367165,0
+"Blue Cross and Blue Shield of Florida, Inc.",large_group,7624858121,7012134752,0.9196,0.85,531005349,0
+Cigna Hlth Grp,individual,3606298948,3167649167,0.8784,0.8,287500661,4890652
+Cigna Hlth Grp,small_group,452280761,461734324,1.0209,0.8,99934226,24511
+Cigna Hlth Grp,large_group,15528901587,14046389138,0.9045,0.85,864769115,17946326
+Blue Shield of California Group,individual,6525957340,5514188426,0.845,0.8,301696254,8273700
+Blue Shield of California Group,small_group,3648392772,2998650682,0.8219,0.8,79936464,0
+Blue Shield of California Group,large_group,7202450909,6439153895,0.894,0.85,317070623,0
+CAREFIRST INC GRP,individual,1622640131,1343467032,0.828,0.8,47927664,2572736
+CAREFIRST INC GRP,small_group,2302241592,1875870383,0.8148,0.8,63574662,29497553
+CAREFIRST INC GRP,large_group,6895453308,6282637095,0.9111,0.85,433139616,11637833
+HIGHMARK GRP,individual,1836210543,1679830135,0.9148,0.8,211066472,204771
+HIGHMARK GRP,small_group,1451906412,1321681380,0.9103,0.8,160178250,21999
+HIGHMARK GRP,large_group,6603522955,6201498418,0.9391,0.85,593557224,5053318
+BCBS OF MI GRP,individual,1009178741,926780004,0.9184,0.8,119437011,0
+BCBS OF MI GRP,small_group,1662829398,1457121204,0.8763,0.8,126857685,0
+BCBS OF MI GRP,large_group,6388078501,5784702187,0.9055,0.85,354835461,0
+BCBS of MA Grp,individual,1457380495,1276923220,0.8762,0.8,111018824,0
+BCBS of MA Grp,small_group,1457380495,1276923220,0.8762,0.8,111018824,0
+BCBS of MA Grp,large_group,5514846853,5119055128,0.9282,0.85,431435303,0
+Blue Cross and Blue Shield of North Carolina,individual,3118237538,2758063925,0.8845,0.8,263473894,0
+Blue Cross and Blue Shield of North Carolina,small_group,1232249513,1065839073,0.865,0.8,80039463,0
+Blue Cross and Blue Shield of North Carolina,large_group,3042101643,2671529968,0.8782,0.85,85743571,0
+BCBS OF NJ GRP,individual,1775556792,1489612692,0.839,0.8,69167258,0
+BCBS OF NJ GRP,small_group,1448088016,1364375755,0.9422,0.8,205905342,0
+BCBS OF NJ GRP,large_group,3079638203,3089932610,1.0033,0.85,472240137,0
+BCBS OF AL GRP,individual,1676150676,1573185178,0.9386,0.8,232264638,0
+BCBS OF AL GRP,small_group,1157780675,1088246005,0.9399,0.8,162021465,0
+BCBS OF AL GRP,large_group,3401118823,3221906356,0.9473,0.85,330955356,0
+REGENCE GRP,individual,802861323,746964709,0.9304,0.8,104675651,0
+REGENCE GRP,small_group,1465317200,1325202812,0.9044,0.8,152949051,0
+REGENCE GRP,large_group,3573654098,3253937615,0.9105,0.85,219151396,2819764
+Oscar Insurance Company of Florida,individual,5473866121,4778637200,0.873,0.8,399544303,0
+INDEPENDENCE BLUE CROSS GRP,individual,1808079168,1574086282,0.8706,0.8,130494027,2871080
+INDEPENDENCE BLUE CROSS GRP,small_group,1283529466,1061511423,0.827,0.8,39027542,4339692
+INDEPENDENCE BLUE CROSS GRP,large_group,2098846115,1818378569,0.8664,0.85,34361333,1961
+HARVARD PILGRIM HTH CARE GRP,individual,1216083561,1102042948,0.9062,0.8,129176100,0
+HARVARD PILGRIM HTH CARE GRP,small_group,1318441138,1189949579,0.9025,0.8,135196669,0
+HARVARD PILGRIM HTH CARE GRP,large_group,2039659915,1925414857,0.944,0.85,191703929,0
+BCBS of SC Grp,individual,2015223585,1798476587,0.8924,0.8,186297719,0
+BCBS of SC Grp,small_group,446465633,380788375,0.8529,0.8,23615869,0
+BCBS of SC Grp,large_group,1869666611,1716915794,0.9183,0.85,127699175,0
+Premera Blue Cross Group,individual,511379775,415547083,0.8126,0.8,20946578,14503315
+Premera Blue Cross Group,small_group,492372860,418500394,0.85,0.8,24602105,0
+Premera Blue Cross Group,large_group,3305976143,2896289547,0.8761,0.85,86913665,703839
+LOUISIANA HLTH SERV GRP,individual,1057352258,781761291,0.7394,0.8,0,64120516
+LOUISIANA HLTH SERV GRP,small_group,1046812396,882302367,0.8428,0.8,44852450,0
+LOUISIANA HLTH SERV GRP,large_group,1805204835,1616851447,0.8957,0.85,82427337,0
+BCBS of TN Inc,individual,848780337,756366658,0.8911,0.8,77342388,0
+BCBS of TN Inc,small_group,635312254,541554675,0.8524,0.8,33304871,0
+BCBS of TN Inc,large_group,2421456081,2170927448,0.8965,0.85,112689780,0
+Wellmark Group,individual,853475562,782011460,0.9163,0.8,99231010,0
+Wellmark Group,small_group,870073879,753063704,0.8655,0.8,57004601,0
+Wellmark Group,large_group,2083445596,1876156130,0.9005,0.85,105227373,0
+HIP INS GRP,individual,850998791,757702129,0.8904,0.8,79545260,2642164
+HIP INS GRP,small_group,89777761,69370934,0.7727,0.8,2119183,4570458
+HIP INS GRP,large_group,2602369136,2271178476,0.8727,0.85,59164710,0
+Corewell Health Group,individual,948071806,872707625,0.9205,0.8,114250180,0
+Corewell Health Group,small_group,661610236,579310292,0.8756,0.8,50700471,678367
+Corewell Health Group,large_group,1882395855,1726163180,0.917,0.85,126126703,0
+Medica Grp,individual,945933132,906871789,0.9587,0.8,150126538,1255
+Medica Grp,small_group,432912802,401036440,0.9264,0.8,54706198,0
+Medica Grp,large_group,2102536989,1866074132,0.8875,0.85,78917691,0
+IHC Inc Grp,individual,1784949486,1473169818,0.8253,0.8,45210230,0
+IHC Inc Grp,small_group,655342886,588855396,0.8985,0.8,64581088,0
+IHC Inc Grp,large_group,1030763590,928763352,0.901,0.85,52614301,0
+Lifetime HlthCare Grp,individual,199274321,202395408,1.0157,0.8,42975951,0
+Lifetime HlthCare Grp,small_group,1087148196,989283299,0.91,0.8,119564741,0
+Lifetime HlthCare Grp,large_group,1630420874,1441768236,0.8843,0.85,55910493,0
+BCBS of MN Grp,individual,310954909,281642911,0.9057,0.8,32878984,0
+BCBS of MN Grp,small_group,616265179,594413500,0.9645,0.8,101401356,0
+BCBS of MN Grp,large_group,1979979353,1793232192,0.9057,0.85,110249742,0
+"Blue Cross and Blue Shield of Arizona, Inc.",individual,706408119,624227938,0.8837,0.8,59101442,0
+"Blue Cross and Blue Shield of Arizona, Inc.",small_group,393559043,342338128,0.8699,0.8,27490894,0
+"Blue Cross and Blue Shield of Arizona, Inc.",large_group,1689309870,1487851283,0.8807,0.85,51937894,0
+Hawaii Medical Service Association,individual,175094284,148947525,0.8507,0.8,8872099,0
+Hawaii Medical Service Association,small_group,390434732,350400268,0.8975,0.8,38052482,0
+Hawaii Medical Service Association,large_group,2134732970,1951404028,0.9141,0.85,136881003,0
+Molina Healthcare Inc GRP,individual,2449944319,1974158752,0.8058,0.8,77205681,63002384
+BCBS OF KC GRP,individual,99505366,86337404,0.8677,0.8,6765551,32440
+BCBS OF KC GRP,small_group,165459834,137366258,0.8302,0.8,4998390,0
+BCBS OF KC GRP,large_group,2124692148,1852524169,0.8719,0.85,46535844,0
+ARKANSAS BCBS GRP,individual,1094349554,1000342039,0.9141,0.8,124862396,0
+ARKANSAS BCBS GRP,small_group,339021908,294260959,0.868,0.8,23743217,699785
+ARKANSAS BCBS GRP,large_group,919426004,845562430,0.9197,0.85,64050327,0
+Tufts Health Plan,individual,1144666198,1107507695,0.9675,0.8,191774736,0
+Tufts Health Plan,small_group,1144666198,1107507695,0.9675,0.8,191774736,0
+Medical Mutual of Ohio,individual,443386774,427152893,0.9634,0.8,81921118,9477644
+Medical Mutual of Ohio,small_group,463029190,365436293,0.7892,0.8,1941650,6928709
+Medical Mutual of Ohio,large_group,1315619411,1214677423,0.9233,0.85,96548774,147851
+UPMC HLTH SYSTEM GRP,individual,711621979,620538872,0.872,0.8,51241821,532
+UPMC HLTH SYSTEM GRP,small_group,742591316,643083206,0.866,0.8,49569937,559783
+UPMC HLTH SYSTEM GRP,large_group,738493976,647335998,0.8766,0.85,19616118,0
+Oscar Health Plan of Georgia,individual,2085441919,2096685432,1.0054,0.8,428331897,0
+"Absolute Total Care, Inc",individual,2061260555,1525899004,0.7403,0.8,0,123109440
+University Health Care & Gundersen Lutheran Group,individual,248135545,226211598,0.9116,0.8,27703162,0
+University Health Care & Gundersen Lutheran Group,small_group,185658159,170055876,0.916,0.8,21529349,0
+University Health Care & Gundersen Lutheran Group,large_group,1353135438,1267496073,0.9367,0.85,117330951,0
+BCBS of KS GRP,individual,273171697,280487245,1.0268,0.8,61949887,0
+BCBS of KS GRP,small_group,418728117,415327812,0.9919,0.8,80345318,0
+BCBS of KS GRP,large_group,1063543698,925570608,0.8703,0.85,21558465,0
+Scott & White GRP,individual,1482254871,1293407583,0.8726,0.8,107603687,0
+Scott & White GRP,small_group,101424926,88479065,0.8724,0.8,7339124,0
+Scott & White GRP,large_group,144842882,139910592,0.9659,0.85,16794142,0
+CareSource Management Group,individual,1691115401,1472074126,0.8705,0.8,119181805,0
+Blue Cross and Blue Shield of Nebraska,individual,137570338,129826507,0.9437,0.8,19770236,0
+Blue Cross and Blue Shield of Nebraska,small_group,93166738,82163994,0.8819,0.8,7630604,0
+Blue Cross and Blue Shield of Nebraska,large_group,1320968165,1182292420,0.895,0.85,59469480,0
+Ambetter of North Carolina Inc.,individual,1479117680,1063494902,0.719,0.8,0,119799242
+MISSISSIPPI INS GRP,individual,159168183,141880431,0.8914,0.8,14545885,0
+MISSISSIPPI INS GRP,small_group,397126363,373405288,0.9403,0.8,55704198,0
+MISSISSIPPI INS GRP,large_group,900156793,868993388,0.9654,0.85,103860114,0
+"Health Alliance Medical Plans, Inc.",individual,372476681,344836417,0.9258,0.8,46855072,0
+"Health Alliance Medical Plans, Inc.",small_group,96272287,98347110,1.0216,0.8,21329281,0
+"Health Alliance Medical Plans, Inc.",large_group,959296632,893841409,0.9318,0.85,80565578,2126306
+MVP GRP,individual,291017333,267312164,0.9185,0.8,34498298,0
+MVP GRP,small_group,473176623,429640622,0.908,0.8,51099323,0
+MVP GRP,large_group,630096604,569630119,0.904,0.85,34048006,0
+Oscar Insurance Company,individual,1365014699,1124967257,0.8241,0.8,37029709,4074212
+CDPHP,individual,38015842,34321030,0.9028,0.8,3908356,0
+CDPHP,small_group,396416153,391579011,0.9878,0.8,74446089,0
+CDPHP,large_group,885300620,807503363,0.9121,0.85,54997836,0
+"Mass General Brigham Health Plan, Inc",individual,537178443,454594385,0.8463,0.8,24851631,0
+"Mass General Brigham Health Plan, Inc",small_group,537178443,454594385,0.8463,0.8,24851631,0
+"Mass General Brigham Health Plan, Inc",large_group,175399996,147570410,0.8413,0.85,0,1519586
+Providence Health Plan,individual,314768506,320601715,1.0185,0.8,69429958,643048
+Providence Health Plan,small_group,297915699,311567855,1.0458,0.8,73235295,0
+Providence Health Plan,large_group,571680144,538298233,0.9416,0.85,52370110,0
+Sentara Health Management Group,individual,492864686,496259703,1.0069,0.8,101967954,0
+Sentara Health Management Group,small_group,227753286,222746637,0.978,0.8,40544008,0
+Sentara Health Management Group,large_group,449371777,440600698,0.9805,0.85,58634688,0
+HEALTHPARTNERS GRP,individual,69481306,66564107,0.958,0.8,10979062,0
+HEALTHPARTNERS GRP,small_group,47920811,43684704,0.9116,0.8,5348055,0
+HEALTHPARTNERS GRP,large_group,1033568726,1004503114,0.9719,0.85,125969697,0
+L.A. Care Health Plan,individual,963077149,868802635,0.9021,0.8,98340916,0
+L.A. Care Health Plan,large_group,186203221,189386658,1.0171,0.85,31113920,0
+Blue Cross Blue Shield of North Dakota,individual,196053816,179314320,0.9146,0.8,22471267,0
+Blue Cross Blue Shield of North Dakota,small_group,304525601,276244074,0.9071,0.8,32623593,0
+Blue Cross Blue Shield of North Dakota,large_group,556688333,492255480,0.8843,0.85,19070397,0
+"Blue Cross of Idaho Health Service, Inc.",individual,146417302,121964330,0.833,0.8,4830488,0
+"Blue Cross of Idaho Health Service, Inc.",small_group,189610986,171817523,0.9062,0.8,20128734,0
+"Blue Cross of Idaho Health Service, Inc.",large_group,711036369,640187245,0.9004,0.85,35806331,0
+Blue Cross & Blue Shield of Rhode Island,individual,127750268,115817274,0.9066,0.8,13617060,0
+Blue Cross & Blue Shield of Rhode Island,small_group,286322511,254265661,0.888,0.8,25207652,0
+Blue Cross & Blue Shield of Rhode Island,large_group,616004027,532765152,0.8649,0.85,9161730,0
+PacificSource Hlth Plan Grp,individual,319317236,296668845,0.9291,0.8,41215056,0
+PacificSource Hlth Plan Grp,small_group,236847553,211491557,0.8929,0.8,22013514,0
+PacificSource Hlth Plan Grp,large_group,429152497,375373957,0.8747,0.85,10594334,0
+Triple-S Salud Inc.,individual,147968604,109782335,0.7419,0.8,0,8592548
+Triple-S Salud Inc.,small_group,77081736,64798354,0.8406,0.8,3132965,0
+Triple-S Salud Inc.,large_group,759954779,596965334,0.7855,0.85,0,48996228
+Capital Advantage Assurance Company,individual,479320394,474430116,0.9898,0.8,90973801,0
+Capital Advantage Assurance Company,small_group,285167204,245434133,0.8607,0.8,17300370,0
+Capital Advantage Assurance Company,large_group,203361841,173860965,0.8549,0.85,1003400,0
+"Boston Medical Center Health Plan, Inc.",individual,473215735,0,0.0,0.8,0,378572588
+"Boston Medical Center Health Plan, Inc.",small_group,473215735,0,0.0,0.8,0,378572588
+Henry Ford Health Systems Group,individual,22615126,23920960,1.0577,0.8,5828859,0
+Henry Ford Health Systems Group,small_group,226709826,199872669,0.8816,0.8,18504808,0
+Henry Ford Health Systems Group,large_group,679328874,597702193,0.8798,0.85,20272650,0
+Sanford Health Plan/Sanford Health Plan of Minnesota,individual,280807806,266061565,0.9475,0.8,41415320,0
+Sanford Health Plan/Sanford Health Plan of Minnesota,small_group,46011692,39280740,0.8537,0.8,3502211,1030824
+Sanford Health Plan/Sanford Health Plan of Minnesota,large_group,570412046,528052467,0.9257,0.85,43202228,0
+Sharp Health Plan,individual,230988975,206351535,0.8933,0.8,21560355,0
+Sharp Health Plan,small_group,125399290,114922535,0.9165,0.8,14603103,0
+Sharp Health Plan,large_group,508764911,429188442,0.8436,0.85,0,3261732
+Western Health Advantage,individual,133057660,122983681,0.9243,0.8,16537553,0
+Western Health Advantage,small_group,146363729,129579996,0.8853,0.8,12489013,0
+Western Health Advantage,large_group,565903463,516985391,0.9136,0.85,35967448,0
+Sutter Health Alliance,individual,28362395,22295486,0.7861,0.8,0,394430
+Sutter Health Alliance,small_group,221157017,196968609,0.8906,0.8,20042996,0
+Sutter Health Alliance,large_group,583315842,548312550,0.94,0.85,52494085,0
+"Community Health Choice, Inc.",individual,800074751,635196730,0.7939,0.8,0,4863070
+"New York State Catholic Health Plan, Inc.",individual,712348169,559040262,0.7848,0.8,0,10838273
+Independent Health Benefits Corporation,individual,74217488,68626762,0.9247,0.8,9252772,0
+Independent Health Benefits Corporation,small_group,361525079,347907747,0.9623,0.8,58687684,0
+Independent Health Benefits Corporation,large_group,265256141,242864796,0.9156,0.85,17397077,0
+Blue Cross Blue Shield of Wyoming,individual,316362585,319489515,1.0099,0.8,66399447,0
+Blue Cross Blue Shield of Wyoming,small_group,88869231,69881262,0.7863,0.8,0,1214123
+Blue Cross Blue Shield of Wyoming,large_group,238623432,250944838,1.0516,0.85,48114921,0
+Blue Care Network of Michigan,individual,239906997,234306089,0.9767,0.8,42380491,0
+Blue Care Network of Michigan,small_group,200964996,198193253,0.9862,0.8,37421256,0
+Blue Care Network of Michigan,large_group,196324737,175649238,0.8947,0.85,8773212,0
+Baystate Hlth Grp,individual,193186854,169101870,0.8753,0.8,14552387,0
+Baystate Hlth Grp,small_group,193186854,169101870,0.8753,0.8,14552387,0
+Baystate Hlth Grp,large_group,198203702,172522306,0.8704,0.85,4049159,0
+Oregon Dental Grp,individual,342807497,322028988,0.9394,0.8,47782990,0
+Oregon Dental Grp,small_group,72745087,72912118,1.0023,0.8,14716049,0
+Oregon Dental Grp,large_group,168440137,155895618,0.9255,0.85,12724381,2879
+"Security Health Plan of Wisconsin, Inc.",individual,237955011,221518026,0.9309,0.8,31154017,0
+"Security Health Plan of Wisconsin, Inc.",small_group,41474484,36113225,0.8707,0.8,2933638,0
+"Security Health Plan of Wisconsin, Inc.",large_group,292484330,275629595,0.9424,0.85,27017915,0
+GEISINGER INS GRP,individual,169810152,143624445,0.8458,0.8,7776323,0
+GEISINGER INS GRP,small_group,150328422,140410438,0.934,0.8,20147700,0
+GEISINGER INS GRP,large_group,238448432,243975828,1.0232,0.85,41294661,0
+Maine Community Health Options,individual,223980063,215998194,0.9644,0.8,36814144,0
+Maine Community Health Options,small_group,223980063,215998194,0.9644,0.8,36814144,0
+Maine Community Health Options,large_group,23604740,21804095,0.9237,0.85,1740066,0
+"Meridian Health Plan of Michigan, Inc.",individual,464939808,366358719,0.788,0.8,0,5593128
+Group Health Cooperative of South Central Wisconsin,individual,38899976,33770411,0.8681,0.8,2650430,0
+Group Health Cooperative of South Central Wisconsin,small_group,55038813,51957497,0.944,0.8,7926447,0
+Group Health Cooperative of South Central Wisconsin,large_group,362692256,325810576,0.8983,0.85,17522159,0
+County of Santa Clara,individual,136088847,229353086,1.6853,0.8,120482008,0
+County of Santa Clara,small_group,320128,355337,1.11,0.8,99235,0
+County of Santa Clara,large_group,294868094,314194065,1.0655,0.85,63556185,0
+QualChoice Holdings Inc.,individual,285607206,224214177,0.785,0.8,0,4271588
+QualChoice Holdings Inc.,small_group,70593887,65373314,0.926,0.8,8898204,0
+QualChoice Holdings Inc.,large_group,72041665,71741170,0.9958,0.85,10505755,0
+Montana Health Cooperative,individual,360125782,354194004,0.9835,0.8,66093379,0
+Montana Health Cooperative,small_group,43647336,39925392,0.9147,0.8,5007523,0
+Montana Health Cooperative,large_group,19473067,21930204,1.1262,0.85,5378097,0
+Common Ground Healthcare Cooperative,individual,401404412,382189503,0.9521,0.8,61065973,0
+Common Ground Healthcare Cooperative,small_group,21636104,19778969,0.9142,0.8,2470086,0
+"Ambetter Health of Louisiana, Inc.",individual,422799422,261019060,0.6174,0.8,0,77220478
+Health One Alliance Grp,individual,396545735,360141781,0.9082,0.8,42905192,0
+Health One Alliance Grp,large_group,20208000,13540457,0.6701,0.85,0,3636343
+CAPITAL BLUE CROSS GRP,individual,4015448,3846544,0.9579,0.8,791626,157441
+CAPITAL BLUE CROSS GRP,small_group,692168,1444374,2.0867,0.8,890640,0
+CAPITAL BLUE CROSS GRP,large_group,409140384,387846443,0.948,0.85,40245970,168853
+"Healthfirst PHSP, Inc.",individual,408029561,352724835,0.8645,0.8,26301187,0
+HUMANA GRP,individual,294031,5569,0.0189,0.8,0,229656
+HUMANA GRP,small_group,153782157,134645071,0.8756,0.8,12388157,768812
+HUMANA GRP,large_group,245360257,226561014,0.9234,0.85,24136287,6131491
+CommunityCare Grp,individual,109146448,121485713,1.1131,0.8,34168555,0
+CommunityCare Grp,small_group,59453545,74862474,1.2592,0.8,27317178,17540
+CommunityCare Grp,large_group,218692976,209390109,0.9575,0.85,23501080,0
+Oscar Buckeye State Insurance Corp.,individual,367511110,289899023,0.7888,0.8,0,4109865
+University Health Alliance,small_group,120436991,113303913,0.9408,0.8,16954321,0
+University Health Alliance,large_group,245832472,221095356,0.8994,0.85,12137754,0
+"Health First Commercial Plans, Inc.",individual,361317170,336134239,0.9303,0.8,47080503,0
+State Farm Mutual Group,individual,151147,280750,1.8575,0.8,220498,60665
+State Farm Mutual Group,large_group,358022228,397879965,1.1113,0.85,93561071,0
+MetroPlus Health Plan,individual,86062040,73119416,0.8496,0.8,4269784,0
+MetroPlus Health Plan,large_group,259945725,229679711,0.8836,0.85,8725845,0
+Network Hlth Grp,individual,59507404,51906273,0.8723,0.8,4300350,0
+Network Hlth Grp,small_group,13645980,10940453,0.8017,0.8,23669,0
+Network Hlth Grp,large_group,239156745,204612609,0.8556,0.85,1329376,0
+Presbyterian Hlthcare Serv Grp,individual,115740683,127849181,1.1046,0.8,35256634,0
+Presbyterian Hlthcare Serv Grp,small_group,72147489,67301142,0.9328,0.8,9583151,0
+Presbyterian Hlthcare Serv Grp,large_group,118639549,111715980,0.9416,0.85,10872364,0
+CHRISTUS HEALTH PLAN,individual,302804251,250542919,0.8274,0.8,8299518,0
+UCare Minnesota,individual,284206728,279319578,0.9828,0.8,51954196,0
+"Independent Health Association, Inc",large_group,259547566,219787548,0.8468,0.85,0,827883
+"Avera Health Plans, Inc.",individual,150460163,127959705,0.8505,0.8,7591574,0
+"Avera Health Plans, Inc.",small_group,50855454,44740338,0.8798,0.8,4055975,0
+"Avera Health Plans, Inc.",large_group,56329165,47093038,0.836,0.85,19417,806169
+Nippon Life Insurance Company of America,large_group,249248912,200007085,0.8024,0.85,1669149,13523639
+Hawaii Management Alliance Association,small_group,50417701,42154383,0.8361,0.8,1820222,0
+Hawaii Management Alliance Association,large_group,171776085,147886782,0.8609,0.85,1877110,0
+COX INS GRP,individual,69841213,69774951,0.9991,0.8,13901980,0
+COX INS GRP,small_group,3938653,5126589,1.3016,0.8,1975667,0
+COX INS GRP,large_group,130419424,162749421,1.2479,0.85,51892911,0
+"Aspirus Health Plan, Inc.",individual,77763966,76532685,0.9842,0.8,14321512,0
+"Aspirus Health Plan, Inc.",small_group,7378207,10246725,1.3888,0.8,4344159,0
+"Aspirus Health Plan, Inc.",large_group,113988355,111386556,0.9772,0.85,14496454,0
+US Health and Life Insurance Company,individual,194180748,190446585,0.9808,0.8,35101987,0
+AultCare Insurance Company,individual,54552277,48555100,0.8901,0.8,4913278,0
+AultCare Insurance Company,small_group,39000672,33234672,0.8522,0.8,2034135,0
+AultCare Insurance Company,large_group,100268536,102265748,1.0199,0.85,17037492,0
+00000,individual,180868924,151081373,0.8353,0.8,6386233,0
+00000,small_group,12349442,10891320,0.8819,0.8,1011767,0
+"Pennsylvania Health & Wellness, Inc.",individual,189435766,164087858,0.8662,0.8,12539245,0
+Renown Health,individual,54187877,50398605,0.9301,0.8,7048303,0
+Renown Health,small_group,37926391,31695757,0.8357,0.8,1354644,0
+Renown Health,large_group,78742899,67108351,0.8522,0.85,1057682,880795
+PHP Insurance Company,individual,73632103,72989543,0.9913,0.8,14083861,0
+PHP Insurance Company,small_group,32732499,31236840,0.9543,0.8,5050841,0
+PHP Insurance Company,large_group,51009272,50908907,0.998,0.85,7551026,0
+WellCare Management Group,individual,150323691,138552864,0.9217,0.8,18293911,0
+Curative Inc Grp,large_group,149306070,198273501,1.328,0.85,71363342,0
+Oscar Garden State Insurance Corporation,individual,142071662,129492001,0.9115,0.8,15834671,0
+Oscar Garden State Insurance Corporation,small_group,3932534,3936258,1.0009,0.8,790231,0
+Community Health Plan of Washington,individual,144934489,163739406,1.1297,0.8,47791815,0
+HEALTH PLAN GRP,individual,1145246,1090948,0.9526,0.8,186845,12093
+HEALTH PLAN GRP,small_group,14271485,15843319,1.1101,0.8,4450451,24320
+HEALTH PLAN GRP,large_group,117381942,113156699,0.964,0.85,13382049,0
+Fallon Grp,individual,64070426,51482014,0.8035,0.8,225673,0
+Fallon Grp,small_group,64070426,51482014,0.8035,0.8,225673,0
+Medica,individual,125765614,129203957,1.0273,0.8,28591466,0
+Summa Hlth Grp,individual,48578764,40731148,0.8385,0.8,1868137,0
+Summa Hlth Grp,small_group,28769802,20430441,0.7101,0.8,0,2585401
+Summa Hlth Grp,large_group,43901526,38390150,0.8745,0.85,1073853,0
+Mercy Alliance Inc Group,individual,39541948,38762549,0.9803,0.8,7128991,0
+Mercy Alliance Inc Group,small_group,12158089,12627778,1.0386,0.8,2901307,0
+Mercy Alliance Inc Group,large_group,68143694,62242944,0.9134,0.85,4320804,0
+"Scripps Health Plan Services, Inc.",large_group,118626001,110854013,0.9345,0.85,10021912,0
+"VIVA Health, Inc.",small_group,12684071,12126886,0.9561,0.8,1979630,0
+"VIVA Health, Inc.",large_group,105915020,89649735,0.8464,0.85,0,378032
+Oscar Insurance Corporation,individual,101144317,93960753,0.929,0.8,13045299,0
+Oscar Insurance Corporation,small_group,16081488,13183902,0.8198,0.8,318712,0
+Inland Empire Health Plan,individual,114374910,104795689,0.9162,0.8,13295761,0
+CHRISTUS Health Plan Louisiana,individual,113984756,83606900,0.7335,0.8,0,7580905
+WISCONSIN PHYSICIANS SERV INS GRP,individual,4839633,4487025,0.9271,0.8,615319,0
+WISCONSIN PHYSICIANS SERV INS GRP,small_group,20373357,17861960,0.8767,0.8,1563274,0
+WISCONSIN PHYSICIANS SERV INS GRP,large_group,84078545,81605237,0.9706,0.85,10152520,14046
+Chorus Community Health Plans,individual,108748368,113660658,1.0452,0.8,26661964,0
+"SilverSummit Healthplan, Inc.",individual,105569090,77558456,0.7347,0.8,0,6896815
+Group Health Cooperative of Eau Claire,small_group,3787326,3397256,0.897,0.8,367395,0
+Group Health Cooperative of Eau Claire,large_group,98237477,107121311,1.0904,0.85,23619456,0
+University of Utah Health Insurance Plans,individual,73645164,59836484,0.8125,0.8,920353,0
+University of Utah Health Insurance Plans,large_group,25584542,23497865,0.9184,0.85,1751004,0
+"Oscar Health Plan, Inc.",individual,98450553,89361023,0.9077,0.8,10600581,0
+Healthy Workers,large_group,98272674,98493122,1.0022,0.85,14961349,0
+Medical Associates Clinic,small_group,20328486,19762178,0.9721,0.8,3499389,0
+Medical Associates Clinic,large_group,76178220,73254694,0.9616,0.85,8503207,0
+TRH Health Insurance Company,individual,89853154,90972743,1.0125,0.8,19090220,0
+"County of Ventura, dba Ventura County Health Care Plan",large_group,83183650,81954470,0.9852,0.85,11248367,0
+"Sendero Health Plans, inc.",individual,81204261,73155593,0.9009,0.8,8192184,0
+"HealthPartners UnityPoint Health, Inc.",small_group,10884127,13500883,1.2404,0.8,4793581,0
+"HealthPartners UnityPoint Health, Inc.",large_group,68116578,59776117,0.8776,0.85,1877026,0
+"Community Care Health Plan, Inc.",small_group,3717839,3937959,1.0592,0.8,963688,0
+"Community Care Health Plan, Inc.",large_group,72324919,61616178,0.8519,0.85,139997,0
+"Mennonite General Hospital, Inc",individual,25441621,20557146,0.808,0.8,203849,0
+"Mennonite General Hospital, Inc",small_group,1386461,1022728,0.7377,0.8,0,86440
+"Mennonite General Hospital, Inc",large_group,42879894,37250682,0.8687,0.85,802772,0
+"Indiana University Health Plans, Inc.",small_group,20255450,21385653,1.0558,0.8,5181293,0
+"Indiana University Health Plans, Inc.",large_group,48242389,38690393,0.802,0.85,0,2315638
+CONTRA COSTA MEDICAL SERVICES DBA CONTRA COSTA HEALTH PLAN,large_group,65783051,77377303,1.1762,0.85,21461710,0
+"Denver Health Medical Plan, Inc.",individual,63877843,76467936,1.1971,0.8,25365662,0
+Humana Insurance Company,individual,830,0,0.0006,0.8,0,663
+Humana Insurance Company,small_group,38018184,29050626,0.7641,0.8,2398265,3762186
+Humana Insurance Company,large_group,22138223,16403463,0.741,0.85,665297,3079324
+Chinese Community Health Plan,individual,35547407,32009756,0.9005,0.8,3571831,0
+Chinese Community Health Plan,small_group,5333395,4280298,0.8025,0.8,13582,0
+Chinese Community Health Plan,large_group,15592992,13503696,0.866,0.85,249653,0
+MAPFRE Insurance Group,small_group,21273615,18643726,0.8764,0.8,1624834,0
+MAPFRE Insurance Group,large_group,27706829,25321191,0.9139,0.85,1770387,0
+Sidecar Health Insurance Company,large_group,48463611,48248365,0.9956,0.85,7054296,0
+"Southeastern Indiana Health Organization, Inc.",small_group,15105605,14539052,0.9625,0.8,2454568,0
+"Southeastern Indiana Health Organization, Inc.",large_group,33229957,29601003,0.8908,0.85,1355539,0
+"Molina Healthcare of Illinois, Inc.",individual,43853095,37357720,0.8519,0.8,2275245,0
+"St. Luke's Health Plan, Inc.",individual,33140201,28650433,0.8645,0.8,2138272,0
+"St. Luke's Health Plan, Inc.",small_group,1504207,1256998,0.8357,0.8,53632,0
+"St. Luke's Health Plan, Inc.",large_group,5946402,4045797,0.6804,0.85,0,1008645
+Mass General Brigham Health Insurance Company,large_group,37848131,35714773,0.9436,0.85,3543862,0
+"Western Sky Community Care, Inc.",individual,37709968,30750388,0.8154,0.8,582414,0
+ALAMEDA ALLIANCE FOR HEALTH,large_group,34211456,33055819,0.9662,0.85,3976082,0
+"WellCare Health Insurance Company of New Jersey, Inc.",individual,31399903,24248563,0.7722,0.8,0,871360
+"Vantage Health Plan of Mississippi, Inc.",individual,27136391,28626161,1.0549,0.8,6917048,0
+"AMHIC, A Reciprocal Association & Sub",small_group,13138005,12818234,0.9757,0.8,2307830,0
+"AMHIC, A Reciprocal Association & Sub",large_group,13946716,12680430,0.9092,0.85,825721,0
+McLaren Hlth Grp,individual,18841405,20318341,1.0784,0.8,5245217,0
+McLaren Hlth Grp,small_group,2855603,914214,0.3201,0.8,0,1370269
+McLaren Hlth Grp,large_group,4832479,4584959,0.9488,0.85,477352,0
+"GMS Reinsurance Company, LTD",small_group,16775164,17145718,1.0221,0.8,3725586,0
+"GMS Reinsurance Company, LTD",large_group,8305241,5385275,0.6484,0.85,0,1674181
+Piedmont Comm Hlth Grp,small_group,14379317,16934389,1.1777,0.8,5430935,0
+Piedmont Comm Hlth Grp,large_group,9869420,11978127,1.2137,0.85,3589120,0
+Select Health of South Carolina,individual,21608866,18932090,0.8761,0.8,1644997,0
+Memorial Hermann Commercial Health Plan,small_group,1316596,876746,0.6659,0.8,0,176531
+Memorial Hermann Commercial Health Plan,large_group,17940478,14649162,0.8165,0.85,0,600244
+"Oscar Health Plan of Pennsylvania, Inc.",individual,18069806,16892280,0.9348,0.8,2436435,0
+AMERICAN INTL GRP,individual,17135220,14419181,0.8415,0.8,1334034,623029
+AMERICAN INTL GRP,large_group,3206,0,0.0,0.85,0,2725
+GlobalHealth Holdings Grp,large_group,16298859,14645290,0.8985,0.85,791260,0
+Community First Insurance Plans,individual,15716304,17550275,1.1167,0.8,4977232,0
+"Healthfirst Insurance Company, Inc.",small_group,15009814,14451620,0.9628,0.8,2443769,0
+"Humana Health Benefit Plan of Louisiana, Inc.",small_group,3574342,4404800,1.2323,0.8,1545326,0
+"Humana Health Benefit Plan of Louisiana, Inc.",large_group,10997839,12483575,1.1351,0.85,3135412,0
+SHELTER INS GRP,individual,25263,0,0.0,0.8,0,20210
+SHELTER INS GRP,small_group,309998,0,0.0,0.8,0,247999
+SHELTER INS GRP,large_group,12412220,0,0.0,0.85,0,10550387
+WMI Mutual Insurance Company,small_group,7918428,4414871,0.5575,0.8,0,1919871
+WMI Mutual Insurance Company,large_group,4188858,3716019,0.8871,0.85,617276,461786
+"Samaritan Health Plans, Inc",small_group,117369,327892,2.7937,0.8,233997,0
+"Samaritan Health Plans, Inc",large_group,9580440,10477609,1.0936,0.85,2334235,0
+"Taro Health Plan of Maine, Inc.",individual,4664614,7044911,1.5103,0.8,3313220,0
+"Taro Health Plan of Maine, Inc.",small_group,4664614,7044911,1.5103,0.8,3313220,0
+"Molina Healthcare of Kentucky, Inc.",individual,8248767,6429158,0.7794,0.8,0,169856
+Plan Medico Servicios de Salud Bella Vista,individual,5635923,4992021,0.8858,0.8,483283,0
+Plan Medico Servicios de Salud Bella Vista,small_group,387002,327145,0.8453,0.8,17543,0
+Plan Medico Servicios de Salud Bella Vista,large_group,2079970,2354456,1.132,0.85,586481,0
+BridgeSpan Health Company,individual,8014489,7686496,0.9591,0.8,1393638,118734
+San Mateo Health Commission,large_group,7851681,8072447,1.0281,0.85,1398518,0
+"Auxilio Platino, Inc.",small_group,90120,95181,1.0562,0.8,23085,0
+"Auxilio Platino, Inc.",large_group,7112502,5827517,0.8193,0.85,0,218109
+Santa Cruz-Monterey-Merced-San Benito-Mariposa Managed Medical Care Commission,large_group,5433711,5354791,0.9855,0.85,736137,0
+Memorial Hermann Health Insurance Company,small_group,370522,359495,0.9702,0.8,63078,0
+Memorial Hermann Health Insurance Company,large_group,5019919,4123164,0.8214,0.85,0,143767
+Tokio Marine Holdings Inc GRP,large_group,5266169,3074513,0.5838,0.85,115379,1517109
+Holman Professional Counseling Centers,large_group,4864795,4897326,1.0067,0.85,762250,0
+EQUITABLE HOLDINGS INC GRP,individual,3352890,6285088,1.8745,0.8,3602776,0
+Integon National Insurance Company,small_group,3175625,3959389,1.2468,0.8,1418889,0
+MemorialCare Select Health Plan,large_group,2476471,2003207,0.8089,0.85,0,101793
+"Taro Health Plan of Oklahoma, Inc.",individual,2268266,2224194,0.9806,0.8,409581,0
+Connecticut General Life Insurance Co,individual,17695,69993,3.9555,0.8,55837,0
+Connecticut General Life Insurance Co,large_group,2066033,1955109,0.9463,0.85,198981,0
+EDUCATORS MUT GRP,large_group,1432052,1445064,1.0091,0.85,384480,156660
+BCS INS GRP,large_group,1101090,350464,0.3183,0.85,142798,728260
+"Ryder Health Plan, Inc.",individual,1071586,940884,0.878,0.8,83615,0
+"Ryder Health Plan, Inc.",large_group,29120,65600,2.2527,0.85,40848,0
+"Molina Healthcare of Nevada, Inc.",individual,266560,120148,0.4507,0.8,0,93100
+GUARDIAN LIFE GRP,individual,232370,1065132,4.5838,0.8,905821,26585
+GUARDIAN LIFE GRP,small_group,14356,0,0.0,0.8,0,11485
+American General Life Insurance Company,individual,73389,36339,0.4952,0.8,12910,35282
+National Health Insurance Company,small_group,23059,21445,0.93,0.8,2998,0
+Community First Grp,small_group,11722,-9583,-0.8175,0.8,0,18960
+Oscar Health Group,individual,2298,488,0.2124,0.8,0,1350
+Assurity Life Insurance Company,individual,208,71,0.3437,0.8,0,95
