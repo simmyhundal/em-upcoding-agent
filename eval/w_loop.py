@@ -53,6 +53,10 @@ VERSIONS = {
     **{f"H16c{c}": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "extend": {"c": c, "more": 30}}} for c in (1, 1.5, 2)},
     "H8chk": {"version": "4.0", **wp40.FROZEN_V40},                                                                         # H8 rerun after the v4.1 refactors: must reproduce H8 exactly
     "H16": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "extend": {"c": 2, "more": 30}}},   # H16 at the c chosen on batches 1 to 4 (all three c gave the same result; ties go to the setting closest to H8)
+    # H17 let the money decide: a loosened pooled chart test of rules 4.0 (min documented charts, min unsupported share, alpha), the demand floor kept. H8 is (10, 0.25, 0.05).
+    **{f"H17{t}": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "rules40_opts": {"min": m, "up": u, "alpha": a}}}
+       for t, (m, u, a) in {"L1": (8, 0.20, 0.05), "L2": (6, 0.15, 0.10), "L3": (5, 0.10, 0.20)}.items()},
+    "H17": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "rules40_opts": {"min": 5, "up": 0.10, "alpha": 0.20}}},   # H17 at L3, chosen on batches 1 to 4
     "H3": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "policy25", "escalate": "stop", "sample_cpts": HI}},       # H2 without escalation (the first sample decides)
 }
 

@@ -8,7 +8,7 @@ Usage:
     python eval/make_v2_ai_runs.py [--only 261012_8_api ...]
 """
 import argparse
-import json
+import json as _json
 import os
 import shutil
 import subprocess
@@ -55,7 +55,7 @@ def run(rid, src, note, view_name="view", flagged_name="flagged_threshold.csv", 
     flagged = os.path.join(out, flagged_name)
     summaries, checked = os.path.join(out, "case_summaries.jsonl"), os.path.join(out, "case_summaries_checked.jsonl")
     sh("src/case_summary.py", view, flagged, summaries, "--cache-dir", os.path.join(out, "llm_cache"),
-       "--usage-jsonl", os.path.join(out, "usage_writer.jsonl"), *(["--v41"] if rules41 else ["--v40"] if rules40 else ["--v23"] if v23 else ["--v22"] if v22 else ["--v21"] if v21 else []), *(["--no-model"] if no_model else []), *(["--rules40-opts", json.dumps(rules40_opts)] if rules40_opts else []))
+       "--usage-jsonl", os.path.join(out, "usage_writer.jsonl"), *(["--v41"] if rules41 else ["--v40"] if rules40 else ["--v23"] if v23 else ["--v22"] if v22 else ["--v21"] if v21 else []), *(["--no-model"] if no_model else []), *(["--rules40-opts", _json.dumps(rules40_opts)] if rules40_opts else []))
     sh("src/guardrail.py", view, summaries, checked)
     if preflight:                                      # workflow v2.2: data-quality pre-flight on the plan tables, then hold affected summaries
         import csv
