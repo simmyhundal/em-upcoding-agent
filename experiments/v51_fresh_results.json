@@ -1,0 +1,124 @@
+{
+"A5.1": {
+"5555": {
+"score": -1340.6791604703435,
+"recovered": 289.39731260657936,
+"staff_cost": 1630.0764730769229,
+"abrasion": 0.0,
+"found": 1,
+"upcoders": 8,
+"demands": 1,
+"honest_called": 0,
+"rounds": 5,
+"charts": 90
+},
+"5656": {
+"score": -376.8299653846153,
+"recovered": 0,
+"staff_cost": 376.8299653846153,
+"abrasion": 0.0,
+"found": 0,
+"upcoders": 8,
+"demands": 0,
+"honest_called": 0,
+"rounds": 1,
+"charts": 30
+},
+"5757": {
+"score": 535.0375835197317,
+"recovered": 2199.4700104428084,
+"staff_cost": 1664.4324269230767,
+"abrasion": 0.0,
+"found": 2,
+"upcoders": 8,
+"demands": 2,
+"honest_called": 0,
+"rounds": 3,
+"charts": 88
+},
+"5858": {
+"score": -937.0293682777717,
+"recovered": 0,
+"staff_cost": 861.2367923076922,
+"abrasion": 75.79257597007948,
+"found": 0,
+"upcoders": 8,
+"demands": 0,
+"honest_called": 0,
+"rounds": 4,
+"charts": 48
+},
+"5959": {
+"score": 5002.01692193244,
+"recovered": 6018.143406547824,
+"staff_cost": 1016.1264846153845,
+"abrasion": 0.0,
+"found": 1,
+"upcoders": 8,
+"demands": 1,
+"honest_called": 0,
+"rounds": 2,
+"charts": 60
+},
+"6060": {
+"score": -1225.6216515325166,
+"recovered": 720.8295561597909,
+"staff_cost": 1946.4512076923074,
+"abrasion": 0.0,
+"found": 1,
+"upcoders": 8,
+"demands": 1,
+"honest_called": 0,
+"rounds": 8,
+"charts": 90
+},
+"6161": {
+"score": 3121.8777547374207,
+"recovered": 5384.792008583574,
+"staff_cost": 2262.9142538461533,
+"abrasion": 0.0,
+"found": 3,
+"upcoders": 8,
+"demands": 3,
+"honest_called": 0,
+"rounds": 5,
+"charts": 101
+},
+"6262": {
+"score": 1634.3564036718624,
+"recovered": 3614.9132421334007,
+"staff_cost": 1980.5568384615383,
+"abrasion": 0.0,
+"found": 1,
+"upcoders": 8,
+"demands": 1,
+"honest_called": 0,
+"rounds": 6,
+"charts": 120
+},
+"6363": {
+"score": 1512.4751721812336,
+"recovered": 2744.0458914120027,
+"staff_cost": 1231.570719230769,
+"abrasion": 0.0,
+"found": 1,
+"upcoders": 8,
+"demands": 1,
+"honest_called": 0,
+"rounds": 4,
+"charts": 59
+},
+"6464": {
+"score": -499.82077692307695,
+"recovered": 0,
+"staff_cost": 499.82077692307695,
+"abrasion": 0.0,
+"found": 0,
+"upcoders": 8,
+"demands": 0,
+"honest_called": 0,
+"rounds": 4,
+"charts": 6
+}
+}
+}

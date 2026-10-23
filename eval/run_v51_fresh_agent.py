@@ -36,6 +36,8 @@ if __name__ == "__main__":
     cap = float(sys.argv[sys.argv.index("--batch-cap") + 1]) if "--batch-cap" in sys.argv else 4.0
     seeds = [int(a) for a in sys.argv[1:] if a.isdigit()] or fresh.SEEDS
     assert all(s in fresh.SEEDS for s in seeds), "only the ten test seeds 5555 to 6464"
+    import seed_registry as sreg
+    sreg.check_run("4.0", seeds, "A5.1", "test", second_use=True)   # issue 176: the second test use of TEST-1 for the agent line (A5.0 was the first)
     from dotenv import load_dotenv
     load_dotenv(os.path.join(ROOT, ".env"))
     res = json.load(open(OUT)) if os.path.exists(OUT) else {}
