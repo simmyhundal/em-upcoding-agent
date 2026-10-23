@@ -61,3 +61,21 @@ Every held-out batch chose N = 4 on the other three (realized -6, 3,941, 188, 1,
 **Reading.** The list can be cut to 4 without losing what the ask model asks about in the top 4; almost all the gain over H22 is the triage no longer charged, and the rest is a lead on a handful of seeds, not a result at 0.0045 (and the tuning picked an edge of the grid). Caveats: the ask model was fitted on 22-provider lists; the list's cut-off is only as good as the `eb_upper_t` ranking (the top 4 hold all but 18 of the asks across 40 seeds); the seeds are development data, not fresh seeds; H8 and H22 comparisons share the same 60 seeds; honest providers are almost never asked, so zero honest called says little. The triage saving would apply to H8 as well (H8 with a list of 4 was not run).
 
 See also: [ceiling benchmarks for W4.1](ceiling_benchmarks_w41.md).
+
+## The control for H23: H8 with the same 4-provider list (H8_n4; issue 166)
+
+H23 differs from H8 by a 4-provider list (triage saved: 18 providers at $13.125 each, $236 per seed) and by H22's rules and near-miss extension. The control is workflow v4.0 (H8) with only the list changed (`H8_n4` in `eval/w_loop.py`: H8's spec with `list_k` = 4). Run once on the 60 hold-out seeds of batches 5 to 10, paired seed by seed; free (no model calls).
+
+| | H8 (list 22) | H8_n4 (list 4) | H23 (list 4 plus H22's changes) |
+|---|---|---|---|
+| Score 4.0 per seed | 426 | 712 | 1,103 |
+| Recovered over 60 seeds | $125,722 | $118,013 | $163,385 |
+| Staff cost over 60 seeds | $100,178 | $75,297 | $97,175 |
+| Upcoders found of 480 | 43 | 38 | 63 |
+| Rounds | 348 | 301 | 366 |
+| Honest providers called | 0 | 0 | 0 |
+
+- **H8_n4 against H8: +$286 per seed**, better on 58 of 60 seeds (p < 0.0001). About $236 is triage saved, as expected, and the other $50 is noise plus a small effect of the shorter list. The shorter list drops 5 upcoders (found 43 to 38) and costs $7,700 of recovery, which the staff saving more than repays.
+- **H23 against H8_n4: +$392 per seed** (sd 1,244; better on 15 seeds, worse on 16, tied on 29; one-sided p = 0.0087; found 63 against 38). With the list size equal, H22's looser chart rules and near-miss extension are worth about $392 per seed. It misses the 0.0045 bar named for the eleventh hypothesis, and clears 0.01.
+- **By batch** (H8 / H8_n4 / H23): batch 5 1,483 / 1,762 / 2,221; batch 6 −46 / 32 / 542; batch 7 −78 / 320 / 880; batch 8 1,148 / 1,431 / 2,301; batch 9 1,025 / 1,223 / 1,079; batch 10 −977 / −497 / −400. H23 is ahead of the control in every batch.
+- **Reading:** H23's lead over H8 ($677 per seed on these 60 seeds) splits into about $286 for the shorter list and about $392 for H22's rules and extension. The mean is driven by a few large wins (better on 15 seeds, worse on 16), so it is a lead with a p-value near 0.01, not a result at the declared bar.

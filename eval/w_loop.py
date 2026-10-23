@@ -69,6 +69,8 @@ VERSIONS = {
     # H22 = H16 + H17 (spec of eval/w_loop_h22.py, unchanged; cache H22.json and run folders wlh22_<seed> are reused) and H23 = H22 with the list size N (`list_k`); H23_n22 is H22 itself.
     "H22": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "rules40_opts": {"min": 5, "up": 0.10, "alpha": 0.20}, "extend": {"c": 2, "more": 30}}},
     **{f"H23_n{n}": {"version": "4.0", "screen": "eb_upper_t", "list_k": n, "w40": {"ask": "linear", "escalate": "stop", "demand_floor": "cost", "rules40_opts": {"min": 5, "up": 0.10, "alpha": 0.20}, "extend": {"c": 2, "more": 30}}} for n in (4, 6, 8, 11, 15)},
+    # Control for H23 (issue 166): workflow v4.0 (H8) with the same 4-provider list (`list_k`), so the triage it saves is the same mechanical saving H23 gets; nothing else differs from H8.
+    "H8_n4": {"version": "4.0", **wp40.FROZEN_V40, "list_k": 4},
     "H3": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "policy25", "escalate": "stop", "sample_cpts": HI}},       # H2 without escalation (the first sample decides)
 }
 
