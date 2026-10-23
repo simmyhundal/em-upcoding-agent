@@ -35,7 +35,7 @@ A seed is a hold-out only for one arm and one decision made before its results w
 | D4.0-DEV-A | 4.0 | 1515 to 2424 step 101; 3000 to 3609 step 21 (40) | burned (2026-10-21) | fit: H8, H12, H13; select: H8, H14, H16, H17, H15, H18, H19, H20, H20c, H23, screens_v4; confirm: H4, H6 | Development data only (fit, select, explore). No clean hold-out for any arm that saw it. |
 | D4.0-DEV-B | 4.0 | 3630 to 4029 step 21 (20) | burned (2026-10-22) | fit: H12; select: H22; confirm: H8, H13, H14, H15, H18, H19, H20, H20c, H16, H17, H23, H8_n4 | Development data only (fit, select, explore). No clean hold-out for any arm that saw it. |
 | D4.0-DEV-C | 4.0 | 4050 to 4869 step 21 (40) | in use (2026-10-22) | confirm: H17, H16, H22, H23, H8_n4, H8, H12 | A confirm for a hypothesis whose design did not see its results; development data for the rest. |
-| D4.0-TEST-1 | 4.0 | 5555 to 6464 step 101 (10) | burned (2026-10-22) | test: W2.5, W4.0, A5.0, A3.5 (not run yet), W4.1 (second use), H8_n4 (second use), A5.1 (not run yet) | Not a clean test any more. A named later version can look at it as a declared second use; otherwise development data. |
+| D4.0-TEST-1 | 4.0 | 5555 to 6464 step 101 (10) | burned (2026-10-22) | test: W2.5, W4.0, A5.0, A3.5 (not run yet), W4.1 (second use), H8_n4 (second use), A5.1 (second use) | Not a clean test any more. A named later version can look at it as a declared second use; otherwise development data. |
 | D4.0-TEST-2 | 4.0 | 6565 to 7474 step 101 (10) | reserved (2026-10-22) | none | Only a final test of a frozen version, once. Never generated, never used for development. |
 
 ## Notes by pool
@@ -144,7 +144,7 @@ A seed is a hold-out only for one arm and one decision made before its results w
 - A3.5, test (date not recorded, planned, not run; docs/v4_v5_results.md; eval/run_v5_fresh_agent.py): frozen agent v3.5 reference: not run (eval/run_v5_fresh_agent.py refuses without --approved).
 - W4.1, test (2026-10-22, second use; docs/w41_freeze.md; docs/w41_fresh_result.md; PR 175, PR 177): second use: +$1,003 per seed against W4.0.
 - H8_n4, test (2026-10-22, second use; docs/w41_freeze.md): control (W4.0 with the same 4-provider list), second use.
-- A5.1, test (date not recorded, planned, not run; docs/w41_freeze.md; issue 135): not run yet: agent v5.1 is planned to mirror W4.1 (issue 135); it would be a second use; paid, needs an estimate and approval.
+- A5.1, test (2026-10-22, second use; docs/a51_fresh_result.md; issue 135): run once, second use of the agent line on these seeds (A5.0 was the first); paid: $1.242 for ten runs under a $4 cap, approved by Simmy after the $1.7 estimate (docs/a51_fresh_result.md).
 
 **D4.0-TEST-2** (test). never generated; untouched until a freeze. Change the status here (with an issue reference) before any run.
 
