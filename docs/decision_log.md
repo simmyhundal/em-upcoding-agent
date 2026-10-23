@@ -6,6 +6,7 @@ Important events for Simmy to review: releases and tags, merges that touch froze
 
 | Date | Event | Detail |
 |---|---|---|
+| 2026-10-23 | True test of v4.1 and v5.1 deferred; paid agent step not approved | Simmy did not approve the paid agent run on the reserved pool (6565 to 7474) to save money. The pool stays unrun so it can be used once for the workflow and the agent together. The README and notes describe v4.1 and v5.1 as second-use results on the W4.0 test seeds. |
 | 2026-10-22 | Releases v4.1 and v5.1 tagged and published | Workflow v4.1 (+$1,003 per seed on the test seeds, found 9 of 80) and agent v5.1 (+$743 per seed, found 10 of 80); notes in `docs/releases/`. Both are not distinguishable from zero; one seed carries each total. |
 | 2026-10-22 | Paid run: agent v5.1 on seeds 5555 to 6464 | $1.242 for ten runs (estimate $1.7, cap $4), approved by Simmy; `docs/a51_fresh_result.md`; recorded as a second use in the seed registry. |
 | 2026-10-22 | Merge touching agent code paths: PRs 171 and 179 | 171 keeps the answer key's roles out of `Environment` (behaviour-preserving, replays identical); 179 builds agent v5.1 behind its own version flag. Agent v5.0 and v3.x unchanged. |
