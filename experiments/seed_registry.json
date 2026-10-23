@@ -1883,10 +1883,71 @@
     5033
    ],
    "kind": "test",
-   "status": "fresh",
+   "status": "burned",
    "status_date": "2026-10-23",
-   "status_note": "released from reserved at the freeze of workflow v4.2 (docs/w42_freeze.md): ten seeds 4700 + 37j, generated for the true test of workflow v4.2 and agent v5.2, run once",
-   "uses": []
+   "status_note": "ten seeds 4700 + 37j, built and run once by workflow v4.2, workflow v4.1 and agent v5.2 (docs/v42_test_result.md); burned for later releases",
+   "uses": [
+    {
+     "arm": "H28",
+     "role": "test",
+     "date": "2026-10-23",
+     "reference": "docs/v42_test_result.md",
+     "note": "workflow v4.2: the true test, first use",
+     "second_use": false,
+     "seeds": [
+      4700,
+      4737,
+      4774,
+      4811,
+      4848,
+      4885,
+      4922,
+      4959,
+      4996,
+      5033
+     ]
+    },
+    {
+     "arm": "H23_n4",
+     "role": "test",
+     "date": "2026-10-23",
+     "reference": "docs/v42_test_result.md",
+     "note": "workflow v4.1 re-run on the test seeds",
+     "second_use": false,
+     "seeds": [
+      4700,
+      4737,
+      4774,
+      4811,
+      4848,
+      4885,
+      4922,
+      4959,
+      4996,
+      5033
+     ]
+    },
+    {
+     "arm": "A5.2",
+     "role": "test",
+     "date": "2026-10-23",
+     "reference": "docs/v42_test_result.md",
+     "note": "agent v5.2, one run per seed, effort low, $1.78 in all",
+     "second_use": false,
+     "seeds": [
+      4700,
+      4737,
+      4774,
+      4811,
+      4848,
+      4885,
+      4922,
+      4959,
+      4996,
+      5033
+     ]
+    }
+   ]
   },
   {
    "id": "D4.2-RESERVED",

@@ -82,6 +82,8 @@ def rows():
 V4_PATH = os.path.join(ROOT, "experiments", "v4_fresh_results.json")
 V41_PATH = os.path.join(ROOT, "experiments", "v41_fresh_results.json")
 V51_PATH = os.path.join(ROOT, "experiments", "v51_fresh_results.json")
+V42_PATH = os.path.join(ROOT, "experiments", "v42_test_results.json")
+V42_ARMS = [("W4.1", "Workflow v4.1"), ("W4.2", "Workflow v4.2"), ("A5.2", "Agent v5.2")]       # ten data 4.2 test seeds (4700 + 37j), score 4.2; W4.1 re-run on them
 V4_ARMS = [("W2.5 (frozen)", "Workflow v2.5", V4_PATH), ("W4.0", "Workflow v4.0", V4_PATH), ("A5.0", "Agent v5.0", V4_PATH),
            ("W4.1 (H23, list 4)", "Workflow v4.1", V41_PATH), ("A5.1", "Agent v5.1", V51_PATH)]
 
@@ -105,6 +107,18 @@ def v4_rows():
     return out
 
 
+def v42_rows():
+    """Workflow v4.1 (re-run), workflow v4.2 and agent v5.2 on the ten data 4.2 test seeds, scored by score 4.2 (docs/score_42.md). On data 4.2 nothing is planted: `upcoders` is the number of providers
+    whose true overpayment is at least the cost of pursuing them (m = 1) and `found` the ones sent a demand."""
+    res = json.load(open(V42_PATH))
+    out = []
+    for key, label in V42_ARMS:
+        v = list(res[key].values())
+        out.append({"arm": label, "seeds": "data 4.2 seeds", "found": sum(x["justified_called"] for x in v), "upcoders": sum(x["justified"] for x in v), "accused": sum(x["demands"] - x["justified_called"] for x in v),
+                    "net_per_seed": round(sum(x["score"] for x in v) / len(v)), "net_total": sum(x["score"] for x in v), "lane": sum(x["lane_demands"] for x in v), "impossible": sum(x["impossible_providers"] for x in v)})
+    return out
+
+
 CHECK_PATH = os.path.join(ROOT, "experiments", "score_40_check.json")
 CHECK_KEY = {("Workflow v2.2", "release 2 seeds"): ("r2", "W2.2"), ("Agent v3.2", "release 2 seeds"): ("r2", "A3.2"), ("Workflow v2.2", "release 3 seeds"): ("r3", "W2.2"),
              ("Workflow v2.3", "release 3 seeds"): ("r3", "W2.3"), ("Agent v3.3", "release 3 seeds"): ("r3", "A3.3"), ("Workflow v2.4", "release 4 seeds"): ("r4", "GL"),
@@ -125,8 +139,7 @@ def dollars(x):
     return "n/a" if x is None else f"-${-round(x):,}" if round(x) < 0 else f"${round(x):,}"
 
 
-TABLE_ROWS = [("Workflow v2.1", "release 1 seeds", "2.1, release 1"), ("Agent v3.1", "release 1 seeds", "2.1, release 1"),
-              ("Workflow v2.5", "release 5 seeds", "2.2, release 5"), ("Agent v3.5", "release 5 seeds", "2.2, release 5")]
+TABLE_ROWS = [("Workflow v2.5", "release 5 seeds", "2.2, release 5"), ("Agent v3.5", "release 5 seeds", "2.2, release 5")]
 
 
 def r1_total(arm):
@@ -145,17 +158,38 @@ def markdown():
     lines = ["| Version | " + hov("Data, seeds", "Data version and the ten seeds. Compare rows within one data and seed set.")
              + " | " + hov("Upcoders found (recall)", "Planted upcoders found.") + " | " + hov("Calls that were upcoders (precision)", "Calls that were upcoders.")
              + " | " + hov("Score 2.5", "Release 5's score: the overpayment a sample supports (90% lower bound) minus request, review and false-accusation costs. Sum over ten seeds. Applied to release 1 after the fact.")
-             + " | " + hov("Score 4.0", "Recovery minus staff-hours cost minus provider abrasion (docs/score_40.md). Sum over ten seeds.") + " |", "|---|---|---|---|---|---|"]
+             + " | " + hov("Score 4.0", "Recovery minus staff-hours cost minus provider abrasion (docs/score_40.md). Sum over ten seeds.")
+             + " | " + hov("Score 4.2", "Score 4.0 with no copy fee, a visit the office has no record of counted as overpaid, and fraud included (docs/score_42.md). Sum over ten seeds.") + " |", "|---|---|---|---|---|---|---|"]
     for arm, seeds, label in TABLE_ROWS:
         x = d[(arm, seeds)]
         sc = stored_scores(arm, seeds)
         s25, s40 = sc if sc else (r1_total(arm), None)
-        lines.append(f"| {arm} | {label} | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | {dollars(s25)} | {dollars(s40)} |")
+        lines.append(f"| {arm} | {label} | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | {dollars(s25)} | {dollars(s40)} | n/a |")
     for x in v4_rows():
-        label = f"{x['arm']} (frozen)" if x["arm"] == "Workflow v2.5" else x["arm"]
-        lines.append(f"| {label} | 4.0, test | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | n/a | {dollars(x['net_total'])} |")
-    lines += ["", "Hover over a column title for its definition ([glossary](docs/glossary.md#results-columns)). Every run and release: [results](docs/results.md), [release 1](docs/eval61.md), [5](docs/release5_results.md), [v4.0 and v5.0](docs/v4_v5_results.md), [v4.1](docs/w41_fresh_result.md), [v5.1](docs/a51_fresh_result.md)."]
+        if x["arm"] in ("Workflow v2.5", "Workflow v4.0", "Agent v5.0"):         # their rows are in docs/v4_v5_results.md; the README keeps the table short (7,000-character cap)
+            continue
+        label = x["arm"]
+        lines.append(f"| {label} | 4.0, test | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | n/a | {dollars(x['net_total'])} | n/a |")
+    for x in v42_rows():
+        lines.append(f"| {x['arm']} | 4.2, test | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | n/a | n/a | {dollars(x['net_total'])} |")
+    lines += ["", "Hover over a column title for its definition ([glossary](docs/glossary.md#results-columns)). Every run and release: [results](docs/results.md), [release 1](docs/eval61.md), [5](docs/release5_results.md), [v4.0 and v5.0](docs/v4_v5_results.md), [v4.1](docs/w41_fresh_result.md), [v5.1](docs/a51_fresh_result.md), [v4.2 and v5.2](docs/v42_test_result.md)."]
     return "\n".join(lines)
+
+
+def score_parts_42(arm):
+    """Totals over the ten data 4.2 test seeds for one arm of experiments/v42_test_results.json, the staff cost split by activity at score 4.2's prices (src/recovery_42.py)."""
+    sys.path.insert(0, os.path.join(ROOT, "src"))
+    import recovery_42 as r42
+    p = r42.params42()
+    m = p["MINUTES"]
+    import recovery_40 as r
+    v = list(json.load(open(V42_PATH))[arm].values())
+    S = lambda f: sum(x[f] for x in v)
+    charts = S("charts") * m["coder_per_chart"] / 60 * r.hourly("coder", p)
+    admin = S("rounds") * (m["admin_per_round"] / 60 * r.hourly("admin", p) + p["C_COPY"])
+    demand = S("demands") * (m["investigator_per_demand"] / 60 * r.hourly("investigator", p) + m["nurse_per_demand"] / 60 * r.hourly("nurse", p))
+    return {"n": len(v), "recovery": S("recovered"), "recovery_lane": S("recovered_fwa"), "staff": S("staff_cost"), "abrasion": S("abrasion"), "score": S("score"), "found": S("justified_called"), "upcoders": S("justified"),
+            "demands": S("demands"), "lane_demands": S("lane_demands"), "rounds": S("rounds"), "charts_n": S("charts"), "charts": charts, "admin": admin, "demand": demand, "triage": S("staff_cost") - charts - admin - demand}
 
 
 def score_parts(arm):
@@ -173,10 +207,15 @@ def score_parts(arm):
             "demands": S("demands"), "rounds": S("rounds"), "charts_n": S("charts"), "charts": charts, "admin": admin, "demand": demand, "triage": S("staff_cost") - charts - admin - demand}
 
 
-def score_text(arm="A5.1"):
+def score_text(arm="A5.2"):
     """The README's three bullets under the score chart, dollars summed over the ten test seeds (experiments/v4_fresh_results.json, v41_ and v51_fresh_results.json)."""
-    w = score_parts(arm)
+    w = score_parts_42(arm) if arm in dict(V42_ARMS) else score_parts(arm)
     f = lambda x: f"${x:,.0f}"
+    if arm in dict(V42_ARMS):
+        return (f"- **Recovery +{f(w['recovery'])}:** {f(w['recovery_lane'])} of it from the visits-per-day check ({w['lane_demands']} of its demands), the rest from reviewing billing levels; {w['demands']} demands in all.\n"
+                f"- **Staff cost -{f(w['staff'])}:** chart review {f(w['charts'])} ({w['charts_n']} charts), requests {f(w['admin'])} ({w['rounds']} rounds), demand work {f(w['demand'])}, triage and model dollars {f(w['triage'])}.\n"
+                f"- **Abrasion -{f(w['abrasion'])}:** the cost to providers of requests and demands, weighted by how little they overbilled.\n"
+                f"- **Net score {dollars(w['score'])}** over ten seeds.")
     return (f"- **Recovery +{f(w['recovery'])}:** {w['found']} of {w['upcoders']} upcoders found, {w['demands']} demands, about {f(w['recovery'] / max(w['demands'], 1))} recovered per demand.\n"
             f"- **Staff cost -{f(w['staff'])}:** chart review {f(w['charts'])} ({w['charts_n']} charts), requests and copy fees {f(w['admin'])} ({w['rounds']} rounds), demand work {f(w['demand'])}, triage and model dollars {f(w['triage'])}.\n"
             f"- **Abrasion -{f(w['abrasion'])}:** the cost to providers of requests and demands; no honest provider was demanded from.\n"
@@ -184,21 +223,22 @@ def score_text(arm="A5.1"):
 
 
 def tldr():
-    """The README's summary, rendered from experiments/v4_fresh_results.json (ten fresh data 4.0 seeds, score 4.0, summed) and experiments/release5_results.json (release 5)."""
+    """The README's summary, rendered from experiments/v4_fresh_results.json (data 4.0), release5_results.json (release 5) and v42_test_results.json (data 4.2, ten test seeds, score 4.2, summed)."""
     w25, w40, a50, w41, a51 = v4_rows()
-    d = json.load(open(os.path.join(ROOT, "experiments", "release5_results.json")))
-    tot = lambda k: sum(d[k]["per_seed"])
-    return (f"A fixed workflow and an AI agent both screen providers, request charts and draft cases for PI teams. On the old data (release 5), both earned about ${round((tot('A3.5') + tot('W2.5')) / 2000) * 1000 / 1000:,.0f}k net over ten seeds under score 2.5 and found under half of the upcoders. "
-            f"Data 4.0 and score 4.0 are harder and charge for staff time. On ten test seeds the old workflow (v2.5) scores {dollars(w25['net_total'])} in total, workflow v4.0 {dollars(w40['net_total'])} and agent v5.0 {dollars(a50['net_total'])}; "
-            f"the newest, workflow v4.1 ({dollars(w41['net_total'])}) and agent v5.1 ({dollars(a51['net_total'])}), find {w41['found']} and {a51['found']} of {w41['upcoders']} upcoders and accuse no honest provider. "
-            "They beat their predecessors on most seeds, but one seed carries each total and neither is distinguishable from zero.")
+    w41b, w42, a52 = v42_rows()
+    lane = score_parts_42("W4.2")
+    return (f"On data 4.0 (ten test seeds, score 4.0) the old workflow v2.5 scores {dollars(w25['net_total'])}; "
+            f"workflow v4.1 ({dollars(w41['net_total'])}) and agent v5.1 ({dollars(a51['net_total'])}) find {w41['found']} and {a51['found']} of {w41['upcoders']} upcoders, but one seed carries each total. "
+            f"Data 4.2 adds fraud. On ten new test seeds workflow v4.1 scores {dollars(w41b['net_total'])}; workflow v4.2 ({dollars(w42['net_total'])}) and agent v5.2 ({dollars(a52['net_total'])}) add a check on visits billed per day, "
+            f"which gives {round(100 * lane['recovery_lane'] / lane['recovery'])}% of their recovery. That signal is clean by construction in the synthetic data: read the gain as what a reviewer does with a clean signal, not as a forecast for real claims.")
 
 
 def headline_cells():
     """Short per-version results for the progression slide: {"v4.1": text, "v5.1": text}."""
     w25, w40, a50, w41, a51 = v4_rows()
-    return {"v4.1": f"Data 4.0, ten test seeds: {w41['found']} of {w41['upcoders']} found, {w41['accused']} honest accused, {dollars(w41['net_total'])} in all (v4.0: {dollars(w40['net_total'])}).",
-            "v5.1": f"Agent, same seeds: {a51['found']} of {a51['upcoders']} found, {a51['accused']} honest accused, {dollars(a51['net_total'])} in all."}
+    w41b, w42, a52 = v42_rows()
+    return {"v4.2": f"Data 4.2, ten test seeds: {w42['lane']} of {w42['impossible']} providers billing impossible visits per day demanded from, {dollars(w42['net_total'])} in all (v4.1: {dollars(w41b['net_total'])}).",
+            "v5.2": f"Agent, same seeds: {a52['lane']} of {a52['impossible']} such providers demanded from, {dollars(a52['net_total'])} in all."}
 
 
 if __name__ == "__main__":

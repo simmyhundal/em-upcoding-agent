@@ -38,8 +38,8 @@ A seed is a hold-out only for one arm and one decision made before its results w
 | D4.0-TEST-1 | 4.0 | 5555 to 6464 step 101 (10) | burned (2026-10-22) | test: W2.5, W4.0, A5.0, A3.5 (not run yet), W4.1 (second use), H8_n4 (second use), A5.1 (second use) | Not a clean test any more. A named later version can look at it as a declared second use; otherwise development data. |
 | D4.0-TEST-2 | 4.0 | 6565 to 7474 step 101 (10) | reserved (2026-10-22) | none | Only a final test of a frozen version, once. Never generated, never used for development. |
 | D4.2-DEV | 4.2 | 1001 to 4664 step 37 (100) | in use (2026-10-23) | select: W2.5, W4.0, W4.1, H24, H25, H26, H27, H23_n4, H28 | A confirm for a hypothesis whose design did not see its results; development data for the rest. |
-| D4.2-CONFIRM | 4.2 | 1002 to 4665 step 37 (100) | fresh (2026-10-23) | none | One test of a frozen version; nothing else. |
-| D4.2-TEST-1 | 4.2 | 4700 to 5033 step 37 (10) | reserved (2026-10-23) | none | Only a final test of a frozen version, once. Never generated, never used for development. |
+| D4.2-CONFIRM | 4.2 | 1002 to 4665 step 37 (100) | in use (2026-10-23) | confirm: H28, H23_n4 | A confirm for a hypothesis whose design did not see its results; development data for the rest. |
+| D4.2-TEST-1 | 4.2 | 4700 to 5033 step 37 (10) | burned (2026-10-23) | test: H28, H23_n4, A5.2 | Not a clean test any more. A named later version can look at it as a declared second use; otherwise development data. |
 | D4.2-RESERVED | 4.2 | 5100 to 5433 step 37 (10) | reserved (2026-10-23) | none | Only a final test of a frozen version, once. Never generated, never used for development. |
 
 ## Notes by pool
@@ -163,9 +163,14 @@ A seed is a hold-out only for one arm and one decision made before its results w
 - H23_n4, select, seeds 1001 to 2444 step 37 (2026-10-23; docs/w_loop_v42.md): paired reference of the v4.2 loop on batches 1 to 4 under score 4.2.
 - H28, select, seeds 1001 to 2444 step 37 (2026-10-23; docs/w_loop_v42.md): lane with up to 3 more follow-ups when the office gives nothing usable; batches 1 to 4 (40 seeds); chosen as W4.2.
 
-**D4.2-CONFIRM** (development). data 4.2 confirm pool of 100 seeds, named and not generated or read by anyone. Change the status to in_use (with an issue reference) at the first read for a decision declared in advance.
+**D4.2-CONFIRM** (development). built (100 seeds, codes d42_<seed>, never run before); the pre-declared confirm read of workflow v4.2 (docs/w42_freeze.md, committed 6db3713) runs here once.
+- H28, confirm, seeds 1002 to 4665 step 37 (2026-10-23; docs/w42_confirm_result.md): workflow v4.2: the pre-declared confirm read (docs/w42_freeze.md); passed.
+- H23_n4, confirm, seeds 1002 to 4665 step 37 (2026-10-23; docs/w42_confirm_result.md): workflow v4.1, the paired reference of the confirm read.
 
-**D4.2-TEST-1** (test). data 4.2 test pool of ten seeds, named and never generated; for the true test of the release's frozen versions, read once. Change the status here (with an issue reference) before any run.
+**D4.2-TEST-1** (test). ten seeds 4700 + 37j, built and run once by workflow v4.2, workflow v4.1 and agent v5.2 (docs/v42_test_result.md); burned for later releases.
+- H28, test, seeds 4700 to 5033 step 37 (2026-10-23; docs/v42_test_result.md): workflow v4.2: the true test, first use.
+- H23_n4, test, seeds 4700 to 5033 step 37 (2026-10-23; docs/v42_test_result.md): workflow v4.1 re-run on the test seeds.
+- A5.2, test, seeds 4700 to 5033 step 37 (2026-10-23; docs/v42_test_result.md): agent v5.2, one run per seed, effort low, $1.78 in all.
 
 **D4.2-RESERVED** (test). data 4.2 reserved pool of ten seeds, named and never generated; untouched until a deliberate decision recorded here.
 
