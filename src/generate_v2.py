@@ -92,6 +92,11 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
             v22 = {**v22, "clone_share": clone_share}
         return generate_v4.build(out_dir, answer_key_path, seed=seed, n_providers=n_providers, n_upcoders=n_up_, n_hard_neg=n_hn_,
                                  clone_signal_strength=clone_signal_strength, **v22)
+    if data_version == "4.2":                     # data 4.2 (issue 173) lives in generate_v42.py: no planted upcoders, so n_upcoders and n_hard_neg are ignored
+        import generate_v42
+        if clone_share is not None:
+            v22 = {**v22, "clone_share": clone_share}
+        return generate_v42.build(out_dir, answer_key_path, seed=seed, n_providers=n_providers, clone_signal_strength=clone_signal_strength, **v22)
     if clone_share is None:
         clone_share = 0.5                         # the data 2.x default, unchanged
     v22_on = data_version == "2.2"
@@ -410,7 +415,7 @@ if __name__ == "__main__":
     ap.add_argument("--hard-neg-rate", type=float, default=8 / 216)
     ap.add_argument("--clone-share", type=float, default=None, help="share of upcoders whose documentation is cloned to match billing (data 2.x default 0.5; data 4.0 default 0.125)")
     ap.add_argument("--answer-key", default=DEFAULT_KEY)
-    ap.add_argument("--data-version", default="2.0", choices=["2.0", "2.1", "2.2", "4.0"], help="2.1 also writes the note package; 2.2 adds honest coding noise; 4.0 provider upcoding rates and habits (generate_v4.py)")
+    ap.add_argument("--data-version", default="2.0", choices=["2.0", "2.1", "2.2", "4.0", "4.2"], help="2.1 also writes the note package; 2.2 adds honest coding noise; 4.0 provider upcoding rates and habits (generate_v4.py)")
     ap.add_argument("--clone-signal-strength", type=float, default=0.7, help="data 2.1: chance each clone signal appears on a cloned visit")
     g = ap.add_argument_group("data 2.2 (issue 74); defaults in V22_DEFAULTS")
     g.add_argument("--honest-miscode-rate", type=float, help="mean share of an honest provider's visits billed off the justified level")

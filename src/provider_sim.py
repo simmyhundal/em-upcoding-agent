@@ -71,6 +71,7 @@ DEFICIENCY_TEXT = {
     "NO_RESPONSE": "No response by the deadline.",
     "MISSING_RESULTS": "An order is listed but its result was not included.",
     "AUDIT_TRAIL_REFUSED": "The office declined to provide the EHR audit trail.",
+    "NO_RECORD": "The office has no record of a visit on that date.",       # office version 4.2: a claim for a service that was never rendered
 }
 STATUS_TO_CODE = {"wrong_content": "WRONG_CONTENT", "missing_signature": "MISSING_SIGNATURE", "wrong_dates": "WRONG_DATES",
                   "illegible": "ILLEGIBLE", "clarification_requested": "SCOPE_UNCLEAR", "extension": "EXTENSION",
@@ -87,9 +88,16 @@ class Office:
     def __init__(self, v2_dir, view_dir, seed=1, correlation=0.0, roles=None, version="2.0"):
         """roles: optional {provider_id: role}, used ONLY to draw hidden behavior when correlation > 0 (evaluation use).
         version "2.1": returned charts carry the note package (docs/data_v2_1.md), a second request per provider is allowed
-        (random first, targeted after), and an audit trail can be requested as a second-tier action. "2.0" is the frozen behaviour."""
+        (random first, targeted after), and an audit trail can be requested as a second-tier action. "2.0" is the frozen behaviour.
+        version "4.2" (issue 173, docs/data_v4_2.md): office 2.1 plus claims for services never rendered (records/unrendered_claims.csv, a simulator-side file): no chart can ever be produced
+        for them; when the office answers it reports them under the deficiency NO_RECORD. Offices 2.0 and 2.1 do not read that file."""
         self.seed = seed
-        self.v21 = version == "2.1"
+        self.v21 = version in ("2.1", "4.2")
+        self.unrendered = set()
+        if version == "4.2":
+            path = os.path.join(v2_dir, "records", "unrendered_claims.csv")
+            if os.path.exists(path):
+                self.unrendered = {r["claim_id"] for r in _rows(path)}
         self.max_rounds = MAX_ROUNDS_21 if self.v21 else MAX_ROUNDS
         if self.v21:
             import note_checks
@@ -211,7 +219,8 @@ class Office:
             st["late"], status = status, "no_response"
         st["day"] += min(delay, deadline) if status == "no_response" else delay
         missing_ids, unusable_ids, deficiencies = [], [], []
-        remaining = [c for c in st["requested"] if c not in st["usable"] and c not in pending_before]
+        remaining = [c for c in st["requested"] if c not in st["usable"] and c not in pending_before and c not in self.unrendered]
+        no_record = [c for c in st["requested"] if c in self.unrendered]        # office 4.2: requested claims for services never rendered (empty for offices 2.0 and 2.1)
         if status in ("complete", "partial"):
             # nothing left to send (every requested chart is usable or held back for a signature): an empty reply, not a crash (issue 84)
             got = remaining if status == "complete" or not remaining else rng.sample(remaining, max(1, int(len(remaining) * rng.uniform(0.4, 0.7))))
@@ -230,6 +239,8 @@ class Office:
             missing_ids = [c for c in remaining if c not in st["usable"] and c not in unusable_ids]
             if missing_ids:
                 deficiencies.append({"code": "MISSING_VISITS", "text": DEFICIENCY_TEXT["MISSING_VISITS"], "claim_ids": missing_ids})
+            if no_record:
+                deficiencies.append({"code": "NO_RECORD", "text": DEFICIENCY_TEXT["NO_RECORD"], "claim_ids": sorted(no_record)})
         elif status in ("missing_signature", "wrong_dates", "illegible"):
             held = remaining[: max(1, int(len(remaining) * 0.8))]
             st["pending"][STATUS_TO_CODE[status]] += held

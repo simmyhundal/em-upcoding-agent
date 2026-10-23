@@ -82,6 +82,8 @@ def request_records(v2_dir, view_dir, provider_ids, sample_n, rng, response_rate
                     coder_noise=CODER_NOISE):
     """Simulate a records request. Returns (documentation rows, one status row per provider)."""
     universe = {r["claim_id"]: r for r in _rows(os.path.join(v2_dir, "records", "records_universe.csv"))}
+    unrendered_path = os.path.join(v2_dir, "records", "unrendered_claims.csv")      # data 4.2 only: services never rendered have no chart (the file does not exist for earlier data)
+    unrendered = {r["claim_id"] for r in _rows(unrendered_path)} if os.path.exists(unrendered_path) else set()
     by_prov = defaultdict(list)
     for r in _rows(os.path.join(view_dir, "claims.csv")):
         by_prov[r["provider_id"]].append(r["claim_id"])
@@ -91,6 +93,9 @@ def request_records(v2_dir, view_dir, provider_ids, sample_n, rng, response_rate
         pick = rng.sample(ids, min(sample_n, len(ids)))
         got = late = missing = 0
         for cid in pick:
+            if cid in unrendered:
+                missing += 1
+                continue
             if rng.random() >= response_rate:
                 missing += 1
                 continue

@@ -1,0 +1,38 @@
+{
+ "4.0_s42_harness": {
+  "__answer_key__": "23c830d3e7499371d4bda984f0a478f5f57d238136eddcd9770e5fc35af50c3a",
+  "claim_lines.csv": "1202704e9269b4bb5544fd64ecf0afdb141a3179add40ec4aa0f197b79e7af97",
+  "claims_header.csv": "f79881fd159157d4635c00c2b448a3f7d59f1c3eea90d62c3e1549cdd2f01423",
+  "control_totals.csv": "b3dff86ba144089404f649f290369592613b69ebd758a85ef03008b0b6e09fb5",
+  "members.csv": "0e2cb48b430a4eb351c1e450a9273dd6b0940643adbd01dc69ed2953e4613180",
+  "providers.csv": "d424601ec38105314c6b92997b28ea7db0da920019fb73e774e5f070e18408f9",
+  "records/audit_trail.csv": "d72c1020bfd45d7b0eca3de64aa8932495d79cb6f9a0d55fe6c330e155a85a37",
+  "records/note_authentication.csv": "f15f87e5e9df9ee76826ca0a7d93223fe2a97e90cb24a75b6d8b5359c04baa4a",
+  "records/note_orders.csv": "054eff6e1b23040ddf47a4f22b745d3479df39e93ef5b6600202326d03517302",
+  "records/note_results.csv": "6af4f3cb57ff3751e86f2fbc99ca2be8e6a393bf5b0328d741398643f442d042",
+  "records/records_universe.csv": "1758ee0ba968bd0c0834b25c44123828a502de8e78b98537d67435cddcf3af59",
+  "records/visit_notes.csv": "b3475afec18466a44ab683f682d1e8ba8adcf60e1ee3930c2cba14d4be9e3765",
+  "reference/fee_schedule.csv": "52c1681b8b23bea8428fbc96261acd32c2508d58dacedacc6eedaf78cc662733",
+  "reference/place_of_service.csv": "790735e452ea1517a18408bb1aae31a857c209f7bf9dc78550687add6c02bae5",
+  "reference/specialty_peer_groups.csv": "170c0628f3e76b94effbd551db0d3e0e1461d41a3fd72fa2cfaa4a1281d71198",
+  "remittance.csv": "f380dde689e48bdaf0f2ed3affee69e9f55d97f866783628d852095e72153fed"
+ },
+ "4.0_s7_small": {
+  "__answer_key__": "d1ecbd506c83b9f36e3808c4beafa1542fad0b1b65d9fe5787549d2008859317",
+  "claim_lines.csv": "5d063d87c86075621294681c3951923c4cc4b97f2f3db3b2c05e2ccf96e29dfb",
+  "claims_header.csv": "6c812929c0f2efde6a4a0c795e860fc0914235176718eb620aa0b455725cfbb3",
+  "control_totals.csv": "4f4fa1d1e7e9396d03e15c5a51e5382c5f6cdd9c667453d4e59c3000dfb25a86",
+  "members.csv": "1651cdc084c5b209be6fff74542b333513ee95b1cba402074639a590e73b9dbc",
+  "providers.csv": "e68baf95e39f030f26d49c94a5a52cb2c70f8b418880941bb7555443645990d0",
+  "records/audit_trail.csv": "5271d0fe268cdadfeb05c3df75e86d69215997ba200324528246d7f5522ab3e0",
+  "records/note_authentication.csv": "9992fe01ee4b7c86d24eaa7b61a0764bbaad63289eee7630c24f8c3ff2ed7232",
+  "records/note_orders.csv": "4bd6bd55bc4f6f936a93d59111f89f8afe9fe1bf41a95a1fbfe86d6d9bea3877",
+  "records/note_results.csv": "ffc1c4921d784cfef58f588a832b0ec0ea2940ce5cf2d328cb33824c96e418e2",
+  "records/records_universe.csv": "2c575e2c23813b24b37809677a4f29ff90717f8bc0dea064bc96e86ba0a24cf2",
+  "records/visit_notes.csv": "bc9a8c87b0336e7e92c798b6eb4a4a66e35c6f9bb7451b53a599d4aa16aeb114",
+  "reference/fee_schedule.csv": "52c1681b8b23bea8428fbc96261acd32c2508d58dacedacc6eedaf78cc662733",
+  "reference/place_of_service.csv": "790735e452ea1517a18408bb1aae31a857c209f7bf9dc78550687add6c02bae5",
+  "reference/specialty_peer_groups.csv": "170c0628f3e76b94effbd551db0d3e0e1461d41a3fd72fa2cfaa4a1281d71198",
+  "remittance.csv": "1e8f9a23b90bc6e6c34d4242dcbd47aa2770e319e7d94b3e63991f371830894c"
+ }
+}
