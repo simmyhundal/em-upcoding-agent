@@ -1,8 +1,8 @@
 # Agentic E/M upcoding detection
 
-An upcoding investigator agent for payment integrity (PI) teams to reduce wasteful U.S. healthcare spending by:
+A **postpay** upcoding investigator for payment integrity (PI) teams: it audits claims already paid (postpay), as against reviewing claims before payment (prepay), to recover wasteful U.S. healthcare spending by:
 
-- 📄 **Claims:** reviewing synthetic Medicare-style claims for E/M (Evaluation and Management) upcoding, billing an office visit at a higher level than the visit supported;
+- 📄 **Claims:** reviewing synthetic Medicare-style paid claims for E/M (Evaluation and Management) upcoding, billing an office visit at a higher level than the visit supported;
 - 🔽 **Screen:** ranking providers whose billing is highest against what their patients' conditions predict;
 - 📁 **Charts:** asking the providers it picks for charts and following up on what comes back (the providers are simulated too);
 - ✏️ **Summaries:** checking the charts against the claims and drafting case summaries, with code writing the facts and a model only where the rules are silent;
