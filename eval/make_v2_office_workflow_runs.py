@@ -112,7 +112,7 @@ def write_view(view, base, office, flagged, exclude=None):
 
 def run(rid, src, screen, note, version="2.0", tier1_n=None, policy24=None, no_model=None, w40=None, office_version="2.1"):
     """no_model None: on for workflow 2.5 only (older versions keep their frozen behavior); pass True to run an older arm API-free on future tests."""
-    view, office, flagged_file = build_view(rid, src, screen, version, **({} if tier1_n is None else {"tier1_n": tier1_n}), **({} if policy24 is None else {"policy24": policy24}), **({} if w40 is None else {"w40": w40}), office_version=office_version)
+    view, office, flagged_file = build_view(rid, src, screen, version, **({} if tier1_n is None else {"tier1_n": tier1_n}), **({} if policy24 is None else {"policy24": policy24}), **({} if w40 is None else {"w40": w40}), **({} if office_version == "2.1" else {"office_version": office_version}))
     name = os.path.basename(view)
 
     def summaries():

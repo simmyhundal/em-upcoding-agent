@@ -44,6 +44,7 @@ def main(n_claim_seeds=20):
     habit_rows = defaultdict(list)
     kinds = {k: {"providers": [], "claims": [], "dollars": [], "per_provider": []} for k in md.FWA}
     disagree = Counter()
+    comp = Counter()                                   # who is justified at m = 1, by why
     tot_level = tot_fwa = 0.0
     all_n = 0
     t_by_m = defaultdict(list)
@@ -76,6 +77,11 @@ def main(n_claim_seeds=20):
                     kinds[kind]["dollars"].append(fw[kind])
             high = net[pid] >= 0.15
             just = T[pid] >= cost
+            if just:
+                lvl_ok = max(v["true_overpay_level_net"], 0) >= cost
+                comp["net rate 15% or more" if high else ("net rate 5% to 15%" if net[pid] >= 0.05 else ("net rate below 5% (a large panel with noise)" if lvl_ok else "fraud, waste and abuse dollars carry it over the line"))] += 1
+                comp["of which have a habit"] += v["habit"] is not None
+                comp["of which have any FWA"] += sum(fw.values()) > 0
             disagree["rate >= 15% and dollars >= pursuit cost"] += high and just
             disagree["rate >= 15% but dollars below pursuit cost"] += high and not just
             disagree["rate below 15% but dollars >= pursuit cost (level only)"] += (not high) and (max(v["true_overpay_level_net"], 0) >= cost)
@@ -149,6 +155,10 @@ def main(n_claim_seeds=20):
           "The two views of 'worth pursuing' disagree (all providers of all datasets):", "", "| Group | Providers |", "|---|---|"]
     for lab, c in disagree.items():
         L.append(f"| {lab} | {c} |")
+    nj = sum(t_by_m[1.0])
+    L += ["", f"Who is justified at m = 1 ({nj} providers in {len(seeds)} datasets; the dollar line is generous to large panels, so a rate-based reading is stricter):", "", "| Why | Providers | Share |", "|---|---|---|"]
+    for lab in ("net rate 15% or more", "net rate 5% to 15%", "net rate below 5% (a large panel with noise)", "fraud, waste and abuse dollars carry it over the line"):
+        L.append(f"| {lab} | {comp[lab]} | {comp[lab] / max(nj, 1):.0%} |")
     L += ["", "## Fraud, waste and abuse", "", "| Kind | Providers per dataset | Claims per provider (mean) | Dollars per provider (mean, median) | Dollars per dataset |", "|---|---|---|---|---|"]
     for kind in md.FWA:
         d = kinds[kind]
