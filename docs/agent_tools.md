@@ -44,3 +44,9 @@ Every tool call and result goes to `audit.jsonl` (arguments, result, running cos
 
 `submit_findings` refuses a `pattern_consistent_with_upcoding` finding for a held provider (flagged by the pre-flight or by `flag_data_issue`) that has fewer than 8 charts received, and
 appends the data caveat to every affected finding after the lint. The run folder gets `data_quality.json` and `data_issues.json`. Built and unit tested offline; no model run has used it.
+
+## Version 5.1: mirrors workflow v4.1 (see [agent_v51.md](agent_v51.md))
+`Environment(version="5.1")` is v5.0 plus three changes, all payer-visible. `screen_providers` (`eb_upper_t`) gives ASK or SKIP advice for the first 4 listed providers only and adds a `list_note`. `hybrid_review` uses the loosened rules 4.0 chart test
+(5 charts, 10%, alpha 0.20) and, for a provider it calls upcoding, returns `demand_check` (point estimate, 90% lower bound, cost of a demand, `near_miss`, advice); `estimate_overpayment` returns it too. `request_records` accepts a second random
+request (at most 30 charts; more is refused) once, and only for a provider called upcoding whose `demand_check` is a near-miss; any other second random request is refused, and the earlier review becomes stale so `hybrid_review` must be run again before `submit_findings`.
+The demand floor, the binding rule of v3.5, the STOP advice and the style repair are as in v5.0.

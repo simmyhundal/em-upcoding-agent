@@ -41,6 +41,9 @@ def _doc_entry(row):
     return lvl, (int(mins) if mins not in ("", None) else None)
 
 
+LIST_K_51 = 4                          # workflow v4.1 (H23_n4): the list is the first 4 providers of the eb_upper_t ranking
+RULES_51 = {"min": 5, "up": 0.10, "alpha": 0.20}      # workflow v4.1 (H17): the loosened pooled chart test of rules 4.0
+EXTEND_N_51, EXTEND_C_51 = 30, 2.0     # workflow v4.1 (H16): a near-miss gets 30 more random charts when the point estimate is at least 2 times the cost of a demand
 ROUND_COPY_USD, ROUND_BURDEN_USD = 90.0, 43.84       # per round: copying fees (CMS Transmittal 786) and burden on an honest practice (Premier 2022); see eval/dollar_reward.py
 
 
@@ -49,7 +52,7 @@ def make_office(v2_dir, view_dir, version="3.0", seed=1, correlation=0.0, roles=
     never holds the answer key's roles (issue 100). `roles` ({provider_id: role}) is used by the office only to draw hidden behavior when correlation > 0 (a test, never in evaluations);
     at correlation 0 it is dropped here and the office never receives it."""
     return provider_sim.Office(v2_dir, view_dir, seed=seed, correlation=correlation, roles=roles if correlation > 0 else None,
-                               version="2.1" if version in ("3.1", "3.2", "3.3", "3.4", "3.5", "5.0") else "2.0")
+                               version="2.1" if version in ("3.1", "3.2", "3.3", "3.4", "3.5", "5.0", "5.1") else "2.0")
 
 
 class Environment:
@@ -61,13 +64,14 @@ class Environment:
         flag_data_issue (issue 81). "3.0" is the frozen agent.
         office: a simulated provider office built by `make_office` (the caller owns it; any answer-key roles for a correlation test go there, never here). None builds the default office
         (correlation 0, no roles), which is what every evaluation uses."""
-        self.v31 = version in ("3.1", "3.2", "3.3", "3.4", "3.5", "5.0")
-        self.v32 = version in ("3.2", "3.3", "3.4", "3.5", "5.0")
-        self.v33 = version in ("3.3", "3.4", "3.5", "5.0")
-        self.v34 = version in ("3.4", "3.5", "5.0")                     # release 4 (issue 108): everything in 3.3 plus the read-only advisor tool advise_next_step                     # release 3 (issue 99): rules 2.3, the eb_ratio_t screen, a top-10% list; data stays 2.2
-        self.v50 = version == "5.0"                     # release 5.0 (issue 128): mirrors workflow v4.0: the eb_upper_t screen, rules 4.0, ask-or-skip advice refitted on score 4.0, no escalation advice, a demand floor, style repair
-        self.v35 = version in ("3.5", "5.0")                     # release 5 (issues 111 to 113): advice inside tool results (workflow v2.5 policy), binding rules, practice status each turn
-        self.advice_log, self.last_advice, self.overrides, self.rule_result, self.p25, self.p25_rows = [], {}, [], {}, None, {}
+        self.v31 = version in ("3.1", "3.2", "3.3", "3.4", "3.5", "5.0", "5.1")
+        self.v32 = version in ("3.2", "3.3", "3.4", "3.5", "5.0", "5.1")
+        self.v33 = version in ("3.3", "3.4", "3.5", "5.0", "5.1")
+        self.v34 = version in ("3.4", "3.5", "5.0", "5.1")                     # release 4 (issue 108): everything in 3.3 plus the read-only advisor tool advise_next_step                     # release 3 (issue 99): rules 2.3, the eb_ratio_t screen, a top-10% list; data stays 2.2
+        self.v51 = version == "5.1"                     # release 5.1 (A5.1): mirrors workflow v4.1 (H23, N = 4): a list of the first 4, the loosened rules 4.0 chart test, the near-miss extension
+        self.v50 = version in ("5.0", "5.1")                     # release 5.0 (issue 128): mirrors workflow v4.0: the eb_upper_t screen, rules 4.0, ask-or-skip advice refitted on score 4.0, no escalation advice, a demand floor, style repair
+        self.v35 = version in ("3.5", "5.0", "5.1")                     # release 5 (issues 111 to 113): advice inside tool results (workflow v2.5 policy), binding rules, practice status each turn
+        self.extended, self.advice_log, self.last_advice, self.overrides, self.rule_result, self.p25, self.p25_rows = set(), [], {}, [], {}, None, {}
         self.dq, self.data_issues, self.held = None, [], set()
         if self.v32:                                    # version 3.2: the data-quality pre-flight runs once per load (issue 81)
             import data_quality
@@ -91,6 +95,9 @@ class Environment:
             import policy_25
             self.p25 = policy_25.load()                 # the same file workflow v2.5 runs (src/policy_25.json), fitted on net dollars
             self.p25_rows = {r["provider_id"]: r for r in flagging.flag(view_dir, method="eb_upper_t" if self.v50 else "eb_ratio_t", top_pct=10) if str(r.get("flagged")) == "True"}
+            if self.v51:                                # workflow v4.1: the list is only the first LIST_K_51 providers of the ranking (the rows keep their rank, so the ask model sees what it saw in W4.0)
+                keep = sorted(self.p25_rows.values(), key=lambda r: int(r["rank"]))[:LIST_K_51]
+                self.p25_rows = {r["provider_id"]: r for r in keep}
             if self.v50:
                 import policy_40
                 self.ask40 = policy_40.load_ask()               # workflow v4.0's ask-or-skip (src/policy_40_ask.json), shown as advice
@@ -206,6 +213,8 @@ class Environment:
             extra_ = extra
             extra = lambda r: extra_(r) + [self._p25_advice(r["provider_id"])["recommended"]]
         return {"method": method, "selected": len(sel),
+                **({"list_note": f"Workflow v4.1 works from a list of the first {LIST_K_51} providers of the eb_upper_t ranking: ask_advice is ASK or SKIP for those only; every other row is SKIP (outside the list)."}
+                   if self.v51 and method == "eb_upper_t" else {}),
                 "table": {"cols": cols,
                           "rows": [[r["provider_id"], int(r["n_claims"]), float(r["share_99215"]), float(r["expected_share"]),
                                     float(r["z"]), float(r["z_adj"]), r["rank"]] + extra(r) for r in sel[:SCREEN_ROWS_SHOWN]]},
@@ -247,10 +256,24 @@ class Environment:
             return {"error": "unknown provider"}
         if provider_id not in self.requested and len(self.requested) >= self.records_budget:
             return {"error": f"records-request budget reached ({self.records_budget} providers)"}
+        st0 = self.office.state.get(provider_id)
+        extension = bool(self.v51 and st0 and st0["round"] > 0 and sample.get("kind", "random") == "random")
+        if extension:                                   # workflow v4.1 (H16): one more random request, only for a near-miss, once, of at most EXTEND_N_51 charts
+            why = self._extension_refusal(provider_id)
+            if why:
+                return {"error": why}
+            if int(sample.get("n", EXTEND_N_51)) > EXTEND_N_51:          # refused, not cut: the logged arguments must be what the office received, or a replay of audit.jsonl would draw other charts
+                return {"error": f"the extension is at most {EXTEND_N_51} charts (workflow v4.1); ask for n of {EXTEND_N_51} or fewer"}
+            sample = {**sample, "n": int(sample.get("n", EXTEND_N_51))}
         self.requested.add(provider_id)
         if self.v35:
-            self._note_action(provider_id, "TARG" if sample.get("kind") == "targeted" else "ASK")
+            self._note_action(provider_id, "EXT" if extension else "TARG" if sample.get("kind") == "targeted" else "ASK")
         out = self.office.send_request(provider_id, sample, deadline)
+        if extension and isinstance(out, dict) and "error" not in out:
+            self.extended.add(provider_id)              # the review of the first sample is stale: hybrid_review must be run again before submitting
+            self.reviewed.discard(provider_id)
+            self.rule_result.pop(provider_id, None)
+            self.summaries.pop(provider_id, None)
         self._absorb(provider_id)
         return self._with_advice(provider_id, out)
 
@@ -271,6 +294,8 @@ class Environment:
         import policy_25 as p25
         row = self.p25_rows.get(pid)
         if row is None:
+            if self.v51:
+                return {"recommended": "SKIP", "meaning": f"skip: outside the list (workflow v4.1 lists only the first {LIST_K_51} providers of the eb_upper_t ranking)"}
             return {"recommended": "SKIP", "meaning": "skip: outside the top 10 percent of the screen (eb_ratio_t)"}
         st = self.office.state.get(pid)
         exp, share = float(row["expected_share"]), float(row["share_99215"])
@@ -280,6 +305,9 @@ class Environment:
             if not st or not st["round"]:
                 v = policy_40.predict(self.ask40, row)
                 return {"recommended": "ASK" if v > 0 else "SKIP", "meaning": ("ask for records" if v > 0 else "skip") + f": predicted net value of asking ${v:,.0f} (score 4.0; rank {row['rank']})"}
+            if self.v51:
+                return {"recommended": "STOP", "meaning": "nothing more after the first sample and its follow-up: run hybrid_review. Its demand_check says whether this provider is a near-miss, "
+                                                          f"the one case where workflow v4.1 asks for {EXTEND_N_51} more random charts (once)"}
             return {"recommended": "STOP", "meaning": "nothing more: the first sample and its follow-up decide; escalations did not pay under score 4.0 (workflow v4.0 stops here)"}
         if not st or not st["round"]:
             ok = p25.ask(self.p25, p25.ask_vector(row))
@@ -292,6 +320,27 @@ class Environment:
                    "BOTH": "send the targeted request, then request the audit trail"}[b]
         return {"recommended": b, "meaning": meaning, "state": dict(zip(ep.STATE, [round(v, 3) for v in x]))}
 
+    def _demand_check(self, pid):
+        """Payer-visible (no answer key): the recovery estimate from the provider's random sample and whether it is a near-miss in the sense of workflow v4.1 (H16): the point estimate is at least
+        EXTEND_C_51 times the staff cost of a demand while the 90% lower bound is below that cost. Only an extrapolated estimate counts."""
+        import recovery_40 as r40
+        level = {c: v[0] for c, v in self.docs.items()}
+        rec = r40.recovery(self.claims.get(pid, []), self.office.random_claim_ids(pid), level, r40.PARAMS)
+        cost = r40.staff_cost(0, 0, 0, 1, 0, r40.PARAMS)[0]
+        return {"point_estimate": round(rec["point"], 2), "lower_bound": round(rec["value"], 2), "demand_cost": round(cost, 2), "mode": rec["mode"], "reviewed": rec["reviewed"],
+                "near_miss": bool(rec["mode"] == "extrapolated" and rec["point"] >= EXTEND_C_51 * cost and rec["value"] < cost), "extended": pid in self.extended}
+
+    def _extension_refusal(self, pid):
+        """Why a second random request is refused (None when it is allowed): it needs a review that called upcoding, a near-miss estimate and no earlier extension."""
+        if pid in self.extended:
+            return "a provider gets one near-miss extension only (workflow v4.1); it has had it"
+        res = self.rule_result.get(pid)
+        if not res or res[0] != sr.UPCODING:
+            return "a second random request is allowed only after hybrid_review called this provider upcoding and its demand_check shows a near-miss (workflow v4.1); run hybrid_review first"
+        if not self._demand_check(pid)["near_miss"]:
+            return "not a near-miss: a second random request is allowed only when the point estimate is at least twice the cost of a demand and its 90% lower bound is below that cost"
+        return None
+
     def _with_advice(self, pid, out):
         if not self.v35 or not isinstance(out, dict) or "error" in out:
             return out
@@ -302,6 +351,8 @@ class Environment:
     def _note_action(self, pid, action):
         advised = self.last_advice.get(pid) or (self._p25_advice(pid)["recommended"] if action == "ASK" else None)
         match = None if advised is None else (action == advised or (advised == "BOTH" and action in ("TARG", "AUD")))
+        if action == "EXT":                             # version 5.1: the extension gate already checked that this is a near-miss, the case the review's advice names
+            advised, match = "EXT (near-miss)", True
         self.advice_log.append({"provider": pid, "action": action, "advised": advised, "match": match})
 
     def practice_status(self):
@@ -338,7 +389,7 @@ class Environment:
             self.reviewed.add(pid)
             chart = self._chart_rule(pid)
             packet = self._packet(pid)
-            rule, reason = (sr.rule_leaning_40 if self.v50 else sr.rule_leaning_23 if self.v33 else sr.rule_leaning_22 if self.v32 else sr.rule_leaning)(packet)       # 5.0: rules 4.0; 3.2: rules 2.2 as workflow v2.2; 3.3: rules 2.3
+            rule, reason = ((lambda pk: sr.rule_leaning_40(pk, RULES_51)) if self.v51 else sr.rule_leaning_40 if self.v50 else sr.rule_leaning_23 if self.v33 else sr.rule_leaning_22 if self.v32 else sr.rule_leaning)(packet)       # 5.0: rules 4.0; 3.2: rules 2.2 as workflow v2.2; 3.3: rules 2.3
             if chart["triggered"] and rule != sr.UPCODING and not self.v50:      # 5.0: the rules decide, as in workflow v4.0 (no separate chart-rule call)
                 lean, source, reason = sr.UPCODING, "chart_rule", f"{chart['below_billed']} of {chart['charts']} returned charts support a lower level than billed"
             elif rule:
@@ -353,6 +404,15 @@ class Environment:
                 self.summaries[pid] = sr.assemble(packet, lean)
             self.rule_result[pid] = (lean, source, bool(chart["triggered"]))
             item = {"provider": pid, "leaning": lean, "source": source, "reason": reason, "chart_rule": chart}
+            if self.v51 and lean == sr.UPCODING:
+                dc = self._demand_check(pid)
+                dc["advice"] = (f"NEAR-MISS: the estimated recovery (point ${dc['point_estimate']:,.0f}) is at least twice the cost of a demand (${dc['demand_cost']:,.0f}) but its 90% lower bound "
+                                f"(${dc['lower_bound']:,.0f}) is below it. Request {EXTEND_N_51} more random charts (once), follow up on any deficiency, run hybrid_review again and stop."
+                                if dc["near_miss"] and not dc["extended"] else
+                                "no extension: " + ("the extension was already used" if dc["extended"] and dc["near_miss"] else
+                                                    f"the lower bound (${dc['lower_bound']:,.0f}) {'covers' if dc['lower_bound'] >= dc['demand_cost'] else 'is below'} the cost of a demand (${dc['demand_cost']:,.0f})"
+                                                    + ("" if dc["lower_bound"] >= dc["demand_cost"] else f" and the point estimate (${dc['point_estimate']:,.0f}) is under twice that cost or not extrapolated")))
+                item["demand_check"] = dc
             ns = (packet.get("documentation_review") or {}).get("note_signals")
             if ns:
                 item["note_signals"] = {"notes": ns["notes"], "rates": ns["rates"], "looks_inflated": sr.inflated_notes(packet)}
@@ -388,6 +448,8 @@ class Environment:
         out = {"valid_for_extrapolation": True, "point_estimate": round(res["point_estimate"]), "ci_low": round(res["ci_low"]),
                "ci_high": round(res["ci_high"]), "reviewed_claims": res["reviewed_claims"], "sampled_claims": res["sampled_claims"],
                "caveat": "Draft arithmetic from a simulated review; a real recovery needs human review of the records."}
+        if self.v51:
+            out["demand_check"] = self._demand_check(provider_id)
         if self.v31:
             strata = {c: d for c, d in res["strata"].items() if d.get("n_reviewed")}
             main = max(strata, key=lambda c: strata[c]["N"] * strata[c].get("mean_overpayment", 0), default=None)
@@ -466,7 +528,7 @@ class Environment:
             if self.v50:                                # issue 116: the two judged writing defects are repaired by code (the leaning is never changed)
                 built[f["provider_id"]] = summary_lint.style_repair(built[f["provider_id"]], packet, f.get("headline"), f.get("interpretation"), version=version)
             if self.v31:
-                lint = summary_lint.lint(built[f["provider_id"]], packet, summary_lint.evidence_from(self.office.transcript, self._audit_log(), f["provider_id"]), rules23=self.v33)
+                lint = summary_lint.lint(built[f["provider_id"]], packet, summary_lint.evidence_from(self.office.transcript, self._audit_log(), f["provider_id"]), rules23=self.v33, rules40_opts=RULES_51 if self.v51 else None)
                 if lint["hard"]:
                     problems[f["provider_id"]] = lint["hard"]
         if self.v31:
@@ -616,14 +678,16 @@ class Environment:
              "input_schema": {"type": "object", "properties": pid, "required": ["provider_id"]}},
             {"name": "request_records", "description":
              "Ask a provider's office for charts. A random sample supports an overpayment estimate; a targeted one does not. Each provider you ask is a burden on that "
-             "practice and counts against a budget. The office may answer incompletely.",
+             "practice and counts against a budget. The office may answer incompletely."
+             + (" A second random request (at most 30 charts) is accepted once, and only for a near-miss named by hybrid_review's demand_check." if self.v51 else ""),
              "input_schema": {"type": "object", "properties": {**pid, "sample": sample, "deadline_days": {"type": "integer"}}, "required": ["provider_id", "sample"]}},
             {"name": "follow_up_records", "description": "Tell the office what was wrong with its last response (deficiency codes from that response). Optional claim_ids narrows scope.",
              "input_schema": {"type": "object", "properties": {**pid, "addressed_codes": {"type": "array", "items": {"type": "string"}},
                               "claim_ids": {"type": "array", "items": {"type": "string"}}}, "required": ["provider_id", "addressed_codes"]}},
             {"name": "close_records", "description": "Close a records request. No response is not evidence of upcoding.",
              "input_schema": {"type": "object", "properties": {**pid, "reason": {"type": "string"}}, "required": ["provider_id"]}},
-            {"name": "hybrid_review", "description": "Chart rule first, then the summary rules, and a model only where both say nothing. Up to 20 providers. Needs records already received.",
+            {"name": "hybrid_review", "description": "Chart rule first, then the summary rules, and a model only where both say nothing. Up to 20 providers. Needs records already received."
+             + (" For a provider called upcoding the result carries demand_check: the payer's recovery estimate, whether it is a near-miss, and what to do." if self.v51 else ""),
              "input_schema": {"type": "object", "properties": {"provider_ids": {"type": "array", "items": {"type": "string"}}}, "required": ["provider_ids"]}},
             {"name": "draft_summary", "description": "Draft case summary for a provider already reviewed, with the citation check.",
              "input_schema": {"type": "object", "properties": pid, "required": ["provider_id"]}},
