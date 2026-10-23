@@ -53,3 +53,5 @@ Reported beside the score, not in it: upcoders found (binary `role`), dollar-wei
 
 ## What is easier or different by construction
 Truth is exact in the simulation (a payer never has it), and the abrasion weight uses it on purpose: it is the only thing that penalizes going after providers that did not upcode, since recovery is not capped. Data 2.2 has no habits and a narrower honest noise than data 4.0, so scoring stored runs isolates the score, not the data.
+
+See also: [ceiling benchmarks for W4.1](ceiling_benchmarks_w41.md) (what a chart-based arm can recover and at what cost under S4.0, on D4.0).

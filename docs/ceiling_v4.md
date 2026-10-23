@@ -80,3 +80,5 @@ Score 4.0 per seed up the ladder:
 - **The largest gap is recovery, not detection.** Of the true overpayment of the providers W2.5 called on the `eb_upper_t` list ($4,639 per seed), the base score recovers $575. Dropping the netting of underpayments (12% of correctly billed charts read higher than billed) lifts it to $1,564, the manual's one-sided 90% bound to $874, all three to $1,887; the rest is the sample (30 charts spread over every billed level) and the lower bound. A recovery that samples where the overpayment is (the 99213-to-99214 stratum for the systematic and template habits) and handles reviewer noise is worth more than any list. This is the lever for the W arm's RL loop.
 - **Silent offices are few.** 'Asked, no usable chart' is 1 to 6 of 88 upcoders in every arm: not worth building for beside the above. Clean-looking cloners are 1 to 2 per arm.
 - Not tested here: a second targeted request for silent offices (#103) and the cost of non-response (#68); the counts above say they are small.
+
+See also: [ceiling benchmarks for W4.1](ceiling_benchmarks_w41.md) (the benchmarks with the cost side, on D4.0 batches 5 to 10).
