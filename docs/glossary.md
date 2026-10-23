@@ -25,6 +25,8 @@
 | LLM | "Large language model": the kind of AI that writes the case summaries |
 | Hard negative | An honest provider who looks suspicious at first glance |
 
+**Postpay and prepay.** Postpay (post-payment) review audits claims after they were paid and recovers any overpayment, usually from a sample of records. Prepay (pre-payment) review checks claims before payment and can deny or adjust them. This project is a postpay audit tool; prepay edits and automatic downcoding policies are the alternatives it competes with.
+
 ## Words this project uses one way
 | Word | Used for | Not used for |
 |---|---|---|
