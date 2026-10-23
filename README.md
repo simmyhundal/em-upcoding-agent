@@ -11,15 +11,15 @@ A postpay upcoding investigator for payment integrity (PI) teams: it audits clai
 
 Two designs are built side by side on the same data:
 
-- ⚙️ **Workflow:** code fixes the order of the steps, and a learned formula decides whom to ask for charts.
-- 🤖 **Agent:** a model chooses its own steps within caps and gets the same formula as advice.
+- ⚙️ **[Workflow](docs/concepts/workflow-and-agent.md):** code fixes the order of the steps, and a learned formula decides whom to ask for charts.
+- 🤖 **[Agent](docs/concepts/workflow-and-agent.md):** a model chooses its own steps within caps and gets the same formula as advice.
 
 Both are scored by the **RL score** ([score 4.0](docs/score_40.md)), in net dollars per seed (the reinforcement learning (RL) reward the policies are trained on):
 
 ```
 RL score = Recovery - Staff cost - Abrasion
 
-Recovery   = 90% lower bound of the overpayment a random chart sample supports, per provider sent a demand
+Recovery   = conservative (90% lower bound) estimate of the overpayment a random chart sample supports, per provider sent a demand
 Staff cost = hours x wage for triage, requests, chart review and demands; $90 copy fee per request; model dollars
 Abrasion   = $43.84 per request round + $2,000 per demand, weighted by how honest the provider is
 ```
@@ -67,4 +67,4 @@ v1.x, v2.x and v4.x are workflows; v3.x and v5.x are agents. Every release chang
 No binary upcoder label, with fraud, waste and abuse ([#173](https://github.com/simmyhundal/em-upcoding-agent/issues/173)); list sizes 2 and 3 ([#166](https://github.com/simmyhundal/em-upcoding-agent/issues/166)); score 4.2 with a sourced commercial profile ([#178](https://github.com/simmyhundal/em-upcoding-agent/issues/178)); data 4.2 ([#137](https://github.com/simmyhundal/em-upcoding-agent/issues/137), [#144](https://github.com/simmyhundal/em-upcoding-agent/issues/144)).
 
 ## Explore
-[Results and evaluation](docs/results-and-evaluation.md) · [limitations](docs/limitations.md) · [E/M background](docs/background.md) · [glossary](docs/glossary.md) · [design](docs/design.md) · [version 1, archived](docs/archive-version-1.md) · [about](docs/about.md) · [for contributors](CLAUDE.md) · [MIT license](LICENSE)
+[Results and evaluation](docs/results-and-evaluation.md) · [limitations](docs/limitations.md) · [E/M background](docs/background.md) · [glossary](docs/glossary.md) · [concepts](docs/concepts/README.md) · [design](docs/design.md) · [version 1, archived](docs/archive-version-1.md) · [about](docs/about.md) · [for contributors](CLAUDE.md) · [MIT license](LICENSE)
