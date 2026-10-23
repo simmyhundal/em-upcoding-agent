@@ -41,13 +41,13 @@ def main(run_id, code_run, screen=True, max_usd=None, records_budget=15, max_too
     max_usd None: $3 for 3.0 and 3.1 (as run), EVAL_MAX_USD_32 for 3.2. model and effort default to Opus 5.5 at medium (as run); another model
     is priced from src/llm.py so the dollar cap means dollars for that model (issue 92)."""
     if max_usd is None:
-        max_usd = EVAL_MAX_USD_32 if version in ("3.2", "3.3", "3.4", "3.5", "5.0", "5.1") else 3.0
+        max_usd = EVAL_MAX_USD_32 if version in ("3.2", "3.3", "3.4", "3.5", "5.0", "5.1", "5.2") else 3.0
     model = model or agent.MODEL
     price_scale = llm.PRICES[model][0] / llm.PRICES["claude-opus-5-5"][0]
     data = os.path.join(ROOT, "data", f"synthetic_v2_{code_run}")
     view = os.path.join(data, "view")
     key = json.load(open(os.path.join(ROOT, "eval", "answer_key", f"ground_truth_v2_{code_run}.json")))["providers"]
-    roles = {p: v["role"] for p, v in key.items()}
+    roles = {p: v.get("role", "n/a") for p, v in key.items()}         # data 4.2 has no role: "n/a" (the office uses roles only when correlation > 0)
     office = agent_tools.make_office(data, view, version, seed=1, correlation=correlation, roles=roles)         # roles stay out of the environment; the office keeps them only when correlation > 0
     env = agent_tools.Environment(data, view, seed=1, model_call=model_call if use_model else None, records_budget=records_budget,
                                   screen_enabled=screen, office=office, version=version)
@@ -60,6 +60,8 @@ def main(run_id, code_run, screen=True, max_usd=None, records_budget=15, max_too
     out = os.path.join(ROOT, "experiments", run_id)
     res = agent.run_agent(env, task, client=client, max_tool_calls=max_tool_calls, max_usd=max_usd, out_dir=out, model=model, effort=effort,
                           price_scale=price_scale)
+    if version == "5.2":                                  # the claims-data lane as score 4.2 reads it (src/agent_tools.py lane_record)
+        json.dump(env.lane_record(), open(os.path.join(out, "fwa_lane.json"), "w"))
     records = [{"provider_id": pid, "model": res["model"], "summary": s, "citations_checked": False, "source": "agent"}
                for pid, s in env.findings.items()]
     summaries, checked = os.path.join(out, "case_summaries.jsonl"), os.path.join(out, "case_summaries_checked.jsonl")
@@ -103,11 +105,11 @@ if __name__ == "__main__":
     ap.add_argument("--max-tool-calls", type=int, default=60)
     ap.add_argument("--model-in-tools", action="store_true")
     ap.add_argument("--correlation", type=float, default=0.0)
-    ap.add_argument("--version", default="3.0", choices=["3.0", "3.1", "3.2", "3.3", "3.4", "3.5", "5.0", "5.1"])
+    ap.add_argument("--version", default="3.0", choices=["3.0", "3.1", "3.2", "3.3", "3.4", "3.5", "5.0", "5.1", "5.2"])
     ap.add_argument("--model", choices=sorted(llm.PRICES), help="agent model (default Opus 5.5, as every recorded run)")
     ap.add_argument("--effort", default="medium", choices=["low", "medium", "high"])
     ap.add_argument("--screen-method", choices=["zscore", "riskadj", "combined", "priority", "eb_ratio", "eb_ratio_t"], help="name a starting screen in the task text (release 2: eb_ratio)")
     ap.add_argument("--top-pct", type=float, help="with --screen-method: start with the top PCT percent (release 2: 5)")
     a = ap.parse_args()
-    print(json.dumps(main(a.run_id, a.code_run, not a.no_screen, a.max_usd, a.records_budget or (EVAL_RECORDS_BUDGET_33 if a.version in ("3.3", "3.4", "3.5", "5.0", "5.1") else 15), a.max_tool_calls, a.model_in_tools,
+    print(json.dumps(main(a.run_id, a.code_run, not a.no_screen, a.max_usd, a.records_budget or (EVAL_RECORDS_BUDGET_33 if a.version in ("3.3", "3.4", "3.5", "5.0", "5.1", "5.2") else 15), a.max_tool_calls, a.model_in_tools,
                           a.correlation, version=a.version, model=a.model, effort=a.effort, screen_method=a.screen_method, top_pct=a.top_pct), indent=1))

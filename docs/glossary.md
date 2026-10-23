@@ -59,6 +59,9 @@
 | [Borderline case](concepts/borderline-case.md) | Best estimate well above the cost of a demand, conservative estimate below it | near-miss, `near_miss` |
 | [Break-even rule](concepts/break-even-rule.md) | No demand when the conservative recovery is below the cost of a demand | demand floor |
 | [Hard rule](concepts/hard-rule.md) | The model cannot override an upcoding call the rules and chart test both support, unless it names a fact the rules cannot see | binding rule |
+| [Volume screen](concepts/volume-screen.md) | Count a provider's visits per service date; 30 or more in a day goes to the claims-data lane | fwa lane, impossible days |
+| [Records not provided](concepts/records-not-provided.md) | A sampled claim the office reports it has no record of counts as overpaid at its paid amount | `NO_RECORD` |
+| [Stratified sample](concepts/stratified-sample.md) | A random sample within one slice of a provider's claims; supports extrapolating to that slice only | stratum |
 | [No-more-requests advice](concepts/no-more-requests.md) | After the first sample and its follow-up, ask for nothing more | STOP advice, stop-after-first-sample |
 
 ## Abbreviations

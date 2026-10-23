@@ -52,7 +52,7 @@ def make_office(v2_dir, view_dir, version="3.0", seed=1, correlation=0.0, roles=
     never holds the answer key's roles (issue 100). `roles` ({provider_id: role}) is used by the office only to draw hidden behavior when correlation > 0 (a test, never in evaluations);
     at correlation 0 it is dropped here and the office never receives it."""
     return provider_sim.Office(v2_dir, view_dir, seed=seed, correlation=correlation, roles=roles if correlation > 0 else None,
-                               version="2.1" if version in ("3.1", "3.2", "3.3", "3.4", "3.5", "5.0", "5.1") else "2.0")
+                               version="4.2" if version == "5.2" else "2.1" if version in ("3.1", "3.2", "3.3", "3.4", "3.5", "5.0", "5.1") else "2.0")
 
 
 class Environment:
@@ -64,13 +64,14 @@ class Environment:
         flag_data_issue (issue 81). "3.0" is the frozen agent.
         office: a simulated provider office built by `make_office` (the caller owns it; any answer-key roles for a correlation test go there, never here). None builds the default office
         (correlation 0, no roles), which is what every evaluation uses."""
-        self.v31 = version in ("3.1", "3.2", "3.3", "3.4", "3.5", "5.0", "5.1")
-        self.v32 = version in ("3.2", "3.3", "3.4", "3.5", "5.0", "5.1")
-        self.v33 = version in ("3.3", "3.4", "3.5", "5.0", "5.1")
-        self.v34 = version in ("3.4", "3.5", "5.0", "5.1")                     # release 4 (issue 108): everything in 3.3 plus the read-only advisor tool advise_next_step                     # release 3 (issue 99): rules 2.3, the eb_ratio_t screen, a top-10% list; data stays 2.2
-        self.v51 = version == "5.1"                     # release 5.1 (A5.1): mirrors workflow v4.1 (H23, N = 4): a list of the first 4, the loosened rules 4.0 chart test, the near-miss extension
-        self.v50 = version in ("5.0", "5.1")                     # release 5.0 (issue 128): mirrors workflow v4.0: the eb_upper_t screen, rules 4.0, ask-or-skip advice refitted on score 4.0, no escalation advice, a demand floor, style repair
-        self.v35 = version in ("3.5", "5.0", "5.1")                     # release 5 (issues 111 to 113): advice inside tool results (workflow v2.5 policy), binding rules, practice status each turn
+        self.v31 = version in ("3.1", "3.2", "3.3", "3.4", "3.5", "5.0", "5.1", "5.2")
+        self.v32 = version in ("3.2", "3.3", "3.4", "3.5", "5.0", "5.1", "5.2")
+        self.v33 = version in ("3.3", "3.4", "3.5", "5.0", "5.1", "5.2")
+        self.v34 = version in ("3.4", "3.5", "5.0", "5.1", "5.2")                     # release 4 (issue 108): everything in 3.3 plus the read-only advisor tool advise_next_step                     # release 3 (issue 99): rules 2.3, the eb_ratio_t screen, a top-10% list; data stays 2.2
+        self.v51 = version in ("5.1", "5.2")                     # release 5.1 (A5.1): mirrors workflow v4.1 (H23, N = 4): a list of the first 4, the loosened rules 4.0 chart test, the near-miss extension
+        self.v52 = version == "5.2"                     # release 5.2 (A5.2): workflow v4.2: A5.1 plus the claims-data lane (volume_screen, request_stratum, send_demand) on data 4.2 and office 4.2
+        self.v50 = version in ("5.0", "5.1", "5.2")                     # release 5.0 (issue 128): mirrors workflow v4.0: the eb_upper_t screen, rules 4.0, ask-or-skip advice refitted on score 4.0, no escalation advice, a demand floor, style repair
+        self.v35 = version in ("3.5", "5.0", "5.1", "5.2")                     # release 5 (issues 111 to 113): advice inside tool results (workflow v2.5 policy), binding rules, practice status each turn
         self.extended, self.advice_log, self.last_advice, self.overrides, self.rule_result, self.p25, self.p25_rows = set(), [], {}, [], {}, None, {}
         self.dq, self.data_issues, self.held = None, [], set()
         if self.v32:                                    # version 3.2: the data-quality pre-flight runs once per load (issue 81)
@@ -101,6 +102,8 @@ class Environment:
             if self.v50:
                 import policy_40
                 self.ask40 = policy_40.load_ask()               # workflow v4.0's ask-or-skip (src/policy_40_ask.json), shown as advice
+        self.lane = {}                                  # version 5.2: providers taken through the claims-data lane: {provider_id: lane record (src/fwa_lane.review)}
+        self.lane_demands = set()
         self.has_test = {}
         for rows in self.claims.values():
             for r in rows:
@@ -493,7 +496,7 @@ class Environment:
         if bad:
             return {"error": f"invalid provider or leaning for: {bad}"}
         if self.v34:                                    # version 3.4: the rules are applied to every provider whose records arrived (mirrors the workflow, which always does)
-            unreviewed = sorted(p for p, st in self.office.state.items() if st["usable"] and p not in self.reviewed)
+            unreviewed = sorted(p for p, st in self.office.state.items() if st["usable"] and p not in self.reviewed and not (self.v52 and p in self.lane and not st["kinds"] or self.v52 and p in self.lane and all(k == "targeted" for k in st["kinds"].values())))
             if unreviewed:
                 return {"error": "run hybrid_review on every provider whose records arrived before submitting, so the deterministic rules are applied to all of them",
                         "missing": unreviewed[:20], "how": "call hybrid_review with these provider ids (up to 20 per call), then submit again"}
@@ -648,6 +651,62 @@ class Environment:
                 "next": "A person will raise this with the plan; you cannot request data yourself. "
                         + ("Upcoding findings for the affected providers now need chart evidence." if rec["hold_findings"] else "No findings are held.")}
 
+    # ---- claims-data lane (version 5.2; src/fwa_lane.py shares its code with workflow v4.2) ----------------
+    def volume_screen(self):
+        """Read-only: providers who billed DAY_MAX or more visits on one service date, from claims alone (the busiest day, how many days, the claims on those days)."""
+        import fwa_lane
+        rows = fwa_lane.flag(self.claims, fwa_lane.DAY_MAX, 10 ** 6)
+        table = [{"provider_id": pid, "busiest_day_visits": top, "days_at_or_above_cap": len(hot), "claims_on_those_days": len(fwa_lane.stratum_ids(self.claims[pid], hot)),
+                  "taken_through_lane": pid in self.lane} for pid, top, hot in rows[:fwa_lane.MAX_FLAGGED]]
+        return {"cap_visits_per_day": fwa_lane.DAY_MAX, "flagged": len(rows), "table": table,
+                "note": "A provider with this many visits on one date has billed more than a clinician can see. request_stratum draws a random sample of the claims on those dates and asks the office for the charts; "
+                        "the office reporting that it has no record of a visit counts that claim as overpaid. Advice: take every provider in the table through request_stratum (at most " + str(fwa_lane.MAX_FLAGGED) + "), then send_demand where the tool says the estimate covers a demand."}
+
+    def request_stratum(self, provider_id):
+        import fwa_lane
+        if not self.v52:
+            return {"error": "tool not available"}
+        if provider_id in self.lane:
+            return {"error": "this provider was already taken through the lane"}
+        rows = fwa_lane.flag({provider_id: self.claims.get(provider_id, [])}, fwa_lane.DAY_MAX, 1)
+        if not rows:
+            return {"error": "this provider has no service date at or above the volume cap; the lane applies only to providers volume_screen lists"}
+        if len(self.lane) >= fwa_lane.MAX_FLAGGED:
+            return {"error": "the lane is capped at %d providers" % fwa_lane.MAX_FLAGGED}
+        _pid, top, hot = rows[0]
+        rec = fwa_lane.review(self.office, provider_id, self.claims[provider_id], hot, seed=1, persist=fwa_lane.PERSIST)
+        rec["busiest_day"] = top
+        self.lane[provider_id] = rec
+        if "error" in rec:
+            return {"error": rec["error"]}
+        e = rec["estimate"]
+        self.tool_calls.append(("request_stratum", {"provider_id": provider_id}, json.dumps({"estimate": e, "demand_cost": rec["demand_cost"]})))
+        return {"provider_id": provider_id, "claims_on_flagged_days": len(rec["stratum_ids"]), "sampled": len(rec["sample_ids"]), "charts_received": rec["charts"], "no_record": len(rec["no_record"]),
+                "rounds": rec["rounds"], "estimate": {"point": e["point"], "lower_bound_90": e["value"], "mode": e["mode"], "sample_error_rate": round(e["sample_error_rate"], 3)},
+                "demand_cost": rec["demand_cost"], "recommended": "DEMAND" if rec["demand"] else "NO DEMAND",
+                "meaning": "the lower bound covers the staff cost of a demand: send_demand" if rec["demand"] else "the lower bound does not cover the cost of a demand (or the office did not answer): do not send a demand"}
+
+    def send_demand(self, provider_id):
+        if not self.v52:
+            return {"error": "tool not available"}
+        rec = self.lane.get(provider_id)
+        if rec is None:
+            return {"error": "take the provider through request_stratum first"}
+        if not rec.get("demand"):
+            return {"error": "refused: the lower bound of the estimate does not cover the staff cost of a demand"}
+        self.lane_demands.add(provider_id)
+        return {"provider_id": provider_id, "demand": True, "lower_bound_90": rec["estimate"]["value"]}
+
+    def lane_record(self):
+        """The lane as score 4.2 reads it (fwa_lane.json): every provider taken through, with `demand` true only where the agent sent one. Rounds and charts are already in the office transcript."""
+        out = {}
+        for pid, rec in self.lane.items():
+            if "error" in rec:
+                continue
+            out[pid] = {**{k: rec[k] for k in ("stratum_ids", "sample_ids", "hot_days", "no_record", "levels", "estimate", "demand_cost", "busiest_day")},
+                        "rounds": 0, "charts": 0, "demand": pid in self.lane_demands}
+        return {"opts": {"agent": True}, "providers": out}
+
     def _audit_log(self):
         return [{"tool": t, "args": a, "result": r} for t, a, r in self.tool_calls]
 
@@ -696,6 +755,7 @@ class Environment:
             *self._v31_tools(),
             *self._v32_tools(),
             *self._v34_tools(),
+            *self._v52_tools(),
             {"name": "submit_findings", "description": "Submit your final findings and end the run. leaning is one of pattern_consistent_with_upcoding, "
              "pattern_consistent_with_high_acuity_panel, inconclusive. Include every provider you looked at closely; only 'upcoding' ones go to recovery.",
              "input_schema": {"type": "object", "properties": {"findings": {"type": "array", "items": {"type": "object", "properties": {
@@ -731,6 +791,17 @@ class Environment:
                                                                   "provider_ids": {"type": "array", "items": {"type": "string"}}, "hold_findings": {"type": "boolean"}},
                                   "required": ["issue", "detail"]}}]
 
+    def _v52_tools(self):
+        if not self.v52:
+            return []
+        return [{"name": "volume_screen", "description": "Read-only, free: providers who billed 30 or more visits on one service date, from claims alone, with the claims on those dates. Call it once at the start.",
+                 "input_schema": {"type": "object", "properties": {}}},
+                {"name": "request_stratum", "description": "For a provider in volume_screen: draw a random sample of 30 of its claims on the flagged dates, ask the office for those charts (one follow-up on a fixable deficiency), "
+                 "and return the 90% lower bound of the overpayment the sample supports for those dates (a visit the office has no record of counts as overpaid at its paid amount). Once per provider.",
+                 "input_schema": {"type": "object", "properties": {"provider_id": {"type": "string"}}, "required": ["provider_id"]}},
+                {"name": "send_demand", "description": "Send a demand for a provider taken through request_stratum. Refused unless the lower bound covers the staff cost of a demand.",
+                 "input_schema": {"type": "object", "properties": {"provider_id": {"type": "string"}}, "required": ["provider_id"]}}]
+
     def _v34_tools(self):
         if not self.v34:
             return []
@@ -754,6 +825,9 @@ class Environment:
               "estimate_overpayment": lambda: self.estimate_overpayment(args["provider_id"]),
               "data_quality": lambda: self.data_quality(args.get("provider_id")),
               "advise_next_step": lambda: self.advise_next_step(args["provider_id"]),
+              "volume_screen": lambda: self.volume_screen() if self.v52 else {"error": "tool not available"},
+              "request_stratum": lambda: self.request_stratum(args["provider_id"]),
+              "send_demand": lambda: self.send_demand(args["provider_id"]),
               "flag_data_issue": lambda: self.flag_data_issue(args["issue"], args["detail"], args.get("provider_ids"), args.get("hold_findings", True)),
               "submit_findings": lambda: self.submit_findings(args["findings"], args.get("set_aside"))}.get(name)
         if fn is None:
