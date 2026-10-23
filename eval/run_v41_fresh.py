@@ -13,6 +13,7 @@ import dev_release3 as dev  # noqa: E402
 import make_v2_office_workflow_runs as ow  # noqa: E402
 import run_release2 as r2  # noqa: E402
 import score_40 as s4  # noqa: E402
+import seed_registry as sreg  # noqa: E402
 import w_loop as wl  # noqa: E402
 
 SEEDS = [5555 + 101 * i for i in range(10)]
@@ -37,6 +38,8 @@ def _run(job):
 
 def run():
     assert all(s >= 5555 for s in SEEDS)
+    for arm in ("W4.1", "H8_n4"):  # issue 176: both arms are a second use of the test seeds, declared in docs/w41_freeze.md
+        sreg.check_run("4.0", SEEDS, arm, "test", second_use=True)
     res = json.load(open(OUT)) if os.path.exists(OUT) else {}
     with mp.get_context("spawn").Pool(4) as pool:
         for label, seed, r in pool.map(_run, [(a, s) for a in ARMS for s in SEEDS], chunksize=1):

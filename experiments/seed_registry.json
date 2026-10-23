@@ -1,0 +1,1036 @@
+{
+ "format": 1,
+ "vocabulary": {
+  "fit": "parameters of a model are estimated on the seeds",
+  "select": "a setting or a design choice is made on the seeds",
+  "confirm": "a hold-out read once for a decision declared in advance",
+  "test": "a fresh seed set read once for a frozen version",
+  "burned": "results were read before a later decision was made; the seeds are development data for everything after",
+  "fresh": "never run by anyone",
+  "reserved": "held back and never generated; changing this needs a deliberate edit of the registry",
+  "in_use": "read for declared decisions and still clean for hypotheses whose design did not see those results"
+ },
+ "arm_aliases": {
+  "W4.0": "H8",
+  "W4.1": "H23",
+  "W2.4 (GL)": "W2.4"
+ },
+ "pools": [
+  {
+   "id": "D1-DEV",
+   "data_version": "1.0",
+   "seeds": [
+    42,
+    101
+   ],
+   "kind": "development",
+   "status": "burned",
+   "status_date": null,
+   "status_note": "version 1 data (data/synthetic); used in development of v1.0 and the earliest thresholds; exact roles were not recorded",
+   "uses": [
+    {
+     "arm": "v1.0",
+     "role": "select",
+     "date": null,
+     "reference": "CLAUDE.md (Data versions and seeds)",
+     "note": "unverified: seeds 42 and 101 are the v1 data; CLAUDE.md does not say which decisions were made on which",
+     "second_use": false
+    }
+   ]
+  },
+  {
+   "id": "D2.0-DEV",
+   "data_version": "2.0",
+   "seeds": [
+    42
+   ],
+   "kind": "development",
+   "status": "burned",
+   "status_date": null,
+   "status_note": "the development seed of data 2.x: thresholds were tuned here",
+   "uses": [
+    {
+     "arm": "v2.0",
+     "role": "select",
+     "date": null,
+     "reference": "docs/versioning.md (What frozen means)",
+     "note": "screen cutoff 5 and the rule cutoffs in summary_rules.py and records.py were set by looking at seed 42",
+     "second_use": false
+    }
+   ]
+  },
+  {
+   "id": "D2.0-HELD",
+   "data_version": "2.0",
+   "seeds": [
+    7,
+    101
+   ],
+   "kind": "development",
+   "status": "burned",
+   "status_date": null,
+   "status_note": "held out for v2.0, but seen since; thresholds are not re-tuned on them",
+   "uses": [
+    {
+     "arm": "v2.0",
+     "role": "confirm",
+     "date": null,
+     "reference": "docs/versioning.md; CLAUDE.md (Data versions and seeds)",
+     "note": "held-out for v2.0; versioning.md says they have been seen since, so they are no longer clean for later versions",
+     "second_use": false
+    }
+   ]
+  },
+  {
+   "id": "D2.0-M6",
+   "data_version": "2.0",
+   "seeds": [
+    202,
+    303
+   ],
+   "kind": "test",
+   "status": "burned",
+   "status_date": null,
+   "status_note": "the Milestone 6 evaluation; retired",
+   "uses": [
+    {
+     "arm": "v2.0",
+     "role": "test",
+     "date": null,
+     "reference": "docs/versioning.md (Reserved seeds)",
+     "note": "unverified: data version 2.0 assumed from the milestone (v2.0 and v3.0 were the arms); dates not recorded here",
+     "second_use": false
+    },
+    {
+     "arm": "v3.0",
+     "role": "test",
+     "date": null,
+     "reference": "docs/versioning.md (Reserved seeds)",
+     "note": "unverified: arm assumed from the milestone",
+     "second_use": false
+    }
+   ]
+  },
+  {
+   "id": "D2.1-REL1",
+   "data_version": "2.1",
+   "seeds": [
+    404,
+    505,
+    606,
+    707,
+    808,
+    909,
+    1010,
+    1111,
+    1212,
+    1313
+   ],
+   "kind": "test",
+   "status": "burned",
+   "status_date": "2026-10-16",
+   "status_note": "release 1 evaluation (issue 61); retired",
+   "uses": [
+    {
+     "arm": "v2.0",
+     "role": "test",
+     "date": "2026-10-16",
+     "reference": "issue 61; docs/eval61.md",
+     "note": "ten fresh seeds, paired; v2.0 and v3.0 were re-run on the data 2.1 claims",
+     "second_use": false
+    },
+    {
+     "arm": "v2.1",
+     "role": "test",
+     "date": "2026-10-16",
+     "reference": "issue 61; docs/eval61.md",
+     "note": "ten fresh seeds, paired; v2.0 and v3.0 were re-run on the data 2.1 claims",
+     "second_use": false
+    },
+    {
+     "arm": "v3.0",
+     "role": "test",
+     "date": "2026-10-16",
+     "reference": "issue 61; docs/eval61.md",
+     "note": "ten fresh seeds, paired; v2.0 and v3.0 were re-run on the data 2.1 claims",
+     "second_use": false
+    },
+    {
+     "arm": "v3.1",
+     "role": "test",
+     "date": "2026-10-16",
+     "reference": "issue 61; docs/eval61.md",
+     "note": "ten fresh seeds, paired; v2.0 and v3.0 were re-run on the data 2.1 claims",
+     "second_use": false
+    }
+   ]
+  },
+  {
+   "id": "D2.1-REL1-LOW",
+   "data_version": "2.1",
+   "seeds": [
+    1414
+   ],
+   "kind": "test",
+   "status": "burned",
+   "status_date": "2026-10-16",
+   "status_note": "release 1 low base rates (0.5%, 1%, 2%) on seed 1414; descriptive only; retired",
+   "uses": [
+    {
+     "arm": "v2.0",
+     "role": "test",
+     "date": "2026-10-16",
+     "reference": "issue 61; docs/eval61.md",
+     "note": "three datasets at low upcoder rates on one seed",
+     "second_use": false
+    },
+    {
+     "arm": "v2.1",
+     "role": "test",
+     "date": "2026-10-16",
+     "reference": "issue 61; docs/eval61.md",
+     "note": "three datasets at low upcoder rates on one seed",
+     "second_use": false
+    },
+    {
+     "arm": "v3.0",
+     "role": "test",
+     "date": "2026-10-16",
+     "reference": "issue 61; docs/eval61.md",
+     "note": "three datasets at low upcoder rates on one seed",
+     "second_use": false
+    },
+    {
+     "arm": "v3.1",
+     "role": "test",
+     "date": "2026-10-16",
+     "reference": "issue 61; docs/eval61.md",
+     "note": "three datasets at low upcoder rates on one seed",
+     "second_use": false
+    }
+   ]
+  },
+  {
+   "id": "D2.2-REL2",
+   "data_version": "2.2",
+   "seeds": [
+    1515,
+    1616,
+    1717,
+    1818,
+    1919,
+    2020,
+    2121,
+    2222,
+    2323,
+    2424
+   ],
+   "kind": "development",
+   "status": "burned",
+   "status_date": "2026-10-17",
+   "status_note": "release 2 evaluation seeds; development data for everything after (release 3 changes were suggested here)",
+   "uses": [
+    {
+     "arm": "W2.2",
+     "role": "test",
+     "date": null,
+     "reference": "docs/release2_results.md; docs/release2_plan.md",
+     "note": "release 2 test; date unverified: not checked",
+     "second_use": false
+    },
+    {
+     "arm": "A3.2",
+     "role": "test",
+     "date": null,
+     "reference": "docs/release2_results.md",
+     "note": "release 2 test",
+     "second_use": false
+    },
+    {
+     "arm": "W2.3",
+     "role": "select",
+     "date": null,
+     "reference": "docs/dev_release3.md",
+     "note": "the ten seeds suggested the changes of workflow v2.3 (in sample)",
+     "second_use": false
+    },
+    {
+     "arm": "W2.4",
+     "role": "select",
+     "date": null,
+     "reference": "docs/dev_release4.md",
+     "note": "release 4 candidates chosen on release 2 and 3 seeds (issue 102)",
+     "second_use": false
+    },
+    {
+     "arm": "W2.4",
+     "role": "fit",
+     "date": null,
+     "reference": "docs/learned_policy_plain.md",
+     "note": "unverified: the learned policy was fitted on 20 development seeds; assumed to be the release 2 and 3 seeds",
+     "second_use": false
+    },
+    {
+     "arm": "W2.5",
+     "role": "fit",
+     "date": "2026-10-19",
+     "reference": "docs/release5_train.md",
+     "note": "ask-or-skip and stop-or-escalate fitted on dollars on 30 development seeds (releases 2, 3 and 4)",
+     "second_use": false
+    }
+   ]
+  },
+  {
+   "id": "D2.2-REL3",
+   "data_version": "2.2",
+   "seeds": [
+    2525,
+    2626,
+    2727,
+    2828,
+    2929,
+    3030,
+    3131,
+    3232,
+    3333,
+    3434
+   ],
+   "kind": "development",
+   "status": "burned",
+   "status_date": null,
+   "status_note": "release 3 evaluation seeds; development data after",
+   "uses": [
+    {
+     "arm": "W2.3",
+     "role": "test",
+     "date": null,
+     "reference": "docs/release3_results.md; issue 99",
+     "note": "fresh test of release 3; W2.2 was the reference arm there",
+     "second_use": false
+    },
+    {
+     "arm": "A3.3",
+     "role": "test",
+     "date": null,
+     "reference": "docs/release3_results.md",
+     "note": "fresh test of release 3",
+     "second_use": false
+    },
+    {
+     "arm": "W2.4",
+     "role": "select",
+     "date": null,
+     "reference": "docs/dev_release4.md",
+     "note": "release 4 candidates chosen on release 2 and 3 seeds (issue 102)",
+     "second_use": false
+    },
+    {
+     "arm": "W2.4",
+     "role": "fit",
+     "date": null,
+     "reference": "docs/learned_policy_plain.md",
+     "note": "unverified: the learned policy was fitted on 20 development seeds; assumed to be the release 2 and 3 seeds",
+     "second_use": false
+    },
+    {
+     "arm": "W2.5",
+     "role": "fit",
+     "date": "2026-10-19",
+     "reference": "docs/release5_train.md",
+     "note": "fitted on 30 development seeds (releases 2, 3 and 4)",
+     "second_use": false
+    }
+   ]
+  },
+  {
+   "id": "D2.2-REL4",
+   "data_version": "2.2",
+   "seeds": [
+    3535,
+    3636,
+    3737,
+    3838,
+    3939,
+    4040,
+    4141,
+    4242,
+    4343,
+    4444
+   ],
+   "kind": "development",
+   "status": "burned",
+   "status_date": null,
+   "status_note": "release 4 evaluation seeds; development data after",
+   "uses": [
+    {
+     "arm": "W2.4",
+     "role": "test",
+     "date": null,
+     "reference": "docs/release4_results.md; issue 108",
+     "note": "fresh test of G, L and GL (GL is the v2.4 default); workflow only in the results page",
+     "second_use": false
+    },
+    {
+     "arm": "A3.4",
+     "role": "test",
+     "date": null,
+     "reference": "docs/release4_agent_results.md",
+     "note": "agent v3.4 test",
+     "second_use": false
+    },
+    {
+     "arm": "W2.5",
+     "role": "fit",
+     "date": "2026-10-19",
+     "reference": "docs/release5_train.md",
+     "note": "fitted on 30 development seeds (releases 2, 3 and 4)",
+     "second_use": false
+    }
+   ]
+  },
+  {
+   "id": "D2.2-REL5",
+   "data_version": "2.2",
+   "seeds": [
+    4545,
+    4646,
+    4747,
+    4848,
+    4949,
+    5050,
+    5151,
+    5252,
+    5353,
+    5454
+   ],
+   "kind": "development",
+   "status": "burned",
+   "status_date": "2026-10-19",
+   "status_note": "release 5 evaluation seeds (dollars); development data after",
+   "uses": [
+    {
+     "arm": "W2.3",
+     "role": "test",
+     "date": "2026-10-19",
+     "reference": "docs/release5_results.md; issue 109",
+     "note": "one look; policies frozen before the seeds were generated",
+     "second_use": false
+    },
+    {
+     "arm": "W2.4",
+     "role": "test",
+     "date": "2026-10-19",
+     "reference": "docs/release5_results.md; issue 109",
+     "note": "one look; policies frozen before the seeds were generated",
+     "second_use": false
+    },
+    {
+     "arm": "W2.5",
+     "role": "test",
+     "date": "2026-10-19",
+     "reference": "docs/release5_results.md; issue 109",
+     "note": "one look; policies frozen before the seeds were generated",
+     "second_use": false
+    },
+    {
+     "arm": "A3.5",
+     "role": "test",
+     "date": "2026-10-19",
+     "reference": "docs/release5_results.md; issue 109",
+     "note": "one look; policies frozen before the seeds were generated",
+     "second_use": false
+    }
+   ]
+  },
+  {
+   "id": "D4.0-SMOKE",
+   "data_version": "4.0",
+   "seeds": [
+    42
+   ],
+   "kind": "development",
+   "status": "burned",
+   "status_date": "2026-10-21",
+   "status_note": "smoke seed of the data 4.0 development pool (d4_42); also used in the screen comparison of issue 127",
+   "uses": [
+    {
+     "arm": "screens_v4",
+     "role": "select",
+     "date": null,
+     "reference": "docs/screens_v4.md; issue 127",
+     "note": "the 11 screen-comparison seeds are d4_42 and the batch 1 seeds (see D4.0-DEV-A); not used to fit any workflow model",
+     "second_use": false
+    }
+   ]
+  },
+  {
+   "id": "D4.0-DEV-A",
+   "data_version": "4.0",
+   "seeds": [
+    1515,
+    1616,
+    1717,
+    1818,
+    1919,
+    2020,
+    2121,
+    2222,
+    2323,
+    2424,
+    3000,
+    3021,
+    3042,
+    3063,
+    3084,
+    3105,
+    3126,
+    3147,
+    3168,
+    3189,
+    3210,
+    3231,
+    3252,
+    3273,
+    3294,
+    3315,
+    3336,
+    3357,
+    3378,
+    3399,
+    3420,
+    3441,
+    3462,
+    3483,
+    3504,
+    3525,
+    3546,
+    3567,
+    3588,
+    3609
+   ],
+   "kind": "development",
+   "status": "burned",
+   "status_date": "2026-10-21",
+   "status_note": "batches 1 to 4 of eval/dev_pool_v4.py; the ask model of H8 (workflow v4.0) is fitted on them and the settings of H13 to H23 are selected on them",
+   "uses": [
+    {
+     "arm": "H8",
+     "role": "fit",
+     "date": "2026-10-21",
+     "reference": "docs/w_loop_v4.md; issue 131",
+     "note": "the ask-or-skip model of workflow v4.0 fitted on batches 1 to 4 (src/policy_40_ask.json)",
+     "second_use": false
+    },
+    {
+     "arm": "H8",
+     "role": "select",
+     "date": "2026-10-21",
+     "reference": "docs/w_loop_v4.md",
+     "note": "H1 to H6 options chosen along batches 1 to 4",
+     "second_use": false
+    },
+    {
+     "arm": "H4",
+     "role": "confirm",
+     "date": "2026-10-21",
+     "reference": "docs/w_loop_v4.md",
+     "note": "confirmed on the unseen batch 3",
+     "second_use": false,
+     "seeds": [
+      3210,
+      3231,
+      3252,
+      3273,
+      3294,
+      3315,
+      3336,
+      3357,
+      3378,
+      3399
+     ]
+    },
+    {
+     "arm": "H6",
+     "role": "confirm",
+     "date": "2026-10-21",
+     "reference": "docs/w_loop_v4.md",
+     "note": "confirmed on the unseen batch 4",
+     "second_use": false,
+     "seeds": [
+      3420,
+      3441,
+      3462,
+      3483,
+      3504,
+      3525,
+      3546,
+      3567,
+      3588,
+      3609
+     ]
+    },
+    {
+     "arm": "H12",
+     "role": "fit",
+     "date": "2026-10-21",
+     "reference": "eval/w_loop.py",
+     "note": "H8 with the ask model refitted on batches 1 to 6",
+     "second_use": false
+    },
+    {
+     "arm": "H13",
+     "role": "fit",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md",
+     "note": "ask model on eb_upper_t features, fitted on batches 1 to 4",
+     "second_use": false
+    },
+    {
+     "arm": "H14",
+     "role": "select",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md",
+     "note": "stop-loss margin m chosen on batches 1 to 4 by leave-one-batch-out",
+     "second_use": false
+    },
+    {
+     "arm": "H16",
+     "role": "select",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md",
+     "note": "near-miss threshold c = 2 chosen on batches 1 to 4",
+     "second_use": false
+    },
+    {
+     "arm": "H17",
+     "role": "select",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md",
+     "note": "loosened chart test L3 chosen on batches 1 to 4",
+     "second_use": false
+    },
+    {
+     "arm": "H15",
+     "role": "select",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md; eval/w_loop_v41_decl.py",
+     "note": "k chosen on batches 1 to 4 (declared before the runs)",
+     "second_use": false
+    },
+    {
+     "arm": "H18",
+     "role": "select",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md; eval/w_loop_v41_decl.py",
+     "note": "its setting chosen on batches 1 to 4 (declared before the runs)",
+     "second_use": false
+    },
+    {
+     "arm": "H19",
+     "role": "select",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md; eval/w_loop_v41_decl.py",
+     "note": "its setting chosen on batches 1 to 4 (declared before the runs)",
+     "second_use": false
+    },
+    {
+     "arm": "H20",
+     "role": "select",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md; eval/w_loop_v41_decl.py",
+     "note": "K and n chosen on batches 1 to 4 (declared before the runs)",
+     "second_use": false
+    },
+    {
+     "arm": "H20c",
+     "role": "select",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md; eval/w_loop_v41_decl.py",
+     "note": "K and n chosen on batches 1 to 4 (declared before the runs)",
+     "second_use": false
+    },
+    {
+     "arm": "H23",
+     "role": "select",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41_confirm.md",
+     "note": "list size N = 4 chosen by leave-one-batch-out on batches 1 to 4 (the edge of the grid)",
+     "second_use": false
+    },
+    {
+     "arm": "screens_v4",
+     "role": "select",
+     "date": null,
+     "reference": "docs/screens_v4.md; issue 127",
+     "note": "the screen comparison used the 10 batch 1 seeds (and seed 42); no workflow model was fitted on it",
+     "second_use": false,
+     "seeds": [
+      1515,
+      1616,
+      1717,
+      1818,
+      1919,
+      2020,
+      2121,
+      2222,
+      2323,
+      2424
+     ]
+    }
+   ]
+  },
+  {
+   "id": "D4.0-DEV-B",
+   "data_version": "4.0",
+   "seeds": [
+    3630,
+    3651,
+    3672,
+    3693,
+    3714,
+    3735,
+    3756,
+    3777,
+    3798,
+    3819,
+    3840,
+    3861,
+    3882,
+    3903,
+    3924,
+    3945,
+    3966,
+    3987,
+    4008,
+    4029
+   ],
+   "kind": "development",
+   "status": "burned",
+   "status_date": "2026-10-22",
+   "status_note": "batches 5 and 6: first out of sample for H8's model and the test of H13 to H20c (a hypothesis H21 appears nowhere in the repository's documents or scripts, so none is recorded); the H16 and H17 results read here informed the definition of H22, so it is burned for H22's design",
+   "uses": [
+    {
+     "arm": "H8",
+     "role": "confirm",
+     "date": "2026-10-21",
+     "reference": "docs/w_loop_v4.md",
+     "note": "ask model out of sample; missed the per-batch rule on batch 5, passed only when pooled with batch 6",
+     "second_use": false
+    },
+    {
+     "arm": "H12",
+     "role": "fit",
+     "date": "2026-10-21",
+     "reference": "eval/w_loop.py",
+     "note": "ask model refitted on batches 1 to 6",
+     "second_use": false
+    },
+    {
+     "arm": "H13",
+     "role": "confirm",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md",
+     "note": "out of sample for both; rejected",
+     "second_use": false
+    },
+    {
+     "arm": "H14",
+     "role": "confirm",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md",
+     "note": "out of sample for both; rejected",
+     "second_use": false
+    },
+    {
+     "arm": "H15",
+     "role": "confirm",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md",
+     "note": "run once at the setting chosen on batches 1 to 4; rejected, no gain over H8",
+     "second_use": false
+    },
+    {
+     "arm": "H18",
+     "role": "confirm",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md",
+     "note": "run once at the setting chosen on batches 1 to 4; rejected, no gain over H8",
+     "second_use": false
+    },
+    {
+     "arm": "H19",
+     "role": "confirm",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md",
+     "note": "run once at the setting chosen on batches 1 to 4; rejected, no gain over H8",
+     "second_use": false
+    },
+    {
+     "arm": "H20",
+     "role": "confirm",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md",
+     "note": "run once at the setting chosen on batches 1 to 4; rejected, no gain over H8",
+     "second_use": false
+    },
+    {
+     "arm": "H20c",
+     "role": "confirm",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md",
+     "note": "run once at the setting chosen on batches 1 to 4; rejected, no gain over H8",
+     "second_use": false
+    },
+    {
+     "arm": "H16",
+     "role": "confirm",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md",
+     "note": "run once; the result informed H22's design",
+     "second_use": false
+    },
+    {
+     "arm": "H17",
+     "role": "confirm",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41.md",
+     "note": "run once; the result informed H22's design",
+     "second_use": false
+    },
+    {
+     "arm": "H22",
+     "role": "select",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41_confirm.md",
+     "note": "H22 combines H16 and H17 after their batch 5 and 6 results were read, so this pool is burned for H22's design",
+     "second_use": false
+    },
+    {
+     "arm": "H23",
+     "role": "confirm",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41_confirm.md",
+     "note": "N chosen on batches 1 to 4, read here; not clean for the H22 part, which this pool had informed",
+     "second_use": false
+    },
+    {
+     "arm": "H8_n4",
+     "role": "confirm",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41_confirm.md",
+     "note": "control: workflow v4.0 with a list of 4, run once on batches 5 to 10",
+     "second_use": false
+    }
+   ]
+  },
+  {
+   "id": "D4.0-DEV-C",
+   "data_version": "4.0",
+   "seeds": [
+    4050,
+    4071,
+    4092,
+    4113,
+    4134,
+    4155,
+    4176,
+    4197,
+    4218,
+    4239,
+    4260,
+    4281,
+    4302,
+    4323,
+    4344,
+    4365,
+    4386,
+    4407,
+    4428,
+    4449,
+    4470,
+    4491,
+    4512,
+    4533,
+    4554,
+    4575,
+    4596,
+    4617,
+    4638,
+    4659,
+    4680,
+    4701,
+    4722,
+    4743,
+    4764,
+    4785,
+    4806,
+    4827,
+    4848,
+    4869
+   ],
+   "kind": "development",
+   "status": "in_use",
+   "status_date": "2026-10-22",
+   "status_note": "batches 7 to 10: untouched when H17, H22, H23 and the H8_n4 control were run; read for those. registry author's inference, not a recorded decision: H23's idea (a shorter list) followed H22's cost reading here, so it is probably burned for list-size and triage hypotheses",
+   "uses": [
+    {
+     "arm": "H17",
+     "role": "confirm",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41_confirm.md",
+     "note": "run once at the setting chosen on batches 1 to 4",
+     "second_use": false
+    },
+    {
+     "arm": "H16",
+     "role": "confirm",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41_confirm.md",
+     "note": "run once at c = 2",
+     "second_use": false
+    },
+    {
+     "arm": "H22",
+     "role": "confirm",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41_confirm.md",
+     "note": "declared in advance (eval/w_loop_h22.py); no result clears the bar",
+     "second_use": false
+    },
+    {
+     "arm": "H23",
+     "role": "confirm",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41_confirm.md",
+     "note": "N = 4 chosen on batches 1 to 4; out of sample here. The brief calls this H23's test; in this vocabulary it is a confirm (a hold-out read for a declared decision)",
+     "second_use": false
+    },
+    {
+     "arm": "H8_n4",
+     "role": "confirm",
+     "date": "2026-10-22",
+     "reference": "docs/w_loop_v41_confirm.md",
+     "note": "control run once on batches 5 to 10",
+     "second_use": false
+    },
+    {
+     "arm": "H8",
+     "role": "confirm",
+     "date": "2026-10-21",
+     "reference": "docs/w_loop_v4.md",
+     "note": "workflow v4.0 run on all 100 development seeds as a report; batches 7 to 10 are out of sample for its ask model",
+     "second_use": false
+    },
+    {
+     "arm": "H12",
+     "role": "confirm",
+     "date": null,
+     "reference": "docs/w_loop_v4.md",
+     "note": "unverified: H12 is listed as rejected; which batches it was read on is not stated in docs/w_loop_v4.md",
+     "second_use": false
+    }
+   ]
+  },
+  {
+   "id": "D4.0-TEST-1",
+   "data_version": "4.0",
+   "seeds": [
+    5555,
+    5656,
+    5757,
+    5858,
+    5959,
+    6060,
+    6161,
+    6262,
+    6363,
+    6464
+   ],
+   "kind": "test",
+   "status": "burned",
+   "status_date": "2026-10-22",
+   "status_note": "ten test seeds, data f4_<seed>; first use 2026-10-21 (frozen W2.5, W4.0, A5.0); second use 2026-10-22 (W4.1 and its control), declared in docs/w41_freeze.md. W4.0's result was known while W4.1 was designed",
+   "uses": [
+    {
+     "arm": "W2.5",
+     "role": "test",
+     "date": "2026-10-21",
+     "reference": "docs/v4_v5_results.md; issue 128",
+     "note": "frozen reference arm, first use",
+     "second_use": false
+    },
+    {
+     "arm": "W4.0",
+     "role": "test",
+     "date": "2026-10-21",
+     "reference": "docs/v4_v5_results.md; issue 128",
+     "note": "first use: -$1,161 per seed",
+     "second_use": false
+    },
+    {
+     "arm": "A5.0",
+     "role": "test",
+     "date": "2026-10-21",
+     "reference": "docs/v4_v5_results.md; issue 128",
+     "note": "first use, paid run ($1.14 spent)",
+     "second_use": false
+    },
+    {
+     "arm": "A3.5",
+     "role": "test",
+     "date": null,
+     "reference": "docs/v4_v5_results.md; eval/run_v5_fresh_agent.py",
+     "note": "frozen agent v3.5 reference: not run (eval/run_v5_fresh_agent.py refuses without --approved)",
+     "second_use": false,
+     "done": false
+    },
+    {
+     "arm": "W4.1",
+     "role": "test",
+     "date": "2026-10-22",
+     "reference": "docs/w41_freeze.md; docs/w41_fresh_result.md; PR 175, PR 177",
+     "note": "second use: +$1,003 per seed against W4.0",
+     "second_use": true
+    },
+    {
+     "arm": "H8_n4",
+     "role": "test",
+     "date": "2026-10-22",
+     "reference": "docs/w41_freeze.md",
+     "note": "control (W4.0 with the same 4-provider list), second use",
+     "second_use": true
+    },
+    {
+     "arm": "A5.1",
+     "role": "test",
+     "date": null,
+     "reference": "docs/w41_freeze.md; issue 135",
+     "note": "not run yet: agent v5.1 is planned to mirror W4.1 (issue 135); it would be a second use; paid, needs an estimate and approval",
+     "second_use": true,
+     "done": false
+    }
+   ]
+  },
+  {
+   "id": "D4.0-TEST-2",
+   "data_version": "4.0",
+   "seeds": [
+    6565,
+    6666,
+    6767,
+    6868,
+    6969,
+    7070,
+    7171,
+    7272,
+    7373,
+    7474
+   ],
+   "kind": "test",
+   "status": "reserved",
+   "status_date": "2026-10-22",
+   "status_note": "never generated; untouched until a freeze. Change the status here (with an issue reference) before any run",
+   "uses": []
+  }
+ ]
+}

@@ -17,6 +17,7 @@ import judge_agent_runs as jar  # noqa: E402
 import run_agent  # noqa: E402
 import run_release2 as r2  # noqa: E402
 import run_v4_fresh as fresh  # noqa: E402
+import seed_registry as sreg  # noqa: E402
 
 PRE = {"3.5": "fra35", "5.0": "fra50"}
 SCREEN = {"3.5": "eb_ratio_t", "5.0": "eb_upper_t"}
@@ -33,6 +34,7 @@ if __name__ == "__main__":
     cap = float(sys.argv[sys.argv.index("--batch-cap") + 1]) if "--batch-cap" in sys.argv else 4.0
     seeds = [int(a) for a in sys.argv[2:] if a.isdigit()] or fresh.SEEDS
     assert all(s in fresh.SEEDS for s in seeds)
+    sreg.check_run("4.0", seeds, "A" + version, "test")  # issue 176: A3.5 and A5.0 are recorded as first uses of the test seeds
     from dotenv import load_dotenv
     load_dotenv(os.path.join(ROOT, ".env"))
     pre = PRE[version]

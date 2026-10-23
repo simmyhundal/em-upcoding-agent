@@ -24,6 +24,7 @@ import make_v2_office_workflow_runs as ow  # noqa: E402
 import workflow_policy_40 as wp40  # noqa: E402
 import run_release2 as r2  # noqa: E402
 import score_40 as s4  # noqa: E402
+import seed_registry as sreg  # noqa: E402
 
 CACHE_DIR = os.path.join(ROOT, "experiments", "w_loop")
 KEEP = ("score", "recovered", "staff_cost", "abrasion", "found", "upcoders", "demands", "honest_called", "rounds", "charts")
@@ -112,6 +113,7 @@ def _run(job):
 
 def evaluate(name, seeds):
     assert all(s < 5555 for s in seeds), "fresh seeds (5555 and above) are never run in the development loop"
+    sreg.check_development("4.0", seeds)  # issue 176: not a reserved, fresh or test pool
     os.makedirs(CACHE_DIR, exist_ok=True)
     path = os.path.join(CACHE_DIR, f"{name}.json")
     have = json.load(open(path)) if os.path.exists(path) else {}

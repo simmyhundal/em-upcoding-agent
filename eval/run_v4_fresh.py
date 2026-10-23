@@ -19,6 +19,7 @@ import make_v2_office_workflow_runs as ow  # noqa: E402
 import make_v2_runs as mk  # noqa: E402
 import run_release2 as r2  # noqa: E402
 import score_40 as s4  # noqa: E402
+import seed_registry as sreg  # noqa: E402
 import w_loop as wl  # noqa: E402
 import workflow_policy_40 as wp40  # noqa: E402
 
@@ -68,6 +69,8 @@ if __name__ == "__main__":
         with mp.get_context("spawn").Pool(4) as pool:
             print(pool.map(build, SEEDS))
     elif cmd == "workflow":
+        for arm in ("W2.5", "W4.0"):  # issue 176: first use of the test seeds, as recorded in experiments/seed_registry.json
+            sreg.check_run("4.0", SEEDS, arm, "test")
         res = json.load(open(OUT)) if os.path.exists(OUT) else {}
         with mp.get_context("spawn").Pool(4) as pool:
             for label, seed, r in pool.map(run_workflow, [(l, s) for l in WORKFLOW for s in SEEDS], chunksize=1):
