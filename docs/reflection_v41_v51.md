@@ -1,0 +1,16 @@
+# Reflection after v4.1 and v5.1: the deepest flaws of the current system
+
+[Back to the README](../README.md) · [process](process.md) · [decision log](decision_log.md)
+
+Written 2026-10-22 at the close of the v4.1 and v5.1 cycle, for the next release's step 1. Each flaw is a candidate issue.
+
+1. **The world has a binary answer key.** D4.0 plants exactly 8 upcoders per dataset; "found 9 of 80" is a count against that quota, and every analysis (funnel, ask models, precision) leans on `role`. Real life has a continuous distribution of overbilling and other fraud, waste and abuse. Filed: #173 (D4.2).
+2. **The score depends on unsourced assumptions.** Staff minutes per task, the $13 triage per listed provider, the $90 copy fee, the 15% extrapolation gate, the $2,000 abrasion and Medicare-sized dollars per provider are assumptions. The triage assumption alone is worth about $236 per seed to a short list, a third of W4.1's lead over W4.0. Filed: #178, #145, #146.
+3. **Statistical power is thin and results are fragile.** Ten test seeds, paired differences with a spread of $1,000 to $3,000, and one seed carrying each total (seed 5959). We have not distinguished W4.1 or A5.1 from zero. The p-values of the loop (eleven hypotheses, then the freeze) were computed on 20 to 60 development seeds. Seed roles were hard to track until the registry (#176).
+4. **Honest providers are almost never exercised.** The ask models skip them, so only 1 of 145 asked providers in the hold-out was not an upcoder: zero honest calls is weak evidence that the loosened rules are safe, and the abrasion term is barely tested. A world where many providers have small positive overbilling (#173) would test it.
+5. **Opportunistic upcoders are out of reach by construction.** Their documentation is padded, so a full audit of every chart finds about a quarter of their true overpayment. Part of that is a property of how D4.0 generates padded notes; whether real borderline upcoding hides like that is unknown. Closed: #134.
+6. **Signals planted by the generator.** The lab-line link (a lab is far likelier when the true data element is high) makes the chosen screen look better than a claims-only screen may be in real data. Filed: #144.
+7. **The arms learn from the answer key's world, not from a payer's.** The oracle ceiling ($2,800 to $4,500 per seed) assumes foresight about which provider is worth pursuing; our best arm is at about a third of it, and what a payer actually knows before asking is the real limit. We have no way to measure how an actual SIU would act.
+8. **The agent is tested by a scripted proxy and ten runs.** Parity is measured with an agent that follows advice; the real model can ignore it, and one run per seed hides run-to-run variance.
+9. **No customer validation.** The product is framed for commercial plans, but we have only public earnings language, a headroom ceiling and prior-auth reading: nothing on what a PI team would buy, at what price, against automatic downcoding policies already in the field. Milestone "Payer stock-price drivers" and layer 2 of the market research are open.
+10. **The process itself leans on one reviewer.** Hypotheses, controls and verdicts are made by the model with Simmy approving; there is no independent replication of a result, and cached runs and one registry are our only audit trail.
