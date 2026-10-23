@@ -15,6 +15,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 sys.path.insert(0, os.path.join(ROOT, "eval"))
+import agent_tools  # noqa: E402
 import judge_usefulness as ju  # noqa: E402
 import provider_sim  # noqa: E402
 import records  # noqa: E402
@@ -25,7 +26,7 @@ def replay(run_id, code_run, version="3.0"):
     data = os.path.join(ROOT, "data", f"synthetic_v2_{code_run}")
     base = os.path.join(data, "view")
     out = os.path.join(ROOT, "experiments", run_id)
-    office = provider_sim.Office(data, base, seed=1, version="2.1" if version in ("3.1", "3.2", "3.3", "3.4", "3.5", "5.0") else "2.0")
+    office = agent_tools.make_office(data, base, version, seed=1)
     for line in open(os.path.join(out, "audit.jsonl")):
         a = json.loads(line)
         args = a["args"]

@@ -59,12 +59,14 @@ def agent_runs():
 
 
 def roles_of(key_path):
+    """Scoring only (outcome of a replay against the answer key); never given to the environment."""
     return {p: v["role"] for p, v in json.load(open(key_path))["providers"].items()}
 
 
-def make_env(data, version, key_path):
+def make_env(data, version, key_path=None):
+    """key_path is accepted for old callers and ignored: the replay needs no roles (correlation 0), so the office is built without them (issue 100)."""
     return at.Environment(data, os.path.join(data, "view"), seed=1, model_call=None, records_budget=15, screen_enabled=True,
-                          correlation=0.0, roles=roles_of(key_path), version=version)
+                          office=at.make_office(data, os.path.join(data, "view"), version), version=version)
 
 
 def result_text(out):
