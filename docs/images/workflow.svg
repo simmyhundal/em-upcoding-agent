@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" width="1000" height="400" font-family="Helvetica, Arial, sans-serif">
 <rect width="1000" height="400" fill="#ffffff"/>
 <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#6b7280"/></marker><marker id="b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#c2410c"/></marker></defs>
-<text x="30" y="30" font-size="16" font-weight="bold" fill="#1f2937">The fixed workflow (v4.0): code sets the order of the steps</text>
+<text x="30" y="30" font-size="16" font-weight="bold" fill="#1f2937">The fixed workflow (v4.1): code sets the order of the steps</text>
 <rect x="30" y="112" width="205" height="118" rx="10" fill="#f9fafb" stroke="#2563eb" stroke-width="2.5"/>
 <text x="44" y="140" font-size="14.5" font-weight="bold" fill="#1f2937">Screen</text>
 <text x="44" y="162" font-size="12" fill="#6b7280">eb_upper_t: share billed 99214</text>
 <text x="44" y="178" font-size="12" fill="#6b7280">or 99215 against expected,</text>
-<text x="44" y="194" font-size="12" fill="#6b7280">shrunk for small panels. Top</text>
-<text x="44" y="210" font-size="12" fill="#6b7280">10% of providers.</text>
+<text x="44" y="194" font-size="12" fill="#6b7280">shrunk for small panels. A</text>
+<text x="44" y="210" font-size="12" fill="#6b7280">list of 4 providers.</text>
 <rect x="263" y="112" width="205" height="118" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
 <text x="277" y="140" font-size="14.5" font-weight="bold" fill="#1f2937">Ask or skip</text>
 <text x="277" y="162" font-size="12" fill="#6b7280">A learned formula (fitted on</text>
@@ -16,7 +16,8 @@
 <rect x="496" y="112" width="205" height="118" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
 <text x="510" y="140" font-size="14.5" font-weight="bold" fill="#1f2937">Request charts</text>
 <text x="510" y="162" font-size="12" fill="#6b7280">30 random charts, then one</text>
-<text x="510" y="178" font-size="12" fill="#6b7280">follow-up on any deficiency.</text>
+<text x="510" y="178" font-size="12" fill="#6b7280">follow-up on any deficiency;</text>
+<text x="510" y="194" font-size="12" fill="#6b7280">one more 30 for a near-miss.</text>
 <rect x="729" y="112" width="205" height="118" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
 <text x="743" y="140" font-size="14.5" font-weight="bold" fill="#1f2937">Stop</text>
 <text x="743" y="162" font-size="12" fill="#6b7280">No second request: the first</text>
@@ -24,10 +25,11 @@
 <text x="743" y="194" font-size="12" fill="#6b7280">decide.</text>
 <rect x="30" y="262" width="205" height="118" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
 <text x="44" y="290" font-size="14.5" font-weight="bold" fill="#1f2937">Rules decide</text>
-<text x="44" y="312" font-size="12" fill="#6b7280">Chart rule and summary rules</text>
-<text x="44" y="328" font-size="12" fill="#6b7280">(4.0) set the leaning; where</text>
-<text x="44" y="344" font-size="12" fill="#6b7280">silent: inconclusive. No model</text>
-<text x="44" y="360" font-size="12" fill="#6b7280">is called.</text>
+<text x="44" y="312" font-size="12" fill="#6b7280">Chart rule (looser test: 10%</text>
+<text x="44" y="328" font-size="12" fill="#6b7280">unsupported) and summary rules</text>
+<text x="44" y="344" font-size="12" fill="#6b7280">set the leaning; where silent:</text>
+<text x="44" y="360" font-size="12" fill="#6b7280">inconclusive. No model is</text>
+<text x="44" y="376" font-size="12" fill="#6b7280">called.</text>
 <rect x="263" y="262" width="205" height="118" rx="10" fill="#f9fafb" stroke="#15803d" stroke-width="2.5"/>
 <text x="277" y="290" font-size="14.5" font-weight="bold" fill="#1f2937">Demand floor</text>
 <text x="277" y="312" font-size="12" fill="#6b7280">Demand only if the payer's</text>
