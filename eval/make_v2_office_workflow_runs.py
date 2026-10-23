@@ -36,7 +36,7 @@ RUNS = [("261013_12_api", "261013_4_code", "threshold", "reserved seed 202; scre
         ("261013_15_api", "261013_5_code", "top25", "reserved seed 303; screen top 25; fixed office policy")]
 
 
-def build_view(rid, src, screen, version="2.0", tier1_n=None, policy24=None, w40=None):
+def build_view(rid, src, screen, version="2.0", tier1_n=None, policy24=None, w40=None, office_version="2.1"):
     """version "2.1": office 2.1 and the fixed v2.1 policy (eval/workflow_policy_v21.py) on data 2.1; the notes go into documentation.csv.
     version "2.2": the same, with the screen named by `screen` (eb_ratio or priority: experiments/<src>/flagged_<screen>.csv, top 25) and the data-quality pre-flight."""
     data = os.path.join(ROOT, "data", f"synthetic_v2_{src}")
@@ -50,7 +50,7 @@ def build_view(rid, src, screen, version="2.0", tier1_n=None, policy24=None, w40
     flagged_file = os.path.join(ROOT, "experiments", src, {"threshold": "flagged_threshold.csv", "top25": "flagged.csv"}.get(screen, f"flagged_{screen}.csv"))
     flagged = [r["provider_id"] for r in csv.DictReader(open(flagged_file)) if r["flagged"] == "True"]
     if version in ("2.1", "2.2", "2.3", "2.4", "2.5", "4.0"):        # 2.2: the same office and policy as 2.1; the screen is eb_ratio or priority (top 25)
-        office = provider_sim.Office(data, base, seed=1, version="2.1")
+        office = provider_sim.Office(data, base, seed=1, version=office_version)         # office_version "4.2" for data 4.2 (claims for services never rendered); the default is the frozen 2.1
         by_provider = {}
         for r in csv.DictReader(open(os.path.join(base, "claims.csv"))):
             by_provider.setdefault(r["provider_id"], []).append(r)
@@ -110,9 +110,9 @@ def write_view(view, base, office, flagged, exclude=None):
             w.writerow([p, "flagged", len(st["requested"]), len(st["usable"]), 0, 0])
 
 
-def run(rid, src, screen, note, version="2.0", tier1_n=None, policy24=None, no_model=None, w40=None):
+def run(rid, src, screen, note, version="2.0", tier1_n=None, policy24=None, no_model=None, w40=None, office_version="2.1"):
     """no_model None: on for workflow 2.5 only (older versions keep their frozen behavior); pass True to run an older arm API-free on future tests."""
-    view, office, flagged_file = build_view(rid, src, screen, version, **({} if tier1_n is None else {"tier1_n": tier1_n}), **({} if policy24 is None else {"policy24": policy24}), **({} if w40 is None else {"w40": w40}))
+    view, office, flagged_file = build_view(rid, src, screen, version, **({} if tier1_n is None else {"tier1_n": tier1_n}), **({} if policy24 is None else {"policy24": policy24}), **({} if w40 is None else {"w40": w40}), office_version=office_version)
     name = os.path.basename(view)
 
     def summaries():

@@ -34,8 +34,8 @@ A second truth dimension, drawn **independently** of the level rate and of each 
 
 | Kind | Providers (expected) | What the provider does | Payer-visible signals | True overpayment | Status |
 |---|---|---|---|---|---|
-| **Services billed but not rendered** | 3.0% (about 6 per dataset) | Extra claims (5% to 25% of its normal volume) for visits that never happened, placed on a small set of "ghost" members of its panel (a dozen or so, each seen many times) | claim volume above peers; many visits per patient; **a records request cannot be answered**: the office has no chart for these visits | the full paid amount of the phantom claims (every line) | **done**, with the office behaviour below |
-| **Impossible visits per day** | 1.5% (about 3 per dataset) | On 3 to 12 days, 32 to 60 extra visits dated that single day | the number of claims per rendering provider per day (an honest provider's busiest day is about 15 to 25 at most; checked in `data_v4_2_stats.md`); total claim volume | the full paid amount of the extra claims (no chart exists for them either) | **done** |
+| **Services billed but not rendered** | 3.0% (about 6 per dataset) | Extra claims (4% to 15% of its normal volume) for visits that never happened, placed on a small set of "ghost" members of its panel (a dozen or so, each seen many times) | claim volume above peers; many visits per patient; **a records request cannot be answered**: the office has no chart for these visits | the full paid amount of the phantom claims (every line) | **done**, with the office behaviour below |
+| **Impossible visits per day** | 1.5% (about 3 per dataset) | On 2 to 6 days, 32 to 50 extra visits dated that single day | the number of claims per rendering provider per day (an honest provider's busiest day is about 15 to 25 at most; checked in `data_v4_2_stats.md`); total claim volume | the full paid amount of the extra claims (no chart exists for them either) | **done** |
 | **Unbundling** | 2.0% (about 4 per dataset) | On 15% to 50% of its visits, an extra separately paid line (a duplicate lab line) with modifier 25 on the E/M line | extra lines and modifier 25 in `claim_lines.csv`; the detector view carries only whether a test line exists, so the frozen arms have **no tool** for this | the paid amount of the extra line | **done** in the raw tables; no arm reads it |
 | **Cloned or fabricated notes** | within the level habit (above) | Documented elements and time inflated to the bill | the data 2.1 clone signals (text duplication, paste events, timestamps) | the level dollars of that provider (not added again) | **reused**, as an intent flag |
 
@@ -80,7 +80,7 @@ Nothing in the run path of the reference arms reads the answer key (checked: `ma
 5. **Unbundling needs the claim lines** and the pre-flight data-quality checks might read a duplicate lab line as a defect; the test checks it and the doc below says so if it does.
 6. **The agent.** Agent A5.x builds its office inside `Environment`; the new office version is not wired there. Reference arms are workflows only. Not done.
 7. **Habit shares by rate** (60/40 below 15%) are assumptions with no source, like data 4.0's shares.
-8. **The impossible-day threshold** (32 to 60 visits) is a modelling choice (about 14 hours or more of time-based visits); an honest day above 25 is vanishingly rare, but real days are not Poisson.
+8. **The impossible-day threshold** (32 to 50 extra visits) is a modelling choice (about 14 hours or more of time-based visits); an honest day above 25 is vanishingly rare, but real days are not Poisson.
 9. **Seeds.** Pools are keyed by (data version, seed). Development and confirm pools of 100 seeds each, a test pool of 10 and a reserved pool of 10 are named in the registry with numbers below 5555 that do not collide inside data 4.2; only the first two are built, and only part of the confirm pool.
 
 ## What is easier by construction

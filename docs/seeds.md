@@ -37,6 +37,10 @@ A seed is a hold-out only for one arm and one decision made before its results w
 | D4.0-DEV-C | 4.0 | 4050 to 4869 step 21 (40) | in use (2026-10-22) | confirm: H17, H16, H22, H23, H8_n4, H8, H12 | A confirm for a hypothesis whose design did not see its results; development data for the rest. |
 | D4.0-TEST-1 | 4.0 | 5555 to 6464 step 101 (10) | burned (2026-10-22) | test: W2.5, W4.0, A5.0, A3.5 (not run yet), W4.1 (second use), H8_n4 (second use), A5.1 (second use) | Not a clean test any more. A named later version can look at it as a declared second use; otherwise development data. |
 | D4.0-TEST-2 | 4.0 | 6565 to 7474 step 101 (10) | reserved (2026-10-22) | none | Only a final test of a frozen version, once. Never generated, never used for development. |
+| D4.2-DEV | 4.2 | 1001 to 4664 step 37 (100) | in use (2026-10-23) | select: W2.5, W4.0, W4.1 | A confirm for a hypothesis whose design did not see its results; development data for the rest. |
+| D4.2-CONFIRM | 4.2 | 1002 to 4665 step 37 (100) | fresh (2026-10-23) | none | One test of a frozen version; nothing else. |
+| D4.2-TEST-1 | 4.2 | 4700 to 5033 step 37 (10) | reserved (2026-10-23) | none | Only a final test of a frozen version, once. Never generated, never used for development. |
+| D4.2-RESERVED | 4.2 | 5100 to 5433 step 37 (10) | reserved (2026-10-23) | none | Only a final test of a frozen version, once. Never generated, never used for development. |
 
 ## Notes by pool
 
@@ -147,6 +151,17 @@ A seed is a hold-out only for one arm and one decision made before its results w
 - A5.1, test (2026-10-22, second use; docs/a51_fresh_result.md; issue 135): run once, second use of the agent line on these seeds (A5.0 was the first); paid: $1.242 for ten runs under a $4 cap, approved by Simmy after the $1.7 estimate (docs/a51_fresh_result.md).
 
 **D4.0-TEST-2** (test). never generated; untouched until a freeze. Change the status here (with an issue reference) before any run.
+
+**D4.2-DEV** (development). data 4.2 development pool of 100 seeds (eval/dev_pool_v42.py; data d42_<seed>); built by eval/make_d42_dev.py. The first 20 were read by the frozen reference arms (descriptive scoring, nothing tuned). Numbers repeat other data versions' seeds on purpose; the registry is keyed by (data version, seed).
+- W2.5, select, seeds 1001 to 1704 step 37 (2026-10-23; docs/d42_reference_arms.md; issue 173): reference scoring of a frozen arm on the first 20 development seeds; no setting was chosen or fitted.
+- W4.0, select, seeds 1001 to 1704 step 37 (2026-10-23; docs/d42_reference_arms.md; issue 173): reference scoring of a frozen arm on the first 20 development seeds; no setting was chosen or fitted.
+- W4.1, select, seeds 1001 to 1704 step 37 (2026-10-23; docs/d42_reference_arms.md; issue 173): reference scoring of a frozen arm on the first 20 development seeds; no setting was chosen or fitted.
+
+**D4.2-CONFIRM** (development). data 4.2 confirm pool of 100 seeds, named and not generated or read by anyone. Change the status to in_use (with an issue reference) at the first read for a decision declared in advance.
+
+**D4.2-TEST-1** (test). data 4.2 test pool of ten seeds, named and never generated; for the true test of the release's frozen versions, read once. Change the status here (with an issue reference) before any run.
+
+**D4.2-RESERVED** (test). data 4.2 reserved pool of ten seeds, named and never generated; untouched until a deliberate decision recorded here.
 
 Arm names: W4.0 is H8, W4.1 is H23, W2.4 (GL) is W2.4. Notes starting with 'unverified' could not be checked against a source in the repository.
 
