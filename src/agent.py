@@ -129,6 +129,17 @@ follow up on any deficiency), run hybrid_review again and stop. A second round c
 near-miss and for a second extension. Do not send targeted requests or audit trails: they did not pay. The rules and the demand floor still decide the demand; the binding rule of version 3.5 stands."""
 
 
+SYSTEM_52 = SYSTEM_51 + """
+
+Version 5.2 additions (workflow v4.2, score 4.2 on data 4.2). Everything above stands, with these changes.
+1. Score 4.2 replaces score 4.0: records are copied at no charge, so a request round costs about $15 of staff time (not $105) and an extension about $15 plus $8.60 per chart. A sampled claim the office reports
+it has NO record of counts as overpaid at its full paid amount, so a provider billing for visits that never took place can be recovered from, not only a provider billing a level too high.
+2. A claims-data lane runs beside the level review. Call volume_screen once at the start (free): it lists providers who billed 30 or more visits on one service date, which no clinician can see. For every provider it
+lists (the table is capped at 10), call request_stratum: it draws a random sample of 30 of that provider's claims on those dates, asks the office for the charts and returns the 90% lower bound of the overpayment the
+sample supports. Call send_demand for each provider whose recommended action is DEMAND; the tool refuses a demand whose lower bound does not cover the cost of one. Triage costs about $13 for each provider you take through the lane.
+3. The lane is independent of the list of four. Run the level review as before for the providers whose advice is ASK."""
+
+
 def _cost(usage, price=(4.00, 20.00)):
     inp = getattr(usage, "input_tokens", 0) or 0
     out = getattr(usage, "output_tokens", 0) or 0
@@ -156,7 +167,7 @@ def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=M
             reason = "dollar cap"
             break
         turn += 1
-        resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_51 if getattr(env, 'v51', False) else SYSTEM_50 if getattr(env, 'v50', False) else SYSTEM_35 if getattr(env, 'v35', False) else SYSTEM_34 if getattr(env, 'v34', False) else SYSTEM_33 if getattr(env, 'v33', False) else SYSTEM_32 if getattr(env, 'v32', False) else SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
+        resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_52 if getattr(env, 'v52', False) else SYSTEM_51 if getattr(env, 'v51', False) else SYSTEM_50 if getattr(env, 'v50', False) else SYSTEM_35 if getattr(env, 'v35', False) else SYSTEM_34 if getattr(env, 'v34', False) else SYSTEM_33 if getattr(env, 'v33', False) else SYSTEM_32 if getattr(env, 'v32', False) else SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
                                       output_config={"effort": effort}, extra_body={"cache_control": {"type": "ephemeral"}})
         usd += _cost(resp.usage) * price_scale
         if getattr(env, "v32", False):

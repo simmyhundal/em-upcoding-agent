@@ -43,9 +43,10 @@
 <text x="320" y="246" font-size="12" fill="#6b7280">eb_upper_t from v4.0.</text>
 <text x="490" y="198" font-size="12" fill="#6b7280">Learned ask-or-skip, 30</text>
 <text x="490" y="214" font-size="12" fill="#6b7280">random charts, one</text>
-<text x="490" y="230" font-size="12" fill="#6b7280">follow-up. v4.1: a list</text>
-<text x="490" y="246" font-size="12" fill="#6b7280">of 4, one near-miss</text>
-<text x="490" y="262" font-size="12" fill="#6b7280">extension.</text>
+<text x="490" y="230" font-size="12" fill="#6b7280">follow-up. v4.1: list of</text>
+<text x="490" y="246" font-size="12" fill="#6b7280">4, a second sample for</text>
+<text x="490" y="262" font-size="12" fill="#6b7280">borderline cases. v4.2:</text>
+<text x="490" y="278" font-size="12" fill="#6b7280">a visits-per-day check.</text>
 <text x="660" y="198" font-size="12" fill="#6b7280">Code writes the facts</text>
 <text x="660" y="214" font-size="12" fill="#6b7280">and decides; no model</text>
 <text x="660" y="230" font-size="12" fill="#6b7280">from v2.5.</text>
@@ -55,8 +56,9 @@
 <text x="830" y="246" font-size="12" fill="#6b7280">floor.</text>
 <text x="1000" y="198" font-size="12" fill="#1f2937">Two reserved seeds: 6 of 16 upcoders found, 0 honest</text>
 <text x="1000" y="214" font-size="12" fill="#1f2937">accused; 17 honest providers asked for charts. Data</text>
-<text x="1000" y="230" font-size="12" fill="#1f2937">4.0, ten test seeds: 9 of 80 found, 0 honest</text>
-<text x="1000" y="246" font-size="12" fill="#1f2937">accused, $10,031 in all (v4.0: -$11,612).</text>
+<text x="1000" y="230" font-size="12" fill="#1f2937">4.2, ten test seeds: 30 of 36 providers billing</text>
+<text x="1000" y="246" font-size="12" fill="#1f2937">impossible visits per day demanded from, $375,031 in</text>
+<text x="1000" y="262" font-size="12" fill="#1f2937">all (v4.1: $17,713).</text>
 <rect x="20" y="292" width="1340" height="110" rx="10" fill="#f9fafb" stroke="#d1d5db"/>
 <text x="34" y="322" font-size="18" font-weight="bold" fill="#1f2937">v3.x</text>
 <text x="34" y="344" font-size="12.5" fill="#6b7280">Agent</text>
@@ -79,6 +81,6 @@
 <text x="830" y="364" font-size="12" fill="#6b7280">binding.</text>
 <text x="1000" y="316" font-size="12" fill="#1f2937">Same two seeds: 4 of 16 upcoders found, 0 honest</text>
 <text x="1000" y="332" font-size="12" fill="#1f2937">accused; 9 honest providers asked for charts. Agent,</text>
-<text x="1000" y="348" font-size="12" fill="#1f2937">same seeds: 10 of 80 found, 0 honest accused, $7,426</text>
-<text x="1000" y="364" font-size="12" fill="#1f2937">in all.</text>
+<text x="1000" y="348" font-size="12" fill="#1f2937">same seeds: 30 of 36 such providers demanded from,</text>
+<text x="1000" y="364" font-size="12" fill="#1f2937">$372,114 in all.</text>
 </svg>

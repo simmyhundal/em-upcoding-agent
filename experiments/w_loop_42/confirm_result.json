@@ -1,0 +1,22 @@
+{
+ "n": 100,
+ "W4.2_mean": 35079.91333170708,
+ "W4.2_median": 32066.769758943145,
+ "W4.1_mean": 1479.0185441947133,
+ "W4.1_median": -83.41442307692307,
+ "diff_mean": 33600.89478751236,
+ "diff_sd": 20838.997784032035,
+ "p": 0.0,
+ "wins": 95,
+ "above_zero_W4.2": 97,
+ "above_zero_W4.1": 37,
+ "impossible": 321,
+ "lane_right": 277,
+ "lane_wrong": 0,
+ "criteria": {
+  "gain >= +$500 per seed with p < 0.0125": true,
+  "lane demands >= 70% of impossible-day providers": true,
+  "lane takes <= 0.5 providers per seed without impossible-day billing": true
+ },
+ "passed": true
+}

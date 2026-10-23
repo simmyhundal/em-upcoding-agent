@@ -42,7 +42,7 @@
 | Term | Meaning |
 |---|---|
 | Data model | The synthetic data a version was tested on. **Easy** (release 1, data 2.1): clean coding, documentation generated from the true visit level, clone signs planted in the notes. **Hard** (releases 2 to 5, data 2.2): adds honest coding noise (honest providers sometimes bill one level up), group and incident-to billing, truncated diagnoses, claims lag, corrections that change a level, and injected data defects |
-| Recall | Upcoders found out of those planted |
+| Recall | Upcoders found out of those planted (data 4.0 and earlier). On data 4.2 nothing is planted: it is the share of providers whose true overpayment is at least the cost of pursuing them that were sent a demand |
 | Precision | Upcoders found out of all providers called upcoding (found plus honest providers accused) |
 | Net $ per seed | The RL score: the overpayment a records sample supports for the upcoders found (90% lower bound) minus request and false-accusation costs, averaged over the ten seeds. Compare rows within one seed set only; each release has its own ten seeds |
 
@@ -59,6 +59,9 @@
 | [Borderline case](concepts/borderline-case.md) | Best estimate well above the cost of a demand, conservative estimate below it | near-miss, `near_miss` |
 | [Break-even rule](concepts/break-even-rule.md) | No demand when the conservative recovery is below the cost of a demand | demand floor |
 | [Hard rule](concepts/hard-rule.md) | The model cannot override an upcoding call the rules and chart test both support, unless it names a fact the rules cannot see | binding rule |
+| [Volume screen](concepts/volume-screen.md) | Count a provider's visits per service date; 30 or more in a day goes to the claims-data lane | fwa lane, impossible days |
+| [Records not provided](concepts/records-not-provided.md) | A sampled claim the office reports it has no record of counts as overpaid at its paid amount | `NO_RECORD` |
+| [Stratified sample](concepts/stratified-sample.md) | A random sample within one slice of a provider's claims; supports extrapolating to that slice only | stratum |
 | [No-more-requests advice](concepts/no-more-requests.md) | After the first sample and its follow-up, ask for nothing more | STOP advice, stop-after-first-sample |
 
 ## Abbreviations

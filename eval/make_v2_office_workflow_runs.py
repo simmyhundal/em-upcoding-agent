@@ -130,6 +130,9 @@ def run(rid, src, screen, note, version="2.0", tier1_n=None, policy24=None, no_m
         json.dump(office.probe_log, open(os.path.join(ROOT, "experiments", rid, "probe_log.json"), "w"))
     if version == "4.0" and (w40 or {}).get("demand_floor") is not None:
         apply_demand_floor(rid, src, view, office, w40["demand_floor"])
+    if version == "4.0" and (w40 or {}).get("fwa"):                      # workflow v4.2: the claims-data lane (src/fwa_lane.py); needs data 4.2 and office 4.2
+        import fwa_lane
+        fwa_lane.run(rid, src, w40["fwa"], ROOT)
 
 
 def extend_near_misses(rid, src, view, office, flagged_file, opts):

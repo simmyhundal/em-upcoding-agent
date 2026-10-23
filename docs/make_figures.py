@@ -108,7 +108,7 @@ def how_it_works(version):
 
 
 AGENT_ACTIONS = [
-    ("Screen", "Rank providers by risk-adjusted score, priority, eb_ratio_t or eb_upper_t (share billed 99214 or 99215 vs expected), any cutoff.", BLUE),
+    ("Screen", "Rank providers by eb_upper_t (share billed 99214 or 99215 vs expected) or other scores, and count visits billed per day.", BLUE),
     ("Look closer", "Evidence card and peer comparison for one provider: billing mix, complexity, sample claims.", GREEN),
     ("Request charts", "Ask a provider for a random sample first, then a targeted one if needed.", GREEN),
     ("Follow up", "Fix deficiencies (unsigned, missing results), or ask for the EHR audit trail.", GREEN),
@@ -167,19 +167,19 @@ def agent_actions():
     write("agent.svg", "\n".join(s))
 
 
-def workflow_v41():
-    """The fixed workflow (v4.1) under the agent figure in the README: code sets the order; a learned formula decides whom to ask, and a demand needs a recovery worth its staff cost."""
-    W, H = 1000, 400
+def workflow_v42():
+    """The fixed workflow (v4.2) under the agent figure in the README: code sets the order; a learned formula decides whom to ask, a demand needs a recovery worth its staff cost, and a visits-per-day check runs beside the level review."""
+    W, H = 1000, 500
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>', f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
          f'<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="{MUTED}"/></marker>'
          f'<marker id="b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="{ORANGE}"/></marker></defs>',
-         f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">The fixed workflow (v4.1): code sets the order of the steps</text>']
+         f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">The fixed workflow (v4.2): code sets the order of the steps</text>']
     steps = [("Screen", "eb_upper_t: share billed 99214 or 99215 against expected, shrunk for small panels. A list of 4 providers.", BLUE),
-             ("Ask or skip", "A learned formula (fitted on score 4.0) decides whom to ask for charts.", GREEN),
-             ("Request charts", "30 random charts, then one follow-up on any deficiency; one more 30 for a near-miss.", GREEN),
+             ("Request recommendation", "A learned formula decides whom to ask for charts (ASK or SKIP).", GREEN),
+             ("Request charts", "30 random charts, then one follow-up on any deficiency; 30 more once for a borderline case.", GREEN),
              ("Stop", "No second request: the first sample and its follow-up decide.", GREEN),
              ("Rules decide", "Chart rule (looser test: 10% unsupported) and summary rules set the leaning; where silent: inconclusive. No model is called.", GREEN),
-             ("Demand floor", "Demand only if the payer's estimated recovery covers the staff cost of a demand.", GREEN),
+             ("Break-even rule", "Demand only if the conservative recovery estimate covers the staff cost of a demand.", GREEN),
              ("Checks", "Citations and numbers must match the evidence.", GREEN),
              ("PI teams review", "Drafts only. Nothing is sent or decided automatically.", PEOPLE)]
     bw, bh, gap = 205, 118, 28
@@ -200,19 +200,32 @@ def workflow_v41():
     for i in (2, 3):
         x = pos[i][0] + bw / 2
         s.append(f'<path d="M{x} 84 V{pos[i][1] - 2}" stroke="{ORANGE}" stroke-width="2.5" fill="none" marker-start="url(#b)" marker-end="url(#b)"/>')
+    ly = 410                                             # the claims-data lane (workflow v4.2), beside the level review
+    s.append(f'<rect x="30" y="{ly - 30}" width="940" height="108" rx="10" fill="none" stroke="{GREEN}" stroke-width="2" stroke-dasharray="6 4"/>')
+    s.append(f'<text x="44" y="{ly - 10}" font-size="13" font-weight="bold" fill="{INK}">Claims-data lane (new in v4.2): visits billed that never happened</text>')
+    lane = [("Volume screen", "30 or more visits billed by one provider on one day."), ("Sample that day", "30 of its claims on those days, drawn at random; charts requested."),
+            ("No record = overpaid", "A visit the office has no record of counts at its paid amount."), ("Break-even rule", "Demand if the conservative estimate covers the cost.")]
+    for i, (n, body) in enumerate(lane):
+        x = 44 + i * 232
+        s.append(f'<rect x="{x}" y="{ly + 4}" width="212" height="60" rx="8" fill="#f9fafb" stroke="{GREEN}" stroke-width="1.5"/>')
+        s.append(f'<text x="{x + 10}" y="{ly + 22}" font-size="12.5" font-weight="bold" fill="{INK}">{escape(n)}</text>')
+        for j, line in enumerate(textwrap.wrap(body, 34)[:2]):
+            s.append(f'<text x="{x + 10}" y="{ly + 38 + j * 14}" font-size="11" fill="{MUTED}">{escape(line)}</text>')
+        if i < 3:
+            s.append(f'<path d="M{x + 212} {ly + 34} L{x + 232} {ly + 34}" stroke="{MUTED}" stroke-width="1.5" marker-end="url(#a)" fill="none"/>')
     s.append("</svg>")
     write("workflow.svg", "\n".join(s))
 
 
 def score_waterfall():
-    """How score 4.0 is built for agent v5.0 on the ten fresh seeds, dollars summed over the seeds: recovery, staff cost, abrasion, net score. The explanation is text in the README (release_table.score_text)."""
+    """How score 4.2 is built for agent v5.2 on the ten test seeds, dollars summed over the seeds: recovery, staff cost, abrasion, net score. The explanation is text in the README (release_table.score_text)."""
     import release_table
-    w = release_table.score_parts("A5.1")
+    w = release_table.score_parts_42("A5.2")
     n = w["n"]
     per = lambda x: x
     W, H = 1000, 280
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>', f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
-         f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">What sets the score: agent v5.1, ten test seeds, dollars summed over the seeds</text>']
+         f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">What sets the score: agent v5.2, ten test seeds, dollars summed over the seeds</text>']
     top, bottom = 50, 220
     bars = [("Recovery", per(w["recovery"]), GREEN), ("Staff cost", -per(w["staff"]), ORANGE), ("Abrasion", -per(w["abrasion"]), ORANGE), ("Net score", per(w["score"]), BLUE)]
     low = per(w["score"])
@@ -325,13 +338,13 @@ def progression_cells(rows=None):
 def progression():
     """One slide: how it works over time, as a table with icons and headline eval results."""
     cells = progression_cells()
-    ev = {"v1.x": cells["v1.0"], "v2.x": cells["v2.0"] + " " + cells["v4.1"], "v3.x": cells["v3.0"] + " " + cells["v5.1"]}
+    ev = {"v1.x": cells["v1.0"], "v2.x": cells["v2.0"] + " " + cells["v4.2"], "v3.x": cells["v3.0"] + " " + cells["v5.2"]}
     cols = [("data", "Claims"), ("screen", "Screen"), ("records", "Charts"), ("write", "Summaries"), ("decide", "Who decides"),
             ("eval", "Headline results")]
     rows = [("v1.x", "Fixed workflow", ["Provider, patient and claim tables with a stored condition count.", "Top 25 by statistics. Fixed.",
                                       "A sample handed to the AI up front.", "The AI writes it all: facts, citations, next steps.", "Code, in a fixed order."]),
             ("v2.x", "Fixed workflow", ["Plan-shaped claims; conditions derived from them. Harder data from v2.2; data 4.0 (habits) from v4.0.", "eb_ratio_t, top 10% of providers (v2.0: suspicion 5 or higher); eb_upper_t from v4.0.",
-                                      "Learned ask-or-skip, 30 random charts, one follow-up. v4.1: a list of 4, one near-miss extension.", "Code writes the facts and decides; no model from v2.5.",
+                                      "Learned ask-or-skip, 30 random charts, one follow-up. v4.1: list of 4, a second sample for borderline cases. v4.2: a visits-per-day check.", "Code writes the facts and decides; no model from v2.5.",
                                       "Code, with formulas fitted on net dollars; v4.0 adds a demand floor."]),
             ("v3.x", "Agent", ["Same as v2.x.", "A tool the agent runs with any cutoff, eb_upper_t from v5.0; v5.1 advises on 4.", "The agent chooses whom to ask, what sample, and whether to follow up; advice arrives in the tool results.",
                               "The agent submits findings; code adds facts and checks.", "The agent, within caps; an upcoding call the chart rule supports is binding."])]
@@ -578,7 +591,7 @@ if __name__ == "__main__":
     os.makedirs(os.path.join(ROOT, "docs", "images"), exist_ok=True)
     pipeline()
     agent_actions()
-    workflow_v41()
+    workflow_v42()
     score_waterfall()
     mlr_headroom()
     progression()

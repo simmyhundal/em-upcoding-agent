@@ -30,7 +30,7 @@ def replay(run_id, code_run, version="3.0"):
     for line in open(os.path.join(out, "audit.jsonl")):
         a = json.loads(line)
         args = a["args"]
-        if version == "5.1" and a["tool"] == "request_records" and a.get("result", "").startswith('{"error"'):
+        if version in ("5.1", "5.2") and a["tool"] == "request_records" and a.get("result", "").startswith('{"error"'):
             continue                                # agent v5.1 refuses some requests itself (extension gate, budget); those never reached the office, so they are not replayed
         if a["tool"] == "request_records":
             office.send_request(args["provider_id"], args["sample"], args.get("deadline_days", provider_sim.DEFAULT_DEADLINE))
@@ -38,6 +38,11 @@ def replay(run_id, code_run, version="3.0"):
             office.follow_up(args["provider_id"], args["addressed_codes"], claim_ids=args.get("claim_ids"))
         elif a["tool"] == "close_records":
             office.close_request(args["provider_id"], args.get("reason", ""))
+        elif a["tool"] == "request_stratum" and not a.get("result", "").startswith('{"error"'):          # agent v5.2: the claims-data lane replays through the same shared code
+            import fwa_lane
+            rows = [r for r in csv.DictReader(open(os.path.join(base, "claims.csv"))) if r["provider_id"] == args["provider_id"]]
+            _p, _top, hot = fwa_lane.flag({args["provider_id"]: rows}, fwa_lane.DAY_MAX, 1)[0]
+            fwa_lane.review(office, args["provider_id"], rows, hot, seed=1, persist=fwa_lane.PERSIST)
         elif a["tool"] == "request_audit_trail":
             office.request_audit_trail(args["provider_id"], args.get("claim_ids", []))
     logged = {}
@@ -77,7 +82,7 @@ def main(run_id, code_run, version="3.0", llm_judge=None):
     """llm_judge None: the LLM judge for 3.0 and 3.1 (as run); 3.2 skips it and only builds the view the rule judge reads (issues 92 and 93)."""
     view = build_view(run_id, code_run, version)
     if llm_judge is None:
-        llm_judge = version not in ("3.2", "3.3", "3.4", "3.5", "5.0", "5.1")
+        llm_judge = version not in ("3.2", "3.3", "3.4", "3.5", "5.0", "5.1", "5.2")
     if not llm_judge:
         print(run_id, "view rebuilt; no LLM judge")
         return
