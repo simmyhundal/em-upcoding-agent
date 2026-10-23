@@ -4,6 +4,8 @@
 
 How a release of this project is run, so it can continue with little input from Simmy. Written 2026-10-22 from the v4.0 to v5.1 cycle. To run the whole cycle in a new session, use the command **`/run-release`** (the skill in `.claude/skills/run-release/SKILL.md` reads this page and CLAUDE.md and follows it).
 
+The command **`/run-release`** takes an argument: `/run-release paid cap=5` grants Simmy's standing approval to run the paid step without stopping, up to $5 for the release (any cap), and to keep going until the release is done or the session limit is reached; without `paid` the run stops at the paid run to ask. See the skill.
+
 A release Y pairs data 4.Y, workflow v4.Y, agent v5.Y and a score version S4.Y that is fixed before the work starts. Short names: S4.x score, D4.x data, W4.x workflow, A5.x agent (see the [glossary](glossary.md)).
 
 ## The steps
@@ -21,13 +23,13 @@ A release Y pairs data 4.Y, workflow v4.Y, agent v5.Y and a score version S4.Y t
 - **Run the control for any mechanical gain.** A shorter list, fewer charts or no asks are acceptable ways to raise the score, but the same saving applied to the baseline (for example H8 with a 4-provider list) must be run, so the gain is split into what is mechanical and what is better asking.
 - Write the result of each hypothesis in `docs/w_loop_v4*.md`, comment on the issue, and merge docs and result files.
 
-**4. Freeze and test.** Write a freeze declaration (`docs/w41_freeze.md` is the template) before any run on the test seeds: what is frozen, the seeds, the arms, the comparisons and the pass criterion ("marked improvement": a stated dollar gain per seed and a p-value). Run the frozen workflow once on the new test seeds, against the **stored** result of the previous workflow (never re-run an earlier arm) and its same-list control. If it misses the criterion, reopen the core stories; **a reopen spends test seeds**, so decide in advance how many attempts are allowed and allocate new test seeds for each.
+**4. Freeze and the final development run.** Write a freeze declaration (`docs/w41_freeze.md` is the template) before the run: what is frozen, the seeds, the arms, the comparisons and the pass criterion ("marked improvement": a stated dollar gain per seed and a p-value). Then run the frozen workflow, **the previous release's workflow arm and the same-list control, all freshly (they are free)**, on the previous release's test seeds. Those seeds were burned by the last release's test, so this is the *final development run*, not a test. If the frozen workflow misses the criterion, reopen the core stories (a reopen costs nothing here because no fresh seed was spent).
 
 **5. Agent at parity.** Build the agent arm to mirror the frozen workflow in its tools. Report parity from a scripted agent that follows the advice, on development seeds only (same asks, same calls, same score, as match rates), and a cost estimate for the paid run from the previous agent's recorded usage.
 
-**6. Run the agent on the test seeds.** The only step that costs money: show the estimate and the cap, get Simmy's approval, then run once. Compare it with the workflow and with the stored results of the other arms. The previous agent is compared indirectly, through the previous workflow that was run on the same seeds for free (the project is price sensitive); the previous agent's own stored result is used if its seeds are the same, and it is never re-run.
+**6. The true test on fresh seeds.** Generate the release's test pool (ten seeds nobody has run; the registry's reserved pool), then run on it **once**: the frozen workflow, the previous release's workflow and the control (free), and the agent (the only step that costs money: state the estimate and the cap, get Simmy's approval or use the standing approval of `/run-release paid`, then run once). Compare the workflow with the previous workflow and the control, and the agent with the workflow. The previous *agent* is never re-run: it is compared indirectly, through the previous workflow that was run on the same seeds (the project is price sensitive). Earlier *workflow* arms are always re-run on new seeds; earlier *agent* runs never are. After the test the pool is burned and a new reserved pool is allocated in the next release's step 1.
 
-**7. Close out.** Update the README table and summary, the figures (progression slide, workflow and agent figures, waterfall), `docs/versioning.md`, the results pages and the seed registry; write the release notes; **tag and publish the GitHub releases**; clean up the milestone and issues; record in the decision log; note what each hypothesis taught so the next cycle starts from it. Step 7 of one cycle is the start of the next.
+**7. Close out and reflect.** Update the README table and summary, the figures (progression slide, workflow and agent figures, waterfall), `docs/versioning.md`, the results pages and the seed registry; write the release notes; **tag and publish the GitHub releases**; clean up the milestone and issues; record in the decision log; note what each hypothesis taught. Then a point of deeper reflection: **what are the deepest flaws in our current system?** Write the answer in `docs/reflection_<release>.md` (the data, the score and its assumptions, the statistics and seed use, the arms, the process, the product): what is by construction, what is unverified, what a sceptic would attack, and what we are not measuring. These flaws seed the next release's step 1 (file an issue for each one worth fixing). Step 7 of one cycle is the start of the next.
 
 ## Who decides what
 
@@ -35,7 +37,7 @@ Decided 2026-10-22 so work can continue when Simmy is busy.
 
 **Autonomous (do it, then log it in [decision_log.md](decision_log.md)):** free runs and analysis; docs, notes and issues; opening and merging pull requests when the tests pass; **merging edits that touch frozen-version code paths** (refactors and new options, as long as the frozen version still reproduces: its tests and a replay pass); **tagging and publishing GitHub releases**; milestone and issue cleanup; building the next arm.
 
-**Ask first:** a **paid run** (state the estimate and the cap first); deleting a repository or a branch other than a merged branch; anything Simmy has asked to hold.
+**Ask first:** a **paid run** (state the estimate and the cap first), unless the command was given with `paid` (then spend up to its cap and log the estimate and cost); deleting a repository or a branch other than a merged branch; anything Simmy has asked to hold.
 
 **Never:** changing a tagged version's results (a frozen version is reproduced by hash and by replay; behaviour changes go behind a new version flag, as CLAUDE.md says), reading the answer key in an arm or its tools, tuning on a test seed and calling it held out, generating or running the reserved pool before the freeze, printing or committing the key in `.env`.
 
