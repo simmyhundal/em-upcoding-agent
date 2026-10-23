@@ -48,8 +48,9 @@ def main(run_id, code_run, screen=True, max_usd=None, records_budget=15, max_too
     view = os.path.join(data, "view")
     key = json.load(open(os.path.join(ROOT, "eval", "answer_key", f"ground_truth_v2_{code_run}.json")))["providers"]
     roles = {p: v["role"] for p, v in key.items()}
+    office = agent_tools.make_office(data, view, version, seed=1, correlation=correlation, roles=roles)         # roles stay out of the environment; the office keeps them only when correlation > 0
     env = agent_tools.Environment(data, view, seed=1, model_call=model_call if use_model else None, records_budget=records_budget,
-                                  screen_enabled=screen, correlation=correlation, roles=roles, version=version)
+                                  screen_enabled=screen, office=office, version=version)
     n_prov, n_claims = len(env.claims), sum(len(v) for v in env.claims.values())
     start_text = "Start by screening the claims." + (f" Begin with screen_providers using method {screen_method}" + (f" and top_pct {top_pct}" if top_pct else "") +
                                                       "; you may change it." if screen_method else "")

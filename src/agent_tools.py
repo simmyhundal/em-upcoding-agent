@@ -44,13 +44,23 @@ def _doc_entry(row):
 ROUND_COPY_USD, ROUND_BURDEN_USD = 90.0, 43.84       # per round: copying fees (CMS Transmittal 786) and burden on an honest practice (Premier 2022); see eval/dollar_reward.py
 
 
+def make_office(v2_dir, view_dir, version="3.0", seed=1, correlation=0.0, roles=None):
+    """The simulated provider office for an agent of the given version (office 2.1 from agent v3.1 on, 2.0 before). Built OUTSIDE `Environment` and passed in, so the agent's environment
+    never holds the answer key's roles (issue 100). `roles` ({provider_id: role}) is used by the office only to draw hidden behavior when correlation > 0 (a test, never in evaluations);
+    at correlation 0 it is dropped here and the office never receives it."""
+    return provider_sim.Office(v2_dir, view_dir, seed=seed, correlation=correlation, roles=roles if correlation > 0 else None,
+                               version="2.1" if version in ("3.1", "3.2", "3.3", "3.4", "3.5", "5.0") else "2.0")
+
+
 class Environment:
     def __init__(self, v2_dir, view_dir, seed=1, model_call=None, records_budget=15, screen_enabled=True,
-                 correlation=0.0, roles=None, version="3.0"):
+                 office=None, version="3.0"):
         """model_call(system, user) -> (json_text, usd) is used only inside hybrid_review and draft_summary; None = never call a model.
         version "3.1" adds the note package (data v2.1): charts carry notes, a second request is allowed (random first, targeted after),
         and the note_checks and request_audit_trail tools exist. "3.2" is 3.1 plus the data-quality pre-flight, the read-only data_quality tool and
-        flag_data_issue (issue 81). "3.0" is the frozen agent."""
+        flag_data_issue (issue 81). "3.0" is the frozen agent.
+        office: a simulated provider office built by `make_office` (the caller owns it; any answer-key roles for a correlation test go there, never here). None builds the default office
+        (correlation 0, no roles), which is what every evaluation uses."""
         self.v31 = version in ("3.1", "3.2", "3.3", "3.4", "3.5", "5.0")
         self.v32 = version in ("3.2", "3.3", "3.4", "3.5", "5.0")
         self.v33 = version in ("3.3", "3.4", "3.5", "5.0")
@@ -99,7 +109,7 @@ class Environment:
                     self.docs[r["claim_id"]] = _doc_entry(r)
                     self.facts[r["claim_id"]] = int(r["documented_data_level"])
         self.stats = self._provider_stats() if self.v31 else {}
-        self.office = provider_sim.Office(v2_dir, view_dir, seed=seed, correlation=correlation, roles=roles, version="2.1" if self.v31 else "2.0")
+        self.office = office if office is not None else make_office(v2_dir, view_dir, version, seed=seed)
         self.requested = set()
         self.spent_usd = 0.0
         self.findings = {}
