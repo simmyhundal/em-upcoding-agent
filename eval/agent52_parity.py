@@ -100,7 +100,7 @@ if __name__ == "__main__":
     for seed in seeds:
         env, a_asked, a_ext, a_called, a_lane, a_dem, res = scripted(seed)
         w_asked, w_called, w_lane, w_dem, w_sc = workflow(seed)
-        ca4 = agent_score(env, f"d42_{seed}", a_called | a_dem, 4 + len(a_lane))
+        ca4 = agent_score(env, f"d42_{seed}", a_called | a_dem, 4)
         eq = (a_asked == w_asked, a_called == w_called, a_lane == w_lane, a_dem == w_dem, abs(ca4["score"] - w_sc["score"]) < max(100.0, 0.01 * abs(w_sc["score"])))
         for name, v in zip(("asked", "called", "lane", "demands", "score"), eq):
             tot[name] += v

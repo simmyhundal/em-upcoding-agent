@@ -13,6 +13,7 @@ OLD_SLUGS = ["workflow-and-agent", "shortlist", "request-recommendation", "triag
 OLD = ["near-miss", "demand floor", "narrow binding rule", "ask-or-skip", "stop-after-first-sample", "(?<!short)listed provider"]
 OUTSIDE_PAGES = {"docs/agent_v51.md": OLD_SLUGS,
                  "docs/score_42.md": ["records-not-provided", "stratified-sample"],
+                 "docs/agent_v52.md": ["workflow-and-agent", "volume-screen", "stratified-sample", "conservative-estimate", "records-not-provided", "break-even-rule"],
                  "docs/w42_freeze.md": ["volume-screen", "stratified-sample", "records-not-provided", "conservative-estimate", "break-even-rule"]}
 
 
