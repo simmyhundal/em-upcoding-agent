@@ -1003,11 +1003,11 @@
     {
      "arm": "A5.1",
      "role": "test",
-     "date": null,
-     "reference": "docs/w41_freeze.md; issue 135",
-     "note": "not run yet: agent v5.1 is planned to mirror W4.1 (issue 135); it would be a second use; paid, needs an estimate and approval",
+     "date": "2026-10-22",
+     "reference": "docs/a51_fresh_result.md; issue 135",
+     "note": "run once, second use of the agent line on these seeds (A5.0 was the first); paid: $1.242 for ten runs under a $4 cap, approved by Simmy after the $1.7 estimate (docs/a51_fresh_result.md)",
      "second_use": true,
-     "done": false
+     "done": true
     }
    ]
   },
