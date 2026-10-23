@@ -85,10 +85,25 @@ def main():
     L.append(f"| Oracle with triage (rate-weighted / dollar-weighted abrasion) | ${o_s:,.0f} / ${o_d:,.0f} | | ${st.mean(orc[s]['s40']['recovered'] for s in SEEDS):,.0f} / ${st.mean(orc[s]['dollar']['recovered'] for s in SEEDS):,.0f} | "
              f"${st.mean(orc[s]['s40']['cost'] for s in SEEDS):,.0f} / ${st.mean(orc[s]['dollar']['cost'] for s in SEEDS):,.0f} | ${st.mean(orc[s]['s40']['abrasion'] for s in SEEDS):,.0f} / ${st.mean(orc[s]['dollar']['abrasion'] for s in SEEDS):,.0f} | "
              f"{st.mean(orc[s]['s40']['pursued'] for s in SEEDS):.1f} / {st.mean(orc[s]['dollar']['pursued'] for s in SEEDS):.1f} | | |")
-    L += ["", "Score over oracle score (rate-weighted score 4.0 / dollar-weighted): " + "; ".join(f"{arm} {mean(arm, 'score_s40') / o_s:.0%} / {mean(arm, 'score_dollar') / o_d:.0%}" for arm in ref.ARMS) + ".", "",
+    sc = {a: [res[a][str(s)]["score_s40"] for s in SEEDS] for a in ref.ARMS}
+    best = {a: max(range(20), key=lambda j: sc[a][j]) for a in ref.ARMS}
+    L += ["", "**How much one seed carries.** Score 4.0 per seed, rate-weighted:", "", "| Arm | Mean | Median | Seeds above zero | Mean without the best seed | Best seed |", "|---|---|---|---|---|---|"]
+    for a in ref.ARMS:
+        rest = [x for j, x in enumerate(sc[a]) if j != best[a]]
+        L.append(f"| {a} | ${st.mean(sc[a]):,.0f} | ${st.median(sc[a]):,.0f} | {sum(x > 0 for x in sc[a])} of 20 | ${st.mean(rest):,.0f} | {SEEDS[best[a]]}: ${sc[a][best[a]]:,.0f} |")
+    L += ["", "A positive mean here is one seed: the best seed has a provider at the maximum panel size with a 37% systematic habit and $26,000 of true overpayment, and both W4.0 and W4.1 recover $19,000 of it. Read the median and the count of seeds above zero first.", "",
+          "**Spread of the paired differences** (re-measured on the first 20 seeds as the release plan asks; issue #185). Seeds needed to detect a difference of $300 per seed with 80% power, one-sided, at the 0.05 level and at the 0.005 level, from the standard deviation of the per-seed differences:", "",
+          "| Difference | Mean | SD of per-seed differences | Seeds for $300 at 0.05 | Seeds for $300 at 0.005 |", "|---|---|---|---|---|"]
+    for a, b in (("W4.1", "W4.0"), ("W4.0", "W2.5")):
+        diffs = [x - y for x, y in zip(sc[a], sc[b])]
+        sd = st.stdev(diffs)
+        L.append(f"| {a} minus {b} | ${st.mean(diffs):+,.0f} | ${sd:,.0f} | {((1.645 + 0.842) * sd / 300) ** 2:,.0f} | {((2.576 + 0.842) * sd / 300) ** 2:,.0f} |")
+    L += ["", "The release plan's figure for data 4.0 was a spread of $800 to $1,300 and about 100 seeds for $300 at 0.05.", "",
+          "Score over oracle score (rate-weighted score 4.0 / dollar-weighted): " + "; ".join(f"{arm} {mean(arm, 'score_s40') / o_s:.0%} / {mean(arm, 'score_dollar') / o_d:.0%}" for arm in ref.ARMS) + ".", "",
           "The oracle (as `eval/ceiling_benchmarks_41.py`, now with the abrasion term it lacked) knows every provider's true overpayment and chart-sample expectation and pays the same costs a tuned arm pays, triage included; "
-          "it pursues a provider at its best sample size (30, 60, 90 or 150 charts) only when the expected 90% lower bound beats ask cost, triage and abrasion. **It is an upper bound for chart-based recovery, not a target**: "
-          "it uses the answer key, and a chart sample can never reach the fraud, waste and abuse dollars (by construction).", "",
+          "it pursues a provider at its best sample size (30, 60, 90 or 150 charts) only when the expected 90% lower bound beats ask cost, triage and abrasion. **It is an expected-value ceiling for chart-based recovery, not a bound on one seed and not a target**: "
+          "it uses the answer key and the expectation over six random samples, so an arm's single sample can land above it (on seed 1408 W4.0 and W4.1 recover $19,100 where the oracle's expectation is $18,500, and the arms' charts carry coder noise the oracle does not read), "
+          "and score over oracle is not capped at 100%. A chart sample can never reach the fraud, waste and abuse dollars (by construction).", "",
           "Per seed (rate-weighted score 4.0):", "", "| Seed | " + " | ".join(ref.ARMS) + " | Oracle | Available dollars | Providers justified (m = 1) |", "|---|" + "---|" * (len(ref.ARMS) + 3)]
     for s in SEEDS:
         r = res["W4.0"][str(s)]

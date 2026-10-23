@@ -16,9 +16,28 @@ The pursuit cost used for the dollar threshold is **$758** per provider (30 char
 | Zero (do nothing) | $0 | $0 | $0 | $0 | $0 / $0 | 0 | 0 | 0 |
 | Oracle with triage (rate-weighted / dollar-weighted abrasion) | $4,917 / $5,010 | | $7,516 / $7,785 | $2,563 / $2,776 | $36 / $0 | 2.2 / 2.5 | | |
 
+**How much one seed carries.** Score 4.0 per seed, rate-weighted:
+
+| Arm | Mean | Median | Seeds above zero | Mean without the best seed | Best seed |
+|---|---|---|---|---|---|
+| W2.5 | $-11,254 | $-11,138 | 0 of 20 | $-11,533 | 1556: $-5,947 |
+| W4.0 | $-113 | $-944 | 1 of 20 | $-1,027 | 1408: $17,243 |
+| W4.1 | $399 | $-498 | 4 of 20 | $-451 | 1408: $16,541 |
+
+A positive mean here is one seed: the best seed has a provider at the maximum panel size with a 37% systematic habit and $26,000 of true overpayment, and both W4.0 and W4.1 recover $19,000 of it. Read the median and the count of seeds above zero first.
+
+**Spread of the paired differences** (re-measured on the first 20 seeds as the release plan asks; issue #185). Seeds needed to detect a difference of $300 per seed with 80% power, one-sided, at the 0.05 level and at the 0.005 level, from the standard deviation of the per-seed differences:
+
+| Difference | Mean | SD of per-seed differences | Seeds for $300 at 0.05 | Seeds for $300 at 0.005 |
+|---|---|---|---|---|
+| W4.1 minus W4.0 | $+512 | $1,021 | 72 | 135 |
+| W4.0 minus W2.5 | $+11,141 | $4,971 | 1,698 | 3,208 |
+
+The release plan's figure for data 4.0 was a spread of $800 to $1,300 and about 100 seeds for $300 at 0.05.
+
 Score over oracle score (rate-weighted score 4.0 / dollar-weighted): W2.5 -229% / -199%; W4.0 -2% / -2%; W4.1 8% / 8%.
 
-The oracle (as `eval/ceiling_benchmarks_41.py`, now with the abrasion term it lacked) knows every provider's true overpayment and chart-sample expectation and pays the same costs a tuned arm pays, triage included; it pursues a provider at its best sample size (30, 60, 90 or 150 charts) only when the expected 90% lower bound beats ask cost, triage and abrasion. **It is an upper bound for chart-based recovery, not a target**: it uses the answer key, and a chart sample can never reach the fraud, waste and abuse dollars (by construction).
+The oracle (as `eval/ceiling_benchmarks_41.py`, now with the abrasion term it lacked) knows every provider's true overpayment and chart-sample expectation and pays the same costs a tuned arm pays, triage included; it pursues a provider at its best sample size (30, 60, 90 or 150 charts) only when the expected 90% lower bound beats ask cost, triage and abrasion. **It is an expected-value ceiling for chart-based recovery, not a bound on one seed and not a target**: it uses the answer key and the expectation over six random samples, so an arm's single sample can land above it (on seed 1408 W4.0 and W4.1 recover $19,100 where the oracle's expectation is $18,500, and the arms' charts carry coder noise the oracle does not read), and score over oracle is not capped at 100%. A chart sample can never reach the fraud, waste and abuse dollars (by construction).
 
 Per seed (rate-weighted score 4.0):
 
