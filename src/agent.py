@@ -116,6 +116,19 @@ Two things are done by code. A demand goes out only when the estimated recovery 
 the two writing defects the rule judge deducts for (a headline figure the rationale never states, a repeated sentence) without changing your leaning."""
 
 
+SYSTEM_51 = SYSTEM_50 + """
+
+Version 5.1 additions (workflow v4.1, same score 4.0). Three things change, and everything else above stands.
+1. The list is shorter. Workflow v4.1 works from the first 4 providers of the eb_upper_t ranking only. screen_providers (method eb_upper_t, top_pct 10) still shows the top 10%, but ask_advice is ASK or SKIP for
+the first 4 and SKIP for every other row. Triage costs about $13 for each provider you submit a finding for, so submit findings for the providers you asked and put the others in set_aside.
+2. The chart test is looser. hybrid_review (rules 4.0 with the 99214 and 99215 charts pooled) now calls a provider upcoding from 5 documented charts, when at least 10% of them support a lower level than billed and the
+excess beats the peer rate at the 20% level (it was 10 charts, 25%, 5%). It calls more providers, so the demand floor matters: a call whose recovery cannot cover the cost of a demand is still withdrawn by code.
+3. A near-miss gets one more sample. For a provider that hybrid_review calls upcoding, its result carries demand_check: the point estimate of the recovery from the random sample, its 90% lower bound and the cost of a
+demand (about $276). If the point estimate is at least twice the cost of a demand while the lower bound is below it (near_miss true), request 30 more random charts once (request_records with a random sample of 30;
+follow up on any deficiency), run hybrid_review again and stop. A second round costs about $105 and each chart about $8.60, so the extension costs about $360 to $480; the tool refuses it for anyone who is not a
+near-miss and for a second extension. Do not send targeted requests or audit trails: they did not pay. The rules and the demand floor still decide the demand; the binding rule of version 3.5 stands."""
+
+
 def _cost(usage, price=(4.00, 20.00)):
     inp = getattr(usage, "input_tokens", 0) or 0
     out = getattr(usage, "output_tokens", 0) or 0
@@ -143,7 +156,7 @@ def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=M
             reason = "dollar cap"
             break
         turn += 1
-        resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_50 if getattr(env, 'v50', False) else SYSTEM_35 if getattr(env, 'v35', False) else SYSTEM_34 if getattr(env, 'v34', False) else SYSTEM_33 if getattr(env, 'v33', False) else SYSTEM_32 if getattr(env, 'v32', False) else SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
+        resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_51 if getattr(env, 'v51', False) else SYSTEM_50 if getattr(env, 'v50', False) else SYSTEM_35 if getattr(env, 'v35', False) else SYSTEM_34 if getattr(env, 'v34', False) else SYSTEM_33 if getattr(env, 'v33', False) else SYSTEM_32 if getattr(env, 'v32', False) else SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
                                       output_config={"effort": effort}, extra_body={"cache_control": {"type": "ephemeral"}})
         usd += _cost(resp.usage) * price_scale
         if getattr(env, "v32", False):
