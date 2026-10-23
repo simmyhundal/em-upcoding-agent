@@ -23,7 +23,7 @@ import score_40 as s4  # noqa: E402
 P = r4.PARAMS
 NS = (30, 60, 90, 150)
 SEEDS = [s for t in range(5, 11) for s in dp.BATCHES[t - 1]]
-CH, RD, DM = (r4.staff_cost(*a, P)[0] for a in ((0, 0, 1, 0, 0), (0, 1, 0, 0, 0), (0, 0, 0, 1, 0)))
+CH, RD, DM, TRIAGE = (r4.staff_cost(*a, P)[0] for a in ((0, 0, 1, 0, 0), (0, 1, 0, 0, 0), (0, 0, 0, 1, 0), (1, 0, 0, 0, 0)))
 
 
 def ask_cost(n):
@@ -91,7 +91,8 @@ def main():
     for n in NS:
         k = sum(1 for x in per[n] if x > ask_cost(n))
         net = sum(max(x - ask_cost(n), 0) for x in per[n])
-        rows.append((f"Oracle: only the {k} worth pursuing, {n} charts", net + k * ask_cost(n), k * ask_cost(n), net))
+        tri = k * TRIAGE                      # the oracle lists, and so triages, the providers it pursues (Simmy, 2026-10-22: an oracle pays the same score costs as a tuned arm)
+        rows.append((f"Oracle: only the {k} worth pursuing, {n} charts (triage included)", net + k * ask_cost(n), k * ask_cost(n) + tri, net - tri))
     for lab, name in (("Workflow v4.0 (H8), actual", "H8"), ("W4.1 candidate (H23, N = 4), actual", "H23_n4")):
         d = json.load(open(os.path.join(ROOT, "experiments", "w_loop", f"{name}.json")))
         rows.append((lab, sum(d[str(s)]["recovered"] for s in SEEDS), sum(d[str(s)]["staff_cost"] + d[str(s)]["abrasion"] for s in SEEDS), sum(d[str(s)]["score"] for s in SEEDS)))

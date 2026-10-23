@@ -167,18 +167,18 @@ def agent_actions():
     write("agent.svg", "\n".join(s))
 
 
-def workflow_v40():
-    """The fixed workflow (v4.0) under the agent figure in the README: code sets the order; a learned formula decides whom to ask, and a demand needs a recovery worth its staff cost."""
+def workflow_v41():
+    """The fixed workflow (v4.1) under the agent figure in the README: code sets the order; a learned formula decides whom to ask, and a demand needs a recovery worth its staff cost."""
     W, H = 1000, 400
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>', f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
          f'<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="{MUTED}"/></marker>'
          f'<marker id="b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="{ORANGE}"/></marker></defs>',
-         f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">The fixed workflow (v4.0): code sets the order of the steps</text>']
-    steps = [("Screen", "eb_upper_t: share billed 99214 or 99215 against expected, shrunk for small panels. Top 10% of providers.", BLUE),
+         f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">The fixed workflow (v4.1): code sets the order of the steps</text>']
+    steps = [("Screen", "eb_upper_t: share billed 99214 or 99215 against expected, shrunk for small panels. A list of 4 providers.", BLUE),
              ("Ask or skip", "A learned formula (fitted on score 4.0) decides whom to ask for charts.", GREEN),
-             ("Request charts", "30 random charts, then one follow-up on any deficiency.", GREEN),
+             ("Request charts", "30 random charts, then one follow-up on any deficiency; one more 30 for a near-miss.", GREEN),
              ("Stop", "No second request: the first sample and its follow-up decide.", GREEN),
-             ("Rules decide", "Chart rule and summary rules (4.0) set the leaning; where silent: inconclusive. No model is called.", GREEN),
+             ("Rules decide", "Chart rule (looser test: 10% unsupported) and summary rules set the leaning; where silent: inconclusive. No model is called.", GREEN),
              ("Demand floor", "Demand only if the payer's estimated recovery covers the staff cost of a demand.", GREEN),
              ("Checks", "Citations and numbers must match the evidence.", GREEN),
              ("PI teams review", "Drafts only. Nothing is sent or decided automatically.", PEOPLE)]
@@ -207,12 +207,12 @@ def workflow_v40():
 def score_waterfall():
     """How score 4.0 is built for agent v5.0 on the ten fresh seeds, dollars summed over the seeds: recovery, staff cost, abrasion, net score. The explanation is text in the README (release_table.score_text)."""
     import release_table
-    w = release_table.score_parts("A5.0")
+    w = release_table.score_parts("A5.1")
     n = w["n"]
     per = lambda x: x
     W, H = 1000, 280
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>', f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
-         f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">What sets the score: agent v5.0, ten fresh seeds, dollars summed over the seeds</text>']
+         f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">What sets the score: agent v5.1, ten test seeds, dollars summed over the seeds</text>']
     top, bottom = 50, 220
     bars = [("Recovery", per(w["recovery"]), GREEN), ("Staff cost", -per(w["staff"]), ORANGE), ("Abrasion", -per(w["abrasion"]), ORANGE), ("Net score", per(w["score"]), BLUE)]
     low = per(w["score"])
@@ -325,15 +325,15 @@ def progression_cells(rows=None):
 def progression():
     """One slide: how it works over time, as a table with icons and headline eval results."""
     cells = progression_cells()
-    ev = {"v1.x": cells["v1.0"], "v2.x": cells["v2.0"] + " " + cells["v4.0"], "v3.x": cells["v3.0"] + " " + cells["v5.0"]}
+    ev = {"v1.x": cells["v1.0"], "v2.x": cells["v2.0"] + " " + cells["v4.1"], "v3.x": cells["v3.0"] + " " + cells["v5.1"]}
     cols = [("data", "Claims"), ("screen", "Screen"), ("records", "Charts"), ("write", "Summaries"), ("decide", "Who decides"),
             ("eval", "Headline results")]
     rows = [("v1.x", "Fixed workflow", ["Provider, patient and claim tables with a stored condition count.", "Top 25 by statistics. Fixed.",
                                       "A sample handed to the AI up front.", "The AI writes it all: facts, citations, next steps.", "Code, in a fixed order."]),
             ("v2.x", "Fixed workflow", ["Plan-shaped claims; conditions derived from them. Harder data from v2.2; data 4.0 (habits) from v4.0.", "eb_ratio_t, top 10% of providers (v2.0: suspicion 5 or higher); eb_upper_t from v4.0.",
-                                      "Learned ask-or-skip, 30 random charts, one follow-up; v4.0 stops there.", "Code writes the facts and decides; no model from v2.5.",
+                                      "Learned ask-or-skip, 30 random charts, one follow-up. v4.1: a list of 4, one near-miss extension.", "Code writes the facts and decides; no model from v2.5.",
                                       "Code, with formulas fitted on net dollars; v4.0 adds a demand floor."]),
-            ("v3.x", "Agent", ["Same as v2.x.", "A tool the agent runs with any cutoff, eb_upper_t from v5.0.", "The agent chooses whom to ask, what sample, and whether to follow up; advice arrives in the tool results.",
+            ("v3.x", "Agent", ["Same as v2.x.", "A tool the agent runs with any cutoff, eb_upper_t from v5.0; v5.1 advises on 4.", "The agent chooses whom to ask, what sample, and whether to follow up; advice arrives in the tool results.",
                               "The agent submits findings; code adds facts and checks.", "The agent, within caps; an upcoding call the chart rule supports is binding."])]
     W, H = 1380, 410
     x0, cw, rh, y0 = 150, 170, 118, 56
@@ -578,7 +578,7 @@ if __name__ == "__main__":
     os.makedirs(os.path.join(ROOT, "docs", "images"), exist_ok=True)
     pipeline()
     agent_actions()
-    workflow_v40()
+    workflow_v41()
     score_waterfall()
     mlr_headroom()
     progression()

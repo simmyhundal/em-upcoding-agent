@@ -27,10 +27,10 @@ Opportunistic upcoders overbill about as much as the others, but their documenta
 | … 60 charts | $495,555 | $481,387 | +$14,167 | +$236 |
 | … 90 charts | $587,864 | $605,304 | −$17,439 | −$291 |
 | … 150 charts | $674,272 | $853,136 | −$178,864 | −$2,981 |
-| Oracle, only the 138 worth pursuing, 30 charts | $271,097 | $102,773 | $168,324 | $2,805 |
-| Oracle, only the 150 worth pursuing, 60 charts | $386,953 | $150,434 | $236,519 | $3,942 |
-| Oracle, only the 134 worth pursuing, 90 charts | $438,381 | $168,981 | $269,400 | $4,490 |
-| Oracle, only the 99 worth pursuing, 150 charts | $415,858 | $175,959 | $239,898 | $3,998 |
+| Oracle, only the 138 worth pursuing, 30 charts (triage included) | $271,097 | $104,584 | $166,512 | $2,775 |
+| Oracle, only the 150 worth pursuing, 60 charts (triage included) | $386,953 | $152,402 | $234,551 | $3,909 |
+| Oracle, only the 134 worth pursuing, 90 charts (triage included) | $438,381 | $170,739 | $267,641 | $4,461 |
+| Oracle, only the 99 worth pursuing, 150 charts (triage included) | $415,858 | $177,259 | $238,599 | $3,977 |
 | **W4.0 (H8), actual** | $125,722 | $100,178 | $25,544 | $426 |
 | **W4.1 candidate (H23), actual** | $163,385 | $97,175 | $66,210 | $1,103 |
 
@@ -39,7 +39,7 @@ Unit costs (S4.0): $8.61 per chart reviewed, $105.46 per request round (admin pl
 Reading it:
 - **Asking every upcoder is break-even at best.** The mean lower bound per upcoder is $723, $1,032, $1,225 and $1,405 at 30, 60, 90 and 150 charts, against a cost of $745, $1,003, $1,261 and $1,777.
 - **Reading every chart is far under water**: about $2.25 million of review cost to find $1.08 million.
-- **Profit comes from selection.** An oracle that pursues only the upcoders whose expected bound beats their cost nets $2,805 to $4,490 per seed, best at 90 charts. The oracle knows which upcoders those are from the answer key, so it is an upper bound; it also leaves out triage and the requirement that the rules call each provider.
+- **Profit comes from selection.** An oracle that pursues only the upcoders whose expected bound beats their cost nets $2,805 to $4,490 per seed, best at 90 charts. The oracle knows which upcoders those are from the answer key, so it is an upper bound; it pays triage for the providers it pursues but leaves out the requirement that the rules call each provider.
 - **W4.0 and the H23 candidate** are at $426 and $1,103 per seed. H23 cut cost by about $3,000 over the 60 seeds and recovered about $38,000 more.
 - Of the true $2.17 million, a full audit could find $1.08 million (50%), a 30-chart sample's bound about $347,000 (16%), and H23 recovered $163,000 (7.5%).
 
@@ -69,4 +69,4 @@ About $100 per seed at best, before regression to the mean (the extension is pic
 - All numbers are development seeds under S4.0 prices; the answer key defines "true". The $8.61 per chart (15 minutes of a coder at a BLS wage proxy times 1.4) and the other staff-time numbers are assumptions ([score_40.md](score_40.md)).
 - The full-audit cost uses the mean of 545 claims per upcoder, not each provider's own count.
 - Dollars are Medicare-sized per provider ([issue 145](https://github.com/simmyhundal/em-upcoding-agent/issues/145)), so the benchmarks scale with that assumption.
-- The oracle and the near-miss net values are optimistic upper bounds, as stated above.
+- The oracle and the near-miss net values are optimistic upper bounds, as stated above. An earlier version of this page left triage out of the oracle rows; it is included since 2026-10-22.
