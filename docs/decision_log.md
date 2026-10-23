@@ -6,6 +6,7 @@ Important events for Simmy to review: releases and tags, merges that touch froze
 
 | Date | Event | Detail |
 |---|---|---|
+| 2026-10-23 | Prepay repository proposed: pend and request records, starts on data 4.2 | After Maxine's note asking for a prepay (upstream, less abrasive) product. Simmy chose prepay point 4 (pend and request records) and a new public repository built on this one. Draft discovery note and copy-list in `docs/prepay_discovery.md` and `docs/prepay_copylist.md`; the repository is not yet created. |
 | 2026-10-23 | True test of v4.1 and v5.1 deferred; paid agent step not approved | Simmy did not approve the paid agent run on the reserved pool (6565 to 7474) to save money. The pool stays unrun so it can be used once for the workflow and the agent together. The README and notes describe v4.1 and v5.1 as second-use results on the W4.0 test seeds. |
 | 2026-10-22 | Releases v4.1 and v5.1 tagged and published | Workflow v4.1 (+$1,003 per seed on the test seeds, found 9 of 80) and agent v5.1 (+$743 per seed, found 10 of 80); notes in `docs/releases/`. Both are not distinguishable from zero; one seed carries each total. |
 | 2026-10-22 | Paid run: agent v5.1 on seeds 5555 to 6464 | $1.242 for ten runs (estimate $1.7, cap $4), approved by Simmy; `docs/a51_fresh_result.md`; recorded as a second use in the seed registry. |
