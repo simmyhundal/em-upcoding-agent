@@ -6,7 +6,7 @@
 
 - **Current screen: `eb_upper_t`** (workflow v4.0, agent v5.0). It shrinks the share of visits billed 99214 or 99215 against what the patients and the test line predict, so upgrades into 99214 count. On the 11 data 4.0 development seeds it put 81 of 88 upcoders in the top 10% of providers against 18 for `eb_ratio_t`, which looks only at 99215 and cannot see the systematic habit (0 of 33 against 33 of 33). The test line is a planted input (see the caveats), and these seeds are development data.
 - **Before that: `eb_ratio_t`** (workflow v2.3 to v2.5, agent v3.3 to v3.5), `eb_ratio` with the test line as one more input to the expected 99215 count: 47 of 78 upcoders in the top 5% on the ten release 2 seeds against 44 for `eb_ratio` (in sample).
-- **How it got there.** On the 14 datasets of data 2.0 and 2.1, `eb_ratio` put 98 of 109 upcoders in the top 25 against 93 for the risk-adjusted z-score (`riskadj`), and never fewer on any dataset. Release 2 confirmed it on 8 fresh data 2.2 seeds by a rule fixed in advance (34 of 62 upcoders in the top 5% against 30).
+- **How it got there.** On the 14 datasets of data 2.0 and 2.1, `eb_ratio` put 98 of 109 upcoders in the top 25 against 93 for the risk-adjusted z-score ([`riskadj`](statistics_review.md#riskadj-risk-adjusted-z-score)), and never fewer on any dataset. Release 2 confirmed it on 8 fresh data 2.2 seeds by a rule fixed in advance (34 of 62 upcoders in the top 5% against 30).
 - **Not solved.** No screen puts every upcoder in the top 25, and the gains are a few upcoders on synthetic data (see the caveats).
 - **Next.** Whether `eb_upper_t` holds on a second fresh set of seeds ([issue](https://github.com/simmyhundal/em-upcoding-agent/issues/132)); the opportunistic habit is the weakest (26 of 33 in the top 10%) ([issue](https://github.com/simmyhundal/em-upcoding-agent/issues/134)).
 
@@ -61,7 +61,7 @@ Top 5% because the release 2 rule used it and it scales with the number of provi
 | Method | Family | What it scores | Used in |
 |---|---|---|---|
 | `zscore` | z-score | share of visits billed 99215 against all providers; no adjustment for how sick the patients are | screen of v1 and v2.0; reference |
-| `riskadj` | z-score, risk-adjusted | observed against expected 99215 count, the expectation from each patient's chronic-condition count (logistic fit), rescaled by the typical spread | screen of v2.1 and v3.1 (frozen); reference |
+| [`riskadj`](statistics_review.md#riskadj-risk-adjusted-z-score) | z-score, risk-adjusted | observed against expected 99215 count, the expectation from each patient's chronic-condition count (logistic fit), rescaled by the typical spread | screen of v2.1 and v3.1 (frozen); reference |
 | `priority` | rank average | average of the ranks by ratio to expected and by excess 99215 claims | ordering in v3.1; release 2 candidate |
 | `eb_ratio` | empirical Bayes | `riskadj`'s observed over expected 99215 count, shrunk toward 1 for small panels (see below) | screen of v2.2 and v3.2 |
 | `eb_ratio_t` | empirical Bayes | `eb_ratio` with one more input to the expected count: whether the claim has a lab or test line | screen of v2.3 to v2.5 and v3.3 to v3.5 (frozen) |
