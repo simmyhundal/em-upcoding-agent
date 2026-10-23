@@ -37,6 +37,8 @@ Judges are named after the release they belong to, like the other pieces. `j1`: 
 - Results from `v1.0` cannot be reproduced on current code (the prompt, packet format and checks changed); their run folders hold the outputs.
 
 ## Reserved seeds
+The seed registry, [seeds.md](seeds.md) (generated from `experiments/seed_registry.json`), names every pool by data version and seed list, with what was fitted, selected, confirmed and tested on it and what it can still be used for; the prose below is the older summary.
+
 Used and retired: 202 and 303 (the Milestone 6 evaluation), 404 to 1313 and 1414 (the release 1 evaluation, #61). Seed 42 stays the development seed. Releases 2 to 5 each named ten fresh seeds on their evaluation issue before generating them (1515 to 5454, in steps of 101); all are development data now. The next fresh seeds start at 5555. From the v4/v5 line on, fresh seeds no longer have to be named on an issue before they are generated (Simmy, 2026-10-20); each run records the seeds it used, nothing is tuned on a fresh seed, and a seed that anything was tuned on is never reported as held out.
 
 ## Known limits carried into v2.0
