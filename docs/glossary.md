@@ -46,5 +46,20 @@
 | Precision | Upcoders found out of all providers called upcoding (found plus honest providers accused) |
 | Net $ per seed | The RL score: the overpayment a records sample supports for the upcoders found (90% lower bound) minus request and false-accusation costs, averaged over the ten seeds. Compare rows within one seed set only; each release has its own ten seeds |
 
+## Project terms (each links to a short page)
+| Term | Plain meaning | Older or code name |
+|---|---|---|
+| [Workflow and agent](concepts/workflow-and-agent.md) | Code fixes the steps, or a model chooses them within caps | fixed workflow |
+| [Shortlisted providers](concepts/shortlist.md) | The few providers at the top of the screen's ranking that are taken further | listed |
+| [Request recommendation](concepts/request-recommendation.md) | ASK or SKIP: is requesting charts expected to pay for itself | ask-or-skip advice, `ask_advice` |
+| [Triage](concepts/triage.md) | The analyst's first look at a shortlisted provider, about $13 | |
+| [Chart review](concepts/chart-review.md) | The step that reads returned charts and decides if they support the billing | `hybrid_review` |
+| [Demand check](concepts/demand-check.md) | The recovery economics attached to a provider called upcoding | `demand_check` |
+| [Conservative recovery estimate](concepts/conservative-estimate.md) | The amount we are 90% confident is at least owed | 90% lower bound |
+| [Borderline case](concepts/borderline-case.md) | Best estimate well above the cost of a demand, conservative estimate below it | near-miss, `near_miss` |
+| [Break-even rule](concepts/break-even-rule.md) | No demand when the conservative recovery is below the cost of a demand | demand floor |
+| [Hard rule](concepts/hard-rule.md) | The model cannot override an upcoding call the rules and chart test both support, unless it names a fact the rules cannot see | binding rule |
+| [No-more-requests advice](concepts/no-more-requests.md) | After the first sample and its follow-up, ask for nothing more | STOP advice, stop-after-first-sample |
+
 ## Abbreviations
 Versions are written short in notes, issues and tables: **S4.0, S4.1** are score versions (score 4.0, score 4.1); **D2.2, D4.0** are data versions (data 2.2, data 4.0); **W2.5, W4.0** are workflow versions and **A3.5, A5.0** agent versions (workflow v4.0, agent v5.0); **H8** is a hypothesis of the workflow's development loop (H8 is workflow v4.0). In the README and release notes the long form stays.
