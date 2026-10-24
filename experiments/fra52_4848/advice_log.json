@@ -1,0 +1,41 @@
+{
+ "summary": {
+  "actions": 5,
+  "with_advice": 5,
+  "followed": 5,
+  "overrides": 0
+ },
+ "log": [
+  {
+   "provider": "1000000192",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000178",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000191",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000178",
+   "action": "STOP",
+   "advised": "STOP",
+   "match": true
+  },
+  {
+   "provider": "1000000191",
+   "action": "STOP",
+   "advised": "STOP",
+   "match": true
+  }
+ ],
+ "overrides": []
+}

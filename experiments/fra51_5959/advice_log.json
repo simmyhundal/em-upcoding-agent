@@ -1,0 +1,23 @@
+{
+ "summary": {
+  "actions": 2,
+  "with_advice": 2,
+  "followed": 2,
+  "overrides": 0
+ },
+ "log": [
+  {
+   "provider": "1000000167",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000167",
+   "action": "EXT",
+   "advised": "EXT (near-miss)",
+   "match": true
+  }
+ ],
+ "overrides": []
+}

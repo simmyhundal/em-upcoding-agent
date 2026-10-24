@@ -1,0 +1,22 @@
+{
+ "1000000059": "99215 share is 4.08 times expected, but the advice was SKIP: under score 4.0 a request is expected to cost more than it recovers. Worth a person's review if the budget policy changes.",
+ "1000000081": "99215 share is 4.33 times expected. Advice SKIP, same reason as above. A strong claims signal for a person to look at.",
+ "1000000142": "99215 share is 4.73 times expected, but expected is already high (0.094) and only 16% of its patients are low complexity, so a sicker panel is possible. Advice SKIP.",
+ "1000000164": "99215 share is 3.62 times expected. Advice SKIP.",
+ "1000000073": "99215 share is 3.18 times expected, but it is a small practice (299 claims) with about 31 extra 99215 claims. Advice SKIP.",
+ "1000000192": "Advice SKIP. 99215 share is 2.79 times expected.",
+ "1000000051": "Advice SKIP. 99215 share is 2.5 times expected.",
+ "1000000072": "Advice SKIP. 99215 share is 1.78 times expected, on a panel that is mostly not low complexity.",
+ "1000000138": "Advice SKIP. 99215 share is 2.34 times expected.",
+ "1000000198": "Advice SKIP. Small practice, 99215 share 2.33 times expected.",
+ "1000000090": "Advice SKIP. 99215 share is 1.95 times expected.",
+ "1000000016": "Advice SKIP. Near expected.",
+ "1000000133": "Advice SKIP. Near expected.",
+ "1000000049": "Advice SKIP. Near expected.",
+ "1000000017": "Advice SKIP. Near expected.",
+ "1000000087": "Advice SKIP. Below expected.",
+ "1000000141": "Advice SKIP. Near expected.",
+ "1000000034": "Advice SKIP. Near expected.",
+ "1000000027": "Advice SKIP. Below expected.",
+ "1000000136": "Advice SKIP. Near expected."
+}

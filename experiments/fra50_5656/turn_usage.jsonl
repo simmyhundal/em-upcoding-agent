@@ -1,0 +1,4 @@
+{"turn": 1, "input_tokens": 4, "output_tokens": 103, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 5978, "usd_so_far": 0.032}
+{"turn": 2, "input_tokens": 4, "output_tokens": 195, "cache_read_input_tokens": 5978, "cache_creation_input_tokens": 2488, "usd_so_far": 0.0495}
+{"turn": 3, "input_tokens": 4, "output_tokens": 60, "cache_read_input_tokens": 8466, "cache_creation_input_tokens": 939, "usd_so_far": 0.0571}
+{"turn": 4, "input_tokens": 4, "output_tokens": 925, "cache_read_input_tokens": 9405, "cache_creation_input_tokens": 540, "usd_so_far": 0.0802}

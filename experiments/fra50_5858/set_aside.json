@@ -1,0 +1,19 @@
+{
+ "1000000140": "Screen advice was SKIP under score 4.0. It has the largest 99215 excess on the list (4.18x expected), so it is worth a person's look.",
+ "1000000104": "Advice SKIP. 7.21x expected but a small practice (243 claims); expected recovery is unlikely to cover the cost of a request.",
+ "1000000191": "Advice SKIP. 5.09x expected on a small practice.",
+ "1000000045": "Advice SKIP. 4.82x expected on a small practice.",
+ "1000000216": "Advice SKIP. 4.04x expected.",
+ "1000000003": "Advice SKIP. 2.74x expected.",
+ "1000000131": "Advice SKIP. 2.86x expected.",
+ "1000000030": "Advice SKIP. 2.54x expected.",
+ "1000000195": "Advice SKIP. 2.63x expected.",
+ "1000000204": "Advice SKIP. 2.07x expected.",
+ "1000000124": "Advice SKIP. 2.03x expected.",
+ "1000000101": "Advice SKIP. 1.85x expected.",
+ "1000000005": "Advice SKIP. 1.82x expected.",
+ "1000000211": "Advice SKIP. 1.57x expected.",
+ "1000000053": "Advice SKIP. 1.53x expected.",
+ "1000000202": "Advice SKIP. 1.46x expected.",
+ "1000000102": "Advice SKIP. 1.34x expected."
+}

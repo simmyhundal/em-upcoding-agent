@@ -1,0 +1,21 @@
+{
+ "1000000101": "Advice was SKIP: the score model predicts a request would not pay for itself. A high 99215 share alone is not evidence.",
+ "1000000141": "Advice was SKIP. Low-complexity share is 0.25, which fits a sicker panel.",
+ "1000000046": "Advice was SKIP",
+ "1000000015": "Advice was SKIP",
+ "1000000036": "Advice was SKIP. Small practice.",
+ "1000000153": "Advice was SKIP. Small practice with a sicker panel.",
+ "1000000137": "Advice was SKIP. Small practice.",
+ "1000000191": "Advice was SKIP",
+ "1000000181": "Advice was SKIP",
+ "1000000162": "Advice was SKIP",
+ "1000000051": "Advice was SKIP",
+ "1000000152": "Advice was SKIP",
+ "1000000065": "Advice was SKIP. Modest ratio.",
+ "1000000186": "Advice was SKIP. Modest ratio.",
+ "1000000160": "Advice was SKIP. Below expected.",
+ "1000000190": "Advice was SKIP. Modest ratio.",
+ "1000000169": "Advice was SKIP. Modest ratio.",
+ "1000000112": "Advice was SKIP. Modest ratio.",
+ "1000000044": "Advice was SKIP. Modest ratio."
+}

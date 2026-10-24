@@ -58,7 +58,7 @@ Hover over a column title for its definition ([glossary](docs/glossary.md#result
 
 ![The fixed workflow v4.2: a list of 4 from eb_upper_t, learned ask-or-skip, request charts, looser chart rules decide, break-even rule, plus a visits-per-day check with a sample of that day's claims, checks, PI teams review](docs/images/workflow.svg)
 
-The agent starts from the full claims book with no pre-screened list; code refuses findings the evidence does not support. [Eight-step walkthrough](docs/how-it-works.md) · [tools and guardrails](docs/agent_tools.md) · [the simulated providers](docs/provider_sim.md)
+The agent starts from the full claims book with no pre-screened list; code refuses findings the evidence does not support. [Operating model](docs/operating_model.md) · [eight-step walkthrough](docs/how-it-works.md) · [tools and guardrails](docs/agent_tools.md) · [the simulated providers](docs/provider_sim.md)
 
 v1.x, v2.x and v4.x are workflows; v3.x and v5.x are agents. Every release changed both; the [progression slide](docs/images/progression.svg), [version history](docs/versioning.md), [releases](https://github.com/simmyhundal/em-upcoding-agent/releases) and [roadmap](docs/roadmap.md) show how. Everything is synthetic ([limitations](docs/limitations.md)).
 

@@ -1,0 +1,35 @@
+{
+ "summary": {
+  "actions": 4,
+  "with_advice": 4,
+  "followed": 4,
+  "overrides": 0
+ },
+ "log": [
+  {
+   "provider": "1000000031",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000114",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000170",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000031",
+   "action": "EXT",
+   "advised": "EXT (near-miss)",
+   "match": true
+  }
+ ],
+ "overrides": []
+}

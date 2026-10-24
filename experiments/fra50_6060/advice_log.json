@@ -1,0 +1,59 @@
+{
+ "summary": {
+  "actions": 8,
+  "with_advice": 8,
+  "followed": 5,
+  "overrides": 0
+ },
+ "log": [
+  {
+   "provider": "1000000196",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000053",
+   "action": "ASK",
+   "advised": "SKIP",
+   "match": false
+  },
+  {
+   "provider": "1000000185",
+   "action": "ASK",
+   "advised": "SKIP",
+   "match": false
+  },
+  {
+   "provider": "1000000005",
+   "action": "ASK",
+   "advised": "SKIP",
+   "match": false
+  },
+  {
+   "provider": "1000000121",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000151",
+   "action": "ASK",
+   "advised": "ASK",
+   "match": true
+  },
+  {
+   "provider": "1000000196",
+   "action": "STOP",
+   "advised": "STOP",
+   "match": true
+  },
+  {
+   "provider": "1000000121",
+   "action": "STOP",
+   "advised": "STOP",
+   "match": true
+  }
+ ],
+ "overrides": []
+}

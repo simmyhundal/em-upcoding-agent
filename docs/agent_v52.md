@@ -12,8 +12,8 @@
 
 The prompt also states score 4.2's prices (records are copied at no charge; a visit with no record counts as overpaid). Everything the agent sees is payer-visible: claims, what the office returns, and the payer's own estimate. Tests check that no answer-key field reaches a tool result (`tests/test_agent_52.py`). The lane shares its code with the workflow (`src/fwa_lane.py`), so the two cannot drift.
 
-## Does the agent match workflow v4.2? (free, development seeds only)
-`eval/agent52_parity.py` runs a *scripted agent* (a stand-in whose steps are written in code to follow the advice exactly, so the tools can be checked without paying for a model) on the first 20 development seeds of data 4.2 and compares it with the stored workflow v4.2 runs. No model is called.
+## Tool and workflow parity (free, development seeds only)
+`eval/agent52_parity.py` runs a *scripted agent* (a stand-in whose steps are written in code to follow the advice exactly, so the tools can be checked without paying for a model) on the first 20 development seeds of data 4.2 and compares it with the stored workflow v4.2 runs. **This tests the tools, not the model:** it shows the agent's tools give the same results as the workflow when the advice is followed exactly. It says nothing about whether a model finds the lane unaided.
 
 | Check | Same on |
 |---|---|
@@ -29,6 +29,7 @@ Mean score 4.2 per seed: workflow v4.2 +$32,662; scripted agent +$32,633. The tw
 Basis: agent v5.1's recorded usage on ten seeds, $1.242 in all ($0.09 to $0.16 per run, 5 to 11 tool calls; Opus 5.5, low effort). Agent v5.2 adds one `volume_screen`, about three `request_stratum` and about two `send_demand` calls per run (the development seeds average 3 impossible-day providers per dataset and 2 demands), each result about 300 tokens, and each extra turn re-reads the cached context. Expected: **about $0.25 per run, $2.5 for ten**; plausible range $1.8 to $3.5. Caps: $1 per run, $4 for the batch. The run is paid; it needs the standing approval of `/run-release paid cap=4` or an explicit OK.
 
 ## What is not done
+- The run traces are committed: [agent_run_traces.md](agent_run_traces.md).
 - No paid run yet: `eval/run_v42_test.py agent --approved` runs it once on the test pool.
-- The parity check uses a scripted agent. A real model may ignore the advice (agent v5.0 and v5.1 stayed close to their workflows; their gaps were within what the workflow-versus-agent differences in triage explain).
+- The tool and workflow parity check uses a scripted agent. A real model may ignore the advice (agent v5.0 and v5.1 stayed close to their workflows; their gaps were within what the workflow-versus-agent differences in triage explain).
 - The lane's signal is clean by construction; see [the volume screen](concepts/volume-screen.md).

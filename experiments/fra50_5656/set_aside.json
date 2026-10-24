@@ -1,0 +1,23 @@
+{
+ "1000000177": "5.0x expected 99215 share, but the advice model said SKIP under score 4.0; not asked. Flagged for a person to consider.",
+ "1000000099": "3.2x expected with the largest excess ($14k), but the advice said SKIP; not asked. Flagged for a person to consider.",
+ "1000000210": "3.1x expected; advice said SKIP",
+ "1000000007": "4.3x expected on a small panel; advice said SKIP",
+ "1000000171": "3.6x expected; advice said SKIP",
+ "1000000072": "3.3x expected; advice said SKIP",
+ "1000000030": "3.2x expected; advice said SKIP",
+ "1000000033": "Advice said SKIP",
+ "1000000027": "Advice said SKIP",
+ "1000000199": "Advice said SKIP",
+ "1000000196": "Advice said SKIP",
+ "1000000207": "Advice said SKIP",
+ "1000000021": "Advice said SKIP",
+ "1000000079": "Advice said SKIP; modest ratio",
+ "1000000076": "Advice said SKIP; modest ratio",
+ "1000000179": "Advice said SKIP; modest ratio",
+ "1000000205": "Advice said SKIP; ratio near 1",
+ "1000000133": "Advice said SKIP; ratio near 1",
+ "1000000074": "Advice said SKIP; ratio near 1",
+ "1000000092": "Advice said SKIP; ratio near 1",
+ "1000000185": "Advice said SKIP; bills below expected"
+}

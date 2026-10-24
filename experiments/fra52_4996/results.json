@@ -1,0 +1,18 @@
+{
+ "run": "fra52_4996",
+ "version": "5.2",
+ "screen_run": "d42_4996",
+ "screen_tool": true,
+ "stop_reason": "submitted",
+ "tool_calls": 12,
+ "estimated_usd": 0.1219,
+ "providers_with_findings": 4,
+ "providers_called_upcoding": 0,
+ "upcoders_found": 0,
+ "honest_called_upcoding": 0,
+ "upcoders_total": 0,
+ "records_requests_to_honest": 4,
+ "records_requests_total": 4,
+ "rounds_on_honest": 7,
+ "citation_accuracy": 1.0
+}
