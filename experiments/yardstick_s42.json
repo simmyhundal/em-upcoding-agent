@@ -1,0 +1,72 @@
+[
+ {
+  "arm": "Workflow v4.0",
+  "data": "4.0, test",
+  "score": -6212,
+  "found": 3,
+  "upcoders": 80,
+  "lane_found": null,
+  "lane_total": null,
+  "demands": 3
+ },
+ {
+  "arm": "Workflow v4.1",
+  "data": "4.0, test",
+  "score": 15791,
+  "found": 9,
+  "upcoders": 80,
+  "lane_found": null,
+  "lane_total": null,
+  "demands": 9
+ },
+ {
+  "arm": "Agent v5.0",
+  "data": "4.0, test",
+  "score": -3762,
+  "found": 3,
+  "upcoders": 80,
+  "lane_found": null,
+  "lane_total": null,
+  "demands": 3
+ },
+ {
+  "arm": "Agent v5.1",
+  "data": "4.0, test",
+  "score": 11206,
+  "found": 10,
+  "upcoders": 80,
+  "lane_found": null,
+  "lane_total": null,
+  "demands": 10
+ },
+ {
+  "arm": "Workflow v4.1",
+  "data": "4.2, test",
+  "score": 17713,
+  "found": 8,
+  "upcoders": 91,
+  "lane_found": 0,
+  "lane_total": 36,
+  "demands": 8
+ },
+ {
+  "arm": "Workflow v4.2",
+  "data": "4.2, test",
+  "score": 375031,
+  "found": 8,
+  "upcoders": 91,
+  "lane_found": 30,
+  "lane_total": 36,
+  "demands": 38
+ },
+ {
+  "arm": "Agent v5.2",
+  "data": "4.2, test",
+  "score": 372114,
+  "found": 6,
+  "upcoders": 91,
+  "lane_found": 30,
+  "lane_total": 36,
+  "demands": 36
+ }
+]

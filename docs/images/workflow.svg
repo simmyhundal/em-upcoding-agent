@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" width="1000" height="500" font-family="Helvetica, Arial, sans-serif">
-<rect width="1000" height="500" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" width="1000" height="560" font-family="Helvetica, Arial, sans-serif">
+<rect width="1000" height="560" fill="#ffffff"/>
 <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#6b7280"/></marker><marker id="b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#c2410c"/></marker></defs>
 <text x="30" y="30" font-size="16" font-weight="bold" fill="#1f2937">The fixed workflow (v4.2): code sets the order of the steps</text>
 <rect x="30" y="112" width="205" height="118" rx="10" fill="#f9fafb" stroke="#2563eb" stroke-width="2.5"/>
@@ -56,25 +56,25 @@
 <text x="510" y="72" font-size="12.5" font-weight="bold" fill="#1f2937">Simulated providers answer every request and follow-up</text>
 <path d="M598.5 84 V110" stroke="#c2410c" stroke-width="2.5" fill="none" marker-start="url(#b)" marker-end="url(#b)"/>
 <path d="M831.5 84 V110" stroke="#c2410c" stroke-width="2.5" fill="none" marker-start="url(#b)" marker-end="url(#b)"/>
-<rect x="30" y="380" width="940" height="108" rx="10" fill="none" stroke="#15803d" stroke-width="2" stroke-dasharray="6 4"/>
-<text x="44" y="400" font-size="13" font-weight="bold" fill="#1f2937">Claims-data lane (new in v4.2): visits billed that never happened</text>
-<rect x="44" y="414" width="212" height="60" rx="8" fill="#f9fafb" stroke="#15803d" stroke-width="1.5"/>
-<text x="54" y="432" font-size="12.5" font-weight="bold" fill="#1f2937">Volume screen</text>
-<text x="54" y="448" font-size="11" fill="#6b7280">30 or more visits billed by one</text>
-<text x="54" y="462" font-size="11" fill="#6b7280">provider on one day.</text>
-<path d="M256 444 L276 444" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)" fill="none"/>
-<rect x="276" y="414" width="212" height="60" rx="8" fill="#f9fafb" stroke="#15803d" stroke-width="1.5"/>
-<text x="286" y="432" font-size="12.5" font-weight="bold" fill="#1f2937">Sample that day</text>
-<text x="286" y="448" font-size="11" fill="#6b7280">30 of its claims on those days,</text>
-<text x="286" y="462" font-size="11" fill="#6b7280">drawn at random; charts requested.</text>
-<path d="M488 444 L508 444" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)" fill="none"/>
-<rect x="508" y="414" width="212" height="60" rx="8" fill="#f9fafb" stroke="#15803d" stroke-width="1.5"/>
-<text x="518" y="432" font-size="12.5" font-weight="bold" fill="#1f2937">No record = overpaid</text>
-<text x="518" y="448" font-size="11" fill="#6b7280">A visit the office has no record</text>
-<text x="518" y="462" font-size="11" fill="#6b7280">of counts at its paid amount.</text>
-<path d="M720 444 L740 444" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)" fill="none"/>
-<rect x="740" y="414" width="212" height="60" rx="8" fill="#f9fafb" stroke="#15803d" stroke-width="1.5"/>
-<text x="750" y="432" font-size="12.5" font-weight="bold" fill="#1f2937">Break-even rule</text>
-<text x="750" y="448" font-size="11" fill="#6b7280">Demand if the conservative</text>
-<text x="750" y="462" font-size="11" fill="#6b7280">estimate covers the cost.</text>
+<rect x="30" y="432" width="940" height="108" rx="10" fill="none" stroke="#15803d" stroke-width="2" stroke-dasharray="6 4"/>
+<text x="44" y="452" font-size="13" font-weight="bold" fill="#1f2937">Claims-data lane (new in v4.2): visits billed that never happened</text>
+<rect x="44" y="466" width="212" height="60" rx="8" fill="#f9fafb" stroke="#15803d" stroke-width="1.5"/>
+<text x="54" y="484" font-size="12.5" font-weight="bold" fill="#1f2937">Volume screen</text>
+<text x="54" y="500" font-size="11" fill="#6b7280">30 or more visits billed by one</text>
+<text x="54" y="514" font-size="11" fill="#6b7280">provider on one day.</text>
+<path d="M256 496 L276 496" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)" fill="none"/>
+<rect x="276" y="466" width="212" height="60" rx="8" fill="#f9fafb" stroke="#15803d" stroke-width="1.5"/>
+<text x="286" y="484" font-size="12.5" font-weight="bold" fill="#1f2937">Sample that day</text>
+<text x="286" y="500" font-size="11" fill="#6b7280">30 of its claims on those days,</text>
+<text x="286" y="514" font-size="11" fill="#6b7280">drawn at random; charts requested.</text>
+<path d="M488 496 L508 496" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)" fill="none"/>
+<rect x="508" y="466" width="212" height="60" rx="8" fill="#f9fafb" stroke="#15803d" stroke-width="1.5"/>
+<text x="518" y="484" font-size="12.5" font-weight="bold" fill="#1f2937">No record = overpaid</text>
+<text x="518" y="500" font-size="11" fill="#6b7280">A visit the office has no record</text>
+<text x="518" y="514" font-size="11" fill="#6b7280">of counts at its paid amount.</text>
+<path d="M720 496 L740 496" stroke="#6b7280" stroke-width="1.5" marker-end="url(#a)" fill="none"/>
+<rect x="740" y="466" width="212" height="60" rx="8" fill="#f9fafb" stroke="#15803d" stroke-width="1.5"/>
+<text x="750" y="484" font-size="12.5" font-weight="bold" fill="#1f2937">Break-even rule</text>
+<text x="750" y="500" font-size="11" fill="#6b7280">Demand if the conservative</text>
+<text x="750" y="514" font-size="11" fill="#6b7280">estimate covers the cost.</text>
 </svg>
