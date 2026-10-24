@@ -1,0 +1,23 @@
+{
+ "1000000177": "Ranked first on z_adj at 5.01x expected, but it falls outside the first 4 of the eb_upper_t list and the advice is SKIP. Worth a human look under a different workflow.",
+ "1000000099": "3.23x expected with a large excess (360 claims), but outside the v4.1 list and the advice is SKIP. Worth a human look.",
+ "1000000210": "3.14x expected, but outside the v4.1 list and the advice is SKIP.",
+ "1000000007": "4.27x expected on a small panel (239 claims). Outside the v4.1 list; advice SKIP.",
+ "1000000171": "3.6x expected. Outside the v4.1 list; advice SKIP.",
+ "1000000072": "3.31x expected. Outside the v4.1 list; advice SKIP.",
+ "1000000030": "3.19x expected. Outside the v4.1 list; advice SKIP.",
+ "1000000133": "In the top 4 but the advice is SKIP; small excess (1.24x expected).",
+ "1000000079": "In the top 4 but the advice is SKIP; 1.61x expected on a small excess.",
+ "1000000205": "In the top 4 but the advice is SKIP; 1.26x expected.",
+ "1000000179": "Outside the list; advice SKIP; 1.41x expected.",
+ "1000000033": "Outside the list; advice SKIP.",
+ "1000000196": "Outside the list; advice SKIP.",
+ "1000000027": "Outside the list; advice SKIP.",
+ "1000000199": "Outside the list; advice SKIP.",
+ "1000000021": "Outside the list; advice SKIP.",
+ "1000000074": "Outside the list; advice SKIP; 1.2x expected.",
+ "1000000092": "Outside the list; advice SKIP; 1.17x expected.",
+ "1000000207": "Outside the list; advice SKIP.",
+ "1000000076": "Outside the list; advice SKIP.",
+ "1000000185": "Outside the list; advice SKIP; below expected (0.92x)."
+}

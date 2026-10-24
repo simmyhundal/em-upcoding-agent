@@ -1,0 +1,3 @@
+Run the stratum lane for all 4, and records for the 4 ASK providers.
+
+Send demands and run hybrid review.

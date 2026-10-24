@@ -1,0 +1,6 @@
+{"turn": 1, "input_tokens": 4, "output_tokens": 128, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 7475, "usd_so_far": 0.04}
+{"turn": 2, "input_tokens": 4, "output_tokens": 305, "cache_read_input_tokens": 7475, "cache_creation_input_tokens": 2890, "usd_so_far": 0.062}
+{"turn": 3, "input_tokens": 4, "output_tokens": 162, "cache_read_input_tokens": 10365, "cache_creation_input_tokens": 1451, "usd_so_far": 0.0746}
+{"turn": 4, "input_tokens": 4, "output_tokens": 1454, "cache_read_input_tokens": 11816, "cache_creation_input_tokens": 930, "usd_so_far": 0.1107}
+{"turn": 5, "input_tokens": 4, "output_tokens": 1223, "cache_read_input_tokens": 12746, "cache_creation_input_tokens": 1906, "usd_so_far": 0.1473}
+{"turn": 6, "input_tokens": 4, "output_tokens": 1163, "cache_read_input_tokens": 14652, "cache_creation_input_tokens": 1536, "usd_so_far": 0.1811}

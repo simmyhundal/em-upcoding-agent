@@ -1,0 +1,18 @@
+{
+ "run": "fra52_4848",
+ "version": "5.2",
+ "screen_run": "d42_4848",
+ "screen_tool": true,
+ "stop_reason": "submitted",
+ "tool_calls": 24,
+ "estimated_usd": 0.2514,
+ "providers_with_findings": 9,
+ "providers_called_upcoding": 0,
+ "upcoders_found": 0,
+ "honest_called_upcoding": 0,
+ "upcoders_total": 0,
+ "records_requests_to_honest": 9,
+ "records_requests_total": 9,
+ "rounds_on_honest": 24,
+ "citation_accuracy": 1.0
+}

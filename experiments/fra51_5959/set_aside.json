@@ -1,0 +1,23 @@
+{
+ "1000000154": "In the workflow v4.1 list of 4, but ask advice was SKIP; ratio 0.86",
+ "1000000121": "In the list of 4, but ask advice was SKIP; small practice (241 claims)",
+ "1000000026": "In the list of 4, but ask advice was SKIP; ratio 1.28",
+ "1000000004": "Outside the v4.1 list of 4 (advice SKIP). It has the largest 99215 excess (4.46 times expected, about $25,000), so a person should consider it for the next cycle",
+ "1000000207": "Outside the v4.1 list (SKIP); 7.41 times expected, worth a later review",
+ "1000000158": "Outside the v4.1 list (SKIP); 4.07 times expected",
+ "1000000095": "Outside the v4.1 list (SKIP)",
+ "1000000032": "Outside the v4.1 list (SKIP)",
+ "1000000053": "Outside the v4.1 list (SKIP)",
+ "1000000114": "Outside the v4.1 list (SKIP)",
+ "1000000142": "Outside the v4.1 list (SKIP)",
+ "1000000162": "Outside the v4.1 list (SKIP)",
+ "1000000072": "Outside the v4.1 list (SKIP)",
+ "1000000097": "Outside the v4.1 list (SKIP); below expected",
+ "1000000191": "Outside the v4.1 list (SKIP); below expected",
+ "1000000100": "Outside the v4.1 list (SKIP)",
+ "1000000009": "Outside the v4.1 list (SKIP)",
+ "1000000175": "Outside the v4.1 list (SKIP)",
+ "1000000120": "Outside the v4.1 list (SKIP)",
+ "1000000057": "Outside the v4.1 list (SKIP); below expected",
+ "1000000116": "Outside the v4.1 list (SKIP)"
+}

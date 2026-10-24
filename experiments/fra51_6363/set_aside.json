@@ -1,0 +1,22 @@
+{
+ "1000000019": "Ranked in the first 4 but the advice was SKIP; its 99215 rate is below expected (ratio 0.76).",
+ "1000000124": "Ranked in the first 4 but the advice was SKIP; its 99215 rate is below expected (ratio 0.70).",
+ "1000000127": "Outside workflow v4.1's 4-provider list, so the advice was SKIP. High ratio (3.73), worth a person's review in a later cycle.",
+ "1000000024": "Outside the 4-provider list (SKIP). Ratio 3.05.",
+ "1000000078": "Outside the 4-provider list (SKIP). Ratio 3.51.",
+ "1000000090": "Outside the 4-provider list (SKIP). Ratio 4.08.",
+ "1000000199": "Outside the 4-provider list (SKIP). Ratio 3.42.",
+ "1000000155": "Outside the 4-provider list (SKIP).",
+ "1000000190": "Outside the 4-provider list (SKIP).",
+ "1000000122": "Outside the 4-provider list (SKIP).",
+ "1000000013": "Outside the 4-provider list (SKIP); its 99215 rate is below expected.",
+ "1000000115": "Outside the 4-provider list (SKIP); its 99215 rate is below expected.",
+ "1000000107": "Outside the 4-provider list (SKIP); its 99215 rate is close to expected.",
+ "1000000149": "Outside the 4-provider list (SKIP).",
+ "1000000145": "Outside the 4-provider list (SKIP).",
+ "1000000140": "Outside the 4-provider list (SKIP); its 99215 rate is close to expected.",
+ "1000000174": "Outside the 4-provider list (SKIP).",
+ "1000000161": "Outside the 4-provider list (SKIP).",
+ "1000000147": "Outside the 4-provider list (SKIP); small practice.",
+ "1000000074": "Outside the 4-provider list (SKIP)."
+}

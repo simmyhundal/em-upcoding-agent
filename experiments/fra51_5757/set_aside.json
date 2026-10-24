@@ -1,0 +1,21 @@
+{
+ "1000000072": "In workflow v4.1's top 4, but ask_advice was SKIP. Ratio 0.98.",
+ "1000000110": "Outside the 4-provider list; ask_advice SKIP",
+ "1000000099": "Outside list; SKIP",
+ "1000000017": "Outside list; SKIP",
+ "1000000193": "Outside list; SKIP",
+ "1000000030": "Outside list; SKIP",
+ "1000000138": "Outside list; SKIP (high 99215 ratio but the advice says a request would not pay; worth a person's look)",
+ "1000000037": "Outside list; SKIP",
+ "1000000008": "Outside list; SKIP",
+ "1000000153": "Outside list; SKIP",
+ "1000000061": "Outside list; SKIP",
+ "1000000048": "Outside list; SKIP",
+ "1000000141": "Outside list; SKIP",
+ "1000000079": "Outside list; SKIP",
+ "1000000010": "Outside list; SKIP",
+ "1000000116": "Outside list; SKIP",
+ "1000000122": "Outside list; SKIP",
+ "1000000051": "Outside list; SKIP",
+ "1000000093": "Outside list; SKIP"
+}

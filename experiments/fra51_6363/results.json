@@ -1,0 +1,18 @@
+{
+ "run": "fra51_6363",
+ "version": "5.1",
+ "screen_run": "f4_6363",
+ "screen_tool": true,
+ "stop_reason": "submitted",
+ "tool_calls": 10,
+ "estimated_usd": 0.1212,
+ "providers_with_findings": 2,
+ "providers_called_upcoding": 1,
+ "upcoders_found": 1,
+ "honest_called_upcoding": 0,
+ "upcoders_total": 8,
+ "records_requests_to_honest": 0,
+ "records_requests_total": 2,
+ "rounds_on_honest": 0,
+ "citation_accuracy": 1.0
+}

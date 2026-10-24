@@ -1,0 +1,9 @@
+{
+ "1000000175": "First 4 on the list, but the ratio is 1.0 with about $2 of excess, so a request could not pay for itself",
+ "1000000071": "Ratio 1.43 with about $778 of excess; recovery unlikely to cover request costs",
+ "1000000097": "Billing is below the expected level (0.81x)",
+ "1000000192": "Billing is below the expected level (0.86x)",
+ "1000000045": "4.8x expected. Not asked: the advice was SKIP and both of my off-list requests came back inconclusive. A candidate for a later cycle",
+ "1000000191": "5.1x expected, but the panel is mostly complex (only 25% low-complexity). Advice SKIP. Not asked",
+ "1000000216": "4.0x expected. Advice SKIP. Not asked; a candidate for a later cycle"
+}

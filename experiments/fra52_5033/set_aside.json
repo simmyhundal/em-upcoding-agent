@@ -1,0 +1,23 @@
+{
+ "1000000089": "Ratio 7.87 to expected, but ask_advice SKIP under score 4.2; no records requested, so no finding",
+ "1000000005": "Ratio 5.46, but ask_advice SKIP; not requested",
+ "1000000053": "Ratio 3.47, but outside the list of four and SKIP; not requested",
+ "1000000045": "ask_advice SKIP",
+ "1000000149": "ask_advice SKIP",
+ "1000000178": "ask_advice SKIP",
+ "1000000108": "SKIP",
+ "1000000100": "SKIP",
+ "1000000214": "SKIP",
+ "1000000215": "SKIP",
+ "1000000168": "SKIP",
+ "1000000073": "SKIP",
+ "1000000147": "SKIP",
+ "1000000010": "SKIP",
+ "1000000163": "SKIP",
+ "1000000013": "SKIP",
+ "1000000064": "SKIP",
+ "1000000181": "SKIP",
+ "1000000116": "SKIP",
+ "1000000132": "SKIP",
+ "1000000012": "SKIP"
+}
