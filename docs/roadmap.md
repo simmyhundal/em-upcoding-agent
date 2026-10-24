@@ -25,4 +25,5 @@ Live from this repository's [milestones](https://github.com/simmyhundal/em-upcod
 - ![v4.2 and v5.2](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/18) Next release after v4.1 and v5.1: list-size grid edges (N = 2 and 3), the shorter-list control, and whatever the fresh-seed test of workflow v4.1 and agent v5.1 shows.
 - ![RL score research and improvement](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/19) Research and changes to the RL score itself (S4.x): what it charges, how realistic its parameters are, and how arms are evaluated across base rates, plan types and scales.
 - ![v4.3 and v5.3](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/20) Data 4.3 (messier volume signal, larger datasets), reaching level upcoding, fraud kinds beyond volume, score 4.3.
+- ![Future projects](https://img.shields.io/github/milestones/progress/simmyhundal/em-upcoding-agent/21) Ideas outside the E/M upcoding line, parked with their considerations.
 <!-- roadmap:end -->

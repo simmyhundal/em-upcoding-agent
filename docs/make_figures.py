@@ -169,7 +169,7 @@ def agent_actions():
 
 def workflow_v42():
     """The fixed workflow (v4.2) under the agent figure in the README: code sets the order; a learned formula decides whom to ask, a demand needs a recovery worth its staff cost, and a visits-per-day check runs beside the level review."""
-    W, H = 1000, 500
+    W, H = 1000, 560
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>', f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
          f'<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="{MUTED}"/></marker>'
          f'<marker id="b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="{ORANGE}"/></marker></defs>',
@@ -200,7 +200,7 @@ def workflow_v42():
     for i in (2, 3):
         x = pos[i][0] + bw / 2
         s.append(f'<path d="M{x} 84 V{pos[i][1] - 2}" stroke="{ORANGE}" stroke-width="2.5" fill="none" marker-start="url(#b)" marker-end="url(#b)"/>')
-    ly = 410                                             # the claims-data lane (workflow v4.2), beside the level review
+    ly = 462                                             # the claims-data lane (workflow v4.2), beside the level review
     s.append(f'<rect x="30" y="{ly - 30}" width="940" height="108" rx="10" fill="none" stroke="{GREEN}" stroke-width="2" stroke-dasharray="6 4"/>')
     s.append(f'<text x="44" y="{ly - 10}" font-size="13" font-weight="bold" fill="{INK}">Claims-data lane (new in v4.2): visits billed that never happened</text>')
     lane = [("Volume screen", "30 or more visits billed by one provider on one day."), ("Sample that day", "30 of its claims on those days, drawn at random; charts requested."),
@@ -223,14 +223,19 @@ def score_waterfall():
     w = release_table.score_parts_42("A5.2")
     n = w["n"]
     per = lambda x: x
-    W, H = 1000, 280
+    W, H = 1000, 270
     s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" {FONT}>', f'<rect width="{W}" height="{H}" fill="#ffffff"/>',
          f'<text x="30" y="30" font-size="16" font-weight="bold" fill="{INK}">What sets the score: agent v5.2, ten test seeds, dollars summed over the seeds</text>']
     top, bottom = 50, 220
     bars = [("Recovery", per(w["recovery"]), GREEN), ("Staff cost", -per(w["staff"]), ORANGE), ("Abrasion", -per(w["abrasion"]), ORANGE), ("Net score", per(w["score"]), BLUE)]
-    low = per(w["score"])
-    sc = (bottom - top - 40) / (per(w["recovery"]) - low)
-    y0 = top + 24 + per(w["recovery"]) * sc                  # the zero line
+    levels, run = [0.0], 0.0
+    for name, v, _ in bars[:3]:
+        run += v
+        levels.append(run)
+    levels.append(per(w["score"]))
+    vmax, vmin = max(levels), min(0.0, min(levels))
+    sc = (bottom - top - 36) / (vmax - vmin)
+    y0 = top + 28 + vmax * sc                            # the $0 line; always inside the drawing, with room for the labels below it
     cur = 0.0
     X = [140, 330, 520, 710]
     for (name, v, col), x in zip(bars, X):
@@ -245,6 +250,7 @@ def score_waterfall():
         s.append(f'<text x="{x + 55}" y="{min(ya, yb) - 6:.1f}" text-anchor="middle" font-size="13" font-weight="bold" fill="{INK}">{label}</text>')
         s.append(f'<text x="{x + 55}" y="{bottom + 22}" text-anchor="middle" font-size="12.5" fill="{MUTED}">{name}</text>')
     s.append(f'<line x1="120" y1="{y0:.1f}" x2="880" y2="{y0:.1f}" stroke="{LINE}" stroke-width="1"/>')
+    s.append(f'<text x="112" y="{y0 + 4:.1f}" text-anchor="end" font-size="11.5" fill="{MUTED}">$0</text>')
     s.append("</svg>")
     write("score_waterfall.svg", "\n".join(s))
 

@@ -36,19 +36,21 @@ Abrasion   = $43.84 per request round + $2,000 per demand, weighted by how hones
 
 ## Results
 <!-- tldr:start -->
-On data 4.2, which adds fraud, ten test seeds give: workflow v4.1 scores $17,713; workflow v4.2 ($375,031) and agent v5.2 ($372,114) add a check on visits billed per day, which gives 94% of their recovery. That signal is clean by construction in the synthetic data: read the gain as what a reviewer does with a clean signal, not as a forecast for real claims. Earlier data 4.0 results are in the linked pages.
+Every row of the table uses one score (score 4.2); the data 4.0 rows are re-scored from the stored runs, so rows on different data are not directly comparable. On data 4.2, which adds fraud, ten test seeds give: workflow v4.1 scores $17,713; workflow v4.2 ($375,031) and agent v5.2 ($372,114) add a check on visits billed per day, which gives 94% of their recovery. That signal is clean by construction in the synthetic data: read the gain as what a reviewer does with a clean signal, not as a forecast for real claims. Earlier data 4.0 results are in the linked pages.
 <!-- tldr:end -->
 
 <!-- release23:start -->
-| Version | [Data, seeds](docs/glossary.md#results-columns "Data version and the ten seeds. Compare rows within one data and seed set.") | [Upcoders found (recall)](docs/glossary.md#results-columns "Planted upcoders found.") | [Calls that were upcoders (precision)](docs/glossary.md#results-columns "Calls that were upcoders.") | [Score 2.5](docs/glossary.md#results-columns "Release 5's score: the overpayment a sample supports (90% lower bound) minus request, review and false-accusation costs. Sum over ten seeds. Applied to release 1 after the fact.") | [Score 4.2](docs/glossary.md#results-columns "Score 4.0 with no copy fee, a visit the office has no record of counted as overpaid, and fraud included (docs/score_42.md). Sum over ten seeds.") |
-|---|---|---|---|---|---|
-| Workflow v2.5 | 2.2, release 5 | 47% | 92% | $318,882 | n/a |
-| Agent v3.5 | 2.2, release 5 | 46% | 97% | $321,585 | n/a |
-| Workflow v4.1 | 4.2, test | 2% | 100% | n/a | $17,713 |
-| Workflow v4.2 | 4.2, test | 8% | 100% | n/a | $375,031 |
-| Agent v5.2 | 4.2, test | 8% | 100% | n/a | $372,114 |
+| Version | [Data, seeds](docs/glossary.md#results-columns "Data version and the ten test seeds. Rows on different data are not directly comparable.") | [Upcoders found](docs/glossary.md#results-columns "Providers whose true net level rate is 15% or more that were sent a demand, of all such providers in the ten datasets.") | [Impossible-day billing found](docs/glossary.md#results-columns "Providers who billed an impossible number of visits in a day that were sent a demand (data 4.2 only).") | [Score 4.2](docs/glossary.md#results-columns "Recovery minus staff cost minus provider abrasion, no records copy fee, a visit the office has no record of counted as overpaid (docs/score_42.md). The same formula on every row (data 4.0 rows re-scored from the stored runs). Dollars summed over ten seeds.") |
+|---|---|---|---|---|
+| Workflow v4.0 | 4.0, test | 4% | n/a | -$6,212 |
+| Workflow v4.1 | 4.0, test | 11% | n/a | $15,791 |
+| Workflow v4.1 | 4.2, test | 9% | 0% | $17,713 |
+| Workflow v4.2 | 4.2, test | 9% | 83% | $375,031 |
+| Agent v5.0 | 4.0, test | 4% | n/a | -$3,762 |
+| Agent v5.1 | 4.0, test | 12% | n/a | $11,206 |
+| Agent v5.2 | 4.2, test | 7% | 83% | $372,114 |
 
-Hover over a column title for its definition ([glossary](docs/glossary.md#results-columns)). Every run and release: [results](docs/results.md), [release 1](docs/eval61.md), [5](docs/release5_results.md), [v4.0 and v5.0](docs/v4_v5_results.md), [v4.1](docs/w41_fresh_result.md), [v5.1](docs/a51_fresh_result.md), [v4.2 and v5.2](docs/v42_test_result.md).
+Hover over a column title for its definition ([glossary](docs/glossary.md#results-columns)). Every run and release: [results](docs/results.md), [v4.0 and v5.0](docs/v4_v5_results.md), [v4.1](docs/w41_fresh_result.md), [v5.1](docs/a51_fresh_result.md), [v4.2 and v5.2](docs/v42_test_result.md); releases 1 to 5: [release 1](docs/eval61.md), [5](docs/release5_results.md).
 <!-- release23:end -->
 
 ## How it works

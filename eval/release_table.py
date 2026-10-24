@@ -149,24 +149,28 @@ def r1_total(arm):
     return dr.net(dr.add(rs))
 
 
+YARDSTICK_PATH = os.path.join(ROOT, "experiments", "yardstick_s42.json")
+YARDSTICK_ORDER = [("Workflow v4.0", "4.0, test"), ("Workflow v4.1", "4.0, test"), ("Workflow v4.1", "4.2, test"), ("Workflow v4.2", "4.2, test"),
+                   ("Agent v5.0", "4.0, test"), ("Agent v5.1", "4.0, test"), ("Agent v5.2", "4.2, test")]
+
+
 def markdown():
-    """Three sets of rows: v2.1 and v3.1 (release 1), v2.5 and v3.5 (release 5), v2.5, v4.0 and v5.0 (data 4.0). Dollars are summed over each set's ten seeds."""
-    d = {(x["arm"], x["seeds"]): x for x in rows()}
+    """The README table: every version of the v4 and v5 line on ONE yardstick, score 4.2's formula (docs/score_42.md), from experiments/yardstick_s42.json (eval/yardstick_s42.py: the data 4.0 runs are
+    re-scored from the stored runs, the data 4.2 runs are scored as run). Rows differ in data set, not in score. Releases 1 to 5 are in docs/results.md."""
     from scoreboard import pct
+    d = {(x["arm"], x["data"]): x for x in json.load(open(YARDSTICK_PATH))}
     gl = "docs/glossary.md#results-columns"
     hov = lambda text, tip: f'[{text}]({gl} "{tip}")'
-    lines = ["| Version | " + hov("Data, seeds", "Data version and the ten seeds. Compare rows within one data and seed set.")
-             + " | " + hov("Upcoders found (recall)", "Planted upcoders found.") + " | " + hov("Calls that were upcoders (precision)", "Calls that were upcoders.")
-             + " | " + hov("Score 2.5", "Release 5's score: the overpayment a sample supports (90% lower bound) minus request, review and false-accusation costs. Sum over ten seeds. Applied to release 1 after the fact.")
-             + " | " + hov("Score 4.2", "Score 4.0 with no copy fee, a visit the office has no record of counted as overpaid, and fraud included (docs/score_42.md). Sum over ten seeds.") + " |", "|---|---|---|---|---|---|"]
-    for arm, seeds, label in TABLE_ROWS:
-        x = d[(arm, seeds)]
-        sc = stored_scores(arm, seeds)
-        s25, s40 = sc if sc else (r1_total(arm), None)
-        lines.append(f"| {arm} | {label} | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | {dollars(s25)} | n/a |")
-    for x in v42_rows():
-        lines.append(f"| {x['arm']} | 4.2, test | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | n/a | {dollars(x['net_total'])} |")
-    lines += ["", "Hover over a column title for its definition ([glossary](docs/glossary.md#results-columns)). Every run and release: [results](docs/results.md), [release 1](docs/eval61.md), [5](docs/release5_results.md), [v4.0 and v5.0](docs/v4_v5_results.md), [v4.1](docs/w41_fresh_result.md), [v5.1](docs/a51_fresh_result.md), [v4.2 and v5.2](docs/v42_test_result.md)."]
+    lines = ["| Version | " + hov("Data, seeds", "Data version and the ten test seeds. Rows on different data are not directly comparable.")
+             + " | " + hov("Upcoders found", "Providers whose true net level rate is 15% or more that were sent a demand, of all such providers in the ten datasets.")
+             + " | " + hov("Impossible-day billing found", "Providers who billed an impossible number of visits in a day that were sent a demand (data 4.2 only).")
+             + " | " + hov("Score 4.2", "Recovery minus staff cost minus provider abrasion, no records copy fee, a visit the office has no record of counted as overpaid (docs/score_42.md). The same formula on every row (data 4.0 rows re-scored from the stored runs). Dollars summed over ten seeds.") + " |",
+             "|---|---|---|---|---|"]
+    for arm, data in YARDSTICK_ORDER:
+        x = d[(arm, data)]
+        lane = "n/a" if x["lane_total"] is None else pct(x["lane_found"], x["lane_total"])
+        lines.append(f"| {arm} | {data} | {pct(x['found'], x['upcoders'])} | {lane} | {dollars(x['score'])} |")
+    lines += ["", "Hover over a column title for its definition ([glossary](docs/glossary.md#results-columns)). Every run and release: [results](docs/results.md), [v4.0 and v5.0](docs/v4_v5_results.md), [v4.1](docs/w41_fresh_result.md), [v5.1](docs/a51_fresh_result.md), [v4.2 and v5.2](docs/v42_test_result.md); releases 1 to 5: [release 1](docs/eval61.md), [5](docs/release5_results.md)."]
     return "\n".join(lines)
 
 
@@ -221,7 +225,8 @@ def tldr():
     w25, w40, a50, w41, a51 = v4_rows()
     w41b, w42, a52 = v42_rows()
     lane = score_parts_42("W4.2")
-    return (f"On data 4.2, which adds fraud, ten test seeds give: workflow v4.1 scores {dollars(w41b['net_total'])}; workflow v4.2 ({dollars(w42['net_total'])}) and agent v5.2 ({dollars(a52['net_total'])}) add a check on visits billed per day, "
+    return ("Every row of the table uses one score (score 4.2); the data 4.0 rows are re-scored from the stored runs, so rows on different data are not directly comparable. "
+            f"On data 4.2, which adds fraud, ten test seeds give: workflow v4.1 scores {dollars(w41b['net_total'])}; workflow v4.2 ({dollars(w42['net_total'])}) and agent v5.2 ({dollars(a52['net_total'])}) add a check on visits billed per day, "
             f"which gives {round(100 * lane['recovery_lane'] / lane['recovery'])}% of their recovery. That signal is clean by construction in the synthetic data: read the gain as what a reviewer does with a clean signal, not as a forecast for real claims. Earlier data 4.0 results are in the linked pages.")
 
 
