@@ -12,8 +12,8 @@
 
 Kept from v5.0: the [break-even rule](concepts/break-even-rule.md "No demand when the conservative recovery is below the cost of a demand") in `submit_findings` (a call whose conservative estimate is below the cost of a demand is withdrawn to inconclusive), the [hard rule](concepts/hard-rule.md "The model cannot override an upcoding call that the rules and the chart test both support, without naming a fact the rules cannot see") of v3.5, the [no-more-requests advice](concepts/no-more-requests.md "After the first sample and its follow-up, ask for nothing more") after the first sample (no targeted request, no audit trail), and the style repair. Everything the agent sees is payer-visible: the estimate uses only claims and the charts the office sent (`src/recovery_40.py`); tests check that no answer key file is opened and no role appears in a tool result.
 
-## Does the agent match workflow v4.1? (free, development seeds only)
-`eval/agent51_parity.py` runs a *scripted agent* (a stand-in whose steps are written in code to follow the advice exactly, so the tools can be checked without paying for a model) that follows the advice (ask where ASK, 30 random charts and one follow-up, chart review, a second request for each borderline case, chart review again, submit the leanings). It runs on the 20 development seeds of batches 5 and 6 (3630 to 4029) and is compared with the stored workflow run `wlh23_n4_<seed>`. No model is called.
+## Tool and workflow parity (free, development seeds only)
+`eval/agent51_parity.py` runs a *scripted agent* (a stand-in whose steps are written in code to follow the advice exactly, so the tools can be checked without paying for a model) that follows the advice (ask where ASK, 30 random charts and one follow-up, chart review, a second request for each borderline case, chart review again, submit the leanings). It runs on the 20 development seeds of batches 5 and 6 (3630 to 4029) and is compared with the stored workflow run `wlh23_n4_<seed>`. No model is called: this tests the tools, not the model.
 
 | Check | Same on |
 |---|---|

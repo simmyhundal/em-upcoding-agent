@@ -12,8 +12,8 @@
 
 The prompt also states score 4.2's prices (records are copied at no charge; a visit with no record counts as overpaid). Everything the agent sees is payer-visible: claims, what the office returns, and the payer's own estimate. Tests check that no answer-key field reaches a tool result (`tests/test_agent_52.py`). The lane shares its code with the workflow (`src/fwa_lane.py`), so the two cannot drift.
 
-## Does the agent match workflow v4.2? (free, development seeds only)
-`eval/agent52_parity.py` runs a *scripted agent* (a stand-in whose steps are written in code to follow the advice exactly, so the tools can be checked without paying for a model) on the first 20 development seeds of data 4.2 and compares it with the stored workflow v4.2 runs. No model is called.
+## Tool and workflow parity (free, development seeds only)
+`eval/agent52_parity.py` runs a *scripted agent* (a stand-in whose steps are written in code to follow the advice exactly, so the tools can be checked without paying for a model) on the first 20 development seeds of data 4.2 and compares it with the stored workflow v4.2 runs. **This tests the tools, not the model:** it shows the agent's tools give the same results as the workflow when the advice is followed exactly. It says nothing about whether a model finds the lane unaided.
 
 | Check | Same on |
 |---|---|
@@ -30,5 +30,5 @@ Basis: agent v5.1's recorded usage on ten seeds, $1.242 in all ($0.09 to $0.16 p
 
 ## What is not done
 - No paid run yet: `eval/run_v42_test.py agent --approved` runs it once on the test pool.
-- The parity check uses a scripted agent. A real model may ignore the advice (agent v5.0 and v5.1 stayed close to their workflows; their gaps were within what the workflow-versus-agent differences in triage explain).
+- The tool and workflow parity check uses a scripted agent. A real model may ignore the advice (agent v5.0 and v5.1 stayed close to their workflows; their gaps were within what the workflow-versus-agent differences in triage explain).
 - The lane's signal is clean by construction; see [the volume screen](concepts/volume-screen.md).
