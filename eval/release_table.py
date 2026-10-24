@@ -158,20 +158,14 @@ def markdown():
     lines = ["| Version | " + hov("Data, seeds", "Data version and the ten seeds. Compare rows within one data and seed set.")
              + " | " + hov("Upcoders found (recall)", "Planted upcoders found.") + " | " + hov("Calls that were upcoders (precision)", "Calls that were upcoders.")
              + " | " + hov("Score 2.5", "Release 5's score: the overpayment a sample supports (90% lower bound) minus request, review and false-accusation costs. Sum over ten seeds. Applied to release 1 after the fact.")
-             + " | " + hov("Score 4.0", "Recovery minus staff-hours cost minus provider abrasion (docs/score_40.md). Sum over ten seeds.")
-             + " | " + hov("Score 4.2", "Score 4.0 with no copy fee, a visit the office has no record of counted as overpaid, and fraud included (docs/score_42.md). Sum over ten seeds.") + " |", "|---|---|---|---|---|---|---|"]
+             + " | " + hov("Score 4.2", "Score 4.0 with no copy fee, a visit the office has no record of counted as overpaid, and fraud included (docs/score_42.md). Sum over ten seeds.") + " |", "|---|---|---|---|---|---|"]
     for arm, seeds, label in TABLE_ROWS:
         x = d[(arm, seeds)]
         sc = stored_scores(arm, seeds)
         s25, s40 = sc if sc else (r1_total(arm), None)
-        lines.append(f"| {arm} | {label} | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | {dollars(s25)} | {dollars(s40)} | n/a |")
-    for x in v4_rows():
-        if x["arm"] in ("Workflow v2.5", "Workflow v4.0", "Agent v5.0"):         # their rows are in docs/v4_v5_results.md; the README keeps the table short (7,000-character cap)
-            continue
-        label = x["arm"]
-        lines.append(f"| {label} | 4.0, test | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | n/a | {dollars(x['net_total'])} | n/a |")
+        lines.append(f"| {arm} | {label} | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | {dollars(s25)} | n/a |")
     for x in v42_rows():
-        lines.append(f"| {x['arm']} | 4.2, test | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | n/a | n/a | {dollars(x['net_total'])} |")
+        lines.append(f"| {x['arm']} | 4.2, test | {pct(x['found'], x['upcoders'])} | {pct(x['found'], x['found'] + x['accused'])} | n/a | {dollars(x['net_total'])} |")
     lines += ["", "Hover over a column title for its definition ([glossary](docs/glossary.md#results-columns)). Every run and release: [results](docs/results.md), [release 1](docs/eval61.md), [5](docs/release5_results.md), [v4.0 and v5.0](docs/v4_v5_results.md), [v4.1](docs/w41_fresh_result.md), [v5.1](docs/a51_fresh_result.md), [v4.2 and v5.2](docs/v42_test_result.md)."]
     return "\n".join(lines)
 
@@ -227,10 +221,8 @@ def tldr():
     w25, w40, a50, w41, a51 = v4_rows()
     w41b, w42, a52 = v42_rows()
     lane = score_parts_42("W4.2")
-    return (f"On data 4.0 (ten test seeds, score 4.0) the old workflow v2.5 scores {dollars(w25['net_total'])}; "
-            f"workflow v4.1 ({dollars(w41['net_total'])}) and agent v5.1 ({dollars(a51['net_total'])}) find {w41['found']} and {a51['found']} of {w41['upcoders']} upcoders, but one seed carries each total. "
-            f"Data 4.2 adds fraud. On ten new test seeds workflow v4.1 scores {dollars(w41b['net_total'])}; workflow v4.2 ({dollars(w42['net_total'])}) and agent v5.2 ({dollars(a52['net_total'])}) add a check on visits billed per day, "
-            f"which gives {round(100 * lane['recovery_lane'] / lane['recovery'])}% of their recovery. That signal is clean by construction in the synthetic data: read the gain as what a reviewer does with a clean signal, not as a forecast for real claims.")
+    return (f"On data 4.2, which adds fraud, ten test seeds give: workflow v4.1 scores {dollars(w41b['net_total'])}; workflow v4.2 ({dollars(w42['net_total'])}) and agent v5.2 ({dollars(a52['net_total'])}) add a check on visits billed per day, "
+            f"which gives {round(100 * lane['recovery_lane'] / lane['recovery'])}% of their recovery. That signal is clean by construction in the synthetic data: read the gain as what a reviewer does with a clean signal, not as a forecast for real claims. Earlier data 4.0 results are in the linked pages.")
 
 
 def headline_cells():
