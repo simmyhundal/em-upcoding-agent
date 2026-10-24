@@ -36,19 +36,17 @@ Abrasion   = $43.84 per request round + $2,000 per demand, weighted by how hones
 
 ## Results
 <!-- tldr:start -->
-On data 4.0 (ten test seeds, score 4.0) the old workflow v2.5 scores -$111,847; workflow v4.1 ($10,031) and agent v5.1 ($7,426) find 9 and 10 of 80 upcoders, but one seed carries each total. Data 4.2 adds fraud. On ten new test seeds workflow v4.1 scores $17,713; workflow v4.2 ($375,031) and agent v5.2 ($372,114) add a check on visits billed per day, which gives 94% of their recovery. That signal is clean by construction in the synthetic data: read the gain as what a reviewer does with a clean signal, not as a forecast for real claims.
+On data 4.2, which adds fraud, ten test seeds give: workflow v4.1 scores $17,713; workflow v4.2 ($375,031) and agent v5.2 ($372,114) add a check on visits billed per day, which gives 94% of their recovery. That signal is clean by construction in the synthetic data: read the gain as what a reviewer does with a clean signal, not as a forecast for real claims. Earlier data 4.0 results are in the linked pages.
 <!-- tldr:end -->
 
 <!-- release23:start -->
-| Version | [Data, seeds](docs/glossary.md#results-columns "Data version and the ten seeds. Compare rows within one data and seed set.") | [Upcoders found (recall)](docs/glossary.md#results-columns "Planted upcoders found.") | [Calls that were upcoders (precision)](docs/glossary.md#results-columns "Calls that were upcoders.") | [Score 2.5](docs/glossary.md#results-columns "Release 5's score: the overpayment a sample supports (90% lower bound) minus request, review and false-accusation costs. Sum over ten seeds. Applied to release 1 after the fact.") | [Score 4.0](docs/glossary.md#results-columns "Recovery minus staff-hours cost minus provider abrasion (docs/score_40.md). Sum over ten seeds.") | [Score 4.2](docs/glossary.md#results-columns "Score 4.0 with no copy fee, a visit the office has no record of counted as overpaid, and fraud included (docs/score_42.md). Sum over ten seeds.") |
-|---|---|---|---|---|---|---|
-| Workflow v2.5 | 2.2, release 5 | 47% | 92% | $318,882 | -$72,680 | n/a |
-| Agent v3.5 | 2.2, release 5 | 46% | 97% | $321,585 | -$16,574 | n/a |
-| Workflow v4.1 | 4.0, test | 11% | 100% | n/a | $10,031 | n/a |
-| Agent v5.1 | 4.0, test | 12% | 100% | n/a | $7,426 | n/a |
-| Workflow v4.1 | 4.2, test | 2% | 100% | n/a | n/a | $17,713 |
-| Workflow v4.2 | 4.2, test | 8% | 100% | n/a | n/a | $375,031 |
-| Agent v5.2 | 4.2, test | 8% | 100% | n/a | n/a | $372,114 |
+| Version | [Data, seeds](docs/glossary.md#results-columns "Data version and the ten seeds. Compare rows within one data and seed set.") | [Upcoders found (recall)](docs/glossary.md#results-columns "Planted upcoders found.") | [Calls that were upcoders (precision)](docs/glossary.md#results-columns "Calls that were upcoders.") | [Score 2.5](docs/glossary.md#results-columns "Release 5's score: the overpayment a sample supports (90% lower bound) minus request, review and false-accusation costs. Sum over ten seeds. Applied to release 1 after the fact.") | [Score 4.2](docs/glossary.md#results-columns "Score 4.0 with no copy fee, a visit the office has no record of counted as overpaid, and fraud included (docs/score_42.md). Sum over ten seeds.") |
+|---|---|---|---|---|---|
+| Workflow v2.5 | 2.2, release 5 | 47% | 92% | $318,882 | n/a |
+| Agent v3.5 | 2.2, release 5 | 46% | 97% | $321,585 | n/a |
+| Workflow v4.1 | 4.2, test | 2% | 100% | n/a | $17,713 |
+| Workflow v4.2 | 4.2, test | 8% | 100% | n/a | $375,031 |
+| Agent v5.2 | 4.2, test | 8% | 100% | n/a | $372,114 |
 
 Hover over a column title for its definition ([glossary](docs/glossary.md#results-columns)). Every run and release: [results](docs/results.md), [release 1](docs/eval61.md), [5](docs/release5_results.md), [v4.0 and v5.0](docs/v4_v5_results.md), [v4.1](docs/w41_fresh_result.md), [v5.1](docs/a51_fresh_result.md), [v4.2 and v5.2](docs/v42_test_result.md).
 <!-- release23:end -->
