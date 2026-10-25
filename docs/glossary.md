@@ -42,6 +42,8 @@
 | Term | Meaning |
 |---|---|
 | Data model | The synthetic data a version was tested on. **Easy** (release 1, data 2.1): clean coding, documentation generated from the true visit level, clone signs planted in the notes. **Hard** (releases 2 to 5, data 2.2): adds honest coding noise (honest providers sometimes bill one level up), group and incident-to billing, truncated diagnoses, claims lag, corrections that change a level, and injected data defects |
+| Oracle | The best conceivable score on the same ten datasets, computed from the answer key with triage paid, perfect screening and every office answering (`eval/oracle_s42.py`). An upper bound, not an arm. |
+| % of oracle | An arm's score divided by the oracle of the same data. Compare it across versions on the same data; across data sets the oracle differs. |
 | Upcoders found (recall) | Providers whose true net level rate is 15% or more that were sent a demand, out of all such providers (data 4.0: the 8 planted per dataset; data 4.2: about 9 per dataset, nothing is planted) |
 | Precision | Upcoders found out of all providers called upcoding (found plus honest providers accused) |
 | Net $ per seed | The RL score: the overpayment a records sample supports for the upcoders found (90% lower bound) minus request and false-accusation costs, averaged over the ten seeds. Compare rows within one seed set only; each release has its own ten seeds |

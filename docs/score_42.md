@@ -31,6 +31,9 @@ Netting (underpayments reduce the estimate), the extrapolation gate (assumption:
 ## Reported beside the score, not in it
 Demands, lane providers flagged and right (providers with impossible-visit billing), lane providers wrong, level and lane recovery, providers justified at m = 1 that were sent a demand, true overpayment available and pursued, and the score under score 4.0 through the adapter (`eval/d42_truth.py`). The justification threshold *m* is not settled; the primary view is m = 1.
 
+## The oracle
+`eval/oracle_s42.py` computes the best conceivable score on the same datasets from the answer key: it pursues a provider only when the expected recovery beats the staff cost (triage included) and the abrasion, takes the better of a level chart sample (30, 60, 90 or 150 charts) and, for providers with a day of 30 or more visits, the volume-lane sample, and assumes every office answers and the screen is perfect. Ten data 4.0 test datasets: $74,155; ten data 4.2 test datasets: $459,400. The README shows each version's score as a share of it. It is an upper bound, not a target.
+
 ## Known weaknesses
 - The copy-fee profile and the 15% gate are assumptions.
 - A demand for fabricated visits is, in practice, usually a fraud referral and not a demand letter; scoring it as a demand with score 4.0's cost ($276) understates the real cost.

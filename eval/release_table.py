@@ -150,27 +150,31 @@ def r1_total(arm):
 
 
 YARDSTICK_PATH = os.path.join(ROOT, "experiments", "yardstick_s42.json")
-YARDSTICK_ORDER = [("Workflow v4.0", "4.0, test"), ("Workflow v4.1", "4.0, test"), ("Workflow v4.1", "4.2, test"), ("Workflow v4.2", "4.2, test"),
-                   ("Agent v5.0", "4.0, test"), ("Agent v5.1", "4.0, test"), ("Agent v5.2", "4.2, test")]
+ORACLE_PATH = os.path.join(ROOT, "experiments", "oracle_s42.json")
+# data 4.0 then data 4.2; inside each, workflows before agents
+YARDSTICK_ORDER = [("Workflow v4.0", "4.0, test"), ("Workflow v4.1", "4.0, test"), ("Agent v5.0", "4.0, test"), ("Agent v5.1", "4.0, test"),
+                   ("Workflow v4.1", "4.2, test"), ("Workflow v4.2", "4.2, test"), ("Agent v5.2", "4.2, test")]
+
+
+def yardstick():
+    """[(arm, data, score, oracle, share of oracle)] in table order: score 4.2's formula on every row (eval/yardstick_s42.py), the oracle of its data set (eval/oracle_s42.py)."""
+    d = {(x["arm"], x["data"]): x for x in json.load(open(YARDSTICK_PATH))}
+    o = json.load(open(ORACLE_PATH))
+    return [(arm, data, d[(arm, data)]["score"], o[data]["score"], d[(arm, data)]["score"] / o[data]["score"]) for arm, data in YARDSTICK_ORDER]
 
 
 def markdown():
-    """The README table: every version of the v4 and v5 line on ONE yardstick, score 4.2's formula (docs/score_42.md), from experiments/yardstick_s42.json (eval/yardstick_s42.py: the data 4.0 runs are
-    re-scored from the stored runs, the data 4.2 runs are scored as run). Rows differ in data set, not in score. Releases 1 to 5 are in docs/results.md."""
-    from scoreboard import pct
-    d = {(x["arm"], x["data"]): x for x in json.load(open(YARDSTICK_PATH))}
+    """The README table: every version of the v4 and v5 line on ONE yardstick, score 4.2 (docs/score_42.md), beside the oracle of its data set and the share of it reached. Dollars are summed over the ten test
+    seeds of the row's data. Data 4.0 rows are re-scored from the stored runs. Releases 1 to 5 are in docs/results.md."""
     gl = "docs/glossary.md#results-columns"
     hov = lambda text, tip: f'[{text}]({gl} "{tip}")'
-    lines = ["| Version | " + hov("Data, seeds", "Data version and the ten test seeds. Rows on different data are not directly comparable.")
-             + " | " + hov("Upcoders found", "Providers whose true net level rate is 15% or more that were sent a demand, of all such providers in the ten datasets.")
-             + " | " + hov("Impossible-day billing found", "Providers who billed an impossible number of visits in a day that were sent a demand (data 4.2 only).")
-             + " | " + hov("Score 4.2", "Recovery minus staff cost minus provider abrasion, no records copy fee, a visit the office has no record of counted as overpaid (docs/score_42.md). The same formula on every row (data 4.0 rows re-scored from the stored runs). Dollars summed over ten seeds.") + " |",
-             "|---|---|---|---|---|"]
-    for arm, data in YARDSTICK_ORDER:
-        x = d[(arm, data)]
-        lane = "n/a" if x["lane_total"] is None else pct(x["lane_found"], x["lane_total"])
-        lines.append(f"| {arm} | {data} | {pct(x['found'], x['upcoders'])} | {lane} | {dollars(x['score'])} |")
-    lines += ["", "Hover over a column title for its definition ([glossary](docs/glossary.md#results-columns)). Every run and release: [results](docs/results.md), [v4.0 and v5.0](docs/v4_v5_results.md), [v4.1](docs/w41_fresh_result.md), [v5.1](docs/a51_fresh_result.md), [v4.2 and v5.2](docs/v42_test_result.md); releases 1 to 5: [release 1](docs/eval61.md), [5](docs/release5_results.md)."]
+    lines = ["| Version | " + hov("Data", "Data version; ten test seeds each. Rows on different data are not directly comparable.")
+             + " | " + hov("Score 4.2", "Recovery minus staff cost minus abrasion (docs/score_42.md), summed over ten seeds. Same formula on every row.")
+             + " | " + hov("Oracle", "Best conceivable score on the same ten datasets, using the answer key, with triage paid and every office answering (eval/oracle_s42.py).")
+             + " | " + hov("% of oracle", "Score divided by oracle.") + " |", "|---|---|---|---|---|"]
+    for arm, data, score, oracle, share in yardstick():
+        lines.append(f"| {arm} | {data} | {dollars(score)} | {dollars(oracle)} | {round(100 * share)}% |")
+    lines += ["", "[All results](docs/results.md) · [v4.0 and v5.0](docs/v4_v5_results.md) · [v4.1](docs/w41_fresh_result.md) · [v5.1](docs/a51_fresh_result.md) · [v4.2 and v5.2](docs/v42_test_result.md) · [releases 1 to 5](docs/release5_results.md)"]
     return "\n".join(lines)
 
 
@@ -210,10 +214,10 @@ def score_text(arm="A5.2"):
     w = score_parts_42(arm) if arm in dict(V42_ARMS) else score_parts(arm)
     f = lambda x: f"${x:,.0f}"
     if arm in dict(V42_ARMS):
-        return (f"- **Recovery +{f(w['recovery'])}:** {f(w['recovery_lane'])} of it from the visits-per-day check ({w['lane_demands']} of its demands), the rest from reviewing billing levels; {w['demands']} demands in all.\n"
-                f"- **Staff cost -{f(w['staff'])}:** chart review {f(w['charts'])} ({w['charts_n']} charts), requests {f(w['admin'])} ({w['rounds']} rounds), demand work {f(w['demand'])}, triage and model dollars {f(w['triage'])}.\n"
-                f"- **Abrasion -{f(w['abrasion'])}:** the cost to providers of requests and demands, weighted by how little they overbilled.\n"
-                f"- **Net score {dollars(w['score'])}** over ten seeds.")
+        return (f"- **Recovery +{f(w['recovery'])}:** {f(w['recovery_lane'])} from the visits-per-day check, the rest from reviewing billing levels.\n"
+                f"- **Staff cost -{f(w['staff'])}:** charts {f(w['charts'])}, requests {f(w['admin'])}, demands {f(w['demand'])}, triage and model {f(w['triage'])}.\n"
+                f"- **Abrasion -{f(w['abrasion'])}:** the cost to providers of requests and demands.\n"
+                f"- **Net {dollars(w['score'])}** for agent v5.2 over ten test seeds.")
     return (f"- **Recovery +{f(w['recovery'])}:** {w['found']} of {w['upcoders']} upcoders found, {w['demands']} demands, about {f(w['recovery'] / max(w['demands'], 1))} recovered per demand.\n"
             f"- **Staff cost -{f(w['staff'])}:** chart review {f(w['charts'])} ({w['charts_n']} charts), requests and copy fees {f(w['admin'])} ({w['rounds']} rounds), demand work {f(w['demand'])}, triage and model dollars {f(w['triage'])}.\n"
             f"- **Abrasion -{f(w['abrasion'])}:** the cost to providers of requests and demands; no honest provider was demanded from.\n"
@@ -221,13 +225,12 @@ def score_text(arm="A5.2"):
 
 
 def tldr():
-    """The README's summary, rendered from experiments/v4_fresh_results.json (data 4.0), release5_results.json (release 5) and v42_test_results.json (data 4.2, ten test seeds, score 4.2, summed)."""
-    w25, w40, a50, w41, a51 = v4_rows()
-    w41b, w42, a52 = v42_rows()
+    """The README's summary: the yardstick table in two sentences."""
+    y = {(a, d): (sc, orc, sh) for a, d, sc, orc, sh in yardstick()}
+    w42, a52, w41 = y[("Workflow v4.2", "4.2, test")], y[("Agent v5.2", "4.2, test")], y[("Workflow v4.1", "4.0, test")]
     lane = score_parts_42("W4.2")
-    return ("Every row of the table uses one score (score 4.2); the data 4.0 rows are re-scored from the stored runs, so rows on different data are not directly comparable. "
-            f"On data 4.2, which adds fraud, ten test seeds give: workflow v4.1 scores {dollars(w41b['net_total'])}; workflow v4.2 ({dollars(w42['net_total'])}) and agent v5.2 ({dollars(a52['net_total'])}) add a check on visits billed per day, "
-            f"which gives {round(100 * lane['recovery_lane'] / lane['recovery'])}% of their recovery. That signal is clean by construction in the synthetic data: read the gain as what a reviewer does with a clean signal, not as a forecast for real claims. Earlier data 4.0 results are in the linked pages.")
+    return (f"Every row uses score 4.2 (data 4.0 rows are re-scored from stored runs) beside the oracle of its data. Workflow v4.2 and agent v5.2 reach {round(100 * w42[2])}% and {round(100 * a52[2])}% of it on data 4.2, "
+            f"{round(100 * lane['recovery_lane'] / lane['recovery'])}% of their recovery from a visits-per-day check on a signal the synthetic data makes clean; workflow v4.1 reaches {round(100 * w41[2])}% on data 4.0.")
 
 
 def headline_cells():
