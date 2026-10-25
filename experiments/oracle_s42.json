@@ -1,0 +1,14 @@
+{
+ "4.0, test": {
+  "score": 74154.93,
+  "pursued": 43,
+  "recovered": 115428.28,
+  "lane_pursued": 0
+ },
+ "4.2, test": {
+  "score": 459399.68,
+  "pursued": 70,
+  "recovered": 499908.02,
+  "lane_pursued": 36
+ }
+}
