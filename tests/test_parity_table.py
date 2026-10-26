@@ -1,4 +1,4 @@
-"""The features-mirror rule (docs/versioning.md): every row of every release's feature table has both a workflow and an agent cell, and a row that is one-sided (n/a, not built,
+"""The features-mirror rule (docs/feature_parity.md): every row of every release's feature table has both a workflow and an agent cell, and a row that is one-sided (n/a, not built,
 moved, do not build, or built in only one stream) states a reason. Run: python tests/test_parity_table.py"""
 import os
 import re
@@ -34,7 +34,7 @@ def problems(text):
 
 
 def test_every_feature_row_has_both_streams_and_a_reason_when_one_sided():
-    assert problems(open(os.path.join(ROOT, "docs", "versioning.md")).read()) == []
+    assert problems(open(os.path.join(ROOT, "docs", "feature_parity.md")).read()) == []
 
 
 def test_the_check_catches_the_failures_it_is_for():

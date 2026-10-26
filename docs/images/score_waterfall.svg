@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" width="1000" height="300" font-family="Helvetica, Arial, sans-serif">
-<rect width="1000" height="300" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 270" width="1000" height="270" font-family="Helvetica, Arial, sans-serif">
+<rect width="1000" height="270" fill="#ffffff"/>
 <text x="30" y="30" font-size="16" font-weight="bold" fill="#1f2937">What sets the score: agent v5.2, ten test seeds, dollars summed over the seeds</text>
 <rect x="140" y="78.0" width="110" height="134.0" rx="3" fill="none" stroke="#15803d" stroke-width="2.5"/>
 <text x="195" y="72.0" text-anchor="middle" font-size="13" font-weight="bold" fill="#1f2937">+$391,910</text>

@@ -153,6 +153,8 @@ def agent_actions():
         s.append(f'<rect x="{x}" y="490" width="{bw}" height="56" rx="10" fill="none" stroke="{col}" stroke-width="2" stroke-dasharray="6 4"/>')
         s.append(f'<text x="{x + 16}" y="513" font-size="13" font-weight="bold" fill="{INK}">{escape(t)}</text>')
         s.append(f'<text x="{x + 16}" y="533" font-size="12" fill="{MUTED}">{escape(sub)}</text>')
+    s.append(f'<path d="M760 466 V478 H500 V490" stroke="{MUTED}" stroke-width="1.5" marker-end="url(#a)" fill="none"/>')           # Submit findings -> the checks
+    s.append(f'<path d="M645 518 H678" stroke="{MUTED}" stroke-width="1.5" marker-end="url(#a)" fill="none"/>')                       # the checks -> PI teams review the drafts
     s.append(f'<path d="M30 248 H12 V518 H30" stroke="{ORANGE}" stroke-width="2.5" fill="none" marker-start="url(#b)" marker-end="url(#b)"/>')       # follow-ups go out, answers come back
     s.append(f'<text x="38" y="478" font-size="11.5" fill="{ORANGE}">follow-up and answer loop</text>')
     key = [(BLUE, "statistics (the screen)"), (GREEN, "plain code and checks"), (ORANGE, "the agent (a model)"), (PEOPLE, "PI teams")]
