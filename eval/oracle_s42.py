@@ -57,7 +57,7 @@ def oracle(code, seed=11, draws=20):
     price = 2 * p["C_BURDEN"] + p["C_DEMAND_ABRASION"]
     price1 = p["C_BURDEN"] + p["C_DEMAND_ABRASION"]           # one request round (the stratum channel alone)
     rng = random.Random(seed)
-    tot = {"score": 0.0, "recovered": 0.0, "recovered_level_only": 0.0, "recovered_impossible_day_providers": 0.0, "recovered_other_phantom_providers": 0.0, "staff": 0.0, "abrasion": 0.0, "pursued": 0, "level_only": 0, "stratum_only": 0, "both": 0, "pursued_with_rate_below_5pct": 0}
+    tot = {"_ids": [], "score": 0.0, "recovered": 0.0, "recovered_level_only": 0.0, "recovered_impossible_day_providers": 0.0, "recovered_other_phantom_providers": 0.0, "staff": 0.0, "abrasion": 0.0, "pursued": 0, "level_only": 0, "stratum_only": 0, "both": 0, "pursued_with_rate_below_5pct": 0}
     for pid, cl in claims.items():
         ids = [r["claim_id"] for r in cl]
         rendered_rows = [r for r in cl if r["claim_id"] not in fraud]
@@ -111,6 +111,7 @@ def oracle(code, seed=11, draws=20):
             continue
         v, lb, kind = max(opts, key=lambda o: o[0])
         if v > 0:
+            tot["_ids"].append(pid)
             tot["score"] += v; tot["recovered"] += lb; tot["pursued"] += 1
             ab = w * (price1 if kind == "S" else price)
             tot["abrasion"] += ab
@@ -129,7 +130,8 @@ def run():
         for c in codes:
             o = oracle(c)
             for k, v in o.items():
-                tot[k] = tot.get(k, 0) + v
+                if not k.startswith("_"):
+                    tot[k] = tot.get(k, 0) + v
         out[name] = {k: round(v, 2) for k, v in tot.items()}
         print(name, out[name], flush=True)
     return out
