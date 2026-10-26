@@ -151,8 +151,8 @@ def r1_total(arm):
 
 YARDSTICK_PATH = os.path.join(ROOT, "experiments", "yardstick_s42.json")
 ORACLE_PATH = os.path.join(ROOT, "experiments", "oracle_s42.json")
-# data 4.0 then data 4.2; inside each, workflows before agents
-YARDSTICK_ORDER = [("Workflow v4.0", "4.0, test"), ("Workflow v4.1", "4.0, test"), ("Agent v5.0", "4.0, test"), ("Agent v5.1", "4.0, test"),
+# chronological order of development: data 4.0 (workflow v4.0, agent v5.0, workflow v4.1, agent v5.1), then data 4.2 (workflow v4.1 re-run, workflow v4.2, agent v5.2)
+YARDSTICK_ORDER = [("Workflow v4.0", "4.0, test"), ("Agent v5.0", "4.0, test"), ("Workflow v4.1", "4.0, test"), ("Agent v5.1", "4.0, test"),
                    ("Workflow v4.1", "4.2, test"), ("Workflow v4.2", "4.2, test"), ("Agent v5.2", "4.2, test")]
 
 
@@ -170,7 +170,7 @@ def markdown():
     hov = lambda text, tip: f'[{text}]({gl} "{tip}")'
     lines = ["| Version | " + hov("Data", "Data version; ten test seeds each. Rows on different data are not directly comparable.")
              + " | " + hov("Score 4.2", "Recovery minus staff cost minus abrasion (docs/score_42.md), summed over ten seeds. Same formula on every row.")
-             + " | " + hov("Oracle", "Best conceivable score on the same ten datasets, using the answer key, with triage paid and every office answering (eval/oracle_s42.py).")
+             + " | " + hov("Oracle", "Best conceivable score on the same ten datasets under the same rules, using the answer key; pays triage, staff cost and abrasion; every office answers (docs/score_42.md).")
              + " | " + hov("% of oracle", "Score divided by oracle.") + " |", "|---|---|---|---|---|"]
     for arm, data, score, oracle, share in yardstick():
         lines.append(f"| {arm} | {data} | {dollars(score)} | {dollars(oracle)} | {round(100 * share)}% |")

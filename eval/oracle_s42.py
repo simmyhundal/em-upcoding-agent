@@ -27,12 +27,19 @@ import recovery_42 as r42  # noqa: E402
 import records as rcd  # noqa: E402
 import score_40 as s4  # noqa: E402
 
-NS = (30, 60, 90, 150)
+LEVEL_NS = (30, 60, 90, 150)
+STRATUM_NS = (30, 60, 90)
 FRAUD = ("not_rendered", "impossible_days")
 OUT = os.path.join(ROOT, "experiments", "oracle_s42.json")
 
 
-def oracle(code, seed=11, draws=6):
+def oracle(code, seed=11, draws=20):
+    """Perfect knowledge of the answer key, inside score 4.2's recovery rules. Per provider the oracle may use two recovery channels and pays for what it uses:
+      level channel (L): a random sample of n of the provider's claims (n = 30, 60, 90, 150 or all of them); sampled claims for visits that never happened return no record and count at their paid amount;
+      stratum channel (S): a stratified sample drawn within the provider's claims for visits that never happened (the oracle knows which they are); n = 30, 60, 90 or all of them.
+    A pursuit is one of L, S or L plus S (on the claims outside the stratum); it pays the charts received, the request rounds (2 for L, 1 for S, 2 for both), one demand, one triage, and abrasion
+    w x (2 rounds x $43.84 + $2,000) with w from the provider's TOTAL true rate. It pursues a provider (honest or not) only when the value is positive, at its best n. Values are expected 90% lower bounds
+    averaged over `draws` random samples (a census has no sampling error). It assumes every office answers and the screen is perfect: an upper bound, not an arm. Returns totals and a breakdown."""
     p = r42.params42()
     data = os.path.join(ROOT, "data", f"synthetic_v2_{code}")
     key = json.load(open(os.path.join(ROOT, "eval", "answer_key", f"ground_truth_v2_{code}.json")))
@@ -48,59 +55,81 @@ def oracle(code, seed=11, draws=6):
     chart = r4.staff_cost(0, 0, 1, 0, 0, p)[0]
     rnd, dem, tri = r4.staff_cost(0, 1, 0, 0, 0, p)[0], r4.staff_cost(0, 0, 0, 1, 0, p)[0], r4.staff_cost(1, 0, 0, 0, 0, p)[0]
     price = 2 * p["C_BURDEN"] + p["C_DEMAND_ABRASION"]
+    price1 = p["C_BURDEN"] + p["C_DEMAND_ABRASION"]           # one request round (the stratum channel alone)
     rng = random.Random(seed)
-    total = {"score": 0.0, "pursued": 0, "recovered": 0.0, "lane_pursued": 0}
+    tot = {"score": 0.0, "recovered": 0.0, "recovered_level_only": 0.0, "recovered_impossible_day_providers": 0.0, "recovered_other_phantom_providers": 0.0, "staff": 0.0, "abrasion": 0.0, "pursued": 0, "level_only": 0, "stratum_only": 0, "both": 0, "pursued_with_rate_below_5pct": 0}
     for pid, cl in claims.items():
         ids = [r["claim_id"] for r in cl]
-        if len(ids) < 50:
-            continue
         rendered_rows = [r for r in cl if r["claim_id"] not in fraud]
         t = s4.provider_truth(rendered_rows, key["justified_cpt_by_claim"], allowed)
         ph = sum(1 for r in cl if r["claim_id"] in fraud)
         rate = (t["upcoded"] - t["downcoded"] + ph) / max(t["claims"] + ph, 1)
         w = s4.abrasion_weight(rate, p)
-        best = None
-        for n in NS:                                                   # level option
-            vals, got = [], []
-            for _ in range(draws):
-                sample = rng.sample(ids, min(n, len(ids)))
-                rendered = {c for c in sample if c not in fraud}
-                vals.append(r42.recovery(cl, rendered, level, p)["value"])
-                got.append(len(rendered))
-            lb, g = st.mean(vals), st.mean(got)
-            v = lb - (g * chart + 2 * rnd + dem + tri) - w * price
-            if best is None or v > best[0]:
-                best = (v, lb, False)
-        days = {}
-        for r in cl:
-            days[r["service_date"]] = days.get(r["service_date"], 0) + 1
-        hot = {d for d, k in days.items() if k >= fwa_lane.DAY_MAX}
-        if hot:                                                        # lane option
-            stratum = [r for r in cl if r["service_date"] in hot]
-            sids = [r["claim_id"] for r in stratum]
-            vals, got = [], []
-            for _ in range(draws):
-                sample = rng.sample(sids, min(fwa_lane.SAMPLE_N, len(sids)))
-                nr = {c for c in sample if c in fraud}
-                vals.append(r42.recovery_stratified(stratum, sample, level, p, no_record=nr)["value"])
-                got.append(len(sample) - len(nr))
-            lb, g = st.mean(vals), st.mean(got)
-            v = lb - (g * chart + rnd + dem + tri)
-            if v > best[0]:
-                best = (v, lb, True)
-        if best[0] > 0:
-            total["score"] += best[0]; total["pursued"] += 1; total["recovered"] += best[1]; total["lane_pursued"] += int(best[2])
-    return total
+        sids = [c for c in ids if c in fraud]
+        stratum = [r for r in cl if r["claim_id"] in set(sids)]
+        outside = [r for r in cl if r["claim_id"] not in set(sids)]
+        oids = [r["claim_id"] for r in outside]
+
+        def level_opt(rows, pool_ids):
+            """best (lower bound, charts received) over n for the level channel on `rows`"""
+            best = None
+            for n in LEVEL_NS + (len(pool_ids),):
+                n = min(n, len(pool_ids))
+                if n <= 0:
+                    continue
+                vals, got = [], []
+                for _ in range(1 if n == len(pool_ids) else draws):
+                    sample = pool_ids if n == len(pool_ids) else rng.sample(pool_ids, n)
+                    nr = {c for c in sample if c in fraud}
+                    vals.append(r42.recovery(rows, set(sample), level, p, no_record=nr)["value"])
+                    got.append(len(sample) - len(nr))
+                lb, g = st.mean(vals), st.mean(got)
+                cand = (lb - g * chart, lb, g)
+                if best is None or cand[0] > best[0]:
+                    best = cand
+            return best
+        L = level_opt(cl, ids)                                               # (lb - chart cost, lb, charts)
+        opts = []
+        if L:
+            opts.append((L[0] - 2 * rnd - dem - tri - w * price, L[1], "L"))
+        S = None
+        if sids:
+            for n in STRATUM_NS + (len(sids),):
+                n = min(n, len(sids))
+                vals = []
+                for _ in range(1 if n == len(sids) else draws):
+                    sample = sids if n == len(sids) else rng.sample(sids, n)
+                    vals.append(r42.recovery_stratified(stratum, sample, level, p, no_record=set(sample))["value"])
+                lb = st.mean(vals)                                           # every sampled claim is a visit that never happened: no chart is received
+                if S is None or lb > S[1]:
+                    S = (lb, lb, 0)
+            opts.append((S[1] - rnd - dem - tri - w * price1, S[1], "S"))
+            LO = level_opt(outside, oids) if oids else None
+            if LO:
+                opts.append((S[1] + LO[1] - LO[2] * chart - 2 * rnd - dem - tri - w * price, S[1] + LO[1], "LS"))
+        if not opts:
+            continue
+        v, lb, kind = max(opts, key=lambda o: o[0])
+        if v > 0:
+            tot["score"] += v; tot["recovered"] += lb; tot["pursued"] += 1
+            ab = w * (price1 if kind == "S" else price)
+            tot["abrasion"] += ab
+            tot["staff"] += lb - v - ab
+            tot[{"L": "level_only", "S": "stratum_only", "LS": "both"}[kind]] += 1
+            imp = any(fraud.get(c) == "impossible_days" for c in sids)
+            tot["recovered_level_only" if kind == "L" else "recovered_impossible_day_providers" if imp else "recovered_other_phantom_providers"] += lb
+            tot["pursued_with_rate_below_5pct"] += int(rate < 0.05)
+    return tot
 
 
 def run():
     out = {}
     for name, codes in (("4.0, test", [f"f4_{5555 + 101 * j}" for j in range(10)]), ("4.2, test", [f"d42_{s}" for s in pool.TEST])):
-        tot = {"score": 0.0, "pursued": 0, "recovered": 0.0, "lane_pursued": 0}
+        tot = {}
         for c in codes:
             o = oracle(c)
-            for k in tot:
-                tot[k] += o[k]
+            for k, v in o.items():
+                tot[k] = tot.get(k, 0) + v
         out[name] = {k: round(v, 2) for k, v in tot.items()}
         print(name, out[name], flush=True)
     return out

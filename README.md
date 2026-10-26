@@ -32,19 +32,19 @@ Abrasion   = $43.84 per request round + $2,000 per demand, weighted by how hones
 
 ## Results
 <!-- tldr:start -->
-Every row uses score 4.2 (data 4.0 rows are re-scored from stored runs) beside the oracle of its data. Workflow v4.2 and agent v5.2 reach 82% and 81% of it on data 4.2, 94% of their recovery from a visits-per-day check on a signal the synthetic data makes clean; workflow v4.1 reaches 21% on data 4.0.
+Every row uses score 4.2 (data 4.0 rows are re-scored from stored runs) beside the oracle of its data. Workflow v4.2 and agent v5.2 reach 60% and 59% of it on data 4.2, 94% of their recovery from a visits-per-day check on a signal the synthetic data makes clean; workflow v4.1 reaches 25% on data 4.0.
 <!-- tldr:end -->
 
 <!-- release23:start -->
-| Version | [Data](docs/glossary.md#results-columns "Data version; ten test seeds each. Rows on different data are not directly comparable.") | [Score 4.2](docs/glossary.md#results-columns "Recovery minus staff cost minus abrasion (docs/score_42.md), summed over ten seeds. Same formula on every row.") | [Oracle](docs/glossary.md#results-columns "Best conceivable score on the same ten datasets, using the answer key, with triage paid and every office answering (eval/oracle_s42.py).") | [% of oracle](docs/glossary.md#results-columns "Score divided by oracle.") |
+| Version | [Data](docs/glossary.md#results-columns "Data version; ten test seeds each. Rows on different data are not directly comparable.") | [Score 4.2](docs/glossary.md#results-columns "Recovery minus staff cost minus abrasion (docs/score_42.md), summed over ten seeds. Same formula on every row.") | [Oracle](docs/glossary.md#results-columns "Best conceivable score on the same ten datasets under the same rules, using the answer key; pays triage, staff cost and abrasion; every office answers (docs/score_42.md).") | [% of oracle](docs/glossary.md#results-columns "Score divided by oracle.") |
 |---|---|---|---|---|
-| Workflow v4.0 | 4.0, test | -$6,212 | $74,155 | -8% |
-| Workflow v4.1 | 4.0, test | $15,791 | $74,155 | 21% |
-| Agent v5.0 | 4.0, test | -$3,762 | $74,155 | -5% |
-| Agent v5.1 | 4.0, test | $11,206 | $74,155 | 15% |
-| Workflow v4.1 | 4.2, test | $17,713 | $459,400 | 4% |
-| Workflow v4.2 | 4.2, test | $375,031 | $459,400 | 82% |
-| Agent v5.2 | 4.2, test | $372,114 | $459,400 | 81% |
+| Workflow v4.0 | 4.0, test | -$6,212 | $62,662 | -10% |
+| Agent v5.0 | 4.0, test | -$3,762 | $62,662 | -6% |
+| Workflow v4.1 | 4.0, test | $15,791 | $62,662 | 25% |
+| Agent v5.1 | 4.0, test | $11,206 | $62,662 | 18% |
+| Workflow v4.1 | 4.2, test | $17,713 | $627,805 | 3% |
+| Workflow v4.2 | 4.2, test | $375,031 | $627,805 | 60% |
+| Agent v5.2 | 4.2, test | $372,114 | $627,805 | 59% |
 
 [All results](docs/results.md) · [v4.0 and v5.0](docs/v4_v5_results.md) · [v4.1](docs/w41_fresh_result.md) · [v5.1](docs/a51_fresh_result.md) · [v4.2 and v5.2](docs/v42_test_result.md) · [releases 1 to 5](docs/release5_results.md)
 <!-- release23:end -->

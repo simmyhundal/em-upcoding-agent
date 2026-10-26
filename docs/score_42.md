@@ -32,7 +32,17 @@ Netting (underpayments reduce the estimate), the extrapolation gate (assumption:
 Demands, lane providers flagged and right (providers with impossible-visit billing), lane providers wrong, level and lane recovery, providers justified at m = 1 that were sent a demand, true overpayment available and pursued, and the score under score 4.0 through the adapter (`eval/d42_truth.py`). The justification threshold *m* is not settled; the primary view is m = 1.
 
 ## The oracle
-`eval/oracle_s42.py` computes the best conceivable score on the same datasets from the answer key: it pursues a provider only when the expected recovery beats the staff cost (triage included) and the abrasion, takes the better of a level chart sample (30, 60, 90 or 150 charts) and, for providers with a day of 30 or more visits, the volume-lane sample, and assumes every office answers and the screen is perfect. Ten data 4.0 test datasets: $74,155; ten data 4.2 test datasets: $459,400. The README shows each version's score as a share of it. It is an upper bound, not a target.
+`eval/oracle_s42.py` computes the best conceivable score on the same datasets from the answer key, **inside score 4.2's recovery rules**. Per provider it may use a random chart sample of n claims (30, 60, 90, 150 or all of them) and, where the provider billed visits that never happened, a stratified sample drawn within exactly those claims (it knows which they are; n = 30, 60, 90 or all). It pays the charts received, the request rounds, one demand and one triage, and abrasion weighted by the provider's total true rate, and it pursues **any provider, honest or not, when the expected value is positive**. Values are expected 90% lower bounds averaged over 20 random samples. It assumes every office answers and the screen is perfect.
+
+| Ten test datasets | Data 4.0 | Data 4.2 |
+|---|---|---|
+| Oracle score | $62,662 | $627,805 |
+| Recovered | $100,688 | $699,963 (level only $57,522; impossible-day providers $477,256; other providers who billed visits never rendered $165,185) |
+| Staff cost | $38,026 | $46,666 |
+| Abrasion | $0 | $25,493 |
+| Providers pursued | 39 | 102 (6 with a true rate under 5%) |
+
+Workflow v4.2 recovered $395,924 on the same data: $370,474 of the oracle's $477,256 from impossible-day providers (78%), $25,450 of its $57,522 level dollars (44%), and nothing of the $165,185 from providers whose phantom visits are spread over patients (no volume signal; [#199](https://github.com/simmyhundal/em-upcoding-agent/issues/199)). An earlier version of the oracle reported $74,155 and $459,400; it averaged only 6 samples (choosing the best sample size from noisy estimates biases the oracle upward; the data 4.0 figure fell from $74,155 to $62,662 with 20 samples), and it considered only the impossible-day strata, not the other providers' phantom visits. It is an upper bound under these rules, not a target. It is not an upper bound on what a payer could recover with other rules: a targeted request for the exact claims known to be overbilled earns nothing here, because the score counts only random and stratified samples.
 
 ## Known weaknesses
 - The copy-fee profile and the 15% gate are assumptions.
