@@ -52,7 +52,7 @@ def make_office(v2_dir, view_dir, version="3.0", seed=1, correlation=0.0, roles=
     never holds the answer key's roles (issue 100). `roles` ({provider_id: role}) is used by the office only to draw hidden behavior when correlation > 0 (a test, never in evaluations);
     at correlation 0 it is dropped here and the office never receives it."""
     return provider_sim.Office(v2_dir, view_dir, seed=seed, correlation=correlation, roles=roles if correlation > 0 else None,
-                               version="4.2" if version == "5.2" else "2.1" if version in ("3.1", "3.2", "3.3", "3.4", "3.5", "5.0", "5.1") else "2.0")
+                               version="4.3" if version == "5.3" else "4.2" if version == "5.2" else "2.1" if version in ("3.1", "3.2", "3.3", "3.4", "3.5", "5.0", "5.1") else "2.0")
 
 
 class Environment:
@@ -64,14 +64,15 @@ class Environment:
         flag_data_issue (issue 81). "3.0" is the frozen agent.
         office: a simulated provider office built by `make_office` (the caller owns it; any answer-key roles for a correlation test go there, never here). None builds the default office
         (correlation 0, no roles), which is what every evaluation uses."""
-        self.v31 = version in ("3.1", "3.2", "3.3", "3.4", "3.5", "5.0", "5.1", "5.2")
-        self.v32 = version in ("3.2", "3.3", "3.4", "3.5", "5.0", "5.1", "5.2")
-        self.v33 = version in ("3.3", "3.4", "3.5", "5.0", "5.1", "5.2")
-        self.v34 = version in ("3.4", "3.5", "5.0", "5.1", "5.2")                     # release 4 (issue 108): everything in 3.3 plus the read-only advisor tool advise_next_step                     # release 3 (issue 99): rules 2.3, the eb_ratio_t screen, a top-10% list; data stays 2.2
-        self.v51 = version in ("5.1", "5.2")                     # release 5.1 (A5.1): mirrors workflow v4.1 (H23, N = 4): a list of the first 4, the loosened rules 4.0 chart test, the near-miss extension
-        self.v52 = version == "5.2"                     # release 5.2 (A5.2): workflow v4.2: A5.1 plus the claims-data lane (volume_screen, request_stratum, send_demand) on data 4.2 and office 4.2
-        self.v50 = version in ("5.0", "5.1", "5.2")                     # release 5.0 (issue 128): mirrors workflow v4.0: the eb_upper_t screen, rules 4.0, ask-or-skip advice refitted on score 4.0, no escalation advice, a demand floor, style repair
-        self.v35 = version in ("3.5", "5.0", "5.1", "5.2")                     # release 5 (issues 111 to 113): advice inside tool results (workflow v2.5 policy), binding rules, practice status each turn
+        self.v31 = version in ("3.1", "3.2", "3.3", "3.4", "3.5", "5.0", "5.1", "5.2", "5.3")
+        self.v32 = version in ("3.2", "3.3", "3.4", "3.5", "5.0", "5.1", "5.2", "5.3")
+        self.v33 = version in ("3.3", "3.4", "3.5", "5.0", "5.1", "5.2", "5.3")
+        self.v34 = version in ("3.4", "3.5", "5.0", "5.1", "5.2", "5.3")                     # release 4 (issue 108): everything in 3.3 plus the read-only advisor tool advise_next_step                     # release 3 (issue 99): rules 2.3, the eb_ratio_t screen, a top-10% list; data stays 2.2
+        self.v51 = version in ("5.1", "5.2", "5.3")                     # release 5.1 (A5.1): mirrors workflow v4.1 (H23, N = 4): a list of the first 4, the loosened rules 4.0 chart test, the near-miss extension
+        self.v52 = version in ("5.2", "5.3")                     # release 5.2 (A5.2): workflow v4.2: A5.1 plus the claims-data lane (volume_screen, request_stratum, send_demand) on data 4.2 and office 4.2
+        self.v53 = version == "5.3"                     # release 5.3 (A5.3): agent v5.2 plus the lane-completion gate (issue 208); the other W4.3 features are added to this flag as the workflow freezes
+        self.v50 = version in ("5.0", "5.1", "5.2", "5.3")                     # release 5.0 (issue 128): mirrors workflow v4.0: the eb_upper_t screen, rules 4.0, ask-or-skip advice refitted on score 4.0, no escalation advice, a demand floor, style repair
+        self.v35 = version in ("3.5", "5.0", "5.1", "5.2", "5.3")                     # release 5 (issues 111 to 113): advice inside tool results (workflow v2.5 policy), binding rules, practice status each turn
         self.extended, self.advice_log, self.last_advice, self.overrides, self.rule_result, self.p25, self.p25_rows = set(), [], {}, [], {}, None, {}
         self.dq, self.data_issues, self.held = None, [], set()
         if self.v32:                                    # version 3.2: the data-quality pre-flight runs once per load (issue 81)
@@ -495,6 +496,14 @@ class Environment:
                (sr.UPCODING, sr.HIGH_ACUITY, sr.INCONCLUSIVE)]
         if bad:
             return {"error": f"invalid provider or leaning for: {bad}"}
+        if self.v53:                                    # version 5.3 (issue 208): every provider on the volume screen's table is taken through the lane or set aside with a stated reason
+            import fwa_lane
+            table = [pid for pid, _t, _h in fwa_lane.flag(self.claims, fwa_lane.DAY_MAX, fwa_lane.MAX_FLAGGED)]
+            aside_ids = {a.get("provider_id") for a in (set_aside or []) if str(a.get("reason", "")).strip()}
+            pending = [pid for pid in table if pid not in self.lane and pid not in aside_ids]
+            if pending:
+                return {"error": "every provider on the volume screen's table must be taken through request_stratum, or set aside with a reason, before you submit",
+                        "pending": pending, "how": "call request_stratum for each (and send_demand where it recommends one), or add the provider to set_aside with the reason"}
         if self.v34:                                    # version 3.4: the rules are applied to every provider whose records arrived (mirrors the workflow, which always does)
             unreviewed = sorted(p for p, st in self.office.state.items() if st["usable"] and p not in self.reviewed and not (self.v52 and p in self.lane and not st["kinds"] or self.v52 and p in self.lane and all(k == "targeted" for k in st["kinds"].values())))
             if unreviewed:

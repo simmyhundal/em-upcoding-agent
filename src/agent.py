@@ -140,6 +140,11 @@ sample supports. Call send_demand for each provider whose recommended action is 
 3. The lane is independent of the list of four. Run the level review as before for the providers whose advice is ASK."""
 
 
+SYSTEM_53 = SYSTEM_52 + """
+
+Version 5.3 additions (release 4.3 and 5.3). submit_findings now refuses until every provider on the volume screen's table has been taken through request_stratum, or is listed in set_aside with a one-line reason (for example: the lower bound could not cover a demand and the office is silent). Do the lane first, then the level review, then submit once."""
+
+
 def _cost(usage, price=(4.00, 20.00)):
     inp = getattr(usage, "input_tokens", 0) or 0
     out = getattr(usage, "output_tokens", 0) or 0
@@ -167,7 +172,7 @@ def run_agent(env, task, client=None, model=MODEL, system=None, max_tool_calls=M
             reason = "dollar cap"
             break
         turn += 1
-        resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_52 if getattr(env, 'v52', False) else SYSTEM_51 if getattr(env, 'v51', False) else SYSTEM_50 if getattr(env, 'v50', False) else SYSTEM_35 if getattr(env, 'v35', False) else SYSTEM_34 if getattr(env, 'v34', False) else SYSTEM_33 if getattr(env, 'v33', False) else SYSTEM_32 if getattr(env, 'v32', False) else SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
+        resp = client.messages.create(model=model, max_tokens=8000, system=system or (SYSTEM_53 if getattr(env, 'v53', False) else SYSTEM_52 if getattr(env, 'v52', False) else SYSTEM_51 if getattr(env, 'v51', False) else SYSTEM_50 if getattr(env, 'v50', False) else SYSTEM_35 if getattr(env, 'v35', False) else SYSTEM_34 if getattr(env, 'v34', False) else SYSTEM_33 if getattr(env, 'v33', False) else SYSTEM_32 if getattr(env, 'v32', False) else SYSTEM_31 if getattr(env, 'v31', False) else SYSTEM), tools=tools, messages=messages,
                                       output_config={"effort": effort}, extra_body={"cache_control": {"type": "ephemeral"}})
         usd += _cost(resp.usage) * price_scale
         if getattr(env, "v32", False):

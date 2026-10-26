@@ -30,7 +30,7 @@ def replay(run_id, code_run, version="3.0"):
     for line in open(os.path.join(out, "audit.jsonl")):
         a = json.loads(line)
         args = a["args"]
-        if version in ("5.1", "5.2") and a["tool"] == "request_records" and a.get("result", "").startswith('{"error"'):
+        if version in ("5.1", "5.2", "5.3") and a["tool"] == "request_records" and a.get("result", "").startswith('{"error"'):
             continue                                # agent v5.1 refuses some requests itself (extension gate, budget); those never reached the office, so they are not replayed
         if a["tool"] == "request_records":
             office.send_request(args["provider_id"], args["sample"], args.get("deadline_days", provider_sim.DEFAULT_DEADLINE))
@@ -82,7 +82,7 @@ def main(run_id, code_run, version="3.0", llm_judge=None):
     """llm_judge None: the LLM judge for 3.0 and 3.1 (as run); 3.2 skips it and only builds the view the rule judge reads (issues 92 and 93)."""
     view = build_view(run_id, code_run, version)
     if llm_judge is None:
-        llm_judge = version not in ("3.2", "3.3", "3.4", "3.5", "5.0", "5.1", "5.2")
+        llm_judge = version not in ("3.2", "3.3", "3.4", "3.5", "5.0", "5.1", "5.2", "5.3")
     if not llm_judge:
         print(run_id, "view rebuilt; no LLM judge")
         return
