@@ -1,0 +1,92 @@
+{
+ "score 4.2 (reference, as in the README)": {
+  "Workflow v4.0 (4.0)": -6212,
+  "Workflow v4.1 (4.0)": 15791,
+  "Agent v5.0 (4.0)": -3762,
+  "Agent v5.1 (4.0)": 11206,
+  "Workflow v4.1 (4.2)": 17713,
+  "Workflow v4.2 (4.2)": 375031,
+  "Agent v5.2 (4.2)": 372114
+ },
+ "score 4.3 defaults": {
+  "Workflow v4.0 (4.0)": -7317,
+  "Workflow v4.1 (4.0)": 8380,
+  "Agent v5.0 (4.0)": -4882,
+  "Agent v5.1 (4.0)": 5211,
+  "Workflow v4.1 (4.2)": 10510,
+  "Workflow v4.2 (4.2)": -36177,
+  "Agent v5.2 (4.2)": -37945
+ },
+ "  referral collection 85% (the payer recoups by offset itself)": {
+  "Workflow v4.0 (4.0)": -7317,
+  "Workflow v4.1 (4.0)": 8380,
+  "Agent v5.0 (4.0)": -4882,
+  "Agent v5.1 (4.0)": 5211,
+  "Workflow v4.1 (4.2)": 10510,
+  "Workflow v4.2 (4.2)": 152765,
+  "Agent v5.2 (4.2)": 150997
+ },
+ "  referral cost $2,000": {
+  "Workflow v4.0 (4.0)": -7317,
+  "Workflow v4.1 (4.0)": 8380,
+  "Agent v5.0 (4.0)": -4882,
+  "Agent v5.1 (4.0)": 5211,
+  "Workflow v4.1 (4.2)": 10510,
+  "Workflow v4.2 (4.2)": 23823,
+  "Agent v5.2 (4.2)": 22055
+ },
+ "  referral cost $0 (as score 4.2)": {
+  "Workflow v4.0 (4.0)": -7317,
+  "Workflow v4.1 (4.0)": 8380,
+  "Agent v5.0 (4.0)": -4882,
+  "Agent v5.1 (4.0)": 5211,
+  "Workflow v4.1 (4.2)": 10510,
+  "Workflow v4.2 (4.2)": 75543,
+  "Agent v5.2 (4.2)": 73775
+ },
+ "  no appeal reduction": {
+  "Workflow v4.0 (4.0)": -6834,
+  "Workflow v4.1 (4.0)": 11712,
+  "Agent v5.0 (4.0)": -4391,
+  "Agent v5.1 (4.0)": 7884,
+  "Workflow v4.1 (4.2)": 13755,
+  "Workflow v4.2 (4.2)": -19039,
+  "Agent v5.2 (4.2)": -21319
+ },
+ "  demand collection 55%": {
+  "Workflow v4.0 (4.0)": -8284,
+  "Workflow v4.1 (4.0)": 1715,
+  "Agent v5.0 (4.0)": -5863,
+  "Agent v5.1 (4.0)": -137,
+  "Workflow v4.1 (4.2)": 4020,
+  "Workflow v4.2 (4.2)": -42667,
+  "Agent v5.2 (4.2)": -43411
+ },
+ "  gate as score 4.2 (15% of claims)": {
+  "Workflow v4.0 (4.0)": -7317,
+  "Workflow v4.1 (4.0)": 8380,
+  "Agent v5.0 (4.0)": -4882,
+  "Agent v5.1 (4.0)": 5211,
+  "Workflow v4.1 (4.2)": 10510,
+  "Workflow v4.2 (4.2)": -36177,
+  "Agent v5.2 (4.2)": -37945
+ },
+ "  no gate (0%)": {
+  "Workflow v4.0 (4.0)": -7317,
+  "Workflow v4.1 (4.0)": 8380,
+  "Agent v5.0 (4.0)": -4882,
+  "Agent v5.1 (4.0)": 5211,
+  "Workflow v4.1 (4.2)": 10510,
+  "Workflow v4.2 (4.2)": -36177,
+  "Agent v5.2 (4.2)": -37945
+ },
+ "  copy fee $90": {
+  "Workflow v4.0 (4.0)": -12717,
+  "Workflow v4.1 (4.0)": 2620,
+  "Agent v5.0 (4.0)": -8932,
+  "Agent v5.1 (4.0)": 1431,
+  "Workflow v4.1 (4.2)": 6460,
+  "Workflow v4.2 (4.2)": -46707,
+  "Agent v5.2 (4.2)": -46945
+ }
+}
