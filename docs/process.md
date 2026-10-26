@@ -11,7 +11,7 @@ A release Y pairs data 4.Y, workflow v4.Y, agent v5.Y and a score version S4.Y t
 ## The steps
 
 **1. Core stories.** File issues in the new release's milestone that fix the shortcomings of the last release, from what its test showed and hypotheses about the causes. Before any work, write down:
-- *The yardsticks.* The last release's workflow on the same new test seeds (free to run), the do-nothing baseline (zero), and the **oracle**: the best conceivable score under the same score version, with the same costs a tuned arm pays, **triage included** (it lists, and so triages, the providers it pursues). Report "score divided by oracle score" with the oracle's definition and seeds (see [ceiling benchmarks](ceiling_benchmarks_w41.md)). The oracle uses the answer key, so it is an upper bound.
+- *The yardsticks.* The last release's workflow on the same new test seeds (free to run), the do-nothing baseline (zero), and the **oracle**: the best conceivable score under the same score version, with the same costs a tuned arm pays, **triage included** (it lists, and so triages, the providers it pursues). **Stress-test every yardstick when it is built** (a README table will quote it for months): write down the rules it works inside and what they exclude; print its breakdown (recovered, staff cost, abrasion, providers pursued, by kind); use at least 20 random samples per estimate, because choosing the best of noisy estimates biases a ceiling upward; check that no arm beats it and that every cost an arm pays (triage, abrasion) is charged to it too; and have a second reviewer read it before it is published. Report "score divided by oracle score" with the oracle's definition and seeds (see [ceiling benchmarks](ceiling_benchmarks_w41.md)). The oracle uses the answer key, so it is an upper bound.
 - *The seed plan.* Allocate a development pool, a confirm pool and a **new, unrun test pool**, keep one reserved pool untouched, and record their roles in the [seed registry](seeds.md). Do not reuse a test pool unless it is declared a second look.
 - *The power plan.* Estimate how many seeds a plausible effect needs (paired per-seed differences have a spread of about $800 to $1,300 under S4.0, so 20 to 60 seeds detect only large effects; about 100 seeds are needed for an effect of about $300 per seed) and size the pools for it. A single pre-declared confirmatory test on unused seeds avoids most of the multiple-comparison penalty.
 
@@ -30,6 +30,12 @@ A release Y pairs data 4.Y, workflow v4.Y, agent v5.Y and a score version S4.Y t
 **6. The true test on fresh seeds.** Generate the release's test pool (ten seeds nobody has run; the registry's reserved pool), then run on it **once**: the frozen workflow, the previous release's workflow and the control (free), and the agent (the only step that costs money: state the estimate and the cap, get Simmy's approval or use the standing approval of `/run-release paid`, then run once). Compare the workflow with the previous workflow and the control, and the agent with the workflow. The previous *agent* is never re-run: it is compared indirectly, through the previous workflow that was run on the same seeds (the project is price sensitive). Earlier *workflow* arms are always re-run on new seeds; earlier *agent* runs never are. After the test the pool is burned and a new reserved pool is allocated in the next release's step 1.
 
 **7. Close out and reflect.** Update the README table and summary, the figures (progression slide, workflow and agent figures, waterfall), `docs/versioning.md`, the results pages and the seed registry; write the release notes; **tag and publish the GitHub releases**; clean up the milestone and issues; record in the decision log; note what each hypothesis taught; apply [Writing for outside readers](#writing-for-outside-readers) to every page the release added or changed (new terms get concept pages). Then a point of deeper reflection: **what are the deepest flaws in our current system?** Write the answer in `docs/reflection_<release>.md` (the data, the score and its assumptions, the statistics and seed use, the arms, the process, the product): what is by construction, what is unverified, what a sceptic would attack, and what we are not measuring. These flaws seed the next release's step 1 (file an issue for each one worth fixing). Step 7 of one cycle is the start of the next.
+
+**The close-out checklist** (every item is checked before the release is tagged):
+- The README is under its cap (`tests/test_readme_sync.py`), every table row uses one yardstick, and every table column has a row in the glossary (`tests/test_readme_columns.py`). Name check: for each new column write one plain sentence; if the label alone would mislead (for example "found" for an economic label), rename it.
+- Every figure was rendered and looked at in the browser pane (spacing, clipped text, a zero line inside the drawing); a figure's numbers come from the results files, not from typing.
+- The decision log, release notes, seed registry, `docs/seeds.md` and issues are current, and the milestone is closed with its leftovers moved on.
+- The outside-reader pass (below) was run and its findings fixed or filed.
 
 ## Writing for outside readers
 
@@ -52,6 +58,17 @@ Added 2026-10-23, after a run ended its turn to wait for background jobs and han
 4. **Order of operations is not a blocker.** If step N+1 needs step N's output, do the parts of N+1 that do not (code, tests, docs, estimates), pin the rest, and resume it when N lands. Registry entries, decision-log rows and issue comments are written as the events happen, not saved for the end.
 5. **Decide, log, move on.** A choice the process lists as autonomous is made by the run, recorded in the decision log with the reason, and Simmy reviews it afterwards. Ask only for the "ask first" items: a paid run beyond the standing approval or the cap, deleting a repository or an unmerged branch, anything Simmy asked to hold.
 6. **If the session limit nears,** stop starting new long runs, commit and push what exists, update the pin list in the decision log with the exact next command for each pinned item, and then end.
+
+## Before a merge, a tag or a release
+
+Decided 2026-10-25, from the rework of the v4.2 and v5.2 close-out.
+
+1. **Start every branch from a fresh `origin/main`** (`git fetch`, then `git checkout -b NAME origin/main`) and rebase before merging; a branch cut from a stale `main` drops other people's merged changes.
+2. **Run the fast checks before every merge:** `sh tests/run_fast.sh` (about a minute: README length and links, README columns against the glossary, concepts, figures, parity table, release table, seed registry, score 4.2). The full suite (`for t in tests/test_*.py`) runs once per release before the tag.
+3. **One fact, one home.** Each kind of page owns one kind of content (the doc map in `CLAUDE.md`): per-release narrative goes in `docs/releases/`, never in `versioning.md`; a number in prose either sits in a generated block or links to the page that generates it. Never hand-copy a result into a second page.
+4. **The outside-reader pass.** Before a tag, start a fresh sub-agent (an in-session sub-agent: no extra API calls, no spend) with no context beyond the README and the pages it links to, and ask it to list every term, number or step it cannot follow and every claim it cannot trace to a page. Fix what it finds or file it. Run it again after a large README change.
+5. **Sibling repositories are not synced without Simmy's permission** (the prepay repository is on hold). Say in one line that a change was not mirrored.
+6. **Record events as they happen** in the decision log (a merge that touches agent code, a pool released or burned, a paid run, a freeze), not at the end of the cycle.
 
 ## Who decides what
 

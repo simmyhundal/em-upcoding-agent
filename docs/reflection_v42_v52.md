@@ -2,7 +2,7 @@
 
 [Back to the README](../README.md) · [test result](v42_test_result.md) · [process](process.md) · [previous reflection](reflection_v41_v51.md)
 
-**What this page is.** Step 7 of the [release process](process.md): what is weakest about the system as it stands after workflow v4.2 and agent v5.2, written for a reader who was not there. Each flaw is filed as an issue in the milestone "v4.3 and v5.3". It is meant to be uncomfortable.
+**What this page is.** What is weakest about the system as it stands after workflow v4.2 and agent v5.2. Each flaw is filed as an issue in the milestone "v4.3 and v5.3".
 
 ## 1. The headline gain rests on a signal the generator made clean
 Workflow v4.2 and agent v5.2 score about $375,000 and $372,000 over ten test seeds against $17,713 for workflow v4.1, and 94% of that is the [volume screen](concepts/volume-screen.md): count visits per provider per day and look at the days above 30. In the synthetic data the busiest honest day is at most 26 visits and the least busy impossible-days provider's is 33, so a threshold separates them perfectly (319 of 319 on 100 seeds). Real claims have group practices billing under one number, locum coverage, scribes and bad dates; the honest tail will overlap. We have measured how a reviewer uses a clean signal, not how large or how clean the real one is. **What a sceptic says:** "you built the answer into the data and then found it". Filed: [#197](https://github.com/simmyhundal/em-upcoding-agent/issues/197), with larger datasets (about 2,160 providers in one run) beside it.
