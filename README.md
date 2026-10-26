@@ -59,7 +59,7 @@ The agent starts from the full claims book; code refuses findings the evidence d
 v1.x, v2.x and v4.x are workflows; v3.x and v5.x are agents. See the [progression slide](docs/images/progression.svg), [versions](docs/versioning.md), [releases](https://github.com/simmyhundal/em-upcoding-agent/releases) and [roadmap](docs/roadmap.md). Everything is synthetic ([limitations](docs/limitations.md)).
 
 ## Next (v4.3 and v5.3)
-[Messier volume signal, bigger datasets](https://github.com/simmyhundal/em-upcoding-agent/issues/197) · [reach level upcoding](https://github.com/simmyhundal/em-upcoding-agent/issues/198) · [fraud with no volume signal](https://github.com/simmyhundal/em-upcoding-agent/issues/199) · [sourced score 4.3](https://github.com/simmyhundal/em-upcoding-agent/issues/200)
+[Messier volume signal](https://github.com/simmyhundal/em-upcoding-agent/issues/197) · [chart realism](https://github.com/simmyhundal/em-upcoding-agent/issues/220) · [reach level upcoding](https://github.com/simmyhundal/em-upcoding-agent/issues/198) · [sourced score 4.3](https://github.com/simmyhundal/em-upcoding-agent/issues/200) · [Opus vs Sonnet agent](https://github.com/simmyhundal/em-upcoding-agent/issues/214)
 
 ## Explore
 [Results](docs/results-and-evaluation.md) · [limitations](docs/limitations.md) · [E/M background](docs/background.md) · [glossary](docs/glossary.md) · [concepts](docs/concepts/README.md) · [design](docs/design.md) · [about](docs/about.md) · [contributors](CLAUDE.md) · [MIT license](LICENSE)
