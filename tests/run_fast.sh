@@ -3,7 +3,7 @@
 # Usage: sh tests/run_fast.sh
 cd "$(dirname "$0")/.." || exit 1
 fail=0
-for t in test_readme_sync test_readme_columns test_concepts test_figures test_parity_table test_release_table test_seed_registry test_score_42; do
+for t in test_readme_sync test_readme_columns test_concepts test_figures test_parity_table test_release_table test_seed_registry test_score_42 test_agent_53; do
   if python3 "tests/$t.py" >/dev/null 2>&1; then echo "ok   $t"; else echo "FAIL $t"; fail=1; fi
 done
 exit $fail
