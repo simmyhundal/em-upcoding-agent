@@ -98,7 +98,7 @@ def run(rid, src, opts, root):
     claims = defaultdict(list)
     for r in csv.DictReader(open(os.path.join(base, "claims.csv"))):
         claims[r["provider_id"]].append(r)
-    office = provider_sim.Office(data, base, seed=1, version="4.2")
+    office = provider_sim.Office(data, base, seed=1, version=opts.get("office_version", "4.2"))     # "4.3" on data 4.3 (workflow v4.3); the frozen workflow v4.2 keeps office 4.2
     out = {"opts": opts, "providers": {}}
     flagged = flag(claims, opts.get("day_max", DAY_MAX), opts.get("max_flagged", MAX_FLAGGED))
     veto = set(opts.get("veto_ids", ()))
