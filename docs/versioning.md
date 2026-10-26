@@ -8,7 +8,7 @@
 Four things carry version numbers, each on its own track:
 - **Workflow** (code fixes the order of the steps): `v1.x`, `v2.x`, `v4.x`.
 - **Agent** (a model chooses its own steps within caps): `v3.x`, `v5.x`.
-- **Data** (the generator, schemas and simulated provider office): `1`, `2.0`, `2.1`, `2.2`, `4.0`, `4.2`.
+- **Data** (the generator, schemas and simulated provider office): `1`, `2.0`, `2.1`, `2.2`, `4.0`, `4.2`, `4.3`.
 - **Score** (how a run is judged): `evals`, `points`, `2.5`, `4.0`, `4.1`, `4.2`.
 
 Short names used in tables and issues: **W4.2** is workflow v4.2, **A5.2** agent v5.2, **D4.2** data 4.2, **S4.2** score 4.2.
@@ -42,6 +42,7 @@ Files and fields per version: [data_fields.md](data_fields.md).
 | 2.2 | Honest coding noise (an upcoder is billing above the honest baseline by a margin), group and incident-to billing, truncated diagnoses, claims lag, level-changing corrections, injected defects. | [data_v2_2.md](data_v2_2.md) |
 | 4.0 | Every provider has a net upcoding rate; exactly 8 upcoders per dataset at 15% to 40% with one of three habits. | [data_v4_0.md](data_v4_0.md) |
 | 4.2 | No planted upcoder: a continuous true rate for everyone, plus fraud, waste and abuse (visits never rendered, impossible days, unbundling) and office 4.2. | [data_v4_2.md](data_v4_2.md) |
+| 4.3 | Legitimate busy days and suspicious volume that overlaps them, diagnosis confounders, a calibrated lab line, charts that vary (contradictions, rounded or ranged time, late signatures, addenda, boilerplate), charts produced for visits that never happened, practice response profiles and office 4.3; mechanism families that can be held out. | [data_v4_3.md](data_v4_3.md) |
 
 ## Score versions
 | Score | What it counts | Document |
