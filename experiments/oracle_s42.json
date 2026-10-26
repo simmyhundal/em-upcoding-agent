@@ -1,14 +1,30 @@
 {
  "4.0, test": {
-  "score": 74154.93,
-  "pursued": 43,
-  "recovered": 115428.28,
-  "lane_pursued": 0
+  "score": 62662.37,
+  "recovered": 100688.3,
+  "recovered_level_only": 100688.3,
+  "recovered_impossible_day_providers": 0.0,
+  "recovered_other_phantom_providers": 0.0,
+  "staff": 38025.93,
+  "abrasion": 0.0,
+  "pursued": 39,
+  "level_only": 39,
+  "stratum_only": 0,
+  "both": 0,
+  "pursued_with_rate_below_5pct": 0
  },
  "4.2, test": {
-  "score": 459399.68,
-  "pursued": 70,
-  "recovered": 499908.02,
-  "lane_pursued": 36
+  "score": 627804.66,
+  "recovered": 699963.12,
+  "recovered_level_only": 57521.97,
+  "recovered_impossible_day_providers": 477256.0,
+  "recovered_other_phantom_providers": 165185.15,
+  "staff": 46665.82,
+  "abrasion": 25492.64,
+  "pursued": 102,
+  "level_only": 22,
+  "stratum_only": 76,
+  "both": 4,
+  "pursued_with_rate_below_5pct": 6
  }
 }
