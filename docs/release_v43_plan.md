@@ -42,3 +42,7 @@ Only the agent runs on the model API key: **A5.3-O about $1.8** and **A5.3-S abo
 
 ## Ask first in this release
 The score 4.3 values (referral cost, collection, appeals, copy fee, error gate): the run writes `docs/score_43_proposal.md` and asks one question. The scope of data 4.3 was decided on 2026-10-25 (issue 197) and is not reopened.
+
+## Update 2026-10-26: spread re-measured, reference arms on data 4.3
+On the first 20 data 4.3 development seeds under score 4.2 (the scores are re-run under score 4.3 once it is signed off): workflow v4.1 scores -$782 per seed (1 of 20 above zero) and workflow v4.2, the release's reference, scores -$3,803 per seed (0 of 20): its volume lane flags about 9 providers per seed and nearly all are not the providers who billed visits that never happened. The paired difference W4.2 minus W4.1 has a standard deviation of **$877 per seed**, so about **53 seeds** detect $300 per seed at the 0.05 level and about **100** at the 0.005 level: the plan's 100-seed development and confirm pools are the right size. Data 4.3 was built sealed and merged (PR 234); the arms were not changed to fit it.
+

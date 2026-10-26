@@ -41,6 +41,10 @@ A seed is a hold-out only for one arm and one decision made before its results w
 | D4.2-CONFIRM | 4.2 | 1002 to 4665 step 37 (100) | in use (2026-10-23) | confirm: H28, H23_n4 | A confirm for a hypothesis whose design did not see its results; development data for the rest. |
 | D4.2-TEST-1 | 4.2 | 4700 to 5033 step 37 (10) | burned (2026-10-23) | test: H28, H23_n4, A5.2 | Not a clean test any more. A named later version can look at it as a declared second use; otherwise development data. |
 | D4.2-RESERVED | 4.2 | 5100 to 5433 step 37 (10) | reserved (2026-10-23) | none | Only a final test of a frozen version, once. Never generated, never used for development. |
+| D4.3-DEV | 4.3 | 1003 to 5062 step 41 (100) | in use (2026-10-26) | none | A confirm for a hypothesis whose design did not see its results; development data for the rest. |
+| D4.3-CONFIRM | 4.3 | 1004 to 5063 step 41 (100) | fresh (2026-10-26) | none | One test of a frozen version; nothing else. |
+| D4.3-TEST | 4.3 | 6003 to 6372 step 41 (10) | reserved (2026-10-26) | none | Only a final test of a frozen version, once. Never generated, never used for development. |
+| D4.3-RESERVED | 4.3 | 7003 to 7372 step 41 (10) | reserved (2026-10-26) | none | Only a final test of a frozen version, once. Never generated, never used for development. |
 
 ## Notes by pool
 
@@ -173,6 +177,14 @@ A seed is a hold-out only for one arm and one decision made before its results w
 - A5.2, test, seeds 4700 to 5033 step 37 (2026-10-23; docs/v42_test_result.md): agent v5.2, one run per seed, effort low, $1.78 in all.
 
 **D4.2-RESERVED** (test). data 4.2 reserved pool of ten seeds, named and never generated; untouched until a deliberate decision recorded here.
+
+**D4.3-DEV** (development). data 4.3 development pool: seeds 1003 + 41j, j = 0 to 99; built as d43_<seed>; arms may fit and select here.
+
+**D4.3-CONFIRM** (development). data 4.3 confirm pool: seeds 1004 + 41j; built only for the declared confirm read.
+
+**D4.3-TEST** (test). data 4.3 test pool for release 4.3 and 5.3: seeds 6003 + 41j, never generated before the freeze.
+
+**D4.3-RESERVED** (test). data 4.3 reserved pool: seeds 7003 + 41j, never generated; for the next release's test.
 
 Arm names: W4.0 is H8, W4.1 is H23, W2.4 (GL) is W2.4, W4.2 is H28. Notes starting with 'unverified' could not be checked against a source in the repository.
 
