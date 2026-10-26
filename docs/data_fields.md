@@ -1,6 +1,6 @@
 # What each data version contains: files, fields and how they changed
 
-[Back to the README](../README.md) · [versions](versioning.md) · [data model of 2.0](v2_schemas.md) · [data 2.1](data_v2_1.md) · [data 2.2](data_v2_2.md) · [data 4.0](data_v4_0.md) · [data 4.2](data_v4_2.md)
+[Back to the README](../README.md) · [versions](versioning.md) · [data model of 2.0](v2_schemas.md) · [data 2.1](data_v2_1.md) · [data 2.2](data_v2_2.md) · [data 4.0](data_v4_0.md) · [data 4.2](data_v4_2.md) · [data 4.3](data_v4_3.md)
 
 **What this page is.** For a reader who wants the data in detail: which files and fields a payer holds in each data version, which of them the provider sends (the 837P claim and the chart returned on a records request), and how each version changed the data from the one before. Everything is synthetic. The shapes follow general knowledge of 837P, 835 and 834 files, not a spec. Field lists were read from datasets built with each version's generator (`src/generate_synthetic.py` for data 1, `src/generate_v2.py --data-version V` for the others).
 
@@ -13,7 +13,7 @@
 | `remittance.csv` | 835 payment advice | the payer | at payment |
 | `members.csv` | 834 eligibility | the payer | held |
 | `providers.csv`, `reference/*` | provider directory, fee schedule, place-of-service and peer-group tables | the payer | held |
-| `records/records_universe.csv`, `records/unrendered_claims.csv`, the answer key | the simulator's truth | nobody: simulator only, never shown to an arm | |
+| `records/records_universe.csv`, `records/unrendered_claims.csv`, `records/office_chart_plan.csv`, `records/office_profiles.csv`, the answer key | the simulator's truth and the simulated office's settings | nobody: simulator only, never shown to an arm | |
 
 ## The 837P claim (provider to payer)
 | File | Field | Meaning | Since |
@@ -38,13 +38,13 @@
 |---|---|---|
 | `documented_problems_level`, `documented_data_level`, `documented_risk_level` | the three medical decision-making elements (the second highest sets the level) | 2.0 |
 | `documented_mdm_level` | the level a coder reads from them (minimal to high; 15% of reads disagree by one level) | 2.0 (data 1 hands over the level and minutes directly, up front) |
-| `documented_minutes` | total time on the date of the visit, when recorded | 2.0 |
+| `documented_minutes` | total time on the date of the visit, when recorded; blank when the note states time only as a range | 2.0 (range blanks from 4.3) |
 | `note_id`, `note_text` | the note, templated text | 2.1 |
-| `problems_addressed`, `time_statement`, `outside_records_reviewed` | what the note says about problems, time and outside records | 2.1 |
-| `auth_status`, `signed_date` | signed, unsigned, illegible or attested; when | 2.1 |
+| `problems_addressed`, `time_statement`, `outside_records_reviewed` | what the note says about problems, time and outside records; `time_statement` can be `range` | 2.1 (`range` from 4.3) |
+| `auth_status`, `signed_date` | signed, e_signed, unsigned, illegible, attested, or amended (an addendum or a changed note; `signed_date` is then the amendment's date); when | 2.1 (`amended`, and dates after a request, from office 4.3) |
 | `order_count`, `results_present` | orders in the note and how many results came back | 2.1 |
 | `created_ts`, `last_edited_ts`, `copy_paste_events`, `template_id` | the audit trail (second request only) | 2.1 |
-| no chart | a visit that never happened returns "no record" instead of a chart | 4.2 |
+| no chart | a visit that never happened returns "no record" instead of a chart | 4.2 (office 4.3: the practice may produce a chart instead) |
 
 The chart's fields reach an arm as rows of `documentation.csv`; the claims reach it as a derived view (`claims.csv` with `provider_id`, `patient_id`, `has_test_line` and the allowed and paid amounts; `patients.csv` with derived conditions and `risk_score`), built from the 837P and 834 files by `src/derive.py`.
 
@@ -64,5 +64,6 @@ The chart's fields reach an arm as rows of `documentation.csv`; the claims reach
 - **2.1 to 2.2: realism and defects.** Same columns, new behavior in the values: honest providers miscode in both directions (about 8% of visits), so an upcoder is billing above the honest baseline by a margin; group billing under an organizational number (billing and rendering numbers differ, the rendering number is sometimes blank); incident-to billing; optional diagnosis truncation; claims lag; replacement claims, some of which change the E/M level; optional injected defects (duplicate claims, orphan replacements, unknown members, blank rendering numbers). New file: `control_totals.csv`. With every option at zero a 2.2 build reproduces 2.1 byte for byte.
 - **2.2 to 4.0: provider rates and habits.** Same columns. Exactly 8 upcoders per dataset, each with a net rate of 15% to 40% and one habit (systematic, opportunistic or template-driven); other providers' rates are centred on zero with noise in both directions; each visit has a continuous complexity, so a borderline visit can read either side of a level; fewer cloned notes (12.5% of upcoders); more patients seen by two or more providers (35%); one calendar year.
 - **4.0 to 4.2: no planted upcoder, and fraud.** Same columns. No `role` in the answer key: every provider has a continuous true rate from one distribution (about 9 providers per dataset at 15% or more). Claims for visits that never happened (about 6 providers), days with 32 to 50 extra visits (about 3 providers) and unbundling (an extra separately paid line, modifier 25 on the E/M line; about 4 providers) are added to the claims. New simulator-only file: `records/unrendered_claims.csv`; office 4.2 answers "no record" for such a claim.
+- **4.2 to 4.3: messier volume, varied charts, office realism.** Same files and columns; two new simulator-only files (`records/office_chart_plan.csv`, `records/office_profiles.csv`) read only by office 4.3. Honest providers can have busy days (mid-level visits billed under the physician's number, covering an absent colleague, a short clinic week, quick-visit clinic days, service dates batched by a billing error and later corrected), and visits that never happened can be spread over many ordinary days as well as concentrated, so busy days are no longer clean. Diagnosis codes can be inflated or sparse. A test may be ordered in the note without a line on the claim (an outside lab). Charts vary: an element can disagree with the note, time can be rounded or given as a range, signatures can be late, notes can carry addenda or template boilerplate. Office 4.3 can return a chart for a visit that never happened, sign a chart when the request arrives, return a changed note on a second answer, and answers according to a practice's response profile. Mechanism families can be switched off for a held-out test. Details: [data 4.3](data_v4_3.md).
 
-Planned: [data 4.3](https://github.com/simmyhundal/em-upcoding-agent/issues/197), a messier volume signal and larger datasets; calibration of habit shares, the lab line and the date range ([#137](https://github.com/simmyhundal/em-upcoding-agent/issues/137), [#144](https://github.com/simmyhundal/em-upcoding-agent/issues/144)).
+Planned: larger pooled datasets and fraud kinds without a volume signal (data 4.4, issues [#199](https://github.com/simmyhundal/em-upcoding-agent/issues/199) and [#224](https://github.com/simmyhundal/em-upcoding-agent/issues/224)); free-text charts ([#221](https://github.com/simmyhundal/em-upcoding-agent/issues/221)).

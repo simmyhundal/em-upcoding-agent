@@ -90,14 +90,27 @@ class Office:
         version "2.1": returned charts carry the note package (docs/data_v2_1.md), a second request per provider is allowed
         (random first, targeted after), and an audit trail can be requested as a second-tier action. "2.0" is the frozen behaviour.
         version "4.2" (issue 173, docs/data_v4_2.md): office 2.1 plus claims for services never rendered (records/unrendered_claims.csv, a simulator-side file): no chart can ever be produced
-        for them; when the office answers it reports them under the deficiency NO_RECORD. Offices 2.0 and 2.1 do not read that file."""
+        for them; when the office answers it reports them under the deficiency NO_RECORD. Offices 2.0 and 2.1 do not read that file.
+        version "4.3" (issues 201 and 220, docs/data_v4_3.md): office 4.2 driven by two further simulator-side files written by the data 4.3 generator. records/office_chart_plan.csv says, per claim,
+        from which answer a chart can be produced (0 never, 1 from the first answer, 2 only after the claim was asked about again), how often coders disagree on it, whether the practice signs it
+        when the request arrives, and the levels it shows if it comes back a second time; records/office_profiles.csv gives each practice's response behaviour. A chart carries an addendum's date
+        as its signature date. Without those files office 4.3 behaves as office 4.2."""
         self.seed = seed
-        self.v21 = version in ("2.1", "4.2")
+        self.v21 = version in ("2.1", "4.2", "4.3")
+        self.v43 = version == "4.3"
         self.unrendered = set()
-        if version == "4.2":
+        if version in ("4.2", "4.3"):
             path = os.path.join(v2_dir, "records", "unrendered_claims.csv")
             if os.path.exists(path):
                 self.unrendered = {r["claim_id"] for r in _rows(path)}
+        self.plan, self.profiles = {}, {}
+        if self.v43:
+            p_plan, p_prof = os.path.join(v2_dir, "records", "office_chart_plan.csv"), os.path.join(v2_dir, "records", "office_profiles.csv")
+            if os.path.exists(p_plan):
+                self.plan = {r["claim_id"]: r for r in _rows(p_plan)}
+            if os.path.exists(p_prof):
+                self.profiles = {r["npi"]: r["behavior"] for r in _rows(p_prof) if r["behavior"] in BEHAVIOR_MIX}
+            self.unrendered = {c for c in self.unrendered if int(self.plan.get(c, {}).get("available_from_round") or 0) == 0}     # a chart the practice can produce is not "no record"
         self.max_rounds = MAX_ROUNDS_21 if self.v21 else MAX_ROUNDS
         if self.v21:
             import note_checks
@@ -106,12 +119,18 @@ class Office:
         self.claims = defaultdict(list)
         for r in _rows(os.path.join(view_dir, "claims.csv")):
             self.claims[r["provider_id"]].append(r)
+        if self.v43:                                   # the day a request is sent: 60 days after the last date of service in the claims, plus the provider's elapsed days
+            from datetime import date
+            last = max((r["service_date"] for rows in self.claims.values() for r in rows), default="2024-12-31")
+            self.request_base = date.fromisoformat(last).toordinal() + 60
         self.correlation, self.roles = correlation, roles or {}
         self.state = {}
         self.transcript = []
 
     # ---- hidden behavior -------------------------------------------------
     def _behavior(self, pid):
+        if self.v43 and pid in self.profiles:
+            return self.profiles[pid]
         rng = random.Random(f"{self.seed}:behavior:{pid}")
         mix = BEHAVIOR_MIX
         if self.correlation > 0 and self.roles.get(pid) == "upcoder" and rng.random() < self.correlation:
@@ -158,6 +177,8 @@ class Office:
         st["requests"].append({"kind": kind, "ids": ids, "round": st["round"] + 1})
         for c in ids:
             st["kinds"][c] = kind
+            if self.v43:
+                st.setdefault("asked", {})[c] = st["round"] + 1
         return self._round(pid, st, deadline, addressed=None, new_ids=ids)
 
     def follow_up(self, pid, addressed_codes, deadline=DEFAULT_DEADLINE, claim_ids=None):
@@ -224,8 +245,10 @@ class Office:
         if status in ("complete", "partial"):
             # nothing left to send (every requested chart is usable or held back for a signature): an empty reply, not a crash (issue 84)
             got = remaining if status == "complete" or not remaining else rng.sample(remaining, max(1, int(len(remaining) * rng.uniform(0.4, 0.7))))
+            if self.v43:                                          # office 4.3: some charts exist only after the claim was asked about again
+                got = [c for c in got if int(self.plan.get(c, {}).get("available_from_round") or 1) < 2 or st["round"] > st.get("asked", {}).get(c, 0)]
             for c in got:
-                row = self._chart(c, rng)
+                row = self._chart(c, rng, day=st["day"])
                 bad = self._signature_problem(c)
                 if bad:                                       # unsigned or illegible: held back until a follow-up fixes it
                     st["pending"][bad].append(c)
@@ -250,7 +273,7 @@ class Office:
             code = STATUS_TO_CODE[status]
             deficiencies.append({"code": code, "text": DEFICIENCY_TEXT[code], "claim_ids": remaining if code != "EXTENSION" else []})
         for c in released:                                        # fixed by the office this round
-            st["usable"][c] = self._chart(c, rng, attested=True)
+            st["usable"][c] = self._chart(c, rng, attested=True, day=st["day"])
         if self.v21:
             gaps = [c for c, row in st["usable"].items() if int(row.get("order_count") or 0) > int(row.get("results_present") or 0)]
             if addressed and "MISSING_RESULTS" in addressed:
@@ -273,23 +296,50 @@ class Office:
         self.transcript.append({"action": action, "deadline": deadline, **resp})
         return resp
 
-    def _chart(self, claim_id, rng, attested=False):
-        """One chart reading; with the note package (version 2.1) its note, signature, order and result fields come along."""
-        row = records.read_chart(self.universe[claim_id], rng)
+    def _chart(self, claim_id, rng, attested=False, day=None):
+        """One chart reading; with the note package (version 2.1) its note, signature, order and result fields come along.
+        Office 4.3: the coder-disagreement rate of the claim's plan row, a signature dated when the request arrived, an addendum's date, and a chart that comes back changed the second time."""
+        if not self.v43:
+            row = records.read_chart(self.universe[claim_id], rng)
+        else:
+            plan = self.plan.get(claim_id, {})
+            u = self.universe[claim_id]
+            if attested and plan.get("release_levels"):
+                p_, d_, r_ = plan["release_levels"].split(";")
+                u = {**u, "problems_level": p_, "data_level": d_, "risk_level": r_}
+            noise = float(plan["coder_disagreement"]) if plan.get("coder_disagreement") not in (None, "") else records.CODER_NOISE
+            row = records.read_chart(u, rng, coder_noise=noise)
         if self.v21:
             pkg = self.packages[claim_id]
             n, a = pkg["note"], pkg["auth"]
             results = pkg["results"].values()
+            status, signed = ("attested" if attested else a["status"]), a["signed_date"]
+            if self.v43:
+                plan = self.plan.get(claim_id, {})
+                asked_on = self._request_date(day, claim_id)
+                if str(a.get("amended")) == "1" and a.get("amended_date"):
+                    status, signed = ("amended" if not attested else status), a["amended_date"]
+                if plan.get("signs_on_request") == "1" and not attested:
+                    status, signed = "e_signed", asked_on
+                if attested and plan.get("release_levels"):
+                    status, signed = "amended", asked_on
             row.update({"note_id": n["note_id"], "note_text": n["note_text"], "problems_addressed": n["problems_addressed"],
                         "time_statement": n["time_statement"], "outside_records_reviewed": n["outside_records_reviewed"],
-                        "auth_status": "attested" if attested else a["status"], "service_date": n["service_date"],
-                        "signed_date": a["signed_date"], "order_count": len(pkg["orders"]),
+                        "auth_status": status, "service_date": n["service_date"],
+                        "signed_date": signed, "order_count": len(pkg["orders"]),
                         "results_present": sum(int(r["result_present"]) for r in results)})
         return row
+
+    def _request_date(self, day, claim_id):
+        """Office 4.3: the ISO date a signature added on request carries (the request day plus a few days; its own draw, so the round's draws do not move)."""
+        from datetime import date
+        return date.fromordinal(self.request_base + int(day or 0) + random.Random(f"{self.seed}:signed:{claim_id}").randint(0, 5)).isoformat()
 
     def _signature_problem(self, claim_id):
         if not self.v21:
             return None
+        if self.v43 and self.plan.get(claim_id, {}).get("signs_on_request") == "1":
+            return None                                 # signed when the request arrived: sent, not held back
         return {"unsigned": "MISSING_SIGNATURE", "illegible": "ILLEGIBLE"}.get(self.packages[claim_id]["auth"]["status"])
 
     def request_audit_trail(self, pid, claim_ids, deadline=DEFAULT_DEADLINE):

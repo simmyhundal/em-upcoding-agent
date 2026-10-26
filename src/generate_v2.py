@@ -97,6 +97,11 @@ def build(out_dir, answer_key_path=DEFAULT_KEY, seed=42, n_providers=216, upcode
         if clone_share is not None:
             v22 = {**v22, "clone_share": clone_share}
         return generate_v42.build(out_dir, answer_key_path, seed=seed, n_providers=n_providers, clone_signal_strength=clone_signal_strength, **v22)
+    if data_version == "4.3":                     # data 4.3 (issue 197) lives in generate_v43.py: no planted upcoders, so n_upcoders and n_hard_neg are ignored (docs/data_v4_3.md)
+        import generate_v43
+        if clone_share is not None:
+            v22 = {**v22, "clone_share": clone_share}
+        return generate_v43.build(out_dir, answer_key_path, seed=seed, n_providers=n_providers, clone_signal_strength=clone_signal_strength, **v22)
     if clone_share is None:
         clone_share = 0.5                         # the data 2.x default, unchanged
     v22_on = data_version == "2.2"
@@ -415,7 +420,8 @@ if __name__ == "__main__":
     ap.add_argument("--hard-neg-rate", type=float, default=8 / 216)
     ap.add_argument("--clone-share", type=float, default=None, help="share of upcoders whose documentation is cloned to match billing (data 2.x default 0.5; data 4.0 default 0.125)")
     ap.add_argument("--answer-key", default=DEFAULT_KEY)
-    ap.add_argument("--data-version", default="2.0", choices=["2.0", "2.1", "2.2", "4.0", "4.2"], help="2.1 also writes the note package; 2.2 adds honest coding noise; 4.0 provider upcoding rates and habits (generate_v4.py)")
+    ap.add_argument("--data-version", default="2.0", choices=["2.0", "2.1", "2.2", "4.0", "4.2", "4.3"],
+                    help="2.1 also writes the note package; 2.2 adds honest coding noise; 4.0 provider upcoding rates and habits (generate_v4.py); 4.2 no planted role (generate_v42.py); 4.3 docs/data_v4_3.md")
     ap.add_argument("--clone-signal-strength", type=float, default=0.7, help="data 2.1: chance each clone signal appears on a cloned visit")
     g = ap.add_argument_group("data 2.2 (issue 74); defaults in V22_DEFAULTS")
     g.add_argument("--honest-miscode-rate", type=float, help="mean share of an honest provider's visits billed off the justified level")
@@ -440,9 +446,16 @@ if __name__ == "__main__":
     g.add_argument("--group-billing", action=argparse.BooleanOptionalAction, default=None,
                    help="groups of 2 or more clinicians bill under an organizational NPI (the clinician stays the rendering provider)")
     g.add_argument("--rendering-omitted-share", type=float, help="share of single-clinician claims with the rendering NPI left blank (it equals billing)")
+    g43 = ap.add_argument_group("data 4.3 (issue 197; docs/data_v4_3.md)")
+    g43.add_argument("--holdout-family", action="append", dest="holdout_families", help="data 4.3: switch off one mechanism family (repeatable; names in docs/data_v4_3.md)")
+    g43.add_argument("--years", type=int, help="data 4.3: length of the date range in calendar years (default 1)")
     a = ap.parse_args()
     opts = {k: (tuple(v) if isinstance(v, list) else v) for k, v in vars(a).items()
             if (k in V22_DEFAULTS or k == "defect_profile") and v is not None}
+    if a.data_version == "4.3":
+        opts.update({k: (tuple(v) if isinstance(v, list) else v) for k, v in (("holdout_families", a.holdout_families), ("years", a.years)) if v is not None})
+    elif a.holdout_families or a.years:
+        ap.error("--holdout-family and --years are data 4.3 options")
     out = build(a.out_dir, a.answer_key, a.seed, a.providers, a.upcoder_rate, a.hard_neg_rate, a.clone_share,
                 data_version=a.data_version, clone_signal_strength=a.clone_signal_strength, **opts)
     print(f"wrote {len(out)} providers to {a.out_dir}; answer key at {a.answer_key}")
