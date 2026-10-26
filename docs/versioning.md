@@ -32,6 +32,8 @@ The major number says what the thing is, not that it performs better: workflow v
 Every row has a tag with the version's name (`v4.2`, `v5.2`, and so on) and notes in [releases/](releases/). The README table puts v4.0 to v5.2 on one score ([score 4.2](score_42.md)) beside the oracle of each data set.
 
 ## Data versions
+Files and fields per version: [data_fields.md](data_fields.md).
+
 | Data | What it adds | Document |
 |---|---|---|
 | 1 | Provider, patient and claim tables with a stored condition count. | [archive](archive-version-1.md) |
