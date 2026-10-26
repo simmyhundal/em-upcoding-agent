@@ -100,7 +100,12 @@ def run(rid, src, opts, root):
         claims[r["provider_id"]].append(r)
     office = provider_sim.Office(data, base, seed=1, version="4.2")
     out = {"opts": opts, "providers": {}}
-    for pid, top, hot in flag(claims, opts.get("day_max", DAY_MAX), opts.get("max_flagged", MAX_FLAGGED)):
+    flagged = flag(claims, opts.get("day_max", DAY_MAX), opts.get("max_flagged", MAX_FLAGGED))
+    veto = set(opts.get("veto_ids", ()))
+    if opts.get("veto_fraction"):                  # evaluation mode (gate 1): a person vetoes a seeded random fraction of the flagged providers (docs/evaluation_modes.md)
+        rng = random.Random(f"{opts.get('veto_seed', 1)}:{src}:lane-gate1")
+        veto |= {pid for pid, _t, _h in flagged if rng.random() < opts["veto_fraction"]}
+    for pid, top, hot in [f for f in flagged if f[0] not in veto]:
         v = review(office, pid, claims[pid], hot, n=opts.get("n", SAMPLE_N), persist=opts.get("persist", 0))
         v["busiest_day"] = top
         out["providers"][pid] = v

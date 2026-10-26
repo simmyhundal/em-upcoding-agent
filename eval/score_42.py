@@ -63,7 +63,7 @@ def no_record_ids(rid):
     return out
 
 
-def seed_result(rid, code, m=1.0, p=None, inputs=None, lane_data=None, no_record=None):
+def seed_result(rid, code, m=1.0, p=None, inputs=None, lane_data=None, no_record=None, gate2=None):
     """lane_data / no_record: the lane record and NO_RECORD ids of a live environment (a parity check); None reads the run folder."""
     p = p or r42.params42()
     claims, key, _lvl = dt.context(code)
@@ -95,6 +95,15 @@ def seed_result(rid, code, m=1.0, p=None, inputs=None, lane_data=None, no_record
             e = r42.recovery_stratified([r for r in rows if r["claim_id"] in strat], v["sample_ids"], {c: int(l) for c, l in v.get("levels", {}).items()}, p, no_record=set(v.get("no_record", [])))
             rec_fwa[pid] = e["value"]
             modes["stratum:" + e["mode"]] += 1
+    rejected = set()
+    if gate2 is not None:                                  # evaluation mode (gate 2): a person signs off each demand; a rejected demand is not sent (docs/evaluation_modes.md)
+        for pid in sorted(called):
+            if not gate2(pid, rec_level.get(pid, 0.0) + rec_fwa.get(pid, 0.0)):
+                rejected.add(pid)
+        called = called - rejected
+        for pid in rejected:
+            rec_level.pop(pid, None)
+            rec_fwa.pop(pid, None)
     recovered = sum(rec_level.values()) + sum(rec_fwa.values())
     cost, parts = r4.staff_cost(listed, sum(rounds.values()), sum(charts.values()), len(called), i["api"], p)
     wt = lambda pid: s4.abrasion_weight(truth[pid]["net_rate"], p)
@@ -104,7 +113,7 @@ def seed_result(rid, code, m=1.0, p=None, inputs=None, lane_data=None, no_record
     return {"recovered": recovered, "recovered_level": sum(rec_level.values()), "recovered_fwa": sum(rec_fwa.values()), "staff_cost": cost, "staff_parts": parts, "abrasion": abrasion,
             "score": recovered - cost - abrasion, "demands": len(called), "lane_flagged": len(ln), "lane_demands": len(lane_demand), "lane_true": len(lane_demand & imp), "lane_false": len(set(ln) - imp),
             "impossible_providers": len(imp), "justified_called": found_just, "justified": sum(v["role"] == "upcoder" for v in dkey.values()), "rounds": sum(rounds.values()), "charts": sum(charts.values()),
-            "listed": listed, "modes": dict(modes), "true_overpay_all": sum(dt.totals(key).values()), "true_overpay_called": sum(dt.totals(key)[pid] for pid in called if pid in truth)}, i
+            "listed": listed, "rejected_demands": len(rejected), "modes": dict(modes), "true_overpay_all": sum(dt.totals(key).values()), "true_overpay_called": sum(dt.totals(key)[pid] for pid in called if pid in truth)}, i
 
 
 if __name__ == "__main__":
