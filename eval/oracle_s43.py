@@ -1,4 +1,4 @@
-"""The oracle under score 4.3 (PROPOSAL values until signed off; src/recovery_43.py): the best conceivable score on one dataset, with triage, from the answer key (evaluation only). An UPPER BOUND, not an arm and not a target.
+"""The oracle under score 4.3 (src/recovery_43.py; values signed off 2026-10-27): the best conceivable score on one dataset, with triage, from the answer key (evaluation only). An UPPER BOUND, not an arm and not a target.
 
 For each provider the oracle knows the true supported level of every claim and which claims are for visits that never happened, and takes the better of two options (not added together):
   level option: pursue with a random chart sample of n charts (n = 30, 60, 90 or 150, the best); value = the expected 90% lower bound of the level overpayment (averaged over `draws` random samples) minus
@@ -74,7 +74,9 @@ def oracle(code, seed=11, draws=20, over=None):
         outside = [r for r in cl if r["claim_id"] not in set(sids)]
         oids = [r["claim_id"] for r in outside]
 
-        def level_opt(rows, pool_ids):
+        fraud_case = bool(sids)                                  # a provider with claims for visits that never happened is pursued as a fraud referral, whatever sample is used
+
+        def level_opt(rows, pool_ids, referral=False):
             """best (lower bound, charts received) over n for the level channel on `rows`"""
             best = None
             for n in LEVEL_NS + (len(pool_ids),):
@@ -88,15 +90,15 @@ def oracle(code, seed=11, draws=20, over=None):
                     vals.append(r43.recovery(rows, set(sample), level, p, no_record=nr)["value"])
                     got.append(len(sample) - len(nr))
                 lb, g = st.mean(vals), st.mean(got)
-                lb = r43.collected(lb, p)
+                lb = r43.collected(lb, p, referral=referral)
                 cand = (lb - g * chart, lb, g)
                 if best is None or cand[0] > best[0]:
                     best = cand
             return best
-        L = level_opt(cl, ids)                                               # (lb - chart cost, lb, charts)
+        L = level_opt(cl, ids, referral=fraud_case)                                               # (lb - chart cost, lb, charts)
         opts = []
         if L:
-            opts.append((L[0] - 2 * rnd - dem - tri - w * price, L[1], "L"))
+            opts.append((L[0] - 2 * rnd - (ref if fraud_case else dem) - tri - w * price, L[1], "L"))
         S = None
         if sids:
             for n in STRATUM_NS + (len(sids),):
@@ -132,14 +134,15 @@ def oracle(code, seed=11, draws=20, over=None):
 def run():
     out = {}
     for name, codes in (("4.0, test", [f"f4_{5555 + 101 * j}" for j in range(10)]), ("4.2, test", [f"d42_{s}" for s in pool.TEST])):
-        tot = {}
+        tot, per = {}, {}
         for c in codes:
             o = oracle(c)
+            per[c] = round(o["score"], 2)
             for k, v in o.items():
                 if not k.startswith("_"):
                     tot[k] = tot.get(k, 0) + v
-        out[name] = {k: round(v, 2) for k, v in tot.items()}
-        print(name, out[name], flush=True)
+        out[name] = {k: round(v, 2) for k, v in tot.items()} | {"per_seed": per}
+        print(name, {k: v for k, v in out[name].items() if k != "per_seed"}, flush=True)
     return out
 
 

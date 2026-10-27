@@ -20,3 +20,8 @@ Plain-language pages for terms this project uses. Each says what the term means,
 | [Volume screen (impossible visits per day)](volume-screen.md) | A check on claims alone: count the visits one provider billed for each service date |
 | [Records not provided](records-not-provided.md) | When a payer samples claims and asks the provider for the charts, a claim for which the provider produces no record of the visit counts as a... |
 | [Stratified sample](stratified-sample.md) | A random sample drawn from one slice of a provider's claims (a *stratum*), such as the claims dated on the days a volume screen flagged |
+| [Error gate (extrapolation threshold, measured in dollars)](error-gate.md) | Before a payer extends what it found in a small sample to a provider's whole book of claims, it checks that the sample shows enough error |
+| [Fraud referral](fraud-referral.md) | The way a payer pursues a provider whose billing looks like fraud, not like a coding disagreement: its special investigations unit (SIU) ope... |
+| [Collection rate](collection-rate.md) | The share of an overpayment a payer has identified or demanded that ends up as cash |
+| [Appeal reduction](appeal-reduction.md) | The share of a demanded amount a payer expects to lose when providers dispute it and win, fully or in part |
+| [Oracle (the best conceivable score)](oracle.md) | A ceiling computed with the answer key: the score a reviewer would get with perfect knowledge of which providers and claims are overbilled,... |

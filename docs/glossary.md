@@ -66,6 +66,11 @@
 | [Volume screen](concepts/volume-screen.md) | Count a provider's visits per service date; 30 or more in a day goes to the claims-data lane | fwa lane, impossible days |
 | [Records not provided](concepts/records-not-provided.md) | A sampled claim the office reports it has no record of counts as overpaid at its paid amount | `NO_RECORD` |
 | [Stratified sample](concepts/stratified-sample.md) | A random sample within one slice of a provider's claims; supports extrapolating to that slice only | stratum |
+| [Error gate](concepts/error-gate.md) | Extrapolate a sample only if its net overpayment is at least 5% of the reviewed claims' paid dollars (the dollar gate) | `GATE_UNIT`, dollar gate |
+| [Fraud referral](concepts/fraud-referral.md) | A volume-screen case pursued as an SIU investigation: $4,000 of staff time, 25% collected | `REFERRAL_COST` |
+| [Collection rate](concepts/collection-rate.md) | The share of an estimated overpayment that ends as cash: 68% for an ordinary demand, 25% for a referral | `COLLECTION_DEMAND` |
+| [Appeal reduction](concepts/appeal-reduction.md) | The 15% of an ordinary demand lost to provider appeals, applied before collection | `APPEAL_REDUCTION` |
+| [Oracle](concepts/oracle.md) | The best conceivable score from the answer key inside the scoring rules; an upper bound | |
 | [No-more-requests advice](concepts/no-more-requests.md) | After the first sample and its follow-up, ask for nothing more | STOP advice, stop-after-first-sample |
 
 ## Abbreviations

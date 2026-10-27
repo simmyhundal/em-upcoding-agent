@@ -1,0 +1,99 @@
+[
+ {
+  "arm": "Workflow v4.0",
+  "data": "4.0, test",
+  "score": -7865,
+  "oracle": 22200,
+  "share": -0.354269586791673,
+  "collected": 2192,
+  "staff": 9995,
+  "abrasion": 61,
+  "demands": 3,
+  "referrals": 0,
+  "seeds_above_oracle": []
+ },
+ {
+  "arm": "Agent v5.0",
+  "data": "4.0, test",
+  "score": -5438,
+  "oracle": 22200,
+  "share": -0.24493216359080922,
+  "collected": 2223,
+  "staff": 7443,
+  "abrasion": 218,
+  "demands": 3,
+  "referrals": 0,
+  "seeds_above_oracle": []
+ },
+ {
+  "arm": "Workflow v4.1",
+  "data": "4.0, test",
+  "score": 4603,
+  "oracle": 22200,
+  "share": 0.20733905239869077,
+  "collected": 15107,
+  "staff": 10504,
+  "abrasion": 0,
+  "demands": 9,
+  "referrals": 0,
+  "seeds_above_oracle": [
+   "f4_5959"
+  ]
+ },
+ {
+  "arm": "Agent v5.1",
+  "data": "4.0, test",
+  "score": 2180,
+  "oracle": 22200,
+  "share": 0.09820711317214735,
+  "collected": 12122,
+  "staff": 9866,
+  "abrasion": 76,
+  "demands": 10,
+  "referrals": 0,
+  "seeds_above_oracle": [
+   "f4_6363"
+  ]
+ },
+ {
+  "arm": "Workflow v4.1",
+  "data": "4.2, test",
+  "score": 2362,
+  "oracle": 24310,
+  "share": 0.09717215508403741,
+  "collected": 13964,
+  "staff": 11602,
+  "abrasion": 0,
+  "demands": 7,
+  "referrals": 1,
+  "seeds_above_oracle": [
+   "d42_4959"
+  ]
+ },
+ {
+  "arm": "Workflow v4.2",
+  "data": "4.2, test",
+  "score": -30432,
+  "oracle": 24310,
+  "share": -1.2518605767234734,
+  "collected": 106583,
+  "staff": 133963,
+  "abrasion": 3051,
+  "demands": 7,
+  "referrals": 31,
+  "seeds_above_oracle": []
+ },
+ {
+  "arm": "Agent v5.2",
+  "data": "4.2, test",
+  "score": -27150,
+  "oracle": 24310,
+  "share": -1.116822254975457,
+  "collected": 105009,
+  "staff": 129107,
+  "abrasion": 3051,
+  "demands": 6,
+  "referrals": 30,
+  "seeds_above_oracle": []
+ }
+]
