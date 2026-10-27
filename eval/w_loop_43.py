@@ -42,6 +42,7 @@ VERSIONS = {
     "W41": w_loop.VERSIONS["H23_n4"],                                                                                                   # workflow v4.1, the level review only
     "W42": {**W41, "w40": {**W41["w40"], "fwa": dict(LANE)}},                                                                           # workflow v4.2 (H28) with office 4.3 for the lane: the reference of this release
     # hypotheses of workflow v4.3 (docs/w_loop_v43.md), each against the current best on development batches 1 to 4
+    "D7": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "all", "escalate": "stop", "demand_floor": "cost43", "rules": "4.1"}},                  # diagnostic, not a hypothesis: every listed provider asked (the data the ask model of H33 is fitted on)
     "H29": _v(W41, floor="cost43"),                                                                                                     # level demands: the break-even rule uses score 4.3's collected value (no lane)
     "H30": _v(W41, fwa={"break_even": "s43"}, floor="cost43"),                                                                          # the lane too: a referral only when its collected lower bound covers the referral cost
     "H31": _v(W41, fwa={"break_even": "s43", "probe": {"n": 10, "k": 3, "more": 20}}, floor="cost43"),                                  # H30 with a probe of 10 claims first; 20 more only if at least 3 had no record

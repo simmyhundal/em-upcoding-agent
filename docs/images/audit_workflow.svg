@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 600" font-family="Helvetica,Arial,sans-serif" font-size="12">
+<rect width="100%" height="100%" fill="#fff"/>
+<text x="10" y="26" font-size="20" font-weight="bold">The commercial postpay audit: who does what, stage by stage</text>
+<text x="10" y="46" fill="#555">Green = a step this project simulates. Grey = context only. Dashed = sometimes. Stages 5 to 7 are the zoom; stage 4 (prepay edits) is the contrast.</text>
+<rect x="190.0" y="48" width="185.71428571428572" height="456" fill="#f6f6f6" stroke="#ddd"/><text x="282.8571428571429" y="63" text-anchor="middle" font-weight="bold">1 Symptoms</text>
+<rect x="375.7142857142857" y="48" width="185.71428571428572" height="456" fill="#f6f6f6" stroke="#ddd"/><text x="468.57142857142856" y="63" text-anchor="middle" font-weight="bold">2 Visit</text>
+<rect x="561.4285714285714" y="48" width="185.71428571428572" height="456" fill="#f6f6f6" stroke="#ddd"/><text x="654.2857142857143" y="63" text-anchor="middle" font-weight="bold">3 Claim (837)</text>
+<rect x="747.1428571428571" y="48" width="185.71428571428572" height="456" fill="#f6f6f6" stroke="#ddd"/><text x="840.0" y="63" text-anchor="middle" font-weight="bold">4 Payment (835)</text>
+<rect x="932.8571428571429" y="48" width="185.71428571428572" height="456" fill="#eef7f0" stroke="#ddd"/><text x="1025.7142857142858" y="63" text-anchor="middle" font-weight="bold">5 Audit</text>
+<rect x="1118.5714285714287" y="48" width="185.71428571428572" height="456" fill="#eef7f0" stroke="#ddd"/><text x="1211.4285714285716" y="63" text-anchor="middle" font-weight="bold">6 Recovery</text>
+<rect x="1304.2857142857142" y="48" width="185.71428571428572" height="456" fill="#eef7f0" stroke="#ddd"/><text x="1397.142857142857" y="63" text-anchor="middle" font-weight="bold">7 Collect, appeal, fees</text>
+<line x1="0" x2="1500" y1="70" y2="70" stroke="#bbb"/><text x="8" y="105.0" font-weight="bold">Patient</text>
+<line x1="0" x2="1500" y1="132" y2="132" stroke="#bbb"/><text x="8" y="167.0" font-weight="bold">Provider (physician, billing office)</text>
+<line x1="0" x2="1500" y1="194" y2="194" stroke="#bbb"/><text x="8" y="229.0" font-weight="bold">Payer: claims</text>
+<line x1="0" x2="1500" y1="256" y2="256" stroke="#bbb"/><text x="8" y="291.0" font-weight="bold">Payer: payment integrity, coder, clinician</text>
+<line x1="0" x2="1500" y1="318" y2="318" stroke="#bbb"/><text x="8" y="353.0" font-weight="bold">Payer: SIU</text>
+<line x1="0" x2="1500" y1="380" y2="380" stroke="#bbb"/><text x="8" y="415.0" font-weight="bold">Software product (this project)</text>
+<line x1="0" x2="1500" y1="442" y2="442" stroke="#bbb"/><text x="8" y="477.0" font-weight="bold">Vendor, legal, regulator</text>
+<rect x="196.0" y="78" width="173.71428571428572" height="46" rx="6" fill="#e4e4e4" stroke="#555"/>
+<text x="282.8571428571429" y="97" text-anchor="middle" font-size="11">Feels ill,</text>
+<text x="282.8571428571429" y="110" text-anchor="middle" font-size="11">seeks care</text>
+<rect x="381.7142857142857" y="78" width="173.71428571428572" height="46" rx="6" fill="#e4e4e4" stroke="#555" stroke-dasharray="4 3"/>
+<text x="468.57142857142856" y="97" text-anchor="middle" font-size="11">Pays copay,</text>
+<text x="468.57142857142856" y="110" text-anchor="middle" font-size="11">gets EOB</text>
+<rect x="381.7142857142857" y="140" width="173.71428571428572" height="46" rx="6" fill="#e4e4e4" stroke="#555"/>
+<text x="468.57142857142856" y="159" text-anchor="middle" font-size="11">Documents visit,</text>
+<text x="468.57142857142856" y="172" text-anchor="middle" font-size="11">chooses level</text>
+<rect x="567.4285714285714" y="140" width="173.71428571428572" height="46" rx="6" fill="#e4e4e4" stroke="#555"/>
+<text x="654.2857142857143" y="159" text-anchor="middle" font-size="11">Submits claim</text>
+<text x="654.2857142857143" y="172" text-anchor="middle" font-size="11">(837P)</text>
+<rect x="753.1428571428571" y="140" width="173.71428571428572" height="46" rx="6" fill="#e4e4e4" stroke="#555"/>
+<text x="840.0" y="159" text-anchor="middle" font-size="11">Posts 835</text>
+<text x="840.0" y="172" text-anchor="middle" font-size="11">(about 7% manual)</text>
+<rect x="567.4285714285714" y="202" width="173.71428571428572" height="46" rx="6" fill="#e4e4e4" stroke="#555"/>
+<text x="654.2857142857143" y="221" text-anchor="middle" font-size="11">Intake and edits</text>
+<rect x="753.1428571428571" y="202" width="173.71428571428572" height="46" rx="6" fill="#e4e4e4" stroke="#555"/>
+<text x="840.0" y="221" text-anchor="middle" font-size="11">Adjudicate, pay</text>
+<text x="840.0" y="234" text-anchor="middle" font-size="11">(prepay edits)</text>
+<rect x="938.8571428571429" y="264" width="173.71428571428572" height="46" rx="6" fill="#bfe3c6" stroke="#555"/>
+<text x="1025.7142857142858" y="283" text-anchor="middle" font-size="11">Screen paid claims,</text>
+<text x="1025.7142857142858" y="296" text-anchor="middle" font-size="11">pick providers</text>
+<rect x="1124.5714285714287" y="264" width="173.71428571428572" height="46" rx="6" fill="#bfe3c6" stroke="#555"/>
+<text x="1211.4285714285716" y="283" text-anchor="middle" font-size="11">Read charts,</text>
+<text x="1211.4285714285716" y="296" text-anchor="middle" font-size="11">estimate overpayment</text>
+<rect x="1310.2857142857142" y="264" width="173.71428571428572" height="46" rx="6" fill="#e4e4e4" stroke="#555" stroke-dasharray="4 3"/>
+<text x="1397.142857142857" y="283" text-anchor="middle" font-size="11">Dispute: legal,</text>
+<text x="1397.142857142857" y="296" text-anchor="middle" font-size="11">medical director</text>
+<rect x="938.8571428571429" y="326" width="173.71428571428572" height="46" rx="6" fill="#bfe3c6" stroke="#555"/>
+<text x="1025.7142857142858" y="345" text-anchor="middle" font-size="11">Volume lane:</text>
+<text x="1025.7142857142858" y="358" text-anchor="middle" font-size="11">30+ visits a day</text>
+<rect x="1124.5714285714287" y="326" width="173.71428571428572" height="46" rx="6" fill="#bfe3c6" stroke="#555"/>
+<text x="1211.4285714285716" y="345" text-anchor="middle" font-size="11">Fraud referral</text>
+<text x="1211.4285714285716" y="358" text-anchor="middle" font-size="11">(SIU case)</text>
+<rect x="1310.2857142857142" y="326" width="173.71428571428572" height="46" rx="6" fill="#e4e4e4" stroke="#555" stroke-dasharray="4 3"/>
+<text x="1397.142857142857" y="345" text-anchor="middle" font-size="11">Law enforcement,</text>
+<text x="1397.142857142857" y="358" text-anchor="middle" font-size="11">state referral</text>
+<rect x="938.8571428571429" y="388" width="173.71428571428572" height="46" rx="6" fill="#bfe3c6" stroke="#555"/>
+<text x="1025.7142857142858" y="407" text-anchor="middle" font-size="11">Request records,</text>
+<text x="1025.7142857142858" y="420" text-anchor="middle" font-size="11">read charts (code)</text>
+<rect x="1124.5714285714287" y="388" width="173.71428571428572" height="46" rx="6" fill="#bfe3c6" stroke="#555"/>
+<text x="1211.4285714285716" y="407" text-anchor="middle" font-size="11">Demand when the</text>
+<text x="1211.4285714285716" y="420" text-anchor="middle" font-size="11">estimate covers cost</text>
+<rect x="938.8571428571429" y="140" width="173.71428571428572" height="46" rx="6" fill="#bfe3c6" stroke="#555"/>
+<text x="1025.7142857142858" y="159" text-anchor="middle" font-size="11">Answers records</text>
+<text x="1025.7142857142858" y="172" text-anchor="middle" font-size="11">request (30-45 d)</text>
+<rect x="1124.5714285714287" y="140" width="173.71428571428572" height="46" rx="6" fill="#bfe3c6" stroke="#555"/>
+<text x="1211.4285714285716" y="159" text-anchor="middle" font-size="11">Repays or</text>
+<text x="1211.4285714285716" y="172" text-anchor="middle" font-size="11">disputes</text>
+<rect x="1310.2857142857142" y="140" width="173.71428571428572" height="46" rx="6" fill="#e4e4e4" stroke="#555" stroke-dasharray="4 3"/>
+<text x="1397.142857142857" y="159" text-anchor="middle" font-size="11">Appeals; may</text>
+<text x="1397.142857142857" y="172" text-anchor="middle" font-size="11">leave network</text>
+<rect x="1310.2857142857142" y="202" width="173.71428571428572" height="46" rx="6" fill="#e4e4e4" stroke="#555" stroke-dasharray="4 3"/>
+<text x="1397.142857142857" y="221" text-anchor="middle" font-size="11">Offset on later</text>
+<text x="1397.142857142857" y="234" text-anchor="middle" font-size="11">835 remittances</text>
+<rect x="938.8571428571429" y="450" width="173.71428571428572" height="46" rx="6" fill="#e4e4e4" stroke="#555" stroke-dasharray="4 3"/>
+<text x="1025.7142857142858" y="469" text-anchor="middle" font-size="11">Contract audit</text>
+<text x="1025.7142857142858" y="482" text-anchor="middle" font-size="11">and records clauses</text>
+<rect x="1124.5714285714287" y="450" width="173.71428571428572" height="46" rx="6" fill="#e4e4e4" stroke="#555" stroke-dasharray="4 3"/>
+<text x="1211.4285714285716" y="469" text-anchor="middle" font-size="11">State look-back</text>
+<text x="1211.4285714285716" y="482" text-anchor="middle" font-size="11">180 d to 24 months</text>
+<rect x="1310.2857142857142" y="450" width="173.71428571428572" height="46" rx="6" fill="#e4e4e4" stroke="#555" stroke-dasharray="4 3"/>
+<text x="1397.142857142857" y="469" text-anchor="middle" font-size="11">Vendor fee 15-30%</text>
+<text x="1397.142857142857" y="482" text-anchor="middle" font-size="11">(commercial)</text>
+<text x="10" y="588" fill="#555">Sourced steps and timings: docs/audit_actors_research.md. Dollars at each step: docs/audit_money_flow_research.md. A simplification: not every path is drawn.</text></svg>
