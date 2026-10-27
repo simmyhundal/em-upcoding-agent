@@ -174,7 +174,11 @@ def apply_demand_floor(rid, src, view, office, floor):
     import dollar_reward as dr
     import recovery_40 as s4
     import summary_rules as sr
-    if isinstance(floor, str) and floor.startswith("cost"):             # "cost" = the staff cost of a demand; "cost2" = twice that
+    if floor == "cost43":                                                  # workflow v4.3: score 4.3's break-even in terms of the lower bound: collected after appeals, it covers a demand's cost and expected appeal handling
+        import recovery_43 as r43
+        P = r43.params43()
+        floor = (s4.staff_cost(0, 0, 0, 1, 0, s4.PARAMS)[0] + P["P_APPEAL"] * P["APPEAL_HANDLING_HOURS"] * s4.hourly("coder", s4.PARAMS)) / ((1 - P["APPEAL_REDUCTION"]) * P["COLLECTION_DEMAND"])
+    elif isinstance(floor, str) and floor.startswith("cost"):             # "cost" = the staff cost of a demand; "cost2" = twice that
         floor = s4.staff_cost(0, 0, 0, 1, 0, s4.PARAMS)[0] * (float(floor[4:]) if floor[4:] else 1.0)
     claims = {}
     for r in csv.DictReader(open(os.path.join(view, "claims.csv"))):

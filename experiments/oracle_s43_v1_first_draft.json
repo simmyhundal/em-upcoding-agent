@@ -1,0 +1,54 @@
+{
+ "4.0, test": {
+  "score": 22200.26,
+  "recovered": 40899.71,
+  "recovered_level_only": 40899.71,
+  "recovered_impossible_day_providers": 0.0,
+  "recovered_other_phantom_providers": 0.0,
+  "staff": 18699.45,
+  "abrasion": 0.0,
+  "pursued": 21,
+  "level_only": 21,
+  "stratum_only": 0,
+  "both": 0,
+  "pursued_with_rate_below_5pct": 0,
+  "per_seed": {
+   "f4_5555": 1085.03,
+   "f4_5656": 917.98,
+   "f4_5757": 102.35,
+   "f4_5858": 1814.98,
+   "f4_5959": 5498.13,
+   "f4_6060": 711.82,
+   "f4_6161": 2106.38,
+   "f4_6262": 2942.41,
+   "f4_6363": 428.18,
+   "f4_6464": 6593.0
+  }
+ },
+ "4.2, test": {
+  "score": 24309.69,
+  "recovered": 80402.53,
+  "recovered_level_only": 22769.26,
+  "recovered_impossible_day_providers": 53274.85,
+  "recovered_other_phantom_providers": 4358.42,
+  "staff": 55382.21,
+  "abrasion": 710.63,
+  "pursued": 20,
+  "level_only": 8,
+  "stratum_only": 12,
+  "both": 0,
+  "pursued_with_rate_below_5pct": 0,
+  "per_seed": {
+   "d42_4700": 6484.19,
+   "d42_4737": 5972.38,
+   "d42_4774": 3072.59,
+   "d42_4811": 69.06,
+   "d42_4848": 580.52,
+   "d42_4885": 4269.69,
+   "d42_4922": 1159.02,
+   "d42_4959": 0.0,
+   "d42_4996": 2702.24,
+   "d42_5033": 0.0
+  }
+ }
+}
