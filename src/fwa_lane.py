@@ -47,18 +47,11 @@ def stratum_ids(rows, hot_days):
     return sorted(r["claim_id"] for r in rows if r["service_date"] in hot)
 
 
-def review(office, pid, rows, hot_days, seed=1, n=SAMPLE_N, p=None, persist=0):
-    """One provider through the lane. Returns the lane record (JSON-able): stratum, sample, what came back, the payer's own estimate and the demand decision."""
-    import dollar_reward as dr
-    p = p or r42.params42()
-    ids = stratum_ids(rows, hot_days)
-    rng = random.Random(f"{seed}:fwa:{pid}")
-    sample = sorted(rng.sample(ids, min(n, len(ids))))
-    rec = {"stratum_ids": ids, "sample_ids": sample, "hot_days": list(hot_days), "rounds": 0, "charts": 0, "no_record": [], "levels": {}, "demand": False}
-    resp = office.send_request(pid, {"kind": "targeted", "claim_ids": sample}, deadline=30)
+def _ask(office, pid, claim_ids, persist):
+    """One records request for `claim_ids` with its follow-ups (one on a fixable deficiency, then up to `persist` more while nothing usable and no NO_RECORD has come back)."""
+    resp = office.send_request(pid, {"kind": "targeted", "claim_ids": claim_ids}, deadline=30)
     if "error" in resp:
-        rec["error"] = resp["error"]
-        return rec
+        return resp
     if resp.get("deficiencies") and resp.get("rounds_left", 0) > 0:
         fixable = [d["code"] for d in resp["deficiencies"] if d["code"] != "NO_RECORD"]
         if fixable:
@@ -70,19 +63,56 @@ def review(office, pid, rows, hot_days, seed=1, n=SAMPLE_N, p=None, persist=0):
             break
         codes = [d["code"] for d in resp.get("deficiencies", []) if d["code"] != "NO_RECORD"]
         resp = office.follow_up(pid, codes, deadline=30)
+    return resp
+
+
+def _no_record(office, pid):
     nr = set()
     for e in office.transcript:
         if e.get("provider_id") == pid:
             for d in e.get("deficiencies", []):
                 if d["code"] == "NO_RECORD":
                     nr.update(d["claim_ids"])
+    return nr
+
+
+def break_even_lower_bound():
+    """Score 4.3's break-even for a fraud referral in terms of the sample's lower bound: collected at the referral rate it must cover the referral cost and the expected appeal handling."""
+    import recovery_43 as r43
+    p = r43.params43()
+    appeal = p["P_APPEAL"] * p["APPEAL_HANDLING_HOURS"] * r4.hourly("coder", p)
+    return (p["REFERRAL_COST"] + appeal) / p["COLLECTION_REFERRAL"]
+
+
+def review(office, pid, rows, hot_days, seed=1, n=SAMPLE_N, p=None, persist=0, break_even="demand", probe=None):
+    """One provider through the lane. Returns the lane record (JSON-able): stratum, sample, what came back, the payer's own estimate and the demand decision.
+    break_even "demand" (workflow v4.2): demand when the lower bound covers a demand's staff cost; "s43" (workflow v4.3): when the lower bound, collected at the referral rate, covers the referral cost.
+    probe {"n", "k", "more"} (workflow v4.3): request `n` claims first and `more` further ones only if the office reported NO_RECORD for at least `k` of them."""
+    import dollar_reward as dr
+    p = p or r42.params42()
+    ids = stratum_ids(rows, hot_days)
+    rng = random.Random(f"{seed}:fwa:{pid}")
+    first = sorted(rng.sample(ids, min(probe["n"] if probe else n, len(ids))))
+    sample = first
+    rec = {"stratum_ids": ids, "sample_ids": sample, "hot_days": list(hot_days), "rounds": 0, "charts": 0, "no_record": [], "levels": {}, "demand": False}
+    resp = _ask(office, pid, first, persist)
+    if "error" in resp:
+        rec["error"] = resp["error"]
+        return rec
+    if probe and len(_no_record(office, pid)) >= probe["k"]:
+        rest = [c for c in ids if c not in set(first)]
+        more = sorted(rng.sample(rest, min(probe["more"], len(rest))))
+        if more and "error" not in _ask(office, pid, more, probe.get("persist", 1)):
+            sample = sorted(first + more)
+            rec["sample_ids"] = sample
+    nr = _no_record(office, pid)
     st = office.state[pid]
     rec["rounds"] = st["round"]
     rec["charts"] = len(st["usable"])
     rec["no_record"] = sorted(nr)
     rec["levels"] = dr.level_of_rows(list(st["usable"].values()))
     est = r42.recovery_stratified([r for r in rows if r["claim_id"] in set(ids)], sample, rec["levels"], p, no_record=nr)
-    cost = r4.staff_cost(0, 0, 0, 1, 0, p)[0]
+    cost = r4.staff_cost(0, 0, 0, 1, 0, p)[0] if break_even == "demand" else break_even_lower_bound()
     rec["estimate"] = {k: (round(v, 2) if isinstance(v, float) else v) for k, v in est.items()}
     rec["demand_cost"] = round(cost, 2)
     rec["demand"] = est["value"] >= cost
@@ -106,7 +136,7 @@ def run(rid, src, opts, root):
         rng = random.Random(f"{opts.get('veto_seed', 1)}:{src}:lane-gate1")
         veto |= {pid for pid, _t, _h in flagged if rng.random() < opts["veto_fraction"]}
     for pid, top, hot in [f for f in flagged if f[0] not in veto]:
-        v = review(office, pid, claims[pid], hot, n=opts.get("n", SAMPLE_N), persist=opts.get("persist", 0))
+        v = review(office, pid, claims[pid], hot, n=opts.get("n", SAMPLE_N), persist=opts.get("persist", 0), break_even=opts.get("break_even", "demand"), probe=opts.get("probe"))
         v["busiest_day"] = top
         out["providers"][pid] = v
     d = os.path.join(root, "experiments", rid)

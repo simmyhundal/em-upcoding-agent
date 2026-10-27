@@ -26,9 +26,26 @@ import w_loop  # noqa: E402
 CACHE_DIR = os.path.join(ROOT, "experiments", "w_loop_43")
 W41 = w_loop.VERSIONS["H23_n4"]
 LANE = {"day_max": 30, "n": 30, "persist": 3, "office_version": "4.3"}    # workflow v4.2 (H28) with the lane on office 4.3
+def _v(base, fwa=None, floor=None, **top):
+    w = {**base["w40"]}
+    if fwa is not None:
+        w["fwa"] = {**LANE, **fwa} if fwa else None
+        if not fwa:
+            w.pop("fwa")
+    if floor:
+        w["demand_floor"] = floor
+    return {**base, **top, "w40": w}
+
+
+NOLANE = {}                                                                         # an empty lane option removes the lane
 VERSIONS = {
     "W41": w_loop.VERSIONS["H23_n4"],                                                                                                   # workflow v4.1, the level review only
     "W42": {**W41, "w40": {**W41["w40"], "fwa": dict(LANE)}},                                                                           # workflow v4.2 (H28) with office 4.3 for the lane: the reference of this release
+    # hypotheses of workflow v4.3 (docs/w_loop_v43.md), each against the current best on development batches 1 to 4
+    "H29": _v(W41, floor="cost43"),                                                                                                     # level demands: the break-even rule uses score 4.3's collected value (no lane)
+    "H30": _v(W41, fwa={"break_even": "s43"}, floor="cost43"),                                                                          # the lane too: a referral only when its collected lower bound covers the referral cost
+    "H31": _v(W41, fwa={"break_even": "s43", "probe": {"n": 10, "k": 3, "more": 20}}, floor="cost43"),                                  # H30 with a probe of 10 claims first; 20 more only if at least 3 had no record
+    "H32": _v(W41, fwa={"break_even": "s43", "max_flagged": 3}, floor="cost43"),                                                        # H30 but at most 3 providers go through the lane (the busiest days)
 }
 KEEP = ("score", "recovered", "recovered_level", "recovered_fwa", "staff_cost", "abrasion", "demands", "lane_flagged", "lane_demands", "lane_true", "lane_false", "impossible_providers",
         "justified_called", "justified", "rounds", "charts", "listed")

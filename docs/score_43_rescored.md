@@ -6,30 +6,30 @@
 
 | Version | Data | Score 4.3 | Oracle | % of oracle | Collected | Staff cost | Abrasion | Demands | Referrals |
 |---|---|---|---|---|---|---|---|---|---|
-| Workflow v4.0 | 4.0, test | -$7,865 | $22,200 | -35% | $2,192 | $9,995 | $61 | 3 | 0 |
-| Agent v5.0 | 4.0, test | -$5,438 | $22,200 | -24% | $2,223 | $7,443 | $218 | 3 | 0 |
-| Workflow v4.1 | 4.0, test | $4,603 | $22,200 | 21% | $15,107 | $10,504 | $0 | 9 | 0 |
-| Agent v5.1 | 4.0, test | $2,180 | $22,200 | 10% | $12,122 | $9,866 | $76 | 10 | 0 |
-| Workflow v4.1 | 4.2, test | $2,362 | $24,310 | 10% | $13,964 | $11,602 | $0 | 7 | 1 |
-| Workflow v4.2 | 4.2, test | -$30,432 | $24,310 | -125% | $106,583 | $133,963 | $3,051 | 7 | 31 |
-| Agent v5.2 | 4.2, test | -$27,150 | $24,310 | -112% | $105,009 | $129,107 | $3,051 | 6 | 30 |
+| Workflow v4.0 | 4.0, test | -$7,865 | $8,778 | -90% | $2,192 | $9,995 | $61 | 3 | 0 |
+| Agent v5.0 | 4.0, test | -$5,438 | $8,778 | -62% | $2,223 | $7,443 | $218 | 3 | 0 |
+| Workflow v4.1 | 4.0, test | $4,603 | $8,778 | 52% | $15,107 | $10,504 | $0 | 9 | 0 |
+| Agent v5.1 | 4.0, test | $2,180 | $8,778 | 25% | $12,122 | $9,866 | $76 | 10 | 0 |
+| Workflow v4.1 | 4.2, test | $2,362 | $14,423 | 16% | $13,964 | $11,602 | $0 | 7 | 1 |
+| Workflow v4.2 | 4.2, test | -$30,432 | $14,423 | -211% | $106,583 | $133,963 | $3,051 | 7 | 31 |
+| Agent v5.2 | 4.2, test | -$27,150 | $14,423 | -188% | $105,009 | $129,107 | $3,051 | 6 | 30 |
 
 ## Reading it
-- Under the signed-off collection rates and costs, the money available is small: the oracle is **$22,200** on the data 4.0 test seeds and **$24,310** on the data 4.2 test seeds (score 4.2 gave $62,662 and $627,805).
+- Under the signed-off collection rates and costs, the money available is small: the oracle is **$8,778** on the data 4.0 test seeds and **$14,423** on the data 4.2 test seeds (score 4.2 gave $62,662 and $627,805).
 - **Workflow v4.2 and agent v5.2 lose money** on data 4.2 under score 4.3: the [volume lane](concepts/volume-screen.md "flag providers by claims per day from claims alone") pursues fraud cases ([referrals](concepts/fraud-referral.md "an SIU case, not a demand letter")) that collect 25% and cost $4,000 each, and too many of its cases are not worth that. Workflow v4.1, which has no lane, is the only version above zero on data 4.2.
 - On data 4.0 only the v4.1 versions are above zero.
 
 ## The oracle under score 4.3 (stress test)
-Per provider the oracle may use a random chart sample of any size, or a sample drawn only from the claims it knows are for visits that never happened, and pursues a provider only when the value after [collection](concepts/collection-rate.md "the share of an estimated overpayment that ends as cash"), staff cost, the $4,000 referral cost, appeal handling and abrasion is positive; honest providers included.
+Per provider the oracle may use a random chart sample of any size, or a sample drawn only from the claims on days with 30 or more visits (a stratum a payer can define from claims), and pursues a provider only when the value after [collection](concepts/collection-rate.md "the share of an estimated overpayment that ends as cash"), staff cost, the $4,000 referral cost, appeal handling and abrasion is positive; honest providers included.
 
-| Ten test seeds | Oracle score | Collected | Staff cost | Abrasion | Providers pursued | by chart sample | by the phantom-claims sample |
+| Ten test seeds | Oracle score | Collected | Staff cost | Abrasion | Providers pursued | by chart sample | by the busy-day sample |
 |---|---|---|---|---|---|---|---|
-| 4.0, test | $22,200 | $40,900 | $18,699 | $0 | 21 | 21 | 0 |
-| 4.2, test | $24,310 | $80,403 | $55,382 | $711 | 20 | 8 | 12 |
+| 4.0, test | $8,778 | $17,303 | $8,525 | $0 | 9 | 9 | 0 |
+| 4.2, test | $14,423 | $57,561 | $43,138 | $0 | 16 | 7 | 9 |
 
 Checks (docs/process.md, step 1):
-- **Rules and exclusions.** Works inside the score's recovery rules (random and stratified samples only; a targeted request for known-overbilled claims earns nothing); perfect knowledge of the answer key; every office answers; no provider changes behavior. A provider with claims for visits that never happened is always pursued as a fraud referral, whatever sample is used (the first draft of this oracle collected such providers as ordinary demands through a full chart census and reported $195,890 on data 4.2; fixed before publication).
-- **Breakdown printed** (table above) and 20 random samples per estimate.
+- **Rules and exclusions.** Works inside the score's recovery rules (random samples, and a stratum a payer can define from claims; a targeted request for claims known to be overbilled earns nothing); perfect knowledge of the answer key, but chart reads carry the reviewer's 15% disagreement like every arm's; every office answers; no provider changes behavior. A provider with claims for visits that never happened is always pursued as a fraud referral, whatever sample is used (the first draft of this oracle collected such providers as ordinary demands through a full chart census and reported $195,890 on data 4.2; fixed before publication).
+- **Breakdown printed** (table above). Sample size and option are chosen on 20 draws and the value is reported on 100 independent draws; the demand is dropped when a sample does not cover its cost, as arms do.
 - **Every cost an arm pays is charged to it:** triage, chart review, request rounds, the demand or the referral, appeal handling, abrasion.
-- **Does any arm beat it?** Not in any total. On single seeds, 3 of the 70 arm-seed cases did (Workflow v4.1 4.0, test f4_5959, Agent v5.1 4.0, test f4_6363, Workflow v4.1 4.2, test d42_4959): the oracle is an expected value over sample draws, and an arm's one real sample can land above it.
-- **Second reviewer:** see the review recorded in the decision log.
+- **Does any arm beat it?** Not in any total. On single seeds, 9 of the 70 arm-seed cases did (Workflow v4.1 and Agent v5.1 on data 4.0 test seeds f4_5959, f4_6161 and f4_6363; Agent v5.0 on f4_6161; Workflow v4.1 on data 4.2 test seeds d42_4774, d42_4922 and d42_4959): the oracle is an expected value over sample draws, and an arm's one real sample can land above it.
+- **Second reviewer (2026-10-27):** found the first draft too high: it read charts without the reviewer's disagreement (about half of the data 4.0 value), sampled claims known to be never rendered (about 15% of data 4.2), chose and reported on the same draws (6 to 13%), and forced a demand it could have dropped (+7% on data 4.0). All four are fixed; the first draft's numbers ($22,200 and $24,310) are kept in `experiments/oracle_s43_v1_first_draft.json`. With perfect chart reading the ceiling is higher; `oracle(code, coder_noise=0)` gives it.
