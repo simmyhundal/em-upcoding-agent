@@ -8,85 +8,103 @@
   "Workflow v4.2 (4.2)": 375031,
   "Agent v5.2 (4.2)": 372114
  },
- "score 4.3 defaults": {
-  "Workflow v4.0 (4.0)": -7317,
-  "Workflow v4.1 (4.0)": 8380,
-  "Agent v5.0 (4.0)": -4882,
-  "Agent v5.1 (4.0)": 5211,
-  "Workflow v4.1 (4.2)": 10510,
-  "Workflow v4.2 (4.2)": -36177,
-  "Agent v5.2 (4.2)": -37945
+ "score 4.3 defaults (lane collected at 25%, net of appeals)": {
+  "Workflow v4.0 (4.0)": -7865,
+  "Workflow v4.1 (4.0)": 4603,
+  "Agent v5.0 (4.0)": -5438,
+  "Agent v5.1 (4.0)": 2180,
+  "Workflow v4.1 (4.2)": 6833,
+  "Workflow v4.2 (4.2)": -25962,
+  "Agent v5.2 (4.2)": -27150
  },
- "  referral collection 85% (the payer recoups by offset itself)": {
-  "Workflow v4.0 (4.0)": -7317,
-  "Workflow v4.1 (4.0)": 8380,
-  "Agent v5.0 (4.0)": -4882,
-  "Agent v5.1 (4.0)": 5211,
-  "Workflow v4.1 (4.2)": 10510,
-  "Workflow v4.2 (4.2)": 152765,
-  "Agent v5.2 (4.2)": 150997
+ "  lane collected at 16%": {
+  "Workflow v4.0 (4.0)": -7865,
+  "Workflow v4.1 (4.0)": 4603,
+  "Agent v5.0 (4.0)": -5438,
+  "Agent v5.1 (4.0)": 2180,
+  "Workflow v4.1 (4.2)": 6833,
+  "Workflow v4.2 (4.2)": -59305,
+  "Agent v5.2 (4.2)": -60492
+ },
+ "  lane collected at 45% (a third to a half of providers exit, the rest offset)": {
+  "Workflow v4.0 (4.0)": -7865,
+  "Workflow v4.1 (4.0)": 4603,
+  "Agent v5.0 (4.0)": -5438,
+  "Agent v5.1 (4.0)": 2180,
+  "Workflow v4.1 (4.2)": 6833,
+  "Workflow v4.2 (4.2)": 48133,
+  "Agent v5.2 (4.2)": 46945
+ },
+ "  lane collected at 65% (the plan offsets against a provider who keeps billing)": {
+  "Workflow v4.0 (4.0)": -7865,
+  "Workflow v4.1 (4.0)": 4603,
+  "Agent v5.0 (4.0)": -5438,
+  "Agent v5.1 (4.0)": 2180,
+  "Workflow v4.1 (4.2)": 6833,
+  "Workflow v4.2 (4.2)": 122228,
+  "Agent v5.2 (4.2)": 121040
+ },
+ "  lane collected at 85% (no source supports it)": {
+  "Workflow v4.0 (4.0)": -7865,
+  "Workflow v4.1 (4.0)": 4603,
+  "Agent v5.0 (4.0)": -5438,
+  "Agent v5.1 (4.0)": 2180,
+  "Workflow v4.1 (4.2)": 6833,
+  "Workflow v4.2 (4.2)": 196322,
+  "Agent v5.2 (4.2)": 195135
  },
  "  referral cost $2,000": {
+  "Workflow v4.0 (4.0)": -7865,
+  "Workflow v4.1 (4.0)": 4603,
+  "Agent v5.0 (4.0)": -5438,
+  "Agent v5.1 (4.0)": 2180,
+  "Workflow v4.1 (4.2)": 6833,
+  "Workflow v4.2 (4.2)": 34038,
+  "Agent v5.2 (4.2)": 32850
+ },
+ "  ordinary demand collected at 85% (the earlier assumption; no source)": {
   "Workflow v4.0 (4.0)": -7317,
   "Workflow v4.1 (4.0)": 8380,
   "Agent v5.0 (4.0)": -4882,
   "Agent v5.1 (4.0)": 5211,
   "Workflow v4.1 (4.2)": 10510,
-  "Workflow v4.2 (4.2)": 23823,
-  "Agent v5.2 (4.2)": 22055
+  "Workflow v4.2 (4.2)": -22284,
+  "Agent v5.2 (4.2)": -24052
  },
- "  referral cost $0 (as score 4.2)": {
-  "Workflow v4.0 (4.0)": -7317,
-  "Workflow v4.1 (4.0)": 8380,
-  "Agent v5.0 (4.0)": -4882,
-  "Agent v5.1 (4.0)": 5211,
-  "Workflow v4.1 (4.2)": 10510,
-  "Workflow v4.2 (4.2)": 75543,
-  "Agent v5.2 (4.2)": 73775
+ "  ordinary demand collected at 91% (Vermont findings that stood)": {
+  "Workflow v4.0 (4.0)": -7124,
+  "Workflow v4.1 (4.0)": 9713,
+  "Agent v5.0 (4.0)": -4686,
+  "Agent v5.1 (4.0)": 6280,
+  "Workflow v4.1 (4.2)": 11808,
+  "Workflow v4.2 (4.2)": -20986,
+  "Agent v5.2 (4.2)": -22959
  },
- "  no appeal reduction": {
-  "Workflow v4.0 (4.0)": -6834,
-  "Workflow v4.1 (4.0)": 11712,
-  "Agent v5.0 (4.0)": -4391,
-  "Agent v5.1 (4.0)": 7884,
-  "Workflow v4.1 (4.2)": 13755,
-  "Workflow v4.2 (4.2)": -19039,
-  "Agent v5.2 (4.2)": -21319
- },
- "  demand collection 55%": {
-  "Workflow v4.0 (4.0)": -8284,
-  "Workflow v4.1 (4.0)": 1715,
-  "Agent v5.0 (4.0)": -5863,
-  "Agent v5.1 (4.0)": -137,
-  "Workflow v4.1 (4.2)": 4020,
-  "Workflow v4.2 (4.2)": -42667,
-  "Agent v5.2 (4.2)": -43411
+ "  no appeal reduction on ordinary demands": {
+  "Workflow v4.0 (4.0)": -7478,
+  "Workflow v4.1 (4.0)": 7269,
+  "Agent v5.0 (4.0)": -5045,
+  "Agent v5.1 (4.0)": 4319,
+  "Workflow v4.1 (4.2)": 9429,
+  "Workflow v4.2 (4.2)": -23366,
+  "Agent v5.2 (4.2)": -24963
  },
  "  gate as score 4.2 (15% of claims)": {
-  "Workflow v4.0 (4.0)": -7317,
-  "Workflow v4.1 (4.0)": 8380,
-  "Agent v5.0 (4.0)": -4882,
-  "Agent v5.1 (4.0)": 5211,
-  "Workflow v4.1 (4.2)": 10510,
-  "Workflow v4.2 (4.2)": -36177,
-  "Agent v5.2 (4.2)": -37945
- },
- "  no gate (0%)": {
-  "Workflow v4.0 (4.0)": -7317,
-  "Workflow v4.1 (4.0)": 8380,
-  "Agent v5.0 (4.0)": -4882,
-  "Agent v5.1 (4.0)": 5211,
-  "Workflow v4.1 (4.2)": 10510,
-  "Workflow v4.2 (4.2)": -36177,
-  "Agent v5.2 (4.2)": -37945
+  "Workflow v4.0 (4.0)": -7865,
+  "Workflow v4.1 (4.0)": 4603,
+  "Agent v5.0 (4.0)": -5438,
+  "Agent v5.1 (4.0)": 2180,
+  "Workflow v4.1 (4.2)": 6833,
+  "Workflow v4.2 (4.2)": -25962,
+  "Agent v5.2 (4.2)": -27150
  },
  "  copy fee $90": {
-  "Workflow v4.0 (4.0)": -12717,
-  "Workflow v4.1 (4.0)": 2620,
-  "Agent v5.0 (4.0)": -8932,
-  "Agent v5.1 (4.0)": 1431,
-  "Workflow v4.1 (4.2)": 6460,
-  "Workflow v4.2 (4.2)": -46707,
-  "Agent v5.2 (4.2)": -46945
+  "Workflow v4.0 (4.0)": -13265,
+  "Workflow v4.1 (4.0)": -1157,
+  "Agent v5.0 (4.0)": -9488,
+  "Agent v5.1 (4.0)": -1600,
+  "Workflow v4.1 (4.2)": 2783,
+  "Workflow v4.2 (4.2)": -36492,
+  "Agent v5.2 (4.2)": -36150
  }
 }

@@ -13,14 +13,16 @@ import score_43 as s43  # noqa: E402
 import yardstick_s42 as ys  # noqa: E402
 
 VARIANTS = [("score 4.2 (reference, as in the README)", None),
-            ("score 4.3 defaults", {}),
-            ("  referral collection 85% (the payer recoups by offset itself)", {"COLLECTION_REFERRAL": 0.85}),
+            ("score 4.3 defaults (lane collected at 25%, net of appeals)", {}),
+            ("  lane collected at 16%", {"COLLECTION_REFERRAL": 0.16}),
+            ("  lane collected at 45% (a third to a half of providers exit, the rest offset)", {"COLLECTION_REFERRAL": 0.45}),
+            ("  lane collected at 65% (the plan offsets against a provider who keeps billing)", {"COLLECTION_REFERRAL": 0.65}),
+            ("  lane collected at 85% (no source supports it)", {"COLLECTION_REFERRAL": 0.85}),
             ("  referral cost $2,000", {"REFERRAL_COST": 2000.0}),
-            ("  referral cost $0 (as score 4.2)", {"REFERRAL_COST": 276.0}),
-            ("  no appeal reduction", {"APPEAL_REDUCTION": 0.0}),
-            ("  demand collection 55%", {"COLLECTION_DEMAND": 0.55}),
+            ("  ordinary demand collected at 85% (the earlier assumption; no source)", {"COLLECTION_DEMAND": 0.85}),
+            ("  ordinary demand collected at 91% (Vermont findings that stood)", {"COLLECTION_DEMAND": 0.91}),
+            ("  no appeal reduction on ordinary demands", {"APPEAL_REDUCTION": 0.0}),
             ("  gate as score 4.2 (15% of claims)", {"GATE_UNIT": "claim"}),
-            ("  no gate (0%)", {"GATE_DOLLAR_RATE": 0.0}),
             ("  copy fee $90", {"C_COPY": 90.0})]
 
 

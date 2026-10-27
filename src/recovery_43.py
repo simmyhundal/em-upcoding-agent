@@ -3,7 +3,7 @@ Every value is the one recommended in docs/score_43_sources.md with its status (
 
 Changes from score 4.2 (frozen, unchanged):
   GATE_UNIT "dollar": extrapolate only when the sample's NET DOLLAR error rate (net overpayment over paid dollars of the reviewed claims) is at least GATE_DOLLAR_RATE; "claim" is score 4.2's share of claims overpaid.
-  A demand's value is what the payer expects to COLLECT: the lower bound times (1 - APPEAL_REDUCTION) times the collection rate (appeals first, then collection on what remains).
+  A demand's value is what the payer expects to COLLECT: the lower bound times (1 - APPEAL_REDUCTION) times the collection rate (appeals first, then collection on what remains); a REFERRAL's rate is already net of appeals, so no separate reduction applies.
   A volume-lane provider is a REFERRAL: its cost is REFERRAL_COST in place of the demand's staff cost, its collection rate is COLLECTION_REFERRAL.
   The payer pays APPEAL_HANDLING_HOURS of coder time for the share P_APPEAL of demands that are appealed (expected cost).
 """
@@ -12,7 +12,7 @@ import math
 import recovery_40 as r4
 import recovery_42 as r42
 
-DEFAULTS = {"GATE_UNIT": "dollar", "GATE_DOLLAR_RATE": 0.05, "APPEAL_REDUCTION": 0.15, "COLLECTION_DEMAND": 0.85, "COLLECTION_REFERRAL": 0.25, "REFERRAL_COST": 4000.0,
+DEFAULTS = {"GATE_UNIT": "dollar", "GATE_DOLLAR_RATE": 0.05, "APPEAL_REDUCTION": 0.15, "COLLECTION_DEMAND": 0.68, "COLLECTION_REFERRAL": 0.25, "REFERRAL_COST": 4000.0,
             "APPEAL_HANDLING_HOURS": 3.0, "P_APPEAL": 0.17}
 
 
@@ -86,7 +86,9 @@ def recovery_stratified(stratum_rows, sample_ids, level_of, p, no_record=frozens
 
 def collected(value, p, referral=False):
     """What the payer expects to collect from a lower bound: appeals first, then collection on what remains."""
-    return value * (1 - p["APPEAL_REDUCTION"]) * (p["COLLECTION_REFERRAL"] if referral else p["COLLECTION_DEMAND"])
+    if referral:                                   # the sourced referral rates (16% to 24%) already count appealed and overturned dollars as uncollected (docs/score_43_sources_addendum.md)
+        return value * p["COLLECTION_REFERRAL"]
+    return value * (1 - p["APPEAL_REDUCTION"]) * p["COLLECTION_DEMAND"]
 
 
 def staff_cost(listed, rounds, charts, demands, referrals, api_usd, p):
