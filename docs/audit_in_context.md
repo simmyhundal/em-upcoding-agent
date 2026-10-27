@@ -30,14 +30,14 @@ Records request to response 30 to 45 days; review 30 to 60 days (assumption); fi
 | Step | Per $100 | Status |
 |---|---|---|
 | Paid in error, all causes | $6.50 | analog (Medicare CERT 2025) |
-| E/M visits paid | $9.00 | analog, derived |
-| E/M overpaid by upcoding | $0.41 | analog |
+| E/M visits paid (all evaluation and management visits: office, emergency, hospital) | $9.00 | analog, derived: Medicare pays 7.3% of its dollars on E/M ($32.3B of $439.9B); commercial professional services are 33.6% of spend and E/M is over a third of those, about 11%; $9 sits between |
+| E/M overpaid by upcoding | $0.41 | analog: $9.00 x 4.5%, where 4.5% is Medicare's 2025 upcoded E/M dollars ($1.47B) over its E/M dollars ($32.3B). Low case $7 x 3.1% = $0.22 (established office visits); high case $11 x 10% = $1.10 (an assumption between Medicare 2025 and a 2010 audit that found 21% of E/M dollars improper) |
 | Share of that a postpay program reaches | 5% | **assumption, no source** |
 | Upcoding found postpay | $0.02 | assumption |
 | Collected (about 60%, already net of appeals) | $0.012 | analog |
 | After fees and cost (20%) | **$0.010** | assumption |
 
-Range for the last line: $0.001 to $0.18 per $100. Even if every upcoded dollar were found, a postpay program would recover about $0.17 per $100 at the central values. Prevention before payment is far larger (New York: about 87 dollars of prepay "savings" per dollar recovered), which is the argument for the prepay repository. The one number that moves everything is the share of upcoded dollars a postpay program reaches, and it has no source; this project's simulation is the only estimate available.
+Read the table as a chain of ratios, each applied to the row above. Rows with a Medicare rate applied to a commercial base assume commercial plans pay and code like Medicare, which nobody has measured. Range for the last line: $0.001 to $0.18 per $100. Even if every upcoded dollar were found, a postpay program would recover about $0.17 per $100 at the central values. Prevention before payment is far larger (New York: about 87 dollars of prepay "savings" per dollar recovered), which is the argument for the prepay repository. The one number that moves everything is the share of upcoded dollars a postpay program reaches, and it has no source; this project's simulation is the only estimate available.
 
 ## Who keeps the recovered dollar
 Self-funded plan: the employer's plan, less the fee. Fully insured plan: the insurer, unless its medical loss ratio is below the floor (80% individual and small group, 85% large group), in which case enrollees get it as a rebate. Under the loss-ratio rule, recoveries from providers lower the ratio; fraud recoveries are added back up to the fraud work's cost. Medicare: the trust funds (52% of 2021 Recovery Audit collections). Medicaid managed care: set by the state contract.
