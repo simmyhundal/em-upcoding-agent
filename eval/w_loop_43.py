@@ -1,4 +1,4 @@
-"""The workflow's RL loop on data 4.3 (release 4.3 and 5.3), scored with the score module named SCORE below (score 4.2 until score 4.3 is signed off). Free: every version is API-free. Same machinery as eval/w_loop.py (which stays untouched), run on the data 4.2 development pool
+"""The workflow's RL loop on data 4.3 (release 4.3 and 5.3), scored with score 4.3 (signed off 2026-10-27); `score42` and the lane diagnostics come from score 4.2. Free: every version is API-free. Same machinery as eval/w_loop.py (which stays untouched), run on the data 4.2 development pool
 (eval/dev_pool_v42.py: code d42_<seed>, run ids d42wl<name>_<seed>, the ones the reference arms already wrote are reused) and scored with score 4.2 (eval/score_42.py) beside the score 4.0 adapter.
 
 Usage: python eval/w_loop_42.py run NAME BATCHES        BATCHES like 1,2,3,4 (ten seeds each)
@@ -19,7 +19,7 @@ import dev_release3 as dev  # noqa: E402
 import make_v2_office_workflow_runs as ow  # noqa: E402
 import run_release2 as r2  # noqa: E402
 import score_42 as s42  # noqa: E402
-SCORE = s42                                                      # switched to score 4.3 once Simmy signs it off (docs/score_43_proposal.md)
+import score_43 as s43  # noqa: E402
 import seed_registry as sreg  # noqa: E402
 import w_loop  # noqa: E402
 
@@ -45,14 +45,17 @@ def _run(job):
     if not r2.done(rid, "case_summaries_checked.jsonl"):
         kw = {"w40": spec["w40"]} if spec["version"] == "4.0" else {}
         ow.run(rid, code, scr, f"workflow loop version {name} on data 4.3 development seed {seed}", version=spec["version"], tier1_n=11, no_model=True, office_version="4.3", **kw)
-    c, _ = SCORE.seed_result(rid, code)
-    return seed, {k: c[k] for k in KEEP}
+    c, _ = s42.seed_result(rid, code)
+    c3, _ = s43.seed_result(rid, code)
+    out = {k: c[k] for k in KEEP}
+    out.update({"score42": c["score"], "score": c3["score"], "collected": c3["collected"], "referrals": c3["referrals"], "demands43": c3["demands"]})       # the loop's score is score 4.3; the lane diagnostics are score 4.2's
+    return seed, out
 
 
 def evaluate(name, seeds, workers=4):
     sreg.check_development("4.3", seeds)
     os.makedirs(CACHE_DIR, exist_ok=True)
-    path = os.path.join(CACHE_DIR, f"{name}.json")
+    path = os.path.join(CACHE_DIR, f"{name}_s43.json")
     have = json.load(open(path)) if os.path.exists(path) else {}
     todo = [s for s in seeds if str(s) not in have]
     if todo:
@@ -73,7 +76,7 @@ def compare(name, ref, seeds):
 
 
 def line(c, name, ref):
-    return (f"{name} vs {ref} on {c['n']} seeds: S4.2 per seed {c['mean_a']:,.0f} (median {c['median_a']:,.0f}) vs {c['mean_b']:,.0f} (difference {c['mean_diff']:+,.0f}, sd {c['sd_diff']:,.0f}, better on {c['wins']} of {c['n']}, "
+    return (f"{name} vs {ref} on {c['n']} seeds: S4.3 per seed {c['mean_a']:,.0f} (median {c['median_a']:,.0f}) vs {c['mean_b']:,.0f} (difference {c['mean_diff']:+,.0f}, sd {c['sd_diff']:,.0f}, better on {c['wins']} of {c['n']}, "
             f"one-sided p = {c['p']:.4f}); seeds above zero {c['above_zero']}; lane providers right {c['lane_true']} of {c['impossible']} impossible-day providers, wrong {c['lane_false']}; lane recovery per seed {c['recovered_fwa']:,.0f}")
 
 
@@ -82,7 +85,7 @@ if __name__ == "__main__":
     if cmd == "run":
         seeds = sum([pool.BATCHES[int(b) - 1] for b in sys.argv[3].split(",")], [])
         res = evaluate(name, seeds)
-        print(name, "S4.2 per seed:", round(st.mean(r["score"] for r in res.values())), "median", round(st.median(r["score"] for r in res.values())))
+        print(name, "S4.3 per seed:", round(st.mean(r["score"] for r in res.values())), "median", round(st.median(r["score"] for r in res.values())))
     elif cmd == "compare":
         ref = sys.argv[3]
         seeds = sum([pool.BATCHES[int(b) - 1] for b in sys.argv[4].split(",")], [])

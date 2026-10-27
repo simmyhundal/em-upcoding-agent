@@ -1,4 +1,4 @@
-"""Score 4.3 on data 4.0 and later, PROPOSAL (docs/score_43_proposal.md; issue 200): dollars COLLECTED minus staff cost minus provider abrasion, per seed. EVALUATION ONLY: reads the answer key.
+"""Score 4.3 on data 4.0 and later (docs/score_43.md; issue 200): dollars COLLECTED minus staff cost minus provider abrasion, per seed. EVALUATION ONLY: reads the answer key.
 Score 4.2's rules plus (src/recovery_43.py): a dollar-based error gate, appeals then collection applied to each demand's lower bound, a volume-lane provider priced as a REFERRAL (referral cost, lower collection rate),
 and the payer's expected cost of handling appeals. Works on data 4.0 stored runs (no fraud claims) and on data 4.2 and later. Never import this from an arm or a model.
 """
@@ -17,7 +17,7 @@ import recovery_43 as r43  # noqa: E402
 import score_40 as s4  # noqa: E402
 import score_42 as s42  # noqa: E402
 
-VERSION = "4.3 (proposal)"
+VERSION = "4.3"
 FRAUD_KINDS = ("not_rendered", "impossible_days")
 _CTX = {}
 
@@ -48,7 +48,7 @@ def seed_result(rid, code, p=None, inputs=None, lane_data=None, no_record=None):
     i = inputs or s4.run_inputs(rid, code)
     ln = (lane_data if lane_data is not None else s42.lane(rid))["providers"]
     nr = no_record if no_record is not None else s42.no_record_ids(rid)
-    referral = {pid for pid, v in ln.items() if v.get("demand")}
+    referral = {pid for pid, v in ln.items() if v.get("demand")} | {pid for pid in i["called"] if nr.get(pid)}     # a demand that rests on claims for visits that never happened is a fraud referral
     ordinary = set(i["called"]) - referral
     rounds, charts = Counter(i["rounds"]), Counter(i["charts"])
     for pid, v in ln.items():

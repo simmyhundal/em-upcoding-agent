@@ -8,6 +8,7 @@ CONCEPTS = {
     "chart-review": "chart review", "demand-check": "demand check", "conservative-estimate": "conservative", "borderline-case": "borderline",
     "break-even-rule": "break-even rule", "hard-rule": "hard rule", "no-more-requests": "no-more-requests",
     "volume-screen": "volume screen", "records-not-provided": "records not provided", "stratified-sample": "stratified sample",
+    "error-gate": "error gate", "fraud-referral": "fraud referral", "collection-rate": "collection rate", "appeal-reduction": "appeal reduction", "oracle": "oracle",
 }
 OLD_SLUGS = ["workflow-and-agent", "shortlist", "request-recommendation", "triage", "chart-review", "demand-check", "conservative-estimate", "borderline-case", "break-even-rule", "hard-rule", "no-more-requests"]
 OLD = ["near-miss", "demand floor", "narrow binding rule", "ask-or-skip", "stop-after-first-sample", "(?<!short)listed provider"]
@@ -15,7 +16,9 @@ OUTSIDE_PAGES = {"docs/agent_v51.md": OLD_SLUGS,
                  "docs/score_42.md": ["records-not-provided", "stratified-sample"],
                  "docs/agent_v52.md": ["workflow-and-agent", "volume-screen", "stratified-sample", "conservative-estimate", "records-not-provided", "break-even-rule"],
                  "docs/w42_freeze.md": ["volume-screen", "stratified-sample", "records-not-provided", "conservative-estimate", "break-even-rule"],
-                 "docs/data_v4_3.md": ["volume-screen", "records-not-provided"]}
+                 "docs/data_v4_3.md": ["volume-screen", "records-not-provided"],
+                 "docs/score_43.md": ["volume-screen", "fraud-referral", "collection-rate", "appeal-reduction", "error-gate", "oracle", "conservative-estimate"],
+                 "docs/score_43_proposal.md": ["error-gate", "fraud-referral", "collection-rate", "appeal-reduction"]}
 
 
 def strip_code(t):

@@ -1,5 +1,5 @@
-"""Score 4.3 pricing, PROPOSAL (docs/score_43_proposal.md; issue 200): score 4.2 plus a referral class, a collection rate, an appeal reduction, a dollar-based error gate and a payer cost of handling appeals.
-Every value is the one recommended in docs/score_43_sources.md with its status (sourced or assumption); nothing here is final until Simmy signs the proposal off. Payer-visible, no answer key.
+"""Score 4.3 pricing (docs/score_43.md; issue 200; signed off by Simmy 2026-10-27): score 4.2 plus a referral class, a collection rate, an appeal reduction, a dollar-based error gate and a payer cost of handling appeals.
+Every value is the one in docs/score_43_proposal.md with its status (sourced or assumption). Payer-visible, no answer key.
 
 Changes from score 4.2 (frozen, unchanged):
   GATE_UNIT "dollar": extrapolate only when the sample's NET DOLLAR error rate (net overpayment over paid dollars of the reviewed claims) is at least GATE_DOLLAR_RATE; "claim" is score 4.2's share of claims overpaid.
