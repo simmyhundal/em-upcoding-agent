@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2094 1378" font-family="Helvetica,Arial,sans-serif"><defs><marker id="ahmain" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#222"/></marker><marker id="ahdash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#666"/></marker><marker id="ahred" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/></marker></defs>
+<rect width="100%" height="100%" fill="#fff"/>
+<text x="10" y="30" font-size="30" font-weight="bold">Stages 5 to 7 of the commercial postpay audit: today and with this repository</text>
+<text x="10" y="54" fill="#444" font-size="15">Yellow = the provider. Blue = payer staff. Green = software in this repository (simulated; it does not send letters or findings). Dashed grey = vendor, optional. Red dashed = dispute and appeal. People still sign the list and the demand.</text>
+<text x="10" y="94" font-size="24" font-weight="bold">Today</text><text x="10" y="116" fill="#444">Humans do every hand-off. Most of the cost is chart review and the chain of sign-offs; a vendor, if used, takes a share of the recovery.</text>
+<rect x="250" y="138" width="262" height="556" fill="#fafafa" stroke="#ddd"/><text x="381.0" y="154" text-anchor="middle" font-weight="bold" font-size="15">5 Screen</text>
+<rect x="512" y="138" width="262" height="556" fill="#f4f9f5" stroke="#ddd"/><text x="643.0" y="154" text-anchor="middle" font-weight="bold" font-size="15">5 Request</text>
+<rect x="774" y="138" width="262" height="556" fill="#fafafa" stroke="#ddd"/><text x="905.0" y="154" text-anchor="middle" font-weight="bold" font-size="15">5 Chart review</text>
+<rect x="1036" y="138" width="262" height="556" fill="#f4f9f5" stroke="#ddd"/><text x="1167.0" y="154" text-anchor="middle" font-weight="bold" font-size="15">5-6 Estimate, findings</text>
+<rect x="1298" y="138" width="262" height="556" fill="#fafafa" stroke="#ddd"/><text x="1429.0" y="154" text-anchor="middle" font-weight="bold" font-size="15">6 Demand</text>
+<rect x="1560" y="138" width="262" height="556" fill="#f4f9f5" stroke="#ddd"/><text x="1691.0" y="154" text-anchor="middle" font-weight="bold" font-size="15">7 Dispute, appeal</text>
+<rect x="1822" y="138" width="262" height="556" fill="#fafafa" stroke="#ddd"/><text x="1953.0" y="154" text-anchor="middle" font-weight="bold" font-size="15">7 Collect, fees</text>
+<line x1="0" x2="2094" y1="162" y2="162" stroke="#aaa"/><text x="8" y="205.0" font-weight="bold" font-size="14">Provider (practice, billing office)</text>
+<line x1="0" x2="2094" y1="238" y2="238" stroke="#aaa"/><text x="8" y="281.0" font-weight="bold" font-size="14">Payer: payment integrity analyst</text>
+<line x1="0" x2="2094" y1="314" y2="314" stroke="#aaa"/><text x="8" y="357.0" font-weight="bold" font-size="14">Payer: coder, nurse, clinician</text>
+<line x1="0" x2="2094" y1="390" y2="390" stroke="#aaa"/><text x="8" y="433.0" font-weight="bold" font-size="14">Payer: legal, medical director</text>
+<line x1="0" x2="2094" y1="466" y2="466" stroke="#aaa"/><text x="8" y="509.0" font-weight="bold" font-size="14">Payer: finance and recovery</text>
+<line x1="0" x2="2094" y1="542" y2="542" stroke="#aaa"/><text x="8" y="585.0" font-weight="bold" font-size="14">Payer: SIU (fraud)</text>
+<line x1="0" x2="2094" y1="618" y2="618" stroke="#aaa"/><text x="8" y="661.0" font-weight="bold" font-size="14">Vendor (optional)</text>
+<line x1="0" x2="2094" y1="694" y2="694" stroke="#aaa"/>
+<rect x="260" y="549.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="381.0" y="577.0" text-anchor="middle" font-size="13.5">SIU: tips, complaints,</text>
+<text x="381.0" y="593.0" text-anchor="middle" font-size="13.5">referrals</text>
+<rect x="522" y="549.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="643.0" y="577.0" text-anchor="middle" font-size="13.5">Fraud cases: referral to</text>
+<text x="643.0" y="593.0" text-anchor="middle" font-size="13.5">state or law enforcement</text>
+<rect x="260" y="245.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="381.0" y="273.0" text-anchor="middle" font-size="13.5">Screen paid claims,</text>
+<text x="381.0" y="289.0" text-anchor="middle" font-size="13.5">pick providers (peers, tips)</text>
+<rect x="522" y="245.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="643.0" y="273.0" text-anchor="middle" font-size="13.5">Draft records request,</text>
+<text x="643.0" y="289.0" text-anchor="middle" font-size="13.5">choose sample of claims</text>
+<rect x="522" y="169.0" width="242" height="62" rx="7" fill="#fdf0b8" stroke="#444"/>
+<text x="643.0" y="197.0" text-anchor="middle" font-size="13.5">Receives request</text>
+<text x="643.0" y="213.0" text-anchor="middle" font-size="13.5">(30 to 45 days to answer)</text>
+<rect x="784" y="169.0" width="242" height="62" rx="7" fill="#fdf0b8" stroke="#444"/>
+<text x="905.0" y="197.0" text-anchor="middle" font-size="13.5">Assembles and sends charts</text>
+<text x="905.0" y="213.0" text-anchor="middle" font-size="13.5">(manual, fax or portal)</text>
+<rect x="784" y="321.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="905.0" y="349.0" text-anchor="middle" font-size="13.5">Code each chart; nurse, then</text>
+<text x="905.0" y="365.0" text-anchor="middle" font-size="13.5">physician review (10-15/hour)</text>
+<rect x="784" y="625.0" width="242" height="62" rx="7" fill="#e8e8e8" stroke="#444" stroke-dasharray="5 3"/>
+<text x="905.0" y="653.0" text-anchor="middle" font-size="13.5">Vendor reviews, extrapolates</text>
+<text x="905.0" y="669.0" text-anchor="middle" font-size="13.5">(15% to 30% of recovery)</text>
+<rect x="1046" y="245.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="1167.0" y="273.0" text-anchor="middle" font-size="13.5">Extrapolate the sample</text>
+<text x="1167.0" y="289.0" text-anchor="middle" font-size="13.5">to all the provider's claims</text>
+<rect x="1046" y="321.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="1167.0" y="349.0" text-anchor="middle" font-size="13.5">Findings meeting, written</text>
+<text x="1167.0" y="365.0" text-anchor="middle" font-size="13.5">findings (2 to 4 weeks)</text>
+<rect x="1046" y="397.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="1167.0" y="425.0" text-anchor="middle" font-size="13.5">Medical director</text>
+<text x="1167.0" y="441.0" text-anchor="middle" font-size="13.5">signs off findings</text>
+<rect x="1308" y="473.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="1429.0" y="501.0" text-anchor="middle" font-size="13.5">Overpayment notice,</text>
+<text x="1429.0" y="517.0" text-anchor="middle" font-size="13.5">settlement offer</text>
+<rect x="1308" y="169.0" width="242" height="62" rx="7" fill="#fdf0b8" stroke="#444"/>
+<text x="1429.0" y="197.0" text-anchor="middle" font-size="13.5">Repays, or disputes</text>
+<text x="1429.0" y="213.0" text-anchor="middle" font-size="13.5">within 30 days</text>
+<rect x="1570" y="169.0" width="242" height="62" rx="7" fill="#fdf0b8" stroke="#444"/>
+<text x="1691.0" y="197.0" text-anchor="middle" font-size="13.5">Dispute, appeal;</text>
+<text x="1691.0" y="213.0" text-anchor="middle" font-size="13.5">may leave the network</text>
+<rect x="1570" y="397.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="1691.0" y="425.0" text-anchor="middle" font-size="13.5">Legal and medical director</text>
+<text x="1691.0" y="441.0" text-anchor="middle" font-size="13.5">answer (30 days)</text>
+<rect x="1832" y="473.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="1953.0" y="501.0" text-anchor="middle" font-size="13.5">Offset on later 835s;</text>
+<text x="1953.0" y="517.0" text-anchor="middle" font-size="13.5">books the recovery</text>
+<rect x="1832" y="169.0" width="242" height="62" rx="7" fill="#fdf0b8" stroke="#444"/>
+<text x="1953.0" y="197.0" text-anchor="middle" font-size="13.5">Refund or offset</text>
+<text x="1953.0" y="213.0" text-anchor="middle" font-size="13.5">taken from payments</text>
+<rect x="1832" y="625.0" width="242" height="62" rx="7" fill="#e8e8e8" stroke="#444" stroke-dasharray="5 3"/>
+<text x="1953.0" y="653.0" text-anchor="middle" font-size="13.5">Vendor invoice:</text>
+<text x="1953.0" y="669.0" text-anchor="middle" font-size="13.5">contingency fee</text>
+<path d="M381.0,549.0 L381.0,307.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M502,580.0 L512,580.0 L512,580.0 L522,580.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M502,276.0 L512,276.0 L512,276.0 L522,276.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M643.0,245.0 L643.0,231.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M764,200.0 L774,200.0 L774,200.0 L784,200.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M905.0,231.0 L905.0,321.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M1026,352.0 L1036,352.0 L1036,276.0 L1046,276.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M1026,656.0 L1036,656.0 L1036,276.0 L1046,276.0" fill="none" stroke="#666" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ahdash)"/>
+<path d="M1167.0,307.0 L1167.0,321.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M1167.0,383.0 L1167.0,397.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M1288,428.0 L1298,428.0 L1298,504.0 L1308,504.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M1429.0,473.0 L1429.0,231.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M1550,200.0 L1560,200.0 L1560,200.0 L1570,200.0" fill="none" stroke="#c0392b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ahred)"/>
+<path d="M1691.0,231.0 L1691.0,397.0" fill="none" stroke="#c0392b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ahred)"/>
+<path d="M1812,428.0 L1822,428.0 L1822,504.0 L1832,504.0" fill="none" stroke="#c0392b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ahred)"/>
+<path d="M1550,504.0 L1822,504.0 L1822,504.0 L1832,504.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M1953.0,473.0 L1953.0,231.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M1953.0,535.0 L1953.0,625.0" fill="none" stroke="#666" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ahdash)"/>
+<text x="10" y="738" font-size="24" font-weight="bold">With this repository</text><text x="10" y="760" fill="#444">Software screens, chooses whom to ask, reads charts by rule and estimates; a person approves the list and signs the demand. Everything downstream of the demand is unchanged.</text>
+<rect x="250" y="782" width="262" height="556" fill="#fafafa" stroke="#ddd"/><text x="381.0" y="798" text-anchor="middle" font-weight="bold" font-size="15">5 Screen</text>
+<rect x="512" y="782" width="262" height="556" fill="#f4f9f5" stroke="#ddd"/><text x="643.0" y="798" text-anchor="middle" font-weight="bold" font-size="15">5 Request</text>
+<rect x="774" y="782" width="262" height="556" fill="#fafafa" stroke="#ddd"/><text x="905.0" y="798" text-anchor="middle" font-weight="bold" font-size="15">5 Chart review</text>
+<rect x="1036" y="782" width="262" height="556" fill="#f4f9f5" stroke="#ddd"/><text x="1167.0" y="798" text-anchor="middle" font-weight="bold" font-size="15">5-6 Estimate, findings</text>
+<rect x="1298" y="782" width="262" height="556" fill="#fafafa" stroke="#ddd"/><text x="1429.0" y="798" text-anchor="middle" font-weight="bold" font-size="15">6 Demand</text>
+<rect x="1560" y="782" width="262" height="556" fill="#f4f9f5" stroke="#ddd"/><text x="1691.0" y="798" text-anchor="middle" font-weight="bold" font-size="15">7 Dispute, appeal</text>
+<rect x="1822" y="782" width="262" height="556" fill="#fafafa" stroke="#ddd"/><text x="1953.0" y="798" text-anchor="middle" font-weight="bold" font-size="15">7 Collect, fees</text>
+<line x1="0" x2="2094" y1="806" y2="806" stroke="#aaa"/><text x="8" y="849.0" font-weight="bold" font-size="14">Provider (practice, billing office)</text>
+<line x1="0" x2="2094" y1="882" y2="882" stroke="#aaa"/><text x="8" y="925.0" font-weight="bold" font-size="14">Payer: payment integrity analyst</text>
+<line x1="0" x2="2094" y1="958" y2="958" stroke="#aaa"/><text x="8" y="1001.0" font-weight="bold" font-size="14">Payer: coder, nurse, clinician</text>
+<line x1="0" x2="2094" y1="1034" y2="1034" stroke="#aaa"/><text x="8" y="1077.0" font-weight="bold" font-size="14">Payer: legal, medical director</text>
+<line x1="0" x2="2094" y1="1110" y2="1110" stroke="#aaa"/><text x="8" y="1153.0" font-weight="bold" font-size="14">Payer: finance and recovery</text>
+<line x1="0" x2="2094" y1="1186" y2="1186" stroke="#aaa"/><text x="8" y="1229.0" font-weight="bold" font-size="14">Payer: SIU (fraud)</text>
+<line x1="0" x2="2094" y1="1262" y2="1262" stroke="#aaa"/><text x="8" y="1305.0" font-weight="bold" font-size="14">This repository (software)</text>
+<line x1="0" x2="2094" y1="1338" y2="1338" stroke="#aaa"/>
+<rect x="260" y="1193.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="381.0" y="1221.0" text-anchor="middle" font-size="13.5">SIU: tips, complaints,</text>
+<text x="381.0" y="1237.0" text-anchor="middle" font-size="13.5">referrals</text>
+<rect x="1570" y="1193.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="1691.0" y="1221.0" text-anchor="middle" font-size="13.5">Fraud cases: referral</text>
+<text x="1691.0" y="1237.0" text-anchor="middle" font-size="13.5">(unchanged)</text>
+<rect x="260" y="1269.0" width="242" height="62" rx="7" fill="#bfe3c6" stroke="#444"/>
+<text x="381.0" y="1297.0" text-anchor="middle" font-size="13.5">Statistical screen and volume</text>
+<text x="381.0" y="1313.0" text-anchor="middle" font-size="13.5">lane (30+ visits in a day)</text>
+<rect x="522" y="889.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="643.0" y="917.0" text-anchor="middle" font-size="13.5">Reviews and approves</text>
+<text x="643.0" y="933.0" text-anchor="middle" font-size="13.5">the list (a person)</text>
+<rect x="522" y="1269.0" width="242" height="62" rx="7" fill="#bfe3c6" stroke="#444"/>
+<text x="643.0" y="1297.0" text-anchor="middle" font-size="13.5">Chooses whom to ask and how</text>
+<text x="643.0" y="1313.0" text-anchor="middle" font-size="13.5">many charts; writes the request</text>
+<rect x="784" y="813.0" width="242" height="62" rx="7" fill="#fdf0b8" stroke="#444"/>
+<text x="905.0" y="841.0" text-anchor="middle" font-size="13.5">Receives request,</text>
+<text x="905.0" y="857.0" text-anchor="middle" font-size="13.5">sends charts</text>
+<rect x="784" y="1269.0" width="242" height="62" rx="7" fill="#bfe3c6" stroke="#444"/>
+<text x="905.0" y="1297.0" text-anchor="middle" font-size="13.5">Reads each chart by rule; a</text>
+<text x="905.0" y="1313.0" text-anchor="middle" font-size="13.5">model only where rules are silent</text>
+<rect x="1046" y="1269.0" width="242" height="62" rx="7" fill="#bfe3c6" stroke="#444"/>
+<text x="1167.0" y="1297.0" text-anchor="middle" font-size="13.5">Lower-bound estimate; demand</text>
+<text x="1167.0" y="1313.0" text-anchor="middle" font-size="13.5">only if it covers its cost</text>
+<rect x="1046" y="965.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="1167.0" y="993.0" text-anchor="middle" font-size="13.5">Reviews cases the rules</text>
+<text x="1167.0" y="1009.0" text-anchor="middle" font-size="13.5">cannot decide</text>
+<rect x="1046" y="889.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="1167.0" y="917.0" text-anchor="middle" font-size="13.5">Approves and signs</text>
+<text x="1167.0" y="933.0" text-anchor="middle" font-size="13.5">the demand (a person)</text>
+<rect x="1308" y="1117.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="1429.0" y="1145.0" text-anchor="middle" font-size="13.5">Notice and settlement</text>
+<text x="1429.0" y="1161.0" text-anchor="middle" font-size="13.5">(unchanged)</text>
+<rect x="1308" y="813.0" width="242" height="62" rx="7" fill="#fdf0b8" stroke="#444"/>
+<text x="1429.0" y="849.0" text-anchor="middle" font-size="13.5">Repays, or disputes</text>
+<rect x="1570" y="813.0" width="242" height="62" rx="7" fill="#fdf0b8" stroke="#444"/>
+<text x="1691.0" y="841.0" text-anchor="middle" font-size="13.5">Dispute, appeal;</text>
+<text x="1691.0" y="857.0" text-anchor="middle" font-size="13.5">may leave the network</text>
+<rect x="1570" y="1041.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="1691.0" y="1069.0" text-anchor="middle" font-size="13.5">Legal and medical director</text>
+<text x="1691.0" y="1085.0" text-anchor="middle" font-size="13.5">answer (unchanged)</text>
+<rect x="1832" y="1117.0" width="242" height="62" rx="7" fill="#cfd8ee" stroke="#444"/>
+<text x="1953.0" y="1153.0" text-anchor="middle" font-size="13.5">Offset on later 835s</text>
+<rect x="1832" y="813.0" width="242" height="62" rx="7" fill="#fdf0b8" stroke="#444"/>
+<text x="1953.0" y="841.0" text-anchor="middle" font-size="13.5">Refund or offset</text>
+<text x="1953.0" y="857.0" text-anchor="middle" font-size="13.5">taken from payments</text>
+<path d="M381.0,1255.0 L381.0,1269.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M502,1224.0 L1560,1224.0 L1560,1224.0 L1570,1224.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M502,1300.0 L512,1300.0 L512,920.0 L522,920.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M643.0,951.0 L643.0,1269.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M764,1300.0 L774,1300.0 L774,844.0 L784,844.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M905.0,875.0 L905.0,1269.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M1026,1300.0 L1036,1300.0 L1036,1300.0 L1046,1300.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M1167.0,1269.0 L1167.0,1027.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M1167.0,965.0 L1167.0,951.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M1288,920.0 L1298,920.0 L1298,1148.0 L1308,1148.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M1429.0,1117.0 L1429.0,875.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M1550,844.0 L1560,844.0 L1560,844.0 L1570,844.0" fill="none" stroke="#c0392b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ahred)"/>
+<path d="M1691.0,875.0 L1691.0,1041.0" fill="none" stroke="#c0392b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ahred)"/>
+<path d="M1812,1072.0 L1822,1072.0 L1822,1148.0 L1832,1148.0" fill="none" stroke="#c0392b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ahred)"/>
+<path d="M1550,1148.0 L1822,1148.0 L1822,1148.0 L1832,1148.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<path d="M1953.0,1117.0 L1953.0,875.0" fill="none" stroke="#222" stroke-width="2" marker-end="url(#ahmain)"/>
+<text x="10" y="1364" fill="#444" font-size="13">Steps and timings: docs/audit_actors_research.md. Dollars: docs/audit_in_context.md. A simplification: not every path is drawn. The lower panel is what the simulation does, not a deployed product.</text></svg>

@@ -62,6 +62,8 @@ Medicare's 4.5% (row 4) is an error rate, not money recovered. Its yearly sample
 
 Reading the table: of $100 the plan paid for E/M visits, $4.50 is upcoded. At Medicare's recovery ratio a postpay program collects about **$0.06** and keeps about $0.05; even finding every upcoded dollar would keep about $2.16.
 
+See [stages 5 to 7 up close](audit_postpay_zoom.md) for the step-by-step diagram, today and with this repository, and where the $100 goes by party.
+
 ## Who keeps the recovered dollar
 Self-funded plan: the employer's plan, less the fee. Fully insured plan: the insurer, unless its medical loss ratio is below the floor (80% individual and small group, 85% large group), in which case enrollees get it as a rebate. Under the loss-ratio rule, recoveries from providers lower the ratio; fraud recoveries are added back up to the fraud work's cost. Medicare: the trust funds (52% of 2021 Recovery Audit collections). Medicaid managed care: set by the state contract.
 
