@@ -25,9 +25,20 @@ def ask_vector_41(row, claims):
     return [int(row["rank"]), float(row["screen_score"]), math.log(n), hi / n, float(hi), top / n]
 
 
+ASK_FEATURES_43 = ASK_FEATURES_41 + ["log_paid_dollars", "share_top_level_paid"]
+
+
+def ask_vector_43(row, claims):
+    """Features of workflow v4.3 (hypothesis H34, data 4.3): those of 4.1 plus the log of the provider's paid dollars and the share of those dollars billed at 99214 or 99215. The money sits in rare large providers (score 4.3 loop)."""
+    paid = sum(float(c.get("paid_amount") or 0) for c in claims)
+    hi = sum(float(c.get("paid_amount") or 0) for c in claims if c["cpt"] in ("99214", "99215"))
+    return ask_vector_41(row, claims) + [math.log(paid + 1.0), hi / paid if paid else 0.0]
+
+
 def predict(model, row, claims=None):
     """Predicted net dollars (score 4.0) of asking this listed provider for charts."""
-    x = ask_vector_41(row, claims or []) if model.get("features_version") == "4.1" else p25.ask_vector(row)
+    fv = model.get("features_version")
+    x = ask_vector_43(row, claims or []) if fv == "4.3" else ask_vector_41(row, claims or []) if fv == "4.1" else p25.ask_vector(row)
     z = [(v - m) / s for v, m, s in zip(x, model["mu"], model["sd"])]
     return model["beta"][0] + sum(b * v for b, v in zip(model["beta"][1:], z))
 

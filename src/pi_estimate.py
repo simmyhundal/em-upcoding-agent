@@ -94,7 +94,7 @@ def render(provider, res):
              f"- {int(res['confidence'] * 100)}% confidence interval: ${res['ci_low']:,.0f} to ${res['ci_high']:,.0f} "
              f"(lower limit floored at $0; t with {res['df']} degrees of freedom)",
              f"- Reviewed {res['reviewed_claims']} of {res['sampled_claims']} sampled claims "
-             f"({res['response_rate']:.0%} response); missing records handled as: {res['missing']}"]
+             f"({'no' if res['response_rate'] is None else format(res['response_rate'], '.0%')} response); missing records handled as: {res['missing']}"]
     for code, d in res["strata"].items():
         if d["n_reviewed"]:
             lines.append(f"- {code}: frame {d['N']}, reviewed {d['n_reviewed']}, mean overpayment per claim "
