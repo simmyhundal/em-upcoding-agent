@@ -26,18 +26,36 @@ The diagram is hand-written SVG, shown here as a 2400-pixel PNG so it stays shar
 ## How long each hand-off takes (assumptions marked)
 Records request to response 30 to 45 days; review 30 to 60 days (assumption); findings meeting and written notice 2 to 4 weeks (assumption); so about 2.5 to 4.5 months from request to written finding. Undisputed repayment adds one month; a disputed one adds two to four; an appeal or fraud referral takes one to two years or more. In Texas the plan must select the provider and send the request within roughly a quarter of payment. The simulation has no payment-to-demand clock yet, so these limits are not in the score.
 
-## Where $100 of paid claims goes (central case)
-| Step | Per $100 | Status |
-|---|---|---|
-| Paid in error, all causes | $6.50 | analog (Medicare CERT 2025) |
-| E/M visits paid (all evaluation and management visits: office, emergency, hospital) | $9.00 | analog, derived: Medicare pays 7.3% of its dollars on E/M ($32.3B of $439.9B); commercial professional services are 33.6% of spend and E/M is over a third of those, about 11%; $9 sits between |
-| E/M overpaid by upcoding | $0.41 | analog: $9.00 x 4.5%, where 4.5% is Medicare's 2025 upcoded E/M dollars ($1.47B) over its E/M dollars ($32.3B). Low case $7 x 3.1% = $0.22 (established office visits); high case $11 x 10% = $1.10 (an assumption between Medicare 2025 and a 2010 audit that found 21% of E/M dollars improper) |
-| Share of that a postpay program reaches | 5% | **assumption, no source** |
-| Upcoding found postpay | $0.02 | assumption |
-| Collected (about 60%, already net of appeals) | $0.012 | analog |
-| After fees and cost (20%) | **$0.010** | assumption |
+## Where $100 billed goes (central case in the middle column)
+The base is the $100 a provider asks for on the first professional claim (837P), not a payer's total spend. Each row is a share of the row it names. Low, Central and High are ordered by value to the payer, so Low has the highest prepay stop and lowest prices. "Source status" says how well sourced the inputs are; "Derivation" shows the arithmetic (hover for the reasoning, details under the table).
 
-Read the table as a chain of ratios, each applied to the row above. Rows with a Medicare rate applied to a commercial base assume commercial plans pay and code like Medicare, which nobody has measured. Range for the last line: $0.001 to $0.18 per $100. Even if every upcoded dollar were found, a postpay program would recover about $0.17 per $100 at the central values. Prevention before payment is far larger (New York: about 87 dollars of prepay "savings" per dollar recovered), which is the argument for the prepay repository. The one number that moves everything is the share of upcoded dollars a postpay program reaches, and it has no source; this project's simulation is the only estimate available.
+| # | Step | Low | Central | High | Source status | Derivation |
+|---|---|---|---|---|---|---|
+| 0 | Billed on the first professional claim (837P) | $100.00 | $100.00 | $100.00 | base | [base](#derivation-notes "the base of the table") |
+| 1 | Stopped before payment (initial denials and prepay edits, net of later reversals) | $15.00 | $10.00 | $5.00 | analog; assumption in the ends | [$100 x 10%](#derivation-notes "initial denial 11.8% overall, 15 to 20% private; over half later paid") |
+| 2 | Allowed (contract) amount on the claims that go on to payment | $29.75 | $40.50 | $57.00 | assumption on a sourced anchor | [$100 x (1 - 10%) x 0.45](#derivation-notes "HCCI: commercial about 110% to 122% of Medicare; charges 2.5 to 3 times Medicare is a guess") |
+| 3 | ...of which E/M visits (all evaluation and management) | $2.08 | $3.65 | $6.27 | analog, derived | [row 2 x 9%](#derivation-notes "7.3% Medicare, about 11% commercial") |
+| 4 | ...of which paid at too high a level (upcoded) | $0.06 | $0.16 | $0.63 | analog; assumption in the high case | [row 3 x 4.5%](#derivation-notes "CERT counts payments already made in error: what prepay did not stop") |
+| 5 | Found by a postpay audit program | $0.0006 | $0.0082 | $0.16 | assumption, no source | [row 4 x 5%](#derivation-notes "the largest unknown") |
+| 6 | Collected (net of appeals and time) | $0.0004 | $0.0049 | $0.11 | analog | [row 5 x 60%](#derivation-notes "already net of appeals; do not cut again") |
+| 7 | Kept after vendor fees and own cost | $0.0003 | $0.0039 | $0.10 | assumption | [row 6 x (1 - 20%)](#derivation-notes "contingency fees 15 to 30%") |
+| 8 | Ceiling: every upcoded dollar found | $0.03 | $0.08 | $0.41 | derived | [row 4 x 60% x 80%](#derivation-notes "if reach were 100%") |
+
+### Derivation notes
+- **Row 0.** Definition: the $100 the provider asked for.
+- **Row 1.** 10% central: initial denials run 12% to 20% and more than half are later paid (Kodiak, Premier), so about 5% to 8% net; 10% is the upper-central choice. Mostly eligibility and administrative denials: prepay is assumed to catch almost no level-of-service upcoding.
+- **Row 2.** = $100 x (1 - row 1 share) x allowed-to-billed ratio 0.45. Anchor: commercial professional prices average 122% of Medicare (HCCI 2017). The charge-to-Medicare multiple (about 2.5) is our guess; no published allowed-to-charges ratio was found. Allowed includes the patient's cost-sharing.
+- **Row 3.** = row 2 x E/M share 9%. Medicare spends 7.3% of its dollars on E/M; commercial professional services are 33.6% of spend and E/M is over a third of those, about 11%; 9% sits between.
+- **Row 4.** = row 3 x 4.5%. Medicare's CERT 2025 sample found $1.47B of $32.3B E/M dollars upcoded. Low 3.1% (established office visits); high 10% (our assumption toward a 2010 audit). A Medicare error rate applied to commercial dollars.
+- **Row 5.** = row 4 x share reached: 1%, 5% or 25%. Targeting helps: a 2010 audit found 56% of claims upcoded among high-coding physicians against 27% for the rest.
+- **Row 6.** = row 5 x 55%, 60% or 70%. Payers' sources: 68% of ordinary overpayments identified were collected; 16% to 24% for fraud-type cases. Already net of appeals.
+- **Row 7.** = row 6 x (1 - fee). Fee 25%, 20% or 6%: commercial vendors take 15% to 30%; in-house is about 6% (a vendor's figure).
+- **Row 8.** = row 4 x collected share x kept share. Before the cost of review and provider abrasion.
+
+### What the Medicare numbers measure
+Medicare's 4.5% (row 4) is an error rate, not money recovered. Its yearly sample (CERT) pulls claims Medicare has **already paid**, reads the records and counts the dollars paid at too high a level. It therefore measures what got through prepay review, so it has no prepay share. Recovery is a different, much smaller number: the Recovery Auditors collected $346M in FY2021 against tens of billions of measured overpayments. There is no published dollar split of Medicare E/M recoveries between prepay and postpay review; only counts (contractors do about 98% of their reviews before payment, the Recovery Auditors about 85% after). Medicare says prepay review prevented about $5B in FY2015, but its own auditors found the savings method inconsistent. For commercial plans nothing comparable is published. Prepay edits are assumed to catch almost no level-of-service upcoding, which is why the postpay program works on what is left.
+
+Reading the central column: of $100 billed, about $40 is allowed, $3.65 of that is E/M, $0.16 is upcoded, and a postpay program keeps about **$0.004** (range $0.0003 to $0.10). Even finding every upcoded dollar would keep about $0.08. Prevention before payment is far larger (New York plans report about $87 of prepay savings per dollar recovered), which is the argument for the prepay repository. The reach share (row 5) has no source; this project's simulation is the only estimate available.
 
 ## Who keeps the recovered dollar
 Self-funded plan: the employer's plan, less the fee. Fully insured plan: the insurer, unless its medical loss ratio is below the floor (80% individual and small group, 85% large group), in which case enrollees get it as a rebate. Under the loss-ratio rule, recoveries from providers lower the ratio; fraud recoveries are added back up to the fraud work's cost. Medicare: the trust funds (52% of 2021 Recovery Audit collections). Medicaid managed care: set by the state contract.
