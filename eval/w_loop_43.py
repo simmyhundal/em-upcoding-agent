@@ -43,6 +43,9 @@ VERSIONS = {
     "W42": {**W41, "w40": {**W41["w40"], "fwa": dict(LANE)}},                                                                           # workflow v4.2 (H28) with office 4.3 for the lane: the reference of this release
     # hypotheses of workflow v4.3 (docs/w_loop_v43.md), each against the current best on development batches 1 to 4
     "D7": {"version": "4.0", "screen": "eb_upper_t", "w40": {"ask": "all", "escalate": "stop", "demand_floor": "cost43", "rules": "4.1"}},                  # diagnostic, not a hypothesis: every listed provider asked (the data the ask model of H33 is fitted on)
+    "H33": {**W41, "w40": {**W41["w40"], "ask_model": os.path.join(ROOT, "experiments", "w_loop_43", "ask_model43_b1to4.json"), "demand_floor": "cost43"}},   # the ask-or-skip model refitted under score 4.3 prices on data 4.3 development batches 1 to 4 (eval/fit_ask_43.py); level demands use the score 4.3 floor
+    "H0": {**W41, "w40": {**W41["w40"], "ask_model": os.path.join(ROOT, "experiments", "w_loop_43", "ask_model43_none.json"), "demand_floor": "cost43"}},      # control, not a hypothesis: list the same providers and ask none of them (what a short-list saving alone buys)
+    "H34": {**W41, "w40": {**W41["w40"], "ask_model": os.path.join(ROOT, "experiments", "w_loop_43", "ask_model43_v43_b1to4.json"), "demand_floor": "cost43"}},  # H33 with the paid-dollar features added to the ask model (the money is in rare large providers)
     "H29": _v(W41, floor="cost43"),                                                                                                     # level demands: the break-even rule uses score 4.3's collected value (no lane)
     "H30": _v(W41, fwa={"break_even": "s43"}, floor="cost43"),                                                                          # the lane too: a referral only when its collected lower bound covers the referral cost
     "H31": _v(W41, fwa={"break_even": "s43", "probe": {"n": 10, "k": 3, "more": 20}}, floor="cost43"),                                  # H30 with a probe of 10 claims first; 20 more only if at least 3 had no record
@@ -70,16 +73,20 @@ def _run(job):
     return seed, out
 
 
-def evaluate(name, seeds, workers=4):
+def evaluate(name, seeds, workers=1):
     sreg.check_development("4.3", seeds)
     os.makedirs(CACHE_DIR, exist_ok=True)
     path = os.path.join(CACHE_DIR, f"{name}_s43.json")
     have = json.load(open(path)) if os.path.exists(path) else {}
     todo = [s for s in seeds if str(s) not in have]
     if todo:
-        with mp.get_context("spawn").Pool(workers) as p:
-            for seed, res in p.map(_run, [(name, s) for s in todo], chunksize=1):
-                have[str(seed)] = res
+        if workers <= 1:                                                            # serial by default: the spawn pool deadlocked once and a crash in a worker hid behind it
+            results = [_run((name, s)) for s in todo]
+        else:
+            with mp.get_context("spawn").Pool(workers) as p:
+                results = p.map(_run, [(name, s) for s in todo], chunksize=1)
+        for seed, res in results:
+            have[str(seed)] = res
         json.dump(have, open(path, "w"), indent=0)
     return {s: have[str(s)] for s in seeds}
 

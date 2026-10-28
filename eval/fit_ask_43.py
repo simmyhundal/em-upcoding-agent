@@ -1,5 +1,5 @@
 """Fit workflow v4.3's ask-or-skip (hypothesis H33): the ridge regression of eval/fit_ask_41.py, on the ask-everyone run D7 on data 4.3 development seeds, with the target scored by score 4.3
-(collected value of the demand after the appeal reduction and collection rate, staff cost incl. appeal handling, abrasion; triage excluded). Free. Usage: python eval/fit_ask_43.py OUT.json BATCH [BATCH ...]"""
+(collected value of the demand after the appeal reduction and collection rate, staff cost incl. appeal handling, abrasion; triage excluded). Free. Usage: python eval/fit_ask_43.py OUT.json BATCH [BATCH ...] [--v43]   (--v43: add the paid-dollar features, H34)"""
 import csv
 import json
 import os
@@ -38,7 +38,7 @@ def per_provider(rid, code, p=None):
     return out
 
 
-def table(batches):
+def table(batches, fv="4.1"):
     rows = []
     for b in batches:
         for seed in pool.BATCHES[b - 1]:
@@ -49,21 +49,22 @@ def table(batches):
             flags = {r["provider_id"]: r for r in csv.DictReader(open(os.path.join(ROOT, "experiments", code, "flagged_eb_upper_t_10.csv"))) if r["flagged"] == "True"}
             pp = per_provider(f"d43wld7_{seed}", code)
             for pid, fr in flags.items():
-                rows.append({"seed": seed, "x": pol.ask_vector_41(fr, claims.get(pid, [])), "net": pp.get(pid, 0.0)})
+                rows.append({"seed": seed, "x": (pol.ask_vector_43 if fv == "4.3" else pol.ask_vector_41)(fr, claims.get(pid, [])), "net": pp.get(pid, 0.0)})
     return rows
 
 
-def fit(batches):
-    rows = table(batches)
+def fit(batches, fv="4.1"):
+    rows = table(batches, fv)
     X, y = np.array([r["x"] for r in rows]), np.array([r["net"] for r in rows])
     mu, sd = X.mean(0), X.std(0) + 1e-9
     Z = np.column_stack([np.ones(len(X)), (X - mu) / sd])
     beta = np.linalg.solve(Z.T @ Z + LAM * np.eye(Z.shape[1]), Z.T @ y)
-    return {"unit": "dollars, score 4.3 net value of asking one listed provider (staff-hours cost, appeal handling and abrasion included, triage excluded)", "features_version": "4.1", "features": pol.ASK_FEATURES_41,
+    return {"unit": "dollars, score 4.3 net value of asking one listed provider (staff-hours cost, appeal handling and abrasion included, triage excluded)", "features_version": fv, "features": pol.ASK_FEATURES_43 if fv == "4.3" else pol.ASK_FEATURES_41,
             "mu": mu.tolist(), "sd": sd.tolist(), "beta": beta.tolist(), "lambda": LAM, "fit_on_batches": batches, "fit_on_seeds": sorted({r["seed"] for r in rows}), "providers": len(rows), "mean_net": float(y.mean())}
 
 
 if __name__ == "__main__":
-    out = fit([int(b) for b in sys.argv[2:]])
+    fv = "4.3" if "--v43" in sys.argv else "4.1"
+    out = fit([int(b) for b in sys.argv[2:] if b.isdigit()], fv)
     json.dump(out, open(sys.argv[1], "w"), indent=1)
     print("wrote", sys.argv[1], "providers", out["providers"], "mean net", round(out["mean_net"]), "beta", [round(b) for b in out["beta"]])

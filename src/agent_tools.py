@@ -41,6 +41,7 @@ def _doc_entry(row):
     return lvl, (int(mins) if mins not in ("", None) else None)
 
 
+ASK_MODEL_53 = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "experiments", "w_loop_43", "ask_model43_b1to4.json")      # workflow v4.3's ask-or-skip model (docs/w43_freeze.md)
 LIST_K_51 = 4                          # workflow v4.1 (H23_n4): the list is the first 4 providers of the eb_upper_t ranking
 RULES_51 = {"min": 5, "up": 0.10, "alpha": 0.20}      # workflow v4.1 (H17): the loosened pooled chart test of rules 4.0
 EXTEND_N_51, EXTEND_C_51 = 30, 2.0     # workflow v4.1 (H16): a near-miss gets 30 more random charts when the point estimate is at least 2 times the cost of a demand
@@ -102,7 +103,7 @@ class Environment:
                 self.p25_rows = {r["provider_id"]: r for r in keep}
             if self.v50:
                 import policy_40
-                self.ask40 = policy_40.load_ask()               # workflow v4.0's ask-or-skip (src/policy_40_ask.json), shown as advice
+                self.ask40 = policy_40.load_ask(ASK_MODEL_53 if version == "5.3" else None)               # workflow v4.0's ask-or-skip (src/policy_40_ask.json), shown as advice; version 5.3: the model refitted under score 4.3 (workflow v4.3)
         self.lane = {}                                  # version 5.2: providers taken through the claims-data lane: {provider_id: lane record (src/fwa_lane.review)}
         self.lane_demands = set()
         self.has_test = {}
@@ -307,8 +308,8 @@ class Environment:
         if self.v50:                                    # workflow v4.0: ask by the model refitted on score 4.0, then stop after the first sample
             import policy_40
             if not st or not st["round"]:
-                v = policy_40.predict(self.ask40, row)
-                return {"recommended": "ASK" if v > 0 else "SKIP", "meaning": ("ask for records" if v > 0 else "skip") + f": predicted net value of asking ${v:,.0f} (score 4.0; rank {row['rank']})"}
+                v = policy_40.predict(self.ask40, row, self.claims.get(pid, []))
+                return {"recommended": "ASK" if v > 0 else "SKIP", "meaning": ("ask for records" if v > 0 else "skip") + f": predicted net value of asking ${v:,.0f} (score {'4.3' if self.v53 else '4.0'}; rank {row['rank']})"}
             if self.v51:
                 return {"recommended": "STOP", "meaning": "nothing more after the first sample and its follow-up: run hybrid_review. Its demand_check says whether this provider is a near-miss, "
                                                           f"the one case where workflow v4.1 asks for {EXTEND_N_51} more random charts (once)"}
@@ -574,6 +575,10 @@ class Environment:
         import recovery_40 as r40
         level = {c: v[0] for c, v in self.docs.items()}
         rec = r40.recovery(self.claims.get(pid, []), self.office.random_claim_ids(pid), level, r40.PARAMS)
+        if self.v53:                                    # workflow v4.3: score 4.3's break-even in terms of the lower bound (collected after appeals covers a demand's cost and appeal handling)
+            import recovery_43 as r43
+            P = r43.params43()
+            return rec["value"], (r40.staff_cost(0, 0, 0, 1, 0, r40.PARAMS)[0] + P["P_APPEAL"] * P["APPEAL_HANDLING_HOURS"] * r40.hourly("coder", r40.PARAMS)) / ((1 - P["APPEAL_REDUCTION"]) * P["COLLECTION_DEMAND"])
         return rec["value"], r40.staff_cost(0, 0, 0, 1, 0, r40.PARAMS)[0]
 
     def _override_ok(self, pid, reason):

@@ -142,7 +142,9 @@ sample supports. Call send_demand for each provider whose recommended action is 
 
 SYSTEM_53 = SYSTEM_52 + """
 
-Version 5.3 additions (release 4.3 and 5.3). submit_findings now refuses until every provider on the volume screen's table has been taken through request_stratum, or is listed in set_aside with a one-line reason (for example: the lower bound could not cover a demand and the office is silent). Do the lane first, then the level review, then submit once."""
+Version 5.3 additions (release 4.3 and 5.3). submit_findings now refuses until every provider on the volume screen's table has been taken through request_stratum, or is listed in set_aside with a one-line reason (for example: the lower bound could not cover a demand and the office is silent). Do the lane first, then the level review, then submit once.
+
+Score 4.3 prices (workflow v4.3 mirror): the ask advice is the model refitted on score 4.3 and mostly says SKIP; follow it unless you can name a reason. A demand collects about 58% of the lower bound after appeals, and the floor shown by submit_findings already accounts for that. A fraud referral (the volume lane) costs $4,000 and collects only about 25% of the lower bound, so set a lane provider aside unless that quarter of the stratum estimate covers $4,000."""
 
 
 def _cost(usage, price=(4.00, 20.00)):
