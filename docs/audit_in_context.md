@@ -26,36 +26,31 @@ The diagram is hand-written SVG, shown here as a 2400-pixel PNG so it stays shar
 ## How long each hand-off takes (assumptions marked)
 Records request to response 30 to 45 days; review 30 to 60 days (assumption); findings meeting and written notice 2 to 4 weeks (assumption); so about 2.5 to 4.5 months from request to written finding. Undisputed repayment adds one month; a disputed one adds two to four; an appeal or fraud referral takes one to two years or more. In Texas the plan must select the provider and send the request within roughly a quarter of payment. The simulation has no payment-to-demand clock yet, so these limits are not in the score.
 
-## Where $100 billed goes (central case in the middle column)
-The base is the $100 a provider asks for on the first professional claim (837P), not a payer's total spend. Each row is a share of the row it names. Low, Central and High are ordered by value to the payer, so Low has the highest prepay stop and lowest prices. "Source status" says how well sourced the inputs are; "Derivation" shows the arithmetic (hover for the reasoning, details under the table).
+## Where $100 of E/M claims goes
+The base is $100 of E/M charges that providers billed on 837P claims and that passed the plan's prepay edits and checks: the claims this repository's work starts on. Each row is a share of the row above. "Source status" says how well sourced the inputs are (sourced, analog = a Medicare or all-payer figure used as a stand-in, assumption); "Derivation" shows the arithmetic, with the reasoning on hover and in the notes below.
 
-| # | Step | Low | Central | High | Source status | Derivation |
-|---|---|---|---|---|---|---|
-| 0 | Billed on the first professional claim (837P) | $100.00 | $100.00 | $100.00 | base | [base](#derivation-notes "the base of the table") |
-| 1 | Stopped before payment (initial denials and prepay edits, net of later reversals) | $15.00 | $10.00 | $5.00 | analog; assumption in the ends | [$100 x 10%](#derivation-notes "initial denial 11.8% overall, 15 to 20% private; over half later paid") |
-| 2 | Allowed (contract) amount on the claims that go on to payment | $29.75 | $40.50 | $57.00 | assumption on a sourced anchor | [$100 x (1 - 10%) x 0.45](#derivation-notes "HCCI: commercial about 110% to 122% of Medicare; charges 2.5 to 3 times Medicare is a guess") |
-| 3 | ...of which E/M visits (all evaluation and management) | $2.08 | $3.65 | $6.27 | analog, derived | [row 2 x 9%](#derivation-notes "7.3% Medicare, about 11% commercial") |
-| 4 | ...of which paid at too high a level (upcoded) | $0.06 | $0.16 | $0.63 | analog; assumption in the high case | [row 3 x 4.5%](#derivation-notes "CERT counts payments already made in error: what prepay did not stop") |
-| 5 | Found by a postpay audit program | $0.0006 | $0.0082 | $0.16 | assumption, no source | [row 4 x 5%](#derivation-notes "the largest unknown") |
-| 6 | Collected (net of appeals and time) | $0.0004 | $0.0049 | $0.11 | analog | [row 5 x 60%](#derivation-notes "already net of appeals; do not cut again") |
-| 7 | Kept after vendor fees and own cost | $0.0003 | $0.0039 | $0.10 | assumption | [row 6 x (1 - 20%)](#derivation-notes "contingency fees 15 to 30%") |
-| 8 | Ceiling: every upcoded dollar found | $0.03 | $0.08 | $0.41 | derived | [row 4 x 60% x 80%](#derivation-notes "if reach were 100%") |
+| # | Step | Value | Source status | Derivation |
+|---|---|---|---|---|
+| 0 | Billed E/M charges that passed prepay | $100.00 | base | [definition](#derivation-notes "the starting point of this repository's work") |
+| 1 | Allowed amount (the contract price) | $45.00 | assumption on a sourced anchor | [$100 x 0.45](#derivation-notes "commercial professional prices average about 122% of Medicare (HCCI 2017); charges are about 2.5 times Medicare, our guess") |
+| 2 | ...of which paid at too high a level (upcoded) | $2.02 | analog | [row 1 x 4.5%](#derivation-notes "Medicare CERT 2025: $1.47B upcoded of $32.3B E/M dollars; a Medicare rate applied to commercial dollars") |
+| 3 | Found by a postpay audit program | $0.10 | assumption, no source | [row 2 x 5%](#derivation-notes "the share of upcoded dollars a postpay program reaches; the largest unknown") |
+| 4 | Collected (net of appeals and time) | $0.061 | analog | [row 3 x 60%](#derivation-notes "payers' sources: 55% to 70% of ordinary overpayments identified are collected, already net of appeals") |
+| 5 | Kept after vendor fees and own cost | $0.049 | assumption | [row 4 x (1 - 20%)](#derivation-notes "commercial contingency fees run 15% to 30%; in-house about 6%") |
+| 6 | Ceiling: every upcoded dollar found | $0.97 | derived | [row 2 x 60% x 80%](#derivation-notes "before the cost of review and provider abrasion") |
 
 ### Derivation notes
-- **Row 0.** Definition: the $100 the provider asked for.
-- **Row 1.** 10% central: initial denials run 12% to 20% and more than half are later paid (Kodiak, Premier), so about 5% to 8% net; 10% is the upper-central choice. Mostly eligibility and administrative denials: prepay is assumed to catch almost no level-of-service upcoding.
-- **Row 2.** = $100 x (1 - row 1 share) x allowed-to-billed ratio 0.45. Anchor: commercial professional prices average 122% of Medicare (HCCI 2017). The charge-to-Medicare multiple (about 2.5) is our guess; no published allowed-to-charges ratio was found. Allowed includes the patient's cost-sharing.
-- **Row 3.** = row 2 x E/M share 9%. Medicare spends 7.3% of its dollars on E/M; commercial professional services are 33.6% of spend and E/M is over a third of those, about 11%; 9% sits between.
-- **Row 4.** = row 3 x 4.5%. Medicare's CERT 2025 sample found $1.47B of $32.3B E/M dollars upcoded. Low 3.1% (established office visits); high 10% (our assumption toward a 2010 audit). A Medicare error rate applied to commercial dollars.
-- **Row 5.** = row 4 x share reached: 1%, 5% or 25%. Targeting helps: a 2010 audit found 56% of claims upcoded among high-coding physicians against 27% for the rest.
-- **Row 6.** = row 5 x 55%, 60% or 70%. Payers' sources: 68% of ordinary overpayments identified were collected; 16% to 24% for fraud-type cases. Already net of appeals.
-- **Row 7.** = row 6 x (1 - fee). Fee 25%, 20% or 6%: commercial vendors take 15% to 30%; in-house is about 6% (a vendor's figure).
-- **Row 8.** = row 4 x collected share x kept share. Before the cost of review and provider abrasion.
+- **Allowed amount.** The most the plan's contract recognizes for the visit. It is what the plan pays plus what the patient owes (copay, deductible, coinsurance); the provider writes off the rest of the billed charge (the contractual adjustment). Charges are set far above prices, so about 45 cents of each billed dollar is allowed here. No published allowed-to-charges ratio was found; the 0.45 is our assumption built on the finding that commercial professional prices average about 122% of Medicare.
+- **Upcoded share.** Medicare's yearly record-review sample found 4.5% of E/M dollars paid at too high a level. High and low variants (3.1% and 10%) are in the research note.
+- **Reach.** The share of upcoded dollars a postpay program finds: 1%, 5% or 25% were tried in the research note. Targeting helps (a 2010 audit found 56% of claims upcoded among high-coding physicians against 27% for the rest).
+- **Collected.** Medicaid plans collected 68% of ordinary overpayments identified and 16% to 24% of fraud-type ones.
+- **Fees.** 20% central.
+- **Skipped in this version:** the share of billed dollars stopped before payment (about 10% overall, mostly eligibility denials) and E/M's share of all claims (about 9%). They sit before the base. Ranges for every row are in the [research note](audit_money_flow_research.md).
 
 ### What the Medicare numbers measure
 Medicare's 4.5% (row 4) is an error rate, not money recovered. Its yearly sample (CERT) pulls claims Medicare has **already paid**, reads the records and counts the dollars paid at too high a level. It therefore measures what got through prepay review, so it has no prepay share. Recovery is a different, much smaller number: the Recovery Auditors collected $346M in FY2021 against tens of billions of measured overpayments. There is no published dollar split of Medicare E/M recoveries between prepay and postpay review; only counts (contractors do about 98% of their reviews before payment, the Recovery Auditors about 85% after). Medicare says prepay review prevented about $5B in FY2015, but its own auditors found the savings method inconsistent. For commercial plans nothing comparable is published. Prepay edits are assumed to catch almost no level-of-service upcoding, which is why the postpay program works on what is left.
 
-Reading the central column: of $100 billed, about $40 is allowed, $3.65 of that is E/M, $0.16 is upcoded, and a postpay program keeps about **$0.004** (range $0.0003 to $0.10). Even finding every upcoded dollar would keep about $0.08. Prevention before payment is far larger (New York plans report about $87 of prepay savings per dollar recovered), which is the argument for the prepay repository. The reach share (row 5) has no source; this project's simulation is the only estimate available.
+Reading the table: of $100 of E/M charges that pass prepay, about $45 is allowed and $2.03 of that is upcoded. A postpay program keeps about **$0.05**; even finding every upcoded dollar would keep about $0.97. Prevention before payment is far larger (New York plans report about $87 of prepay savings per dollar recovered), which is the argument for the prepay repository. The reach share (row 5) has no source; this project's simulation is the only estimate available.
 
 ## Who keeps the recovered dollar
 Self-funded plan: the employer's plan, less the fee. Fully insured plan: the insurer, unless its medical loss ratio is below the floor (80% individual and small group, 85% large group), in which case enrollees get it as a rebate. Under the loss-ratio rule, recoveries from providers lower the ratio; fraud recoveries are added back up to the fraud work's cost. Medicare: the trust funds (52% of 2021 Recovery Audit collections). Medicaid managed care: set by the state contract.
