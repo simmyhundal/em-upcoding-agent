@@ -6,7 +6,7 @@ CW = 262
 BH = 62
 LH = 76
 NCOL = 7
-LANES = ["Provider (practice, billing office)", "Payer: payment integrity analyst", "Payer: coder, nurse, clinician", "Payer: legal, medical director", "Payer: finance and recovery", "Payer: SIU (fraud)", None]
+LANES = ["Provider (practice, billing office)", "Payer: payment integrity analyst", "Payer: SIU (fraud)", "Payer: coder, nurse, clinician", "Payer: legal, medical director", "Payer: finance and recovery", None]
 COLS = ["5 Screen", "5 Request", "5 Chart review", "5-6 Estimate, findings", "6 Demand", "7 Dispute, appeal", "7 Collect, fees"]
 G, Y, B, R = "#bfe3c6", "#fdf0b8", "#cfd8ee", "#e8e8e8"
 
@@ -35,12 +35,17 @@ def panel(title, sub, last_lane, boxes, arrows, y0, o):
         y1 = y + BH / 2 - (len(lines) - 1) * 8 + 5
         for n, t in enumerate(lines):
             o.append(f'<text x="{x + (CW - 20) / 2}" y="{y1 + n * 16}" text-anchor="middle" font-size="13.5">{t}</text>')
-    for a, b, kind in arrows:
+    for arrow in arrows:
+        a, b, kind = arrow[:3]
+        left = len(arrow) > 3
         xa, ya, wa, ha = pos[a]
         xb, yb, wb, hb = pos[b]
         col = {"main": "#222", "dash": "#666", "red": "#c0392b"}[kind]
         dash = ' stroke-dasharray="6 4"' if kind != "main" else ""
-        if abs(xa - xb) < 5:                                           # same column: vertical
+        if left:                                                       # same column, routed through the gap on the left of the column
+            xg = xa - 5
+            d = f"M{xa},{ya + ha / 2} L{xg},{ya + ha / 2} L{xg},{yb + hb / 2} L{xb},{yb + hb / 2}"
+        elif abs(xa - xb) < 5:                                           # same column: vertical
             y_s, y_e = (ya + ha, yb) if yb > ya else (ya, yb + hb)
             d = f"M{xa + wa / 2},{y_s} L{xb + wb / 2},{y_e}"
         else:
@@ -59,22 +64,22 @@ def main():
     o.append('<text x="10" y="30" font-size="30" font-weight="bold">Stages 5 to 7 of the commercial postpay audit: today and with this repository</text>')
     o.append('<text x="10" y="54" fill="#444" font-size="15">Yellow = the provider. Blue = payer staff. Green = software in this repository (simulated; it does not send letters or findings). Dashed grey = vendor, optional. Red dashed = dispute and appeal. People still sign the list and the demand.</text>')
     today = {
-        "t_sig": (5, 0, "SIU: tips, complaints,|referrals", B, False),
-        "t_fraud": (5, 1, "Fraud cases: referral to|state or law enforcement", B, False),
+        "t_sig": (2, 0, "SIU: tips, complaints,|referrals", B, False),
+        "t_fraud": (2, 1, "Fraud cases: referral to|state or law enforcement", B, False),
         "t_scr": (1, 0, "Screen paid claims,|pick providers (peers, tips)", B, False),
         "t_req": (1, 1, "Draft records request,|choose sample of claims", B, False),
         "t_pr1": (0, 1, "Receives request|(30 to 45 days to answer)", Y, False),
         "t_pr2": (0, 2, "Assembles and sends charts|(manual, fax or portal)", Y, False),
-        "t_cod": (2, 2, "Code each chart; nurse, then|physician review (10-15/hour)", B, False),
+        "t_cod": (3, 2, "Code each chart; nurse, then|physician review (10-15/hour)", B, False),
         "t_ven3": (6, 2, "Vendor reviews, extrapolates|(15% to 30% of recovery)", R, True),
         "t_est": (1, 3, "Extrapolate the sample|to all the provider's claims", B, False),
-        "t_meet": (2, 3, "Findings meeting, written|findings (2 to 4 weeks)", B, False),
-        "t_md": (3, 3, "Medical director|signs off findings", B, False),
-        "t_not": (4, 4, "Overpayment notice,|settlement offer", B, False),
+        "t_meet": (3, 3, "Findings meeting, written|findings (2 to 4 weeks)", B, False),
+        "t_md": (4, 3, "Medical director|signs off findings", B, False),
+        "t_not": (5, 4, "Overpayment notice,|settlement offer", B, False),
         "t_prd": (0, 4, "Repays, or disputes|within 30 days", Y, False),
         "t_dis": (0, 5, "Dispute, appeal;|may leave the network", Y, False),
-        "t_leg": (3, 5, "Legal and medical director|answer (30 days)", B, False),
-        "t_off": (4, 6, "Offset on later 835s;|books the recovery", B, False),
+        "t_leg": (4, 5, "Legal and medical director|answer (30 days)", B, False),
+        "t_off": (5, 6, "Offset on later 835s;|books the recovery", B, False),
         "t_ref": (0, 6, "Refund or offset|taken from payments", Y, False),
         "t_inv": (6, 6, "Vendor invoice:|contingency fee", R, True),
     }
@@ -83,24 +88,25 @@ def main():
                 ("t_leg", "t_off", "red"), ("t_not", "t_off", "main"), ("t_off", "t_ref", "main"), ("t_off", "t_inv", "dash")]
     y = panel("Today", "Humans do every hand-off. Most of the cost is chart review and the chain of sign-offs; a vendor, if used, takes a share of the recovery.", "Vendor (optional)", today, t_arrows, 70, o)
     proj = {
-        "p_sig": (5, 0, "SIU: tips, complaints,|referrals", B, False),
-        "p_fraud": (5, 5, "Fraud cases: referral|(unchanged)", B, False),
+        "p_sig": (2, 0, "SIU: tips, complaints,|referrals", B, False),
+        "p_fraud": (2, 5, "Fraud cases: referral|(unchanged)", B, False),
         "p_scr": (6, 0, "Statistical screen and volume|lane (30+ visits in a day)", G, False),
-        "p_list": (1, 1, "Reviews and approves|the list (a person)", B, False),
+        "p_list": (1, 0, "Reviews and approves|the list (a person)", B, False),
         "p_req": (6, 1, "Chooses whom to ask and how|many charts; writes the request", G, False),
-        "p_pr": (0, 2, "Receives request,|sends charts", Y, False),
+        "p_pr1": (0, 1, "Receives request|(30 to 45 days to answer)", Y, False),
+        "p_pr2": (0, 2, "Sends charts", Y, False),
         "p_rd": (6, 2, "Reads each chart by rule; a|model only where rules are silent", G, False),
         "p_est": (6, 3, "Lower-bound estimate; demand|only if it covers its cost", G, False),
-        "p_chk": (2, 3, "Reviews cases the rules|cannot decide", B, False),
+        "p_chk": (3, 3, "Reviews cases the rules|cannot decide", B, False),
         "p_pkt": (1, 3, "Approves and signs|the demand (a person)", B, False),
-        "p_not": (4, 4, "Notice and settlement|(unchanged)", B, False),
+        "p_not": (5, 4, "Notice and settlement|(unchanged)", B, False),
         "p_prd": (0, 4, "Repays, or disputes", Y, False),
         "p_dis": (0, 5, "Dispute, appeal;|may leave the network", Y, False),
-        "p_leg": (3, 5, "Legal and medical director|answer (unchanged)", B, False),
-        "p_off": (4, 6, "Offset on later 835s", B, False),
+        "p_leg": (4, 5, "Legal and medical director|answer (unchanged)", B, False),
+        "p_off": (5, 6, "Offset on later 835s", B, False),
         "p_ref": (0, 6, "Refund or offset|taken from payments", Y, False),
     }
-    p_arrows = [("p_sig", "p_scr", "main"), ("p_sig", "p_fraud", "main"), ("p_scr", "p_list", "main"), ("p_list", "p_req", "main"), ("p_req", "p_pr", "main"), ("p_pr", "p_rd", "main"), ("p_rd", "p_est", "main"),
+    p_arrows = [("p_sig", "p_scr", "main"), ("p_sig", "p_fraud", "main"), ("p_scr", "p_list", "main", "L"), ("p_list", "p_req", "main"), ("p_req", "p_pr1", "main"), ("p_pr1", "p_pr2", "main"), ("p_pr2", "p_rd", "main"), ("p_rd", "p_est", "main"),
                 ("p_est", "p_chk", "main"), ("p_chk", "p_pkt", "main"), ("p_pkt", "p_not", "main"), ("p_not", "p_prd", "main"), ("p_prd", "p_dis", "red"), ("p_dis", "p_leg", "red"), ("p_leg", "p_off", "red"),
                 ("p_not", "p_off", "main"), ("p_off", "p_ref", "main")]
     y2 = panel("With this repository", "Software screens, chooses whom to ask, reads charts by rule and estimates; a person approves the list and signs the demand. Everything downstream of the demand is unchanged.", "This repository (software)", proj, p_arrows, y + 20, o)
