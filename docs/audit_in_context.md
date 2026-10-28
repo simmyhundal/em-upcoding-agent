@@ -33,16 +33,16 @@ The base is $100 that the plan paid a provider for E/M visits on 835 remittances
 |---|---|---|---|---|
 | 0 | Paid by the plan to providers for E/M visits | $100.00 | base | [definition](#derivation-notes "the 835 payment; the starting point of this repository's work") |
 | 1 | ...of which paid at too high a level (upcoded) | $4.50 | analog | [$100 x 4.5%](#derivation-notes "Medicare CERT 2025: $1.47B upcoded of $32.3B E/M dollars paid; a Medicare rate applied to commercial dollars") |
-| 2 | Found by a postpay audit program | $0.23 | assumption, no source | [row 1 x 5%](#derivation-notes "the share of upcoded dollars a postpay program identifies; the largest unknown") |
-| 3 | Collected (net of appeals and time) | $0.135 | analog | [row 2 x 60%](#derivation-notes "payers' sources: 55% to 70% of ordinary overpayments identified are collected, already net of appeals") |
-| 4 | Kept after vendor fees and own cost | $0.108 | assumption | [row 3 x (1 - 20%)](#derivation-notes "commercial contingency fees run 15% to 30%; in-house about 6%") |
+| 2 | Collected after a postpay audit (net of appeals and time) | $0.054 | analog | [row 1 x 1.2%](#derivation-notes "Medicare Recovery Auditors collected $346M in FY2021 against $28.75B of measured overpayments (CERT 2025): 1.2%") |
+| 3 | Found by a postpay audit program | $0.090 | derived | [row 2 / 60%](#derivation-notes "backed out: if about 60% of what is found is collected, collected / 0.60 is what was found") |
+| 4 | Kept after vendor fees and own cost | $0.043 | assumption | [row 2 x (1 - 20%)](#derivation-notes "commercial contingency fees run 15% to 30%; in-house about 6%") |
 | 5 | Ceiling: every upcoded dollar found | $2.16 | derived | [row 1 x 60% x 80%](#derivation-notes "before the cost of review and provider abrasion") |
 
 ### Derivation notes
 - **Base.** The plan's payment on the 835 is the allowed amount (the contract price) minus the patient's cost-sharing (copay, deductible, coinsurance). The patient's share is outside the base: a plan recovers its own overpayment, and refunding patients is a separate, unmodelled step. Medicare's error rate is measured on dollars Medicare paid, so it applies to this base directly.
 - **Upcoded share.** Medicare's yearly record-review sample found 4.5% of E/M dollars paid at too high a level (3.1% for established office visits; a 2010 audit found 21% of E/M dollars improper).
-- **Found.** The share of those upcoded dollars the audit program identifies. It is not a Medicare figure and not money recovered: recovery is row 3. Cross-check: Medicare's Recovery Auditors collected about $346M in FY2021 against roughly $29B of measured overpayments, about 1%, for all error types and counting collections rather than findings. Our 5% found and 60% collected give 3% collected, above that. Treat 5% as generous.
-- **Collected.** Medicaid plans collected 68% of ordinary overpayments identified and 16% to 24% of fraud-type ones.
+- **Collected.** The only measured path: Medicare's Recovery Auditors collected about $346M in FY2021 against $28.75B of overpayments measured by the record-review sample in 2025, 1.2%. Caveats: the years differ (and 2021 activity was depressed); it covers all error types, not E/M alone; it counts only the Recovery Auditors, so other Medicare postpay contractors would raise it; and a commercial plan may do better or worse. Commercial plans have published nothing comparable. Medicaid plans collected 68% of the ordinary overpayments they identified, which is a share of findings, a different ratio.
+- **Found.** Backed out of the row above: if about 60% of what is found is collected (the Medicaid figure, net of appeals), the collected $ divided by 0.60 is what was found, about 2% of the upcoded dollars. It is not a Medicare figure; it moves with the 60%.
 - **Fees.** 20% central.
 - **Before the base (not shown).** The share of billed dollars stopped before payment (about 10%, mostly eligibility denials), the allowed-to-billed ratio (about 0.45, our assumption) and E/M's share of all payments (about 9%).
 
@@ -60,7 +60,7 @@ The practical answer is that the recoverable amount is the part where expected r
 ### What the Medicare numbers measure
 Medicare's 4.5% (row 4) is an error rate, not money recovered. Its yearly sample (CERT) pulls claims Medicare has **already paid**, reads the records and counts the dollars paid at too high a level. It therefore measures what got through prepay review, so it has no prepay share. Recovery is a different, much smaller number: the Recovery Auditors collected $346M in FY2021 against tens of billions of measured overpayments. There is no published dollar split of Medicare E/M recoveries between prepay and postpay review; only counts (contractors do about 98% of their reviews before payment, the Recovery Auditors about 85% after). Medicare says prepay review prevented about $5B in FY2015, but its own auditors found the savings method inconsistent. For commercial plans nothing comparable is published. Prepay edits are assumed to catch almost no level-of-service upcoding, which is why the postpay program works on what is left.
 
-Reading the table: of $100 the plan paid for E/M visits, $4.50 is upcoded. A postpay program keeps about **$0.11**; even finding every upcoded dollar would keep about $2.16.
+Reading the table: of $100 the plan paid for E/M visits, $4.50 is upcoded. At Medicare's recovery ratio a postpay program collects about **$0.05** and keeps about $0.04; even finding every upcoded dollar would keep about $2.16.
 
 ## Who keeps the recovered dollar
 Self-funded plan: the employer's plan, less the fee. Fully insured plan: the insurer, unless its medical loss ratio is below the floor (80% individual and small group, 85% large group), in which case enrollees get it as a rebate. Under the loss-ratio rule, recoveries from providers lower the ratio; fraud recoveries are added back up to the fraud work's cost. Medicare: the trust funds (52% of 2021 Recovery Audit collections). Medicaid managed care: set by the state contract.
