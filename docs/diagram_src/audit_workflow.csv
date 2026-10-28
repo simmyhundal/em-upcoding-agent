@@ -1,0 +1,36 @@
+panel,id,lane,col,copy,kind,counterpart,next
+today,t_sig,6,0,"SIU: tips, complaints, referrals",payer,p_sig,t_scr:main;t_fraud:main
+today,t_scr,1,0,"Screen paid claims, pick providers (peers, tips)",payer,p_scr,t_req:main
+today,t_req,1,1,"Draft records request, choose sample of claims",payer,p_req,t_pr1:main
+today,t_pr1,0,1,"Receives request (30 to 45 days to answer)",provider,p_pr1,t_pr2:main
+today,t_pr2,0,2,"Assembles and sends charts (manual, fax or portal)",provider,p_pr2,t_cod:main
+today,t_cod,2,2,"Code each chart; nurse, then physician review (10-15 an hour)",payer,p_rd,t_est:main
+today,t_ven,5,2,"Vendor reviews, extrapolates (15% to 30% of recovery)",vendor,-,t_est:dash
+today,t_est,1,3,"Extrapolate the sample to all the provider's claims",payer,p_est,t_meet:main
+today,t_meet,2,3,"Findings meeting, written findings (2 to 4 weeks)",payer,p_chk,t_md:main
+today,t_md,3,3,"Medical director signs off findings",payer,p_pkt,t_not:main
+today,t_not,4,4,"Overpayment notice, settlement offer",payer,p_not,t_prd:main;t_off:main
+today,t_prd,0,4,"Repays, or disputes within 30 days",provider,p_prd,t_dis:red
+today,t_dis,0,5,"Dispute, appeal; may leave the network",provider,p_dis,t_leg:red
+today,t_leg,3,5,"Legal and medical director answer (30 days)",payer,p_leg,t_off:red
+today,t_off,4,6,"Offset on later 835s; books the recovery",payer,p_off,t_ref:main;t_inv:dash
+today,t_ref,0,6,"Refund or offset taken from payments",provider,p_ref,
+today,t_inv,5,6,"Vendor invoice: contingency fee",vendor,-,
+today,t_fraud,6,4,"Fraud cases: referral to state or law enforcement",payer,p_fraud,
+agent,p_sig,6,0,"SIU: tips, complaints, referrals",payer,t_sig,p_scr:main;p_fraud:main
+agent,p_scr,5,0,"Statistical screen and volume lane (30+ visits in a day)",software,t_scr,p_list:main:L
+agent,p_list,1,0,"Approves the list (a person)",payer_changed,t_scr,p_req:main
+agent,p_req,5,1,"Chooses whom to ask and how many charts; writes the request",software,t_req,p_pr1:main
+agent,p_pr1,0,1,"Receives request (30 to 45 days to answer)",provider,t_pr1,p_pr2:main
+agent,p_pr2,0,2,"Assembles and sends charts (manual, fax or portal)",provider,t_pr2,p_rd:main
+agent,p_rd,5,2,"Reads each chart by rule; a model only where rules are silent",software,t_cod,p_est:main
+agent,p_est,5,3,"Lower-bound estimate; demand only if it covers its cost",software,t_est,p_chk:main;p_fraud:main
+agent,p_chk,2,3,"Reviews the cases the rules cannot decide",payer_changed,t_meet,p_pkt:main
+agent,p_pkt,1,3,"Approves and signs the demand (a person)",payer_changed,t_md,p_not:main
+agent,p_not,4,4,"Overpayment notice, settlement offer",payer,t_not,p_prd:main;p_off:main
+agent,p_prd,0,4,"Repays, or disputes within 30 days",provider,t_prd,p_dis:red
+agent,p_dis,0,5,"Dispute, appeal; may leave the network",provider,t_dis,p_leg:red
+agent,p_leg,3,5,"Legal and medical director answer (30 days)",payer,t_leg,p_off:red
+agent,p_off,4,6,"Offset on later 835s; books the recovery",payer,t_off,p_ref:main
+agent,p_ref,0,6,"Refund or offset taken from payments",provider,t_ref,
+agent,p_fraud,6,4,"Fraud cases: referral, now also from the volume lane",payer_changed,t_fraud,
