@@ -42,7 +42,7 @@ A seed is a hold-out only for one arm and one decision made before its results w
 | D4.2-TEST-1 | 4.2 | 4700 to 5033 step 37 (10) | burned (2026-10-23) | test: H28, H23_n4, A5.2 | Not a clean test any more. A named later version can look at it as a declared second use; otherwise development data. |
 | D4.2-RESERVED | 4.2 | 5100 to 5433 step 37 (10) | reserved (2026-10-23) | none | Only a final test of a frozen version, once. Never generated, never used for development. |
 | D4.3-DEV | 4.3 | 1003 to 5062 step 41 (100) | in use (2026-10-26) | fit: H33; select: H33; confirm: H33 | A confirm for a hypothesis whose design did not see its results; development data for the rest. |
-| D4.3-CONFIRM | 4.3 | 1004 to 5063 step 41 (100) | fresh (2026-10-26) | none | One test of a frozen version; nothing else. |
+| D4.3-CONFIRM | 4.3 | 1004 to 5063 step 41 (100) | in use (2026-10-28) | confirm: H33, W41, W42, H0 | A confirm for a hypothesis whose design did not see its results; development data for the rest. |
 | D4.3-TEST | 4.3 | 6003 to 6372 step 41 (10) | reserved (2026-10-26) | none | Only a final test of a frozen version, once. Never generated, never used for development. |
 | D4.3-RESERVED | 4.3 | 7003 to 7372 step 41 (10) | reserved (2026-10-26) | none | Only a final test of a frozen version, once. Never generated, never used for development. |
 
@@ -183,7 +183,11 @@ A seed is a hold-out only for one arm and one decision made before its results w
 - H33, select, seeds 1003 to 2602 step 41 (2026-10-28; docs/w_loop_v43.md): hypotheses H29 to H34 and the margin sweep run on batches 1 to 4.
 - H33, confirm, seeds 2643 to 5062 step 41 (2026-10-28; docs/w_loop_v43.md): ask model out of sample on batches 5 to 10; W41, H0, H33 and H34 read once.
 
-**D4.3-CONFIRM** (development). data 4.3 confirm pool: seeds 1004 + 41j; built only for the declared confirm read.
+**D4.3-CONFIRM** (development). built (100 seeds, codes d43_<seed>, never run before); the pre-declared confirm read of workflow v4.3 (docs/w43_freeze.md, merged in bcbc16e) runs here once; read once on 2026-10-28 (burned for later decisions).
+- H33, confirm, seeds 1004 to 5063 step 41 (2026-10-28; docs/w43_confirm_result.md): workflow v4.3: the pre-declared confirm read (docs/w43_freeze.md); passed the +$400 and p<0.007 rule against W41 (+$616, 90 of 100); -$141 per seed against the ask-nobody control.
+- W41, confirm, seeds 1004 to 5063 step 41 (2026-10-28; docs/w43_confirm_result.md): workflow v4.1 re-run as the paired reference.
+- W42, confirm, seeds 1004 to 5063 step 41 (2026-10-28; docs/w43_confirm_result.md): workflow v4.2 re-run as a reference.
+- H0, confirm, seeds 1004 to 5063 step 41 (2026-10-28; docs/w43_confirm_result.md): the ask-nobody control.
 
 **D4.3-TEST** (test). data 4.3 test pool for release 4.3 and 5.3: seeds 6003 + 41j, never generated before the freeze.
 
