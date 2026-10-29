@@ -14,7 +14,8 @@
   "W4.0": "H8",
   "W4.1": "H23",
   "W2.4 (GL)": "W2.4",
-  "W4.2": "H28"
+  "W4.2": "H28",
+  "W4.3": "H33"
  },
  "pools": [
   {
@@ -2820,9 +2821,9 @@
     6372
    ],
    "kind": "test",
-   "status": "reserved",
-   "status_date": "2026-10-26",
-   "status_note": "data 4.3 test pool for release 4.3 and 5.3: seeds 6003 + 41j, never generated before the freeze",
+   "status": "fresh",
+   "status_date": "2026-10-28",
+   "status_note": "released from reserved for the declared true test of workflow v4.3 and agent v5.3 (docs/w43_freeze.md, confirm read passed); built by eval/run_v43_test.py, never run before",
    "uses": []
   },
   {
