@@ -1,0 +1,16 @@
+{
+ "1000000211": "Volume lane: a stratum of 47 claims cannot give a lower bound whose 25% collection covers the $4,000 referral cost",
+ "1000000055": "Volume lane: a stratum of 40 claims cannot cover the $4,000 referral at 25% collection",
+ "1000000079": "Volume lane: a stratum of 65 claims cannot cover the $4,000 referral at 25% collection",
+ "1000000187": "Volume lane: a stratum of 33 claims cannot cover the $4,000 referral",
+ "1000000006": "Volume lane: a stratum of 32 claims cannot cover the $4,000 referral",
+ "1000000009": "Volume lane: a stratum of 32 claims cannot cover the $4,000 referral",
+ "1000000020": "Volume lane: a stratum of 32 claims cannot cover the $4,000 referral",
+ "1000000071": "Volume lane: a stratum of 31 claims cannot cover the $4,000 referral",
+ "1000000152": "Volume lane: a stratum of 30 claims cannot cover the $4,000 referral",
+ "1000000170": "Ask advice SKIP; 1.04 times expected",
+ "1000000047": "Outside the first-4 list; ask advice SKIP (small practice of 224 claims, 7.05 times expected)",
+ "1000000113": "Outside the first-4 list; ask advice SKIP",
+ "1000000147": "Outside the first-4 list; ask advice SKIP (209 claims)",
+ "1000000181": "Ask advice SKIP; 1.41 times expected"
+}

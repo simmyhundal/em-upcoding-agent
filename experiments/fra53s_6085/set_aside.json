@@ -1,0 +1,14 @@
+{
+ "1000000021": "Advice SKIP; not asked, no chart evidence",
+ "1000000070": "Advice SKIP; not asked, no chart evidence",
+ "1000000123": "Lane: lower bound 0, no demand",
+ "1000000131": "Lane: lower bound 0, no demand",
+ "1000000109": "Lane: lower bound 0, no demand",
+ "1000000098": "Lane: lower bound 0, no demand",
+ "1000000213": "Lane: lower bound 0, no demand",
+ "1000000125": "Lane: lower bound 0, no demand",
+ "1000000004": "Lane: lower bound 0, partial charts, no demand",
+ "1000000068": "Lane: office silent, lower bound 0; non-response is not evidence",
+ "1000000186": "Lane: lower bound 0, no demand",
+ "1000000204": "Lane: lower bound 0, no demand"
+}

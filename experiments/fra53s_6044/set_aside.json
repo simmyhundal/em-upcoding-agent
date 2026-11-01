@@ -1,0 +1,15 @@
+{
+ "1000000035": "Top eb_upper_t rank (8x expected) but ask_advice SKIP; no charts requested, so no chart evidence for upcoding; recommend human review.",
+ "1000000051": "High ratio (8x) but ask_advice SKIP; not examined.",
+ "1000000085": "4.9x expected but ask_advice SKIP; not examined.",
+ "1000000058": "Volume lane: lower bound $0, no demand.",
+ "1000000208": "Volume lane: lower bound $0, no demand.",
+ "1000000082": "Volume lane: only 3 of 30 charts returned, lower bound $0.",
+ "1000000154": "Volume lane: lower bound $0, no demand.",
+ "1000000108": "Volume lane: lower bound $0, point estimate too small for referral.",
+ "1000000010": "Volume lane: 16 of 30 charts, lower bound $0.",
+ "1000000183": "Volume lane: lower bound $0, no demand.",
+ "1000000033": "Volume lane: lower bound $0, no demand.",
+ "1000000049": "Volume lane: office silent, lower bound $0; non-response is not evidence.",
+ "1000000081": "Volume lane: lower bound $0, no demand."
+}

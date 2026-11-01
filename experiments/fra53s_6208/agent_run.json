@@ -1,0 +1,10 @@
+{
+ "stop_reason": "submitted",
+ "turns": 3,
+ "tool_calls": 14,
+ "estimated_usd": 0.0517,
+ "model": "claude-sonnet-5-5",
+ "findings": 0,
+ "records_providers_requested": 0,
+ "model_spend_in_tools_usd": 0.0
+}

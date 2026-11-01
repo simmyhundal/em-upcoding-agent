@@ -1,0 +1,16 @@
+{
+ "1000000211": "Volume lane: lower bound $0, no demand.",
+ "1000000055": "Volume lane: lower bound $0, no demand.",
+ "1000000079": "Volume lane: lower bound $0, no demand.",
+ "1000000187": "Volume lane: lower bound $0, no demand.",
+ "1000000006": "Volume lane: lower bound $0, no demand.",
+ "1000000009": "Volume lane: lower bound $0, no demand.",
+ "1000000020": "Volume lane: lower bound $0, no demand.",
+ "1000000071": "Volume lane: lower bound $0, no demand.",
+ "1000000152": "Volume lane: lower bound $0, no demand.",
+ "1000000170": "Volume lane: office silent, no charts, lower bound $0. Non-response is not evidence.",
+ "1000000166": "Ask advice SKIP (rank 3 in list); not examined.",
+ "1000000047": "Advice SKIP; outside the first 4 of the ranking.",
+ "1000000113": "Advice SKIP; outside the first 4.",
+ "1000000147": "Advice SKIP; outside the first 4."
+}

@@ -1,0 +1,13 @@
+{
+ "1000000038": "Volume lane: no charts came back and the lower bound is 0, so it cannot cover a demand.",
+ "1000000043": "Volume lane: lower bound 0, below the cost of a demand.",
+ "1000000091": "Volume lane: only 2 charts came back and the lower bound is 0.",
+ "1000000003": "Volume lane: lower bound 0, below the cost of a demand.",
+ "1000000055": "Volume lane: lower bound 0, below the cost of a demand.",
+ "1000000202": "Volume lane: lower bound 0, below the cost of a demand.",
+ "1000000093": "Volume lane: lower bound 0, below the cost of a demand.",
+ "1000000001": "Volume lane: lower bound 0, below the cost of a demand.",
+ "1000000082": "Volume lane: lower bound 0, below the cost of a demand.",
+ "1000000032": "High share (3.05x expected), but ask advice was SKIP, so I did not ask for records.",
+ "1000000213": "High share (3.02x expected), but ask advice was SKIP, so I did not ask for records."
+}

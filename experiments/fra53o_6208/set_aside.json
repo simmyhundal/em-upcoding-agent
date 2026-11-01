@@ -1,0 +1,19 @@
+{
+ "1000000173": "Volume lane: 85 claims on flagged days; a quarter of any lower bound could not cover the $4,000 referral cost",
+ "1000000134": "Volume lane: 70 claims; too small to cover a $4,000 referral at 25% collection",
+ "1000000202": "Volume lane: 37 claims; too small to cover the referral cost",
+ "1000000178": "Volume lane: 65 claims; too small to cover the referral cost",
+ "1000000031": "Volume lane: 33 claims; too small to cover the referral cost",
+ "1000000067": "Volume lane: 33 claims; too small to cover the referral cost",
+ "1000000005": "Volume lane: 32 claims; too small to cover the referral cost",
+ "1000000037": "Volume lane: 32 claims; too small to cover the referral cost",
+ "1000000164": "Volume lane: 32 claims; too small to cover the referral cost",
+ "1000000216": "4.35x expected 99215 share and the largest excess, but ask_advice SKIP (refitted model: a request is expected to lose money); no records requested",
+ "1000000115": "5.52x expected but small (176 claims); ask_advice SKIP",
+ "1000000083": "4.03x expected but small (159 claims); ask_advice SKIP",
+ "1000000043": "3.39x expected; ask_advice SKIP",
+ "1000000194": "Below 3x expected; ask_advice SKIP",
+ "1000000123": "Below 3x expected; ask_advice SKIP",
+ "1000000030": "2.25x expected; ask_advice SKIP",
+ "1000000035": "2.63x expected; ask_advice SKIP"
+}

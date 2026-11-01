@@ -938,5 +938,229 @@
 "6290": 195.91,
 "6331": 101.72,
 "6372": 0.0
+},
+"A5.3-O": {
+"6003": {
+"score": -798.571580044593,
+"collected": 0,
+"staff_cost": 630.7870538461538,
+"abrasion": 167.78452619843927,
+"demands": 0,
+"referrals": 0,
+"rounds": 4,
+"charts": 60,
+"listed": 4
+},
+"6044": {
+"score": -1447.754166053382,
+"collected": 0,
+"staff_cost": 1193.457296153846,
+"abrasion": 254.29686989953586,
+"demands": 0,
+"referrals": 0,
+"rounds": 7,
+"charts": 120,
+"listed": 4
+},
+"6085": {
+"score": -291.3609673249456,
+"collected": 0,
+"staff_cost": 216.2671923076923,
+"abrasion": 75.09377501725328,
+"demands": 0,
+"referrals": 0,
+"rounds": 2,
+"charts": 20,
+"listed": 1
+},
+"6126": {
+"score": -330.6937653846154,
+"collected": 0,
+"staff_cost": 286.8537653846154,
+"abrasion": 43.84,
+"demands": 0,
+"referrals": 0,
+"rounds": 1,
+"charts": 30,
+"listed": 1
+},
+"6167": {
+"score": -772.2969472109016,
+"collected": 77.29804894294446,
+"staff_cost": 849.5949961538461,
+"abrasion": 0.0,
+"demands": 1,
+"referrals": 0,
+"rounds": 2,
+"charts": 58,
+"listed": 2
+},
+"6208": {
+"score": -403.0927769230769,
+"collected": 0,
+"staff_cost": 315.4127769230769,
+"abrasion": 87.68,
+"demands": 0,
+"referrals": 0,
+"rounds": 2,
+"charts": 30,
+"listed": 2
+},
+"6249": {
+"score": -3307.0105390510116,
+"collected": 0,
+"staff_cost": 2139.998692307692,
+"abrasion": 1167.0118467433192,
+"demands": 0,
+"referrals": 0,
+"rounds": 30,
+"charts": 178,
+"listed": 11
+},
+"6290": {
+"score": -746.8091423076922,
+"collected": 0,
+"staff_cost": 615.2891423076923,
+"abrasion": 131.52,
+"demands": 0,
+"referrals": 0,
+"rounds": 3,
+"charts": 60,
+"listed": 4
+},
+"6331": {
+"score": -3180.4043393390057,
+"collected": 0,
+"staff_cost": 2363.3233846153844,
+"abrasion": 817.0809547236215,
+"demands": 0,
+"referrals": 0,
+"rounds": 23,
+"charts": 215,
+"listed": 12
+},
+"6372": {
+"score": -785.1898461538461,
+"collected": 0,
+"staff_cost": 434.4698461538461,
+"abrasion": 350.72,
+"demands": 0,
+"referrals": 0,
+"rounds": 8,
+"charts": 30,
+"listed": 4
+}
+},
+"A5.3-S": {
+"6003": {
+"score": -7298.6644057968115,
+"collected": 540.9054313090943,
+"staff_cost": 6414.019107692307,
+"abrasion": 1425.5507294135987,
+"demands": 0,
+"referrals": 1,
+"rounds": 26,
+"charts": 215,
+"listed": 11
+},
+"6044": {
+"score": -3191.039772272821,
+"collected": 0,
+"staff_cost": 2457.4278230769232,
+"abrasion": 733.611949195898,
+"demands": 0,
+"referrals": 0,
+"rounds": 23,
+"charts": 229,
+"listed": 10
+},
+"6085": {
+"score": -3472.742704770988,
+"collected": 0,
+"staff_cost": 2549.7581846153844,
+"abrasion": 922.9845201556035,
+"demands": 0,
+"referrals": 0,
+"rounds": 22,
+"charts": 240,
+"listed": 11
+},
+"6126": {
+"score": -3109.0076896047376,
+"collected": 0,
+"staff_cost": 2316.2417769230765,
+"abrasion": 792.7659126816613,
+"demands": 0,
+"referrals": 0,
+"rounds": 25,
+"charts": 209,
+"listed": 10
+},
+"6167": {
+"score": -3943.3516454920505,
+"collected": 0,
+"staff_cost": 3071.1775499999994,
+"abrasion": 872.174095492051,
+"demands": 0,
+"referrals": 0,
+"rounds": 24,
+"charts": 297,
+"listed": 11
+},
+"6208": {
+"score": -2876.545600123003,
+"collected": 0,
+"staff_cost": 2119.907469230769,
+"abrasion": 756.6381308922339,
+"demands": 0,
+"referrals": 0,
+"rounds": 29,
+"charts": 179,
+"listed": 10
+},
+"6249": {
+"score": -3306.901839051011,
+"collected": 0,
+"staff_cost": 2139.889992307692,
+"abrasion": 1167.0118467433192,
+"demands": 0,
+"referrals": 0,
+"rounds": 30,
+"charts": 178,
+"listed": 11
+},
+"6290": {
+"score": -9010.0786161058,
+"collected": 248.67183516380726,
+"staff_cost": 6742.773934615384,
+"abrasion": 2515.9765166542243,
+"demands": 0,
+"referrals": 1,
+"rounds": 25,
+"charts": 255,
+"listed": 11
+},
+"6331": {
+"score": -3167.1648393390055,
+"collected": 0,
+"staff_cost": 2350.0838846153842,
+"abrasion": 817.0809547236214,
+"demands": 0,
+"referrals": 0,
+"rounds": 23,
+"charts": 215,
+"listed": 11
+},
+"6372": {
+"score": -6868.570364802597,
+"collected": 574.9742638670441,
+"staff_cost": 6592.4383538461525,
+"abrasion": 851.1062748234889,
+"demands": 0,
+"referrals": 1,
+"rounds": 25,
+"charts": 236,
+"listed": 12
+}
 }
 }

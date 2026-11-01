@@ -1,0 +1,15 @@
+{
+ "1000000023": "volume lane: 30 charts received, lower bound $0, no demand",
+ "1000000139": "volume lane: lower bound $0, no demand",
+ "1000000075": "volume lane: office silent, lower bound $0; non-response is not evidence",
+ "1000000078": "volume lane: lower bound $0, no demand",
+ "1000000082": "volume lane: lower bound $0, no demand",
+ "1000000191": "volume lane: lower bound $0, no demand",
+ "1000000089": "volume lane: lower bound $0, no demand",
+ "1000000094": "volume lane: office silent, lower bound $0",
+ "1000000183": "volume lane: office silent, lower bound $0",
+ "1000000104": "high ratio (3.95x) but ask advice SKIP; a request would not pay for itself",
+ "1000000138": "3.96x expected but ask advice SKIP",
+ "1000000131": "3.25x expected but ask advice SKIP",
+ "1000000020": "3.07x expected but ask advice SKIP"
+}

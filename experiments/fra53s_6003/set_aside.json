@@ -1,0 +1,16 @@
+{
+ "1000000126": "lane: lower bound 0, no demand",
+ "1000000129": "lane: lower bound 0",
+ "1000000193": "lane: lower bound 0",
+ "1000000197": "lane: lower bound 0",
+ "1000000066": "lane: only 3 charts returned, lower bound 0; silence is not evidence",
+ "1000000055": "lane: lower bound 0",
+ "1000000080": "lane: office silent, lower bound 0",
+ "1000000152": "lane: lower bound 0",
+ "1000000017": "lane: lower bound 0",
+ "1000000161": "advice ASK but ratio to expected 0.85; no claims reason to request records",
+ "1000000082": "ranked beyond list of 4, advice SKIP; not examined",
+ "1000000131": "ranked beyond list of 4, advice SKIP; not examined",
+ "1000000146": "ranked beyond list of 4, advice SKIP; not examined",
+ "1000000213": "ranked beyond list of 4, advice SKIP; not examined"
+}

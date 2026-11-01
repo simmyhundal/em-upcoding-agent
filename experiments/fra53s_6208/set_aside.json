@@ -1,0 +1,20 @@
+{
+ "1000000173": "Volume lane: charts received, lower bound 0, no demand.",
+ "1000000134": "Volume lane: office silent, lower bound 0; non-response is not evidence.",
+ "1000000065": "Volume lane: charts received, lower bound 0, no demand.",
+ "1000000202": "Volume lane: lower bound 0, no demand.",
+ "1000000178": "Volume lane: office silent, lower bound 0.",
+ "1000000031": "Volume lane: lower bound 0, no demand.",
+ "1000000067": "Volume lane: lower bound 0, no demand.",
+ "1000000005": "Volume lane: office silent, lower bound 0.",
+ "1000000037": "Volume lane: office silent, lower bound 0.",
+ "1000000164": "Volume lane: lower bound 0, no demand.",
+ "1000000216": "Top-ranked by eb_upper_t but ask_advice SKIP; not asked for records, so no chart evidence.",
+ "1000000115": "High ratio (5.5x) but small practice, ask_advice SKIP; no charts requested.",
+ "1000000043": "ask_advice SKIP; no charts requested.",
+ "1000000083": "ask_advice SKIP; small practice; no charts requested.",
+ "1000000194": "Rest of top-10% list: ask_advice SKIP, not examined.",
+ "1000000123": "ask_advice SKIP, not examined.",
+ "1000000030": "ask_advice SKIP, not examined.",
+ "1000000035": "ask_advice SKIP, not examined."
+}

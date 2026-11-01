@@ -1,0 +1,18 @@
+{
+ "1000000154": "Volume lane: stratum lower bound $0, no demand",
+ "1000000108": "Volume lane: stratum lower bound $0, no demand",
+ "1000000058": "Volume lane: stratum lower bound $0, no demand",
+ "1000000208": "Volume lane: 130 claims on flagged days, so 25% of any lower bound cannot cover the $4,000 referral cost",
+ "1000000082": "Volume lane: 93 claims on flagged days, too few for a referral to cover $4,000",
+ "1000000010": "Volume lane: 35 claims on flagged days, too few to cover a referral",
+ "1000000183": "Volume lane: 34 claims on flagged days, too few to cover a referral; level advice SKIP",
+ "1000000033": "Volume lane: 33 claims on flagged days, too few to cover a referral",
+ "1000000049": "Volume lane: 32 claims on flagged days, too few to cover a referral",
+ "1000000081": "Volume lane: 32 claims on flagged days, too few to cover a referral; level advice SKIP",
+ "1000000051": "Ask advice SKIP; small practice (141 claims), so the recoverable excess is small",
+ "1000000085": "Ask advice SKIP; excess about $2.3k, unlikely to cover costs after a 58% collection rate",
+ "1000000107": "Ask advice SKIP; ratio below 3",
+ "1000000151": "Ask advice SKIP; low-complexity share 0.10 points to a sicker panel",
+ "1000000167": "Ask advice SKIP; ratio below 3",
+ "1000000144": "Ask advice SKIP; small practice"
+}

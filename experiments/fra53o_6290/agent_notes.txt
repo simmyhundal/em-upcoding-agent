@@ -1,0 +1,3 @@
+Starting with the data-quality pre-flight, the volume screen and the main screen.
+
+Both strata are clean. The remaining lane providers are too small to justify a $4,000 referral, and the level-review advice is SKIP for every candidate, so I'll submit.

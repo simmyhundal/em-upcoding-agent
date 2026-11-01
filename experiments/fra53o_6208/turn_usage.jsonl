@@ -1,0 +1,3 @@
+{"turn": 1, "input_tokens": 4, "output_tokens": 147, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 7753, "usd_so_far": 0.0417}
+{"turn": 2, "input_tokens": 4, "output_tokens": 263, "cache_read_input_tokens": 7753, "cache_creation_input_tokens": 3441, "usd_so_far": 0.0658}
+{"turn": 3, "input_tokens": 4, "output_tokens": 954, "cache_read_input_tokens": 11194, "cache_creation_input_tokens": 527, "usd_so_far": 0.0897}

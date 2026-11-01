@@ -1,0 +1,18 @@
+{
+ "run": "fra53s_6044",
+ "version": "5.3",
+ "screen_run": "d43_6044",
+ "screen_tool": true,
+ "stop_reason": "submitted",
+ "tool_calls": 14,
+ "estimated_usd": 0.0509,
+ "providers_with_findings": 0,
+ "providers_called_upcoding": 0,
+ "upcoders_found": 0,
+ "honest_called_upcoding": 0,
+ "upcoders_total": 0,
+ "records_requests_to_honest": 10,
+ "records_requests_total": 10,
+ "rounds_on_honest": 23,
+ "citation_accuracy": null
+}

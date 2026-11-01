@@ -1,0 +1,17 @@
+{
+ "1000000111": "volume lane: lower bound 0, no demand",
+ "1000000047": "volume lane: office silent, non-response is not evidence",
+ "1000000208": "volume lane: lower bound 0",
+ "1000000083": "volume lane: lower bound 0, thin response",
+ "1000000097": "volume lane: lower bound 0",
+ "1000000145": "volume lane: lower bound 0",
+ "1000000166": "volume lane: office silent",
+ "1000000177": "volume lane: office silent",
+ "1000000045": "volume lane: lower bound 0",
+ "1000000015": "ask advice SKIP; small practice",
+ "1000000057": "ask advice SKIP",
+ "1000000062": "ask advice SKIP",
+ "1000000103": "ask advice SKIP",
+ "1000000130": "ask advice SKIP",
+ "1000000135": "ask advice SKIP"
+}

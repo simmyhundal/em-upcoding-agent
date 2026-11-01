@@ -1,0 +1,6 @@
+{
+ "cost_usd": 0.0509,
+ "effort": "low",
+ "model": "claude-sonnet-5-5",
+ "version": "5.3"
+}

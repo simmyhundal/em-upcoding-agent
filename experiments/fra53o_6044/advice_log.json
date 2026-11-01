@@ -1,0 +1,17 @@
+{
+ "summary": {
+  "actions": 1,
+  "with_advice": 1,
+  "followed": 0,
+  "overrides": 0
+ },
+ "log": [
+  {
+   "provider": "1000000035",
+   "action": "ASK",
+   "advised": "SKIP",
+   "match": false
+  }
+ ],
+ "overrides": []
+}

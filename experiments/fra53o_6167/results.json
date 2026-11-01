@@ -1,0 +1,18 @@
+{
+ "run": "fra53o_6167",
+ "version": "5.3",
+ "screen_run": "d43_6167",
+ "screen_tool": true,
+ "stop_reason": "submitted",
+ "tool_calls": 7,
+ "estimated_usd": 0.1104,
+ "providers_with_findings": 2,
+ "providers_called_upcoding": 1,
+ "upcoders_found": 0,
+ "honest_called_upcoding": 1,
+ "upcoders_total": 0,
+ "records_requests_to_honest": 2,
+ "records_requests_total": 2,
+ "rounds_on_honest": 2,
+ "citation_accuracy": 1.0
+}

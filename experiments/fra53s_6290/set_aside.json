@@ -1,0 +1,15 @@
+{
+ "1000000038": "Lane sample clean; lower bound 0",
+ "1000000026": "Lane sample clean; lower bound 0",
+ "1000000182": "Lane sample clean; lower bound 0",
+ "1000000051": "Lane sample clean; lower bound 0",
+ "1000000008": "Lane sample clean; lower bound 0",
+ "1000000126": "Lane sample clean; lower bound 0",
+ "1000000149": "Lane lower bound 0; cannot cover a demand",
+ "1000000115": "Office silent on lane request; lower bound 0; non-response is not evidence",
+ "1000000183": "Lane sample clean; lower bound 0",
+ "1000000131": "High ratio but ask advice SKIP; no records requested, not examined",
+ "1000000113": "High ratio but ask advice SKIP; not examined",
+ "1000000087": "Small practice, ask advice SKIP; not examined",
+ "1000000103": "Other eb_upper_t top-10% rows: advice SKIP, no records requested; not examined"
+}
